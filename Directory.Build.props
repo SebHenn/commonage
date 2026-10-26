@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <!-- Warnings fail the build on CI only, so local experiments stay quick. -->
+    <TreatWarningsAsErrors Condition="'$(CI)' == 'true'">true</TreatWarningsAsErrors>
+  </PropertyGroup>
+</Project>
