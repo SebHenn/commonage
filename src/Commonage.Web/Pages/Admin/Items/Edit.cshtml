@@ -1,0 +1,61 @@
+@page "{id:int?}"
+@model Commonage.Web.Pages.Admin.Items.EditModel
+@{
+    ViewData["Title"] = Model.ItemId is null ? T["New item"] : T["Edit item"];
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="/Admin/Index">@T["Items"]</a></li>
+    </ol>
+</nav>
+
+<div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+    <h1 class="me-auto mb-0">@ViewData["Title"]</h1>
+    @if (Model.CurrentStatus is { } status)
+    {
+        <partial name="_StatusBadge" model="status" />
+    }
+    @if (Model.CurrentStatus == ItemStatus.Published)
+    {
+        <a asp-page="/Items/Details" asp-route-id="@Model.ItemId">@T["View public page"]</a>
+    }
+</div>
+
+<form method="post" class="col-lg-8">
+    <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+    <div class="mb-3">
+        <label asp-for="Input.Title" class="form-label"></label>
+        <input asp-for="Input.Title" class="form-control" />
+        <span asp-validation-for="Input.Title" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Input.CollectionId" class="form-label"></label>
+        <select asp-for="Input.CollectionId" asp-items="Model.CollectionOptions" class="form-select">
+            <option value="">@T["Choose a collection"]</option>
+        </select>
+        <span asp-validation-for="Input.CollectionId" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Input.Description" class="form-label"></label>
+        <textarea asp-for="Input.Description" class="form-control" rows="8"></textarea>
+        <span asp-validation-for="Input.Description" class="text-danger"></span>
+    </div>
+
+    <div class="d-flex flex-wrap gap-2">
+        @if (Model.CurrentStatus == ItemStatus.Published)
+        {
+            <button type="submit" class="btn btn-primary">@T["Save"]</button>
+            <button type="submit" name="command" value="unpublish" class="btn btn-outline-danger">@T["Unpublish"]</button>
+        }
+        else
+        {
+            <button type="submit" class="btn btn-outline-primary">@T["Save as draft"]</button>
+            <button type="submit" name="command" value="publish" class="btn btn-primary">@T["Save and publish"]</button>
+        }
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

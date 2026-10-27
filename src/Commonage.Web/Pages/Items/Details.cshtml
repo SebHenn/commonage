@@ -1,0 +1,20 @@
+@page "/items/{id:int}"
+@model Commonage.Web.Pages.Items.DetailsModel
+@{
+    ViewData["Title"] = Model.Item.Title;
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="/Index">@T["Collections"]</a></li>
+        <li class="breadcrumb-item"><a asp-page="/Collections/Details" asp-route-id="@Model.Item.CollectionId">@Model.Item.Collection.Title</a></li>
+    </ol>
+</nav>
+
+<article>
+    <h1>@Model.Item.Title</h1>
+    @if (!string.IsNullOrWhiteSpace(Model.Item.Description))
+    {
+        <p class="text-preserve-lines">@Model.Item.Description</p>
+    }
+</article>

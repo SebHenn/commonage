@@ -1,0 +1,34 @@
+@page
+@model Commonage.Web.Pages.Admin.Collections.IndexModel
+@{
+    ViewData["Title"] = T["Collections"];
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="/Admin/Index">@T["Items"]</a></li>
+    </ol>
+</nav>
+
+<div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+    <h1 class="me-auto mb-0">@T["Collections"]</h1>
+    <a asp-page="/Admin/Collections/Edit" class="btn btn-primary">@T["New collection"]</a>
+</div>
+
+@if (Model.Collections.Count == 0)
+{
+    <p class="text-muted">@T["There are no collections yet."]</p>
+}
+else
+{
+    <ul class="list-group">
+        @foreach (var collection in Model.Collections)
+        {
+            <li class="list-group-item d-flex flex-wrap gap-2 align-items-center">
+                <a asp-page="/Admin/Collections/Edit" asp-route-id="@collection.Id" class="me-auto">@collection.Title</a>
+                <small class="text-muted">@T["Items: {0}", collection.ItemCount]</small>
+                <a asp-page="/Admin/Items/Edit" asp-route-collectionId="@collection.Id" class="btn btn-sm btn-outline-primary">@T["Add item"]</a>
+            </li>
+        }
+    </ul>
+}

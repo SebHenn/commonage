@@ -12,7 +12,8 @@ cp .env.example .env    # set your own POSTGRES_PASSWORD
 docker compose up --build
 ```
 
-The app runs at http://localhost:8080.
+The app runs at http://localhost:8080. Log in with the `COMMONAGE_ADMIN_EMAIL` and
+`COMMONAGE_ADMIN_PASSWORD` from your `.env` (use "Curator login" in the footer).
 
 ## Run the app from your IDE
 
@@ -28,10 +29,30 @@ They live in your user profile, outside the repository:
 ```sh
 dotnet user-secrets --project src/Commonage.Web set "ConnectionStrings:Default" \
   "Host=localhost;Database=commonage;Username=commonage;Password=<your POSTGRES_PASSWORD>"
+dotnet user-secrets --project src/Commonage.Web set "InitialAdmin:Email" "admin@example.org"
+dotnet user-secrets --project src/Commonage.Web set "InitialAdmin:Password" "<a password of your choice>"
 dotnet run --project src/Commonage.Web
 ```
 
+The database schema is created and upgraded automatically when the app starts. The first
+administrator is created from `InitialAdmin:*` only while the archive has no users.
+
 To open a SQL shell: `docker compose exec db psql -U commonage`.
+
+## Database changes
+
+After changing an entity or `CommonageDbContext`, create a migration and commit it:
+
+```sh
+dotnet tool restore
+dotnet ef migrations add <DescriptiveName> --project src/Commonage.Web --output-dir Data/Migrations
+```
+
+## Translations
+
+UI text is written in English and used as the key, for example `@T["Save"]` in a page. German
+translations live in `src/Commonage.Web/Resources/SharedResource.de.resx`. Text without a
+translation is shown in English, so add the German entry whenever you add new UI text.
 
 ## Tests
 

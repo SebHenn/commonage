@@ -1,5 +1,14 @@
+using System.Globalization;
+using System.Text.Encodings.Web;
+using System.Text.Unicode;
+using Commonage.Web;
 using Commonage.Web.Data;
+using Commonage.Web.Identity;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.WebEncoders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,9 +20,41 @@ var connectionString = builder.Configuration.GetConnectionString("Default")
 
 builder.Services.AddDbContext<CommonageDbContext>(options => options.UseNpgsql(connectionString));
 builder.Services.AddHealthChecks().AddDbContextCheck<CommonageDbContext>();
-builder.Services.AddRazorPages();
+builder.Services.AddDataProtection().PersistKeysToDbContext<CommonageDbContext>();
+
+builder.Services
+    .AddIdentity<IdentityUser, IdentityRole>(options =>
+    {
+        options.User.RequireUniqueEmail = true;
+        options.Lockout.AllowedForNewUsers = true;
+    })
+    .AddEntityFrameworkStores<CommonageDbContext>()
+    .AddDefaultTokenProviders();
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Account/Login";
+    options.AccessDeniedPath = "/Account/Login";
+});
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy(Policies.ManageArchive, policy => policy.RequireRole(Roles.Admin, Roles.Curator));
+
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+// Write letters such as ü and ß as-is instead of as HTML entities. Razor still escapes markup characters.
+builder.Services.Configure<WebEncoderOptions>(options => options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.All));
+builder.Services.AddRazorPages(options => options.Conventions.AuthorizeFolder("/Admin", Policies.ManageArchive))
+    .AddViewLocalization()
+    .AddDataAnnotationsLocalization(options =>
+        options.DataAnnotationLocalizerProvider = (_, factory) => factory.Create(typeof(SharedResource)));
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    // A self-hosted archive runs as a single instance, so applying migrations at startup is safe
+    // and saves operators a manual upgrade step.
+    await scope.ServiceProvider.GetRequiredService<CommonageDbContext>().Database.MigrateAsync();
+    await InitialAdminSeeder.SeedAsync(scope.ServiceProvider, app.Configuration, app.Logger);
+}
 
 if (!app.Environment.IsDevelopment())
 {
@@ -23,8 +64,17 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+string[] supportedCultures = ["en", "de"];
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture("en"),
+    SupportedCultures = supportedCultures.Select(c => new CultureInfo(c)).ToList(),
+    SupportedUICultures = supportedCultures.Select(c => new CultureInfo(c)).ToList(),
+});
+
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapHealthChecks("/health");

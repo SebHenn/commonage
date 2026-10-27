@@ -1,0 +1,49 @@
+@page
+@model Commonage.Web.Pages.Admin.IndexModel
+@{
+    ViewData["Title"] = T["Manage archive"];
+}
+
+<div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+    <h1 class="me-auto mb-0">@T["Items"]</h1>
+    <a asp-page="/Admin/Collections/Index" class="btn btn-outline-secondary">@T["Collections"]</a>
+    @if (Model.HasCollections)
+    {
+        <a asp-page="/Admin/Items/Edit" class="btn btn-primary">@T["New item"]</a>
+    }
+</div>
+
+@if (!Model.HasCollections)
+{
+    <p>@T["Items belong to a collection."] <a asp-page="/Admin/Collections/Edit">@T["Create your first collection"]</a></p>
+}
+else if (Model.Items.Count == 0)
+{
+    <p class="text-muted">@T["There are no items yet."]</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th scope="col">@T["Title"]</th>
+                    <th scope="col">@T["Collection"]</th>
+                    <th scope="col">@T["Status"]</th>
+                    <th scope="col">@T["Last changed"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td><a asp-page="/Admin/Items/Edit" asp-route-id="@item.Id">@item.Title</a></td>
+                        <td>@item.Collection.Title</td>
+                        <td><partial name="_StatusBadge" model="item.Status" /></td>
+                        <td>@item.UpdatedAt.ToLocalTime().ToString("g")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

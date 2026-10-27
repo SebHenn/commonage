@@ -1,0 +1,25 @@
+@page "/collections/{id:int}"
+@model Commonage.Web.Pages.Collections.DetailsModel
+@{
+    ViewData["Title"] = Model.Collection.Title;
+}
+
+<h1>@Model.Collection.Title</h1>
+@if (!string.IsNullOrWhiteSpace(Model.Collection.Description))
+{
+    <p class="lead text-preserve-lines">@Model.Collection.Description</p>
+}
+
+@if (Model.Items.Count == 0)
+{
+    <p class="text-muted">@T["This collection has no published items yet."]</p>
+}
+else
+{
+    <ul class="list-unstyled">
+        @foreach (var item in Model.Items)
+        {
+            <li class="mb-2"><a asp-page="/Items/Details" asp-route-id="@item.Id">@item.Title</a></li>
+        }
+    </ul>
+}

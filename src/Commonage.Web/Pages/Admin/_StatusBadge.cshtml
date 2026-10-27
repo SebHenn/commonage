@@ -1,0 +1,9 @@
+@model ItemStatus
+@if (Model == ItemStatus.Published)
+{
+    <span class="badge text-bg-success">@T["Published"]</span>
+}
+else
+{
+    <span class="badge text-bg-secondary">@T["Draft"]</span>
+}

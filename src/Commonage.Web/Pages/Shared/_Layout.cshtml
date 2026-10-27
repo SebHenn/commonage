@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="@System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,37 +9,59 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Commonage.Web.styles.css" asp-append-version="true" />
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container">
                 <a class="navbar-brand" asp-area="" asp-page="/Index">Commonage</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                        aria-expanded="false" aria-label="@T["Toggle navigation"]">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
+                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">@T["Collections"]</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
-                        </li>
+                        @if (User.IsInRole(Commonage.Web.Identity.Roles.Admin) || User.IsInRole(Commonage.Web.Identity.Roles.Curator))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-page="/Admin/Index">@T["Manage archive"]</a>
+                            </li>
+                        }
                     </ul>
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <form method="post" asp-page="/Account/Logout" class="d-flex">
+                            <button type="submit" class="btn btn-link nav-link text-dark">@T["Log out"]</button>
+                        </form>
+                    }
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
+    <div class="container flex-grow-1">
         <main role="main" class="pb-3">
+            @if (TempData["Message"] is string message)
+            {
+                <div class="alert alert-success" role="status">@message</div>
+            }
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - Commonage - <a asp-area="" asp-page="/Privacy">Privacy</a>
+    <footer class="border-top text-muted py-3">
+        <div class="container d-flex flex-wrap gap-3 align-items-center">
+            <span>Commonage</span>
+            <form method="post" asp-page="/SetLanguage" asp-route-returnUrl="@(Context.Request.Path + Context.Request.QueryString)" class="d-flex gap-1">
+                <button type="submit" name="culture" value="en" class="btn btn-link btn-sm p-0" lang="en">English</button>
+                <span aria-hidden="true">·</span>
+                <button type="submit" name="culture" value="de" class="btn btn-link btn-sm p-0" lang="de">Deutsch</button>
+            </form>
+            @if (User.Identity?.IsAuthenticated != true)
+            {
+                <a asp-page="/Account/Login" class="ms-auto">@T["Curator login"]</a>
+            }
         </div>
     </footer>
 
