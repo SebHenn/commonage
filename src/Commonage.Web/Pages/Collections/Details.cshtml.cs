@@ -8,8 +8,10 @@ namespace Commonage.Web.Pages.Collections;
 
 public class DetailsModel(CommonageDbContext db) : PageModel
 {
+    public record ItemSummary(int Id, string Title, int? ThumbnailMediaFileId);
+
     public Collection Collection { get; private set; } = null!;
-    public IReadOnlyList<ArchiveItem> Items { get; private set; } = [];
+    public IReadOnlyList<ItemSummary> Items { get; private set; } = [];
 
     public async Task<IActionResult> OnGetAsync(int id)
     {
@@ -21,6 +23,10 @@ public class DetailsModel(CommonageDbContext db) : PageModel
         Items = await db.PublishedItems
             .Where(i => i.CollectionId == id)
             .OrderByDescending(i => i.PublishedAt)
+            .Select(i => new ItemSummary(
+                i.Id,
+                i.Title,
+                i.MediaFiles.Where(f => f.Status == ProcessingStatus.Ready).OrderBy(f => f.Id).Select(f => (int?)f.Id).FirstOrDefault()))
             .ToListAsync();
         return Page();
     }

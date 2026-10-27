@@ -14,6 +14,8 @@ public class ArchiveItem
     public int CollectionId { get; set; }
     public Collection Collection { get; set; } = null!;
 
+    public List<MediaFile> MediaFiles { get; set; } = [];
+
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     public DateTime? PublishedAt { get; set; }

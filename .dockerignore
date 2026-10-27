@@ -8,3 +8,4 @@ tests/
 data/
 media/
 backups/
+**/App_Data/

@@ -39,6 +39,18 @@ administrator is created from `InitialAdmin:*` only while the archive has no use
 
 To open a SQL shell: `docker compose exec db psql -U commonage`.
 
+## Uploaded files
+
+Originals and their previews are stored under `Storage:RootPath`. It defaults to
+`src/Commonage.Web/App_Data/media` when you run from the IDE (ignored by git) and to the
+`media-data` volume in Docker. The directory is never served directly; every file goes through
+`Media/MediaEndpoints.cs`, which checks permissions. The per-file limit is
+`Uploads:MaxFileSizeMegabytes` (default 200).
+
+Previews are generated in the background with [NetVips](https://github.com/kleisauke/net-vips)
+(libvips). They are rotated upright and contain no EXIF, so GPS coordinates stay in the private
+original.
+
 ## Database changes
 
 After changing an entity or `CommonageDbContext`, create a migration and commit it:

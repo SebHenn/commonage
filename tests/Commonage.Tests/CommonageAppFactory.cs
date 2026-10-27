@@ -12,6 +12,7 @@ public class CommonageAppFactory : WebApplicationFactory<Program>, IAsyncLifetim
     public const string AdminPassword = "Test-only-password-1";
 
     private readonly PostgreSqlContainer _db = new PostgreSqlBuilder("postgres:18-alpine").Build();
+    private readonly string _storageRoot = Path.Combine(Path.GetTempPath(), "commonage-tests", Guid.NewGuid().ToString("N"));
 
     public Task InitializeAsync() => _db.StartAsync();
 
@@ -19,6 +20,8 @@ public class CommonageAppFactory : WebApplicationFactory<Program>, IAsyncLifetim
     {
         await base.DisposeAsync();
         await _db.DisposeAsync();
+        if (Directory.Exists(_storageRoot))
+            Directory.Delete(_storageRoot, recursive: true);
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -26,6 +29,7 @@ public class CommonageAppFactory : WebApplicationFactory<Program>, IAsyncLifetim
         builder.UseSetting("ConnectionStrings:Default", _db.GetConnectionString());
         builder.UseSetting("InitialAdmin:Email", AdminEmail);
         builder.UseSetting("InitialAdmin:Password", AdminPassword);
+        builder.UseSetting("Storage:RootPath", _storageRoot);
     }
 }
 

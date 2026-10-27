@@ -4,6 +4,7 @@ using System.Text.Unicode;
 using Commonage.Web;
 using Commonage.Web.Data;
 using Commonage.Web.Identity;
+using Commonage.Web.Media;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
@@ -38,6 +39,15 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy(Policies.ManageArchive, policy => policy.RequireRole(Roles.Admin, Roles.Curator));
 
+// Uploaded originals and their previews. In Docker this directory is a persistent volume.
+var storageRoot = Path.GetFullPath(
+    builder.Configuration["Storage:RootPath"] ?? Path.Combine("App_Data", "media"), builder.Environment.ContentRootPath);
+builder.Services.AddSingleton<IFileStorage>(new LocalFileStorage(storageRoot));
+builder.Services.Configure<UploadOptions>(builder.Configuration.GetSection("Uploads"));
+builder.Services.AddScoped<MediaUploadService>();
+builder.Services.AddSingleton<MediaProcessingQueue>();
+builder.Services.AddHostedService<MediaProcessor>();
+
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 // Write letters such as ü and ß as-is instead of as HTML entities. Razor still escapes markup characters.
 builder.Services.Configure<WebEncoderOptions>(options => options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.All));
@@ -64,6 +74,13 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// Browsers must not guess content types, so an uploaded file can never be interpreted as a script or page.
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.XContentTypeOptions = "nosniff";
+    await next();
+});
+
 string[] supportedCultures = ["en", "de"];
 app.UseRequestLocalization(new RequestLocalizationOptions
 {
@@ -78,6 +95,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapHealthChecks("/health");
+app.MapMediaEndpoints();
 app.MapStaticAssets();
 app.MapRazorPages()
    .WithStaticAssets();
