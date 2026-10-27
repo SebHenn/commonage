@@ -19,7 +19,10 @@ services:
   web:
     build: .
     environment:
-      ConnectionStrings__Default: "Host=db;Database=commonage;Username=commonage;Password=${POSTGRES_PASSWORD}"
+      ConnectionStrings__Default: "Host=db;Database=commonage;Username=commonage;Password=${POSTGRES_PASSWORD};GSS Encryption Mode=Disable"
+      # Only used on first start, when the archive has no users yet.
+      InitialAdmin__Email: ${COMMONAGE_ADMIN_EMAIL:-}
+      InitialAdmin__Password: ${COMMONAGE_ADMIN_PASSWORD:-}
     ports:
       - "127.0.0.1:8080:8080"
     depends_on:

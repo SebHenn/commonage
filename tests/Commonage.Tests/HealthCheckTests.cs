@@ -1,22 +1,12 @@
-using Microsoft.AspNetCore.Mvc.Testing;
-using Testcontainers.PostgreSql;
-
 namespace Commonage.Tests;
 
-public class HealthCheckTests : IAsyncLifetime
+[Collection(nameof(AppCollection))]
+public class HealthCheckTests(CommonageAppFactory app)
 {
-    private readonly PostgreSqlContainer _db = new PostgreSqlBuilder("postgres:18-alpine").Build();
-
-    public Task InitializeAsync() => _db.StartAsync();
-
-    public Task DisposeAsync() => _db.DisposeAsync().AsTask();
-
     [Fact]
     public async Task Health_endpoint_reports_healthy_when_the_database_is_reachable()
     {
-        await using var factory = new WebApplicationFactory<Program>()
-            .WithWebHostBuilder(host => host.UseSetting("ConnectionStrings:Default", _db.GetConnectionString()));
-        using var client = factory.CreateClient();
+        using var client = app.CreateClient();
 
         var response = await client.GetAsync("/health");
 
