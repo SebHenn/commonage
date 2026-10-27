@@ -11,6 +11,7 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options)
 {
     public DbSet<Collection> Collections => Set<Collection>();
     public DbSet<ArchiveItem> ArchiveItems => Set<ArchiveItem>();
+    public DbSet<MediaFile> MediaFiles => Set<MediaFile>();
 
     // Keys that encrypt login cookies. Stored in the database so logins survive container rebuilds.
     public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
@@ -36,6 +37,19 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options)
             item.HasOne(i => i.Collection)
                 .WithMany(c => c.Items)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        builder.Entity<MediaFile>(file =>
+        {
+            file.Property(f => f.OriginalFileName).HasMaxLength(255);
+            file.Property(f => f.ContentType).HasMaxLength(100);
+            file.Property(f => f.Sha256).HasMaxLength(64).IsFixedLength();
+            file.Property(f => f.ProcessingError).HasMaxLength(1000);
+            file.HasIndex(f => f.StorageId).IsUnique();
+            file.HasIndex(f => f.Status);
+            file.HasOne(f => f.ArchiveItem)
+                .WithMany(i => i.MediaFiles)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

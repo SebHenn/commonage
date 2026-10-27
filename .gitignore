@@ -496,6 +496,7 @@ appsettings.Local.json
 # Local archive data: uploads, database files and backups contain real people's material
 /data/
 /media/
+App_Data/
 /backups/
 *.dump
 *.sql.gz

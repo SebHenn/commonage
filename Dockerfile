@@ -9,6 +9,8 @@ RUN dotnet publish src/Commonage.Web/Commonage.Web.csproj -c Release -o /app --n
 FROM mcr.microsoft.com/dotnet/aspnet:10.0
 WORKDIR /app
 COPY --from=build /app .
+# Uploaded files live here; Compose mounts a volume so they survive container updates.
+RUN mkdir -p /app/App_Data/media && chown -R $APP_UID /app/App_Data
 USER $APP_UID
 EXPOSE 8080
 ENTRYPOINT ["dotnet", "Commonage.Web.dll"]

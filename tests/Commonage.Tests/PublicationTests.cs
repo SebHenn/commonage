@@ -41,16 +41,12 @@ public partial class PublicationTests(CommonageAppFactory app)
     public async Task A_curator_can_create_and_publish_an_item_that_visitors_then_see()
     {
         using var curator = app.CreateClient();
-        await PostFormAsync(curator, "/Account/Login", new()
-        {
-            ["Input.Email"] = CommonageAppFactory.AdminEmail,
-            ["Input.Password"] = CommonageAppFactory.AdminPassword,
-        });
+        await Browser.LogInAsCuratorAsync(curator);
         var collectionTitle = $"Mill Street {Guid.NewGuid():N}";
-        await PostFormAsync(curator, "/Admin/Collections/Edit", new() { ["Input.Title"] = collectionTitle });
+        await Browser.PostFormAsync(curator, "/Admin/Collections/Edit", new() { ["Input.Title"] = collectionTitle });
         var collectionId = await FindCollectionIdAsync(collectionTitle);
 
-        var itemPage = await PostFormAsync(curator, "/Admin/Items/Edit", new()
+        var itemPage = await Browser.PostFormAsync(curator, "/Admin/Items/Edit", new()
         {
             ["Input.Title"] = "The mill in winter",
             ["Input.CollectionId"] = collectionId.ToString(),
@@ -83,19 +79,6 @@ public partial class PublicationTests(CommonageAppFactory app)
         var db = scope.ServiceProvider.GetRequiredService<CommonageDbContext>();
         return db.Collections.Single(c => c.Title == title).Id;
     }
-
-    /// <summary>Submits a form the way a browser does, including the antiforgery token from the page.</summary>
-    private static async Task<HttpResponseMessage> PostFormAsync(HttpClient client, string url, Dictionary<string, string> fields)
-    {
-        var form = await client.GetStringAsync(url);
-        fields["__RequestVerificationToken"] = AntiforgeryToken().Match(form).Groups[1].Value;
-        var response = await client.PostAsync(url, new FormUrlEncodedContent(fields));
-        response.EnsureSuccessStatusCode();
-        return response;
-    }
-
-    [GeneratedRegex(@"name=""__RequestVerificationToken"" type=""hidden"" value=""([^""]+)""")]
-    private static partial Regex AntiforgeryToken();
 
     [GeneratedRegex(@"/Admin/Items/Edit/(\d+)")]
     private static partial Regex ItemIdInUrl();

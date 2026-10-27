@@ -23,6 +23,8 @@ services:
       # Only used on first start, when the archive has no users yet.
       InitialAdmin__Email: ${COMMONAGE_ADMIN_EMAIL:-}
       InitialAdmin__Password: ${COMMONAGE_ADMIN_PASSWORD:-}
+    volumes:
+      - media-data:/app/App_Data
     ports:
       - "127.0.0.1:8080:8080"
     depends_on:
@@ -31,3 +33,4 @@ services:
 
 volumes:
   db-data:
+  media-data:

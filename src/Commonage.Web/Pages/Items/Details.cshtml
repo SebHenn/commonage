@@ -13,6 +13,13 @@
 
 <article>
     <h1>@Model.Item.Title</h1>
+    @foreach (var file in Model.Item.MediaFiles)
+    {
+        <figure class="mb-4">
+            <img src="/media/@file.Id/preview" alt="@Model.Item.Title" width="@file.PreviewWidth" height="@file.PreviewHeight"
+                 class="media-preview rounded" loading="lazy" />
+        </figure>
+    }
     @if (!string.IsNullOrWhiteSpace(Model.Item.Description))
     {
         <p class="text-preserve-lines">@Model.Item.Description</p>

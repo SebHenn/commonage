@@ -56,6 +56,61 @@
     </div>
 </form>
 
+<section class="mt-5" aria-labelledby="photos-heading">
+    <h2 id="photos-heading" class="h4">@T["Photos"]</h2>
+    @if (Model.ItemId is null)
+    {
+        <p class="text-muted">@T["Save the item first, then add photos."]</p>
+    }
+    else
+    {
+        @if (Model.MediaFiles.Count > 0)
+        {
+            <div class="row g-3 mb-3">
+                @foreach (var file in Model.MediaFiles)
+                {
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <div class="card h-100">
+                            @if (file.Status == ProcessingStatus.Ready)
+                            {
+                                <img src="/admin/media/@file.Id/thumbnail" class="card-img-top media-thumbnail" alt="@file.OriginalFileName" loading="lazy" />
+                            }
+                            else
+                            {
+                                <div class="card-img-top media-thumbnail d-flex align-items-center justify-content-center bg-light text-muted small p-2 text-center">
+                                    @(file.Status == ProcessingStatus.Pending ? T["Creating preview…"] : T["No preview could be created."])
+                                </div>
+                            }
+                            <div class="card-body p-2 small">
+                                <div class="text-truncate" title="@file.OriginalFileName">@file.OriginalFileName</div>
+                                <div class="text-muted">@((file.SizeBytes / 1024.0 / 1024.0).ToString("0.0")) MB</div>
+                                <div class="d-flex flex-wrap gap-2 mt-1">
+                                    <a href="/admin/media/@file.Id/original">@T["Original"]</a>
+                                    <form method="post" asp-page-handler="DeleteMedia" asp-route-id="@Model.ItemId" asp-route-mediaFileId="@file.Id"
+                                          onsubmit="return confirm('@T["Delete this photo and its original file?"]');">
+                                        <button type="submit" class="btn btn-link btn-sm p-0 text-danger">@T["Delete"]</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            @if (Model.MediaFiles.Any(f => f.Status == ProcessingStatus.Pending))
+            {
+                <p class="text-muted small">@T["Previews are being created. Reload the page in a moment."]</p>
+            }
+        }
+
+        <form method="post" asp-page-handler="Upload" asp-route-id="@Model.ItemId" enctype="multipart/form-data" class="d-flex flex-wrap gap-2 align-items-center">
+            <label for="photo-upload" class="visually-hidden">@T["Choose photos"]</label>
+            <input id="photo-upload" type="file" name="files" accept="@Commonage.Web.Media.ImageFormats.AcceptAttribute" multiple class="form-control w-auto" required />
+            <button type="submit" class="btn btn-outline-primary">@T["Upload"]</button>
+        </form>
+        <p class="form-text">@T["JPEG, PNG, TIFF or WebP. The original file is kept unchanged and is only visible to curators."]</p>
+    }
+</section>
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
