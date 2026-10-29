@@ -10,28 +10,19 @@
     <p class="lead text-preserve-lines">@Model.Collection.Description</p>
 }
 
-@if (Model.Items.Count == 0)
+@if (Model.Items.TotalCount == 0)
 {
     <p class="text-muted">@T["This collection has no published items yet."]</p>
 }
 else
 {
-    <ul class="list-unstyled row g-3">
-        @foreach (var item in Model.Items)
-        {
-            <li class="col-6 col-md-4 col-lg-3">
-                <a asp-page="/Items/Details" asp-route-id="@item.Id" class="d-block">
-                    @if (item.ThumbnailMediaFileId is { } mediaFileId)
-                    {
-                        <img src="/media/@mediaFileId/thumbnail" alt="" class="media-thumbnail rounded mb-1" loading="lazy" />
-                    }
-                    else
-                    {
-                        <span class="media-thumbnail rounded mb-1 bg-light d-block" aria-hidden="true"></span>
-                    }
-                    @item.Title
-                </a>
-            </li>
-        }
-    </ul>
+    <form method="get" asp-page="/Search" role="search" class="input-group mb-4">
+        <input type="hidden" name="collection" value="@Model.Collection.Id" />
+        <label for="collection-search" class="visually-hidden">@T["Search this collection"]</label>
+        <input id="collection-search" type="search" name="q" class="form-control" placeholder="@T["Search this collection"]" />
+        <button type="submit" class="btn btn-outline-primary">@T["Search"]</button>
+    </form>
+    <p class="text-muted">@T["Items: {0}", Model.Items.TotalCount]</p>
+    <partial name="_ItemCards" model="Model.Items.Items" />
+    <partial name="_Pager" model="Model.Items" />
 }

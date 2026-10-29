@@ -1,0 +1,101 @@
+@page "/search"
+@model SearchModel
+@{
+    ViewData["Title"] = T["Search"];
+}
+
+<h1>@T["Search the archive"]</h1>
+
+<form method="get" role="search">
+    <div class="input-group mb-3">
+        <label for="search-text" class="visually-hidden">@T["Search words"]</label>
+        <input id="search-text" type="search" name="q" value="@Model.Text" class="form-control" placeholder="@T["Names, places, events …"]" />
+        <button type="submit" class="btn btn-primary">@T["Search"]</button>
+    </div>
+    @if (Model.Tag is not null)
+    {
+        <input type="hidden" name="tag" value="@Model.Tag" />
+    }
+
+    <div class="row g-4">
+        <div class="col-lg-3">
+            @* On small screens the filters fold away so the results come first. *@
+            <button class="btn btn-outline-secondary w-100 d-lg-none" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#search-filters" aria-expanded="@(Model.HasFilters ? "true" : "false")" aria-controls="search-filters">
+                @T["Filters"]
+            </button>
+            <div id="search-filters" class="collapse d-lg-block mt-3 mt-lg-0 @(Model.HasFilters ? "show" : "")">
+                <div class="mb-3">
+                    <label for="filter-collection" class="form-label">@T["Collection"]</label>
+                    <select id="filter-collection" name="collection" asp-items="Model.CollectionOptions" class="form-select">
+                        <option value="">@T["All collections"]</option>
+                    </select>
+                </div>
+                <fieldset class="mb-3">
+                    <legend class="form-label fs-6">@T["Period"]</legend>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label for="filter-from" class="form-label small text-muted">@T["From year"]</label>
+                            <input id="filter-from" type="number" name="from" value="@Model.From" min="1000" max="2999" inputmode="numeric" class="form-control" />
+                        </div>
+                        <div class="col-6">
+                            <label for="filter-to" class="form-label small text-muted">@T["To year"]</label>
+                            <input id="filter-to" type="number" name="to" value="@Model.To" min="1000" max="2999" inputmode="numeric" class="form-control" />
+                        </div>
+                    </div>
+                </fieldset>
+                <div class="mb-3">
+                    <label for="filter-sort" class="form-label">@T["Sort by"]</label>
+                    <select id="filter-sort" name="sort" class="form-select">
+                        @if (ItemSearch.ToPrefixQuery(Model.Text) is not null)
+                        {
+                            <option value="@ItemSort.Relevance" selected="@(Model.EffectiveSort == ItemSort.Relevance)">@T["Best match"]</option>
+                        }
+                        <option value="@ItemSort.RecentlyAdded" selected="@(Model.EffectiveSort == ItemSort.RecentlyAdded)">@T["Recently added"]</option>
+                        <option value="@ItemSort.OldestFirst" selected="@(Model.EffectiveSort == ItemSort.OldestFirst)">@T["Oldest first"]</option>
+                        <option value="@ItemSort.NewestFirst" selected="@(Model.EffectiveSort == ItemSort.NewestFirst)">@T["Newest first"]</option>
+                    </select>
+                </div>
+                <div class="d-flex flex-wrap gap-2 align-items-center mb-4">
+                    <button type="submit" class="btn btn-outline-primary">@T["Apply filters"]</button>
+                    @if (Model.HasFilters)
+                    {
+                        <a asp-page="/Search" asp-route-q="@Model.Text">@T["Clear filters"]</a>
+                    }
+                </div>
+
+                @if (Model.Tags.Any(t => !string.Equals(t.Name, Model.Tag, StringComparison.OrdinalIgnoreCase)))
+                {
+                    <h2 class="h6">@T["Tags"]</h2>
+                    <ul class="list-unstyled d-flex flex-wrap gap-2">
+                        @foreach (var tag in Model.Tags.Where(t => !string.Equals(t.Name, Model.Tag, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            <li><a href="@Request.WithQueryValue("tag", tag.Name)" class="badge rounded-pill text-bg-light border tag-link">@tag.Name <span class="text-muted">@tag.Count</span></a></li>
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+
+        <div class="col-lg-9">
+            <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+                <p class="mb-0 me-auto" role="status">@T["Items found: {0}", Model.Results.TotalCount]</p>
+                @if (Model.Tag is not null)
+                {
+                    <a href="@Request.WithQueryValue("tag", null)" class="badge rounded-pill text-bg-secondary tag-link"
+                       title="@T["Remove this filter"]">@T["Tag: {0}", Model.Tag] <span aria-hidden="true">×</span><span class="visually-hidden">@T["Remove this filter"]</span></a>
+                }
+            </div>
+
+            @if (Model.Results.TotalCount == 0)
+            {
+                <p class="text-muted">@T["Nothing matches your search. Try fewer words or remove a filter."]</p>
+            }
+            else
+            {
+                <partial name="_ItemCards" model="Model.Results.Items" />
+                <partial name="_Pager" model="Model.Results" />
+            }
+        </div>
+    </div>
+</form>

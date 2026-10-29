@@ -4,14 +4,23 @@
   <resheader name="version"><value>2.0</value></resheader>
   <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="A tag can be at most {0} characters long." xml:space="preserve"><value>Ein Schlagwort darf höchstens {0} Zeichen lang sein.</value></data>
   <data name="Add item" xml:space="preserve"><value>Eintrag hinzufügen</value></data>
+  <data name="All collections" xml:space="preserve"><value>Alle Sammlungen</value></data>
+  <data name="All statuses" xml:space="preserve"><value>Alle Status</value></data>
+  <data name="An item can have at most {0} tags." xml:space="preserve"><value>Ein Eintrag kann höchstens {0} Schlagwörter haben.</value></data>
+  <data name="Apply filters" xml:space="preserve"><value>Filter anwenden</value></data>
+  <data name="Best match" xml:space="preserve"><value>Beste Treffer</value></data>
+  <data name="Browse by tag" xml:space="preserve"><value>Nach Schlagwort stöbern</value></data>
   <data name="Choose a collection" xml:space="preserve"><value>Sammlung auswählen</value></data>
   <data name="Choose photos" xml:space="preserve"><value>Fotos auswählen</value></data>
+  <data name="Clear filters" xml:space="preserve"><value>Filter zurücksetzen</value></data>
   <data name="Collection" xml:space="preserve"><value>Sammlung</value></data>
   <data name="Collections" xml:space="preserve"><value>Sammlungen</value></data>
   <data name="Create your first collection" xml:space="preserve"><value>Erste Sammlung anlegen</value></data>
   <data name="Creating preview…" xml:space="preserve"><value>Vorschau wird erstellt …</value></data>
   <data name="Curator login" xml:space="preserve"><value>Anmeldung für Kuratoren</value></data>
+  <data name="Date" xml:space="preserve"><value>Datierung</value></data>
   <data name="Delete" xml:space="preserve"><value>Löschen</value></data>
   <data name="Delete this photo and its original file?" xml:space="preserve"><value>Dieses Foto samt Originaldatei löschen?</value></data>
   <data name="Description" xml:space="preserve"><value>Beschreibung</value></data>
@@ -19,34 +28,60 @@
   <data name="Edit collection" xml:space="preserve"><value>Sammlung bearbeiten</value></data>
   <data name="Edit item" xml:space="preserve"><value>Eintrag bearbeiten</value></data>
   <data name="Email" xml:space="preserve"><value>E-Mail</value></data>
+  <data name="Filters" xml:space="preserve"><value>Filter</value></data>
+  <data name="Found when visitors filter by: {0}" xml:space="preserve"><value>Wird beim Filtern nach Zeitraum gefunden für: {0}</value></data>
+  <data name="From year" xml:space="preserve"><value>Von Jahr</value></data>
   <data name="Items" xml:space="preserve"><value>Einträge</value></data>
   <data name="Items belong to a collection." xml:space="preserve"><value>Einträge gehören immer zu einer Sammlung.</value></data>
+  <data name="Items found: {0}" xml:space="preserve"><value>Gefundene Einträge: {0}</value></data>
   <data name="Items: {0}" xml:space="preserve"><value>Einträge: {0}</value></data>
   <data name="JPEG, PNG, TIFF or WebP. The original file is kept unchanged and is only visible to curators." xml:space="preserve"><value>JPEG, PNG, TIFF oder WebP. Die Originaldatei bleibt unverändert erhalten und ist nur für Kuratoren sichtbar.</value></data>
   <data name="Last changed" xml:space="preserve"><value>Zuletzt geändert</value></data>
   <data name="Log in" xml:space="preserve"><value>Anmelden</value></data>
   <data name="Log out" xml:space="preserve"><value>Abmelden</value></data>
   <data name="Manage archive" xml:space="preserve"><value>Archiv verwalten</value></data>
+  <data name="Names, places, events …" xml:space="preserve"><value>Namen, Orte, Ereignisse …</value></data>
   <data name="New collection" xml:space="preserve"><value>Neue Sammlung</value></data>
   <data name="New item" xml:space="preserve"><value>Neuer Eintrag</value></data>
+  <data name="Newest first" xml:space="preserve"><value>Neueste zuerst</value></data>
+  <data name="Next" xml:space="preserve"><value>Weiter</value></data>
+  <data name="No items match." xml:space="preserve"><value>Keine Einträge gefunden.</value></data>
   <data name="No preview could be created." xml:space="preserve"><value>Es konnte keine Vorschau erstellt werden.</value></data>
+  <data name="Nothing matches your search. Try fewer words or remove a filter." xml:space="preserve"><value>Nichts gefunden. Versuchen Sie es mit weniger Wörtern oder entfernen Sie einen Filter.</value></data>
+  <data name="Oldest first" xml:space="preserve"><value>Älteste zuerst</value></data>
   <data name="Original" xml:space="preserve"><value>Original</value></data>
+  <data name="Page {0} of {1}" xml:space="preserve"><value>Seite {0} von {1}</value></data>
+  <data name="Pages" xml:space="preserve"><value>Seiten</value></data>
   <data name="Password" xml:space="preserve"><value>Passwort</value></data>
+  <data name="Period" xml:space="preserve"><value>Zeitraum</value></data>
   <data name="Photos" xml:space="preserve"><value>Fotos</value></data>
   <data name="Photos uploaded: {0}. Previews are being created." xml:space="preserve"><value>Hochgeladene Fotos: {0}. Vorschauen werden erstellt.</value></data>
+  <data name="Places, people or topics, separated by commas." xml:space="preserve"><value>Orte, Personen oder Themen, durch Kommas getrennt.</value></data>
   <data name="Please choose a collection." xml:space="preserve"><value>Bitte wählen Sie eine Sammlung aus.</value></data>
   <data name="Please choose at least one photo." xml:space="preserve"><value>Bitte wählen Sie mindestens ein Foto aus.</value></data>
   <data name="Please enter a title." xml:space="preserve"><value>Bitte geben Sie einen Titel ein.</value></data>
   <data name="Please enter your email address." xml:space="preserve"><value>Bitte geben Sie Ihre E-Mail-Adresse ein.</value></data>
   <data name="Please enter your password." xml:space="preserve"><value>Bitte geben Sie Ihr Passwort ein.</value></data>
   <data name="Previews are being created. Reload the page in a moment." xml:space="preserve"><value>Vorschauen werden erstellt. Laden Sie die Seite gleich neu.</value></data>
+  <data name="Previous" xml:space="preserve"><value>Zurück</value></data>
   <data name="Published" xml:space="preserve"><value>Veröffentlicht</value></data>
+  <data name="Recently added" xml:space="preserve"><value>Zuletzt hinzugefügt</value></data>
+  <data name="Remove this filter" xml:space="preserve"><value>Diesen Filter entfernen</value></data>
   <data name="Save" xml:space="preserve"><value>Speichern</value></data>
   <data name="Save and publish" xml:space="preserve"><value>Speichern und veröffentlichen</value></data>
   <data name="Save as draft" xml:space="preserve"><value>Als Entwurf speichern</value></data>
   <data name="Save the item first, then add photos." xml:space="preserve"><value>Speichern Sie den Eintrag zuerst, dann können Sie Fotos hinzufügen.</value></data>
+  <data name="Search" xml:space="preserve"><value>Suchen</value></data>
+  <data name="Search items" xml:space="preserve"><value>Einträge durchsuchen</value></data>
+  <data name="Search the archive" xml:space="preserve"><value>Archiv durchsuchen</value></data>
+  <data name="Search this collection" xml:space="preserve"><value>Diese Sammlung durchsuchen</value></data>
+  <data name="Search words" xml:space="preserve"><value>Suchbegriffe</value></data>
+  <data name="Sort by" xml:space="preserve"><value>Sortieren nach</value></data>
   <data name="Status" xml:space="preserve"><value>Status</value></data>
+  <data name="Tag: {0}" xml:space="preserve"><value>Schlagwort: {0}</value></data>
+  <data name="Tags" xml:space="preserve"><value>Schlagwörter</value></data>
   <data name="The archive has no collections yet." xml:space="preserve"><value>Das Archiv enthält noch keine Sammlungen.</value></data>
+  <data name="The date can be at most {1} characters long." xml:space="preserve"><value>Die Datierung darf höchstens {1} Zeichen lang sein.</value></data>
   <data name="The description can be at most {1} characters long." xml:space="preserve"><value>Die Beschreibung darf höchstens {1} Zeichen lang sein.</value></data>
   <data name="The email address or password is incorrect." xml:space="preserve"><value>E-Mail-Adresse oder Passwort ist falsch.</value></data>
   <data name="The item is no longer public." xml:space="preserve"><value>Der Eintrag ist nicht mehr öffentlich.</value></data>
@@ -56,12 +91,15 @@
   <data name="There are no collections yet." xml:space="preserve"><value>Es gibt noch keine Sammlungen.</value></data>
   <data name="There are no items yet." xml:space="preserve"><value>Es gibt noch keine Einträge.</value></data>
   <data name="This collection has no published items yet." xml:space="preserve"><value>Diese Sammlung enthält noch keine veröffentlichten Einträge.</value></data>
+  <data name="This date could not be understood. Please include a year, for example: 1953, 12.03.1953, circa 1950, 1950s, 1950–1955." xml:space="preserve"><value>Diese Datierung wurde nicht verstanden. Bitte geben Sie ein Jahr an, zum Beispiel: 1953, 12.03.1953, ca. 1950, 1950er, 1950–1955.</value></data>
   <data name="Title" xml:space="preserve"><value>Titel</value></data>
+  <data name="To year" xml:space="preserve"><value>Bis Jahr</value></data>
   <data name="Toggle navigation" xml:space="preserve"><value>Navigation ein- oder ausblenden</value></data>
   <data name="Too many failed attempts. Please try again in a few minutes." xml:space="preserve"><value>Zu viele Fehlversuche. Bitte versuchen Sie es in einigen Minuten erneut.</value></data>
   <data name="Unpublish" xml:space="preserve"><value>Veröffentlichung zurückziehen</value></data>
   <data name="Upload" xml:space="preserve"><value>Hochladen</value></data>
   <data name="View public page" xml:space="preserve"><value>Öffentliche Seite ansehen</value></data>
+  <data name="Write the date as precisely as it is known, for example: 1953, 12.03.1953, March 1953, circa 1950, 1950s, 1950–1955, before 1945." xml:space="preserve"><value>Geben Sie das Datum so genau an, wie es bekannt ist, zum Beispiel: 1953, 12.03.1953, März 1953, ca. 1950, 1950er Jahre, 1950–1955, vor 1945.</value></data>
   <data name="Your changes are saved." xml:space="preserve"><value>Ihre Änderungen sind gespeichert.</value></data>
   <data name="{0} is empty." xml:space="preserve"><value>{0} ist leer.</value></data>
   <data name="{0} is not a supported photo format. Please use JPEG, PNG, TIFF or WebP." xml:space="preserve"><value>{0} ist kein unterstütztes Fotoformat. Bitte verwenden Sie JPEG, PNG, TIFF oder WebP.</value></data>

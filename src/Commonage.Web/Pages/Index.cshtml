@@ -4,6 +4,12 @@
     ViewData["Title"] = T["Collections"];
 }
 
+<form method="get" asp-page="/Search" role="search" class="input-group input-group-lg mb-4">
+    <label for="home-search" class="visually-hidden">@T["Search the archive"]</label>
+    <input id="home-search" type="search" name="q" class="form-control" placeholder="@T["Search the archive"]" />
+    <button type="submit" class="btn btn-primary">@T["Search"]</button>
+</form>
+
 <h1>@T["Collections"]</h1>
 
 @if (Model.Collections.Count == 0)
@@ -25,4 +31,17 @@ else
             </li>
         }
     </ul>
+}
+
+@if (Model.Tags.Count > 0)
+{
+    <section class="mt-5" aria-labelledby="tags-heading">
+        <h2 id="tags-heading" class="h4">@T["Browse by tag"]</h2>
+        <ul class="list-unstyled d-flex flex-wrap gap-2">
+            @foreach (var tag in Model.Tags)
+            {
+                <li><a asp-page="/Search" asp-route-tag="@tag" class="badge rounded-pill text-bg-light border tag-link">@tag</a></li>
+            }
+        </ul>
+    </section>
 }

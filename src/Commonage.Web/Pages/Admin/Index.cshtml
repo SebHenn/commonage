@@ -17,33 +17,55 @@
 {
     <p>@T["Items belong to a collection."] <a asp-page="/Admin/Collections/Edit">@T["Create your first collection"]</a></p>
 }
-else if (Model.Items.Count == 0)
-{
-    <p class="text-muted">@T["There are no items yet."]</p>
-}
 else
 {
-    <div class="table-responsive">
-        <table class="table align-middle">
-            <thead>
-                <tr>
-                    <th scope="col">@T["Title"]</th>
-                    <th scope="col">@T["Collection"]</th>
-                    <th scope="col">@T["Status"]</th>
-                    <th scope="col">@T["Last changed"]</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.Items)
-                {
+    <form method="get" role="search" class="row g-2 mb-3">
+        <div class="col-12 col-md">
+            <label for="admin-search" class="visually-hidden">@T["Search items"]</label>
+            <input id="admin-search" type="search" name="q" value="@Model.Text" class="form-control" placeholder="@T["Search items"]" />
+        </div>
+        <div class="col">
+            <label for="admin-status" class="visually-hidden">@T["Status"]</label>
+            <select id="admin-status" name="status" class="form-select">
+                <option value="">@T["All statuses"]</option>
+                <option value="@ItemStatus.Draft" selected="@(Model.Status == ItemStatus.Draft)">@T["Draft"]</option>
+                <option value="@ItemStatus.Published" selected="@(Model.Status == ItemStatus.Published)">@T["Published"]</option>
+            </select>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-outline-primary">@T["Search"]</button>
+        </div>
+    </form>
+
+    @if (Model.Items.TotalCount == 0)
+    {
+        <p class="text-muted">@(Model.Text is null && Model.Status is null ? T["There are no items yet."] : T["No items match."])</p>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
                     <tr>
-                        <td><a asp-page="/Admin/Items/Edit" asp-route-id="@item.Id">@item.Title</a></td>
-                        <td>@item.Collection.Title</td>
-                        <td><partial name="_StatusBadge" model="item.Status" /></td>
-                        <td>@item.UpdatedAt.ToLocalTime().ToString("g")</td>
+                        <th scope="col">@T["Title"]</th>
+                        <th scope="col" class="d-none d-md-table-cell">@T["Collection"]</th>
+                        <th scope="col">@T["Status"]</th>
+                        <th scope="col" class="d-none d-md-table-cell">@T["Last changed"]</th>
                     </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items.Items)
+                    {
+                        <tr>
+                            <td><a asp-page="/Admin/Items/Edit" asp-route-id="@item.Id">@item.Title</a></td>
+                            <td class="d-none d-md-table-cell">@item.Collection.Title</td>
+                            <td><partial name="_StatusBadge" model="item.Status" /></td>
+                            <td class="d-none d-md-table-cell">@item.UpdatedAt.ToLocalTime().ToString("g")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <partial name="_Pager" model="Model.Items" />
+    }
 }
