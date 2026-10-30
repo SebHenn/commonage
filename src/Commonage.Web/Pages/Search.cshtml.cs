@@ -40,7 +40,10 @@ public class SearchModel(CommonageDbContext db) : PageModel
     public SelectList CollectionOptions { get; private set; } = null!;
 
     /// <summary>The order actually used: without search text there is nothing to rank by relevance.</summary>
-    public ItemSort EffectiveSort => Sort == ItemSort.Relevance && ItemSearch.ToPrefixQuery(Text) is null ? ItemSort.RecentlyAdded : Sort;
+    public ItemSort EffectiveSort => Sort == ItemSort.Relevance && Query is null ? ItemSort.RecentlyAdded : Sort;
+
+    /// <summary>The full-text query made from <see cref="Text"/>; null when there is nothing to search for.</summary>
+    public string? Query { get; private set; }
 
     public bool HasFilters => Tag is not null || Collection is not null || From is not null || To is not null;
 
@@ -56,11 +59,12 @@ public class SearchModel(CommonageDbContext db) : PageModel
         if (string.IsNullOrWhiteSpace(Tag))
             Tag = null;
 
-        var filter = new ItemFilter(Text, Tag, Collection, From, To);
+        Query = await db.ToSearchQueryAsync(Text, cancellationToken);
+        var filter = new ItemFilter(Query, Tag, Collection, From, To);
         var matches = db.PublishedItems.Filter(filter);
 
         Results = await matches
-            .Sort(Sort, Text)
+            .Sort(Sort, Query)
             .Select(ItemSummary.FromItem)
             .ToPagedListAsync(PageNumber, PageSize, cancellationToken);
 

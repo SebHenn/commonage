@@ -47,7 +47,7 @@
                 <div class="mb-3">
                     <label for="filter-sort" class="form-label">@T["Sort by"]</label>
                     <select id="filter-sort" name="sort" class="form-select">
-                        @if (ItemSearch.ToPrefixQuery(Model.Text) is not null)
+                        @if (Model.Query is not null)
                         {
                             <option value="@ItemSort.Relevance" selected="@(Model.EffectiveSort == ItemSort.Relevance)">@T["Best match"]</option>
                         }

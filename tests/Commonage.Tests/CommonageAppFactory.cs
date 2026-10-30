@@ -14,6 +14,9 @@ public class CommonageAppFactory : WebApplicationFactory<Program>, IAsyncLifetim
     private readonly PostgreSqlContainer _db = new PostgreSqlBuilder("postgres:18-alpine").Build();
     private readonly string _storageRoot = Path.Combine(Path.GetTempPath(), "commonage-tests", Guid.NewGuid().ToString("N"));
 
+    /// <summary>Connects as the container's superuser, for tests that set up databases of their own.</summary>
+    public string ConnectionString => _db.GetConnectionString();
+
     public Task InitializeAsync() => _db.StartAsync();
 
     async Task IAsyncLifetime.DisposeAsync()

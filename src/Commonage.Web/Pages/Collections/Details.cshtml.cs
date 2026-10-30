@@ -23,7 +23,7 @@ public class DetailsModel(CommonageDbContext db) : PageModel
         Collection = collection;
         Items = await db.PublishedItems
             .Filter(new ItemFilter(CollectionId: id))
-            .Sort(ItemSort.RecentlyAdded, text: null)
+            .Sort(ItemSort.RecentlyAdded, query: null)
             .Select(ItemSummary.FromItem)
             .ToPagedListAsync(PageNumber, SearchModel.PageSize, cancellationToken);
         return Page();

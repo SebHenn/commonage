@@ -24,11 +24,21 @@ Estimates assume about 10 hours a week. Every milestone ends with something demo
   ("circa 1950", "1950er Jahre", "vor 1945"); `DateRange.TryParse` derives the range, and text it cannot read
   is rejected rather than stored without a range. "Circa" widens a year by five years on each side.
 - Search uses PostgreSQL full-text search; no separate search server. A stored generated `tsvector` column
-  covers title (weight A), tags and date text (B) and description (C). It uses the `commonage` text search
-  configuration: `simple` (no stemming, same for German and English) with the `unaccent` dictionary in front,
-  so "Muhle" finds "Mühle" and "Strasse" finds "Straße". Every search word matches word beginnings, so
-  "Schule" also finds "Schulen". The database user needs to be allowed to create the `unaccent` extension
-  (a trusted extension, so the database owner can).
+  covers title (weight A), tags and date text (B) and description (C). It uses the `simple` text search
+  configuration (no stemming, same for German and English). Every search word matches word beginnings, so
+  "Schule" also finds "Schulen". This works for every language that separates words with spaces, in any
+  script (Hindi and Korean included). Chinese, Japanese and Thai only match at the start of a run of
+  characters, and words joined to articles (Arabic "al-", Hebrew "ha-") only match the whole joined word;
+  see "After v0.1".
+- Search ignores accents ("Muhle" finds "Mühle", "Strasse" finds "Straße") without requiring a PostgreSQL
+  extension. Documents and search text pass through the database function `commonage_fold`. A migration
+  creates it from built-in functions only (Unicode decomposition, dropping combining accents and Arabic vowel
+  marks, spelling out ß, æ, œ, ø, ł and a few more), so it works on any server with a UTF-8 database (the
+  default). At every start `AccentFolding` checks whether the `unaccent` extension can be used; if so, it
+  switches the function to `unaccent` (which covers more letters, such as ligatures) and re-indexes all items.
+  Hosts that install the extension later get it on the next start; hosts that cannot install it keep the
+  built-in folding and see a warning in the log. The search text is folded in the database before the query
+  is built, and only letters, digits and the marks that belong to letters reach `to_tsquery`.
 - Tags are a `Tag` table with a many-to-many link to items, matched case-insensitively. `ArchiveItem.TagNames`
   repeats the names so the generated search column can include them; `SetTags` keeps it in sync.
 - Filtering, sorting and paging live in `Search/ItemSearch.cs` and take the base query as input, so public
@@ -41,6 +51,19 @@ Estimates assume about 10 hours a week. Every milestone ends with something demo
   Accepted for now: JPEG, PNG, TIFF, WebP.
 - Previews and thumbnails are generated one at a time by a background service (`Channel<T>`), with the
   state in the database so unfinished work resumes after a restart.
+
+## After v0.1
+
+- **Search in languages without spaces** (Chinese, Japanese, Thai). Today a run of characters without spaces
+  is one search word, so "歴史" does not find "東京都の歴史". Plan: index each character of these scripts as its
+  own word and search for the typed characters as a phrase ("歴 followed by 史"), using PostgreSQL's built-in
+  phrase search, so still no extension and no search server. Matches are by characters, not real words
+  (京都 also matches inside 東京都), and long texts make the index bigger. Real word splitting would need an
+  extension such as PGroonga or a separate search server.
+- **Language-aware search.** Per-archive language setting that picks PostgreSQL's built-in rules for that
+  language (for example `german` or `english`), so "Schulen" and "Schule" count as the same word, and that
+  handles words joined to articles or prepositions in Arabic and Hebrew. Mixed-language archives need a
+  decision: one language per archive, or per item.
 
 ## Open decisions
 

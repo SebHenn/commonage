@@ -62,7 +62,9 @@ using (var scope = app.Services.CreateScope())
 {
     // A self-hosted archive runs as a single instance, so applying migrations at startup is safe
     // and saves operators a manual upgrade step.
-    await scope.ServiceProvider.GetRequiredService<CommonageDbContext>().Database.MigrateAsync();
+    var db = scope.ServiceProvider.GetRequiredService<CommonageDbContext>();
+    await db.Database.MigrateAsync();
+    await AccentFolding.TryUseUnaccentAsync(db, app.Logger);
     await InitialAdminSeeder.SeedAsync(scope.ServiceProvider, app.Configuration, app.Logger);
 }
 

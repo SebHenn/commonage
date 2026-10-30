@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using Commonage.Web.Data;
 using Commonage.Web.Domain;
@@ -15,7 +16,8 @@ public enum ItemSort
     NewestFirst,
 }
 
-public record ItemFilter(string? Text = null, string? Tag = null, int? CollectionId = null, int? YearFrom = null, int? YearTo = null);
+/// <param name="Query">A full-text query from <see cref="ItemSearch.ToSearchQueryAsync"/>, or null to match all items.</param>
+public record ItemFilter(string? Query = null, string? Tag = null, int? CollectionId = null, int? YearFrom = null, int? YearTo = null);
 
 /// <summary>
 /// Filters and sorts archive items. It never decides what the caller may see: public pages pass
@@ -24,10 +26,11 @@ public record ItemFilter(string? Text = null, string? Tag = null, int? Collectio
 public static class ItemSearch
 {
     private const int MaxSearchWords = 10;
+    private const int MaxSearchTextLength = 500;
 
     public static IQueryable<ArchiveItem> Filter(this IQueryable<ArchiveItem> items, ItemFilter filter)
     {
-        if (ToPrefixQuery(filter.Text) is { } query)
+        if (filter.Query is { } query)
         {
             items = items.Where(i => EF.Property<NpgsqlTsVector>(i, CommonageDbContext.SearchVector)
                 .Matches(EF.Functions.ToTsQuery(CommonageDbContext.SearchConfiguration, query)));
@@ -58,9 +61,9 @@ public static class ItemSearch
         return items;
     }
 
-    public static IQueryable<ArchiveItem> Sort(this IQueryable<ArchiveItem> items, ItemSort sort, string? text)
+    /// <param name="query">The query from <see cref="ToSearchQueryAsync"/>, which relevance ranks by.</param>
+    public static IQueryable<ArchiveItem> Sort(this IQueryable<ArchiveItem> items, ItemSort sort, string? query)
     {
-        var query = ToPrefixQuery(text);
         if (sort == ItemSort.Relevance && query is null)
             sort = ItemSort.RecentlyAdded;
 
@@ -87,9 +90,29 @@ public static class ItemSearch
     }
 
     /// <summary>
-    /// Turns what a visitor typed into a tsquery that requires every word, each matched at its beginning,
-    /// so "mill schul" finds "Mill Street School" and "Schulen". Returns null if there is nothing to search for.
-    /// Only letters and digits reach PostgreSQL, so the input cannot break the query syntax.
+    /// Turns what a visitor typed into a full-text query, or null if there is nothing to search for.
+    /// The text first loses its accents in the database, exactly as the indexed documents did
+    /// (see <see cref="AccentFolding"/>), so "Muhle" and "Mühle" both find "Mühle".
+    /// </summary>
+    public static async Task<string?> ToSearchQueryAsync(this CommonageDbContext db, string? text, CancellationToken cancellationToken = default)
+    {
+        if (ToPrefixQuery(text) is null)
+            return null;
+
+        text = text!.Normalize();
+        if (text.Length > MaxSearchTextLength)
+            text = text[..MaxSearchTextLength];
+        var folded = await db.Database
+            .SqlQuery<string>($"SELECT commonage_fold({text}) AS \"Value\"")
+            .SingleAsync(cancellationToken);
+        return ToPrefixQuery(folded);
+    }
+
+    /// <summary>
+    /// Builds a tsquery that requires every word, each matched at its beginning, so "mill schul" finds
+    /// "Mill Street School" and "Schulen". Returns null if there is nothing to search for.
+    /// Only letters, digits and the marks that belong to letters reach PostgreSQL, so the input cannot break the
+    /// query syntax. Without the marks, words in scripts such as Hindi or Thai would fall apart at their vowel signs.
     /// </summary>
     public static string? ToPrefixQuery(string? text)
     {
@@ -100,7 +123,7 @@ public static class ItemSearch
         var word = new StringBuilder();
         foreach (var c in text.Append(' '))
         {
-            if (char.IsLetterOrDigit(c))
+            if (char.IsLetterOrDigit(c) || (word.Length > 0 && IsMark(c)))
             {
                 word.Append(char.ToLowerInvariant(c));
             }
@@ -115,4 +138,7 @@ public static class ItemSearch
             ? null
             : string.Join(" & ", words.Distinct().Take(MaxSearchWords).Select(w => w + ":*"));
     }
+
+    private static bool IsMark(char c) => char.GetUnicodeCategory(c) is
+        UnicodeCategory.NonSpacingMark or UnicodeCategory.SpacingCombiningMark or UnicodeCategory.EnclosingMark;
 }

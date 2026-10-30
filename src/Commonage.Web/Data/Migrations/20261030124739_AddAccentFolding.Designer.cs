@@ -13,8 +13,8 @@ using NpgsqlTypes;
 namespace Commonage.Web.Data.Migrations
 {
     [DbContext(typeof(CommonageDbContext))]
-    [Migration("20261029141009_AddUnaccentSearch")]
-    partial class AddUnaccentSearch
+    [Migration("20261030124739_AddAccentFolding")]
+    partial class AddAccentFolding
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,7 +24,6 @@ namespace Commonage.Web.Data.Migrations
                 .HasAnnotation("ProductVersion", "10.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "unaccent");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("ArchiveItemTag", b =>
@@ -76,7 +75,7 @@ namespace Commonage.Web.Data.Migrations
                     b.Property<NpgsqlTsVector>("SearchVector")
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("tsvector")
-                        .HasComputedColumnSql("setweight(to_tsvector('commonage', coalesce(\"Title\", '')), 'A') || setweight(to_tsvector('commonage', coalesce(\"TagNames\", '') || ' ' || coalesce(\"DateText\", '')), 'B') || setweight(to_tsvector('commonage', coalesce(\"Description\", '')), 'C')", true);
+                        .HasComputedColumnSql("setweight(to_tsvector('simple', commonage_fold(coalesce(\"Title\", ''))), 'A') || setweight(to_tsvector('simple', commonage_fold(coalesce(\"TagNames\", '') || ' ' || coalesce(\"DateText\", ''))), 'B') || setweight(to_tsvector('simple', commonage_fold(coalesce(\"Description\", ''))), 'C')", true);
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");

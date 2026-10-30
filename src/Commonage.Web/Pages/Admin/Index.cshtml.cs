@@ -28,7 +28,7 @@ public class IndexModel(CommonageDbContext db) : PageModel
         HasCollections = await db.Collections.AnyAsync(cancellationToken);
 
         // Curators see every item, drafts included.
-        var items = db.ArchiveItems.Filter(new ItemFilter(Text));
+        var items = db.ArchiveItems.Filter(new ItemFilter(await db.ToSearchQueryAsync(Text, cancellationToken)));
         if (Status is { } status)
             items = items.Where(i => i.Status == status);
 

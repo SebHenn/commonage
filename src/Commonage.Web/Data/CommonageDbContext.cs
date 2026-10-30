@@ -25,12 +25,16 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options)
     public const string SearchVector = "SearchVector";
 
     /// <summary>
-    /// The text search configuration, created by the AddUnaccentSearch migration. It is a copy of "simple",
-    /// which lower-cases words but does not stem them, so German and English text are treated alike;
-    /// <see cref="Search.ItemSearch"/> matches word beginnings to make up for it. Words also pass through the
-    /// unaccent dictionary, in documents and queries alike, so "Muhle" finds "Mühle" and "Café" finds "Cafe".
+    /// The text search configuration: lower-cases words but does not stem them, so German and English text are
+    /// treated alike. <see cref="Search.ItemSearch"/> matches word beginnings to make up for it.
     /// </summary>
-    public const string SearchConfiguration = "commonage";
+    public const string SearchConfiguration = "simple";
+
+    /// <summary>
+    /// The database function that removes accents before text is indexed or searched, so "Muhle" finds "Mühle".
+    /// See <see cref="AccentFolding"/>.
+    /// </summary>
+    public const string FoldFunction = "commonage_fold";
 
     /// <summary>Items the public may see. Every public page must start from this query.</summary>
     public IQueryable<ArchiveItem> PublishedItems => ArchiveItems.Where(i => i.Status == ItemStatus.Published);
@@ -38,8 +42,6 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options)
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-
-        builder.HasPostgresExtension("unaccent");
 
         builder.Entity<Collection>(collection =>
         {
@@ -58,9 +60,9 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options)
             item.HasMany(i => i.Tags).WithMany(t => t.Items);
             // Kept on one line: line breaks would differ between Windows and Linux checkouts and look like a model change.
             item.Property<NpgsqlTsVector>(SearchVector).HasComputedColumnSql(
-                $"""setweight(to_tsvector('{SearchConfiguration}', coalesce("Title", '')), 'A') || """ +
-                $"""setweight(to_tsvector('{SearchConfiguration}', coalesce("TagNames", '') || ' ' || coalesce("DateText", '')), 'B') || """ +
-                $"""setweight(to_tsvector('{SearchConfiguration}', coalesce("Description", '')), 'C')""",
+                $"""setweight(to_tsvector('{SearchConfiguration}', {FoldFunction}(coalesce("Title", ''))), 'A') || """ +
+                $"""setweight(to_tsvector('{SearchConfiguration}', {FoldFunction}(coalesce("TagNames", '') || ' ' || coalesce("DateText", ''))), 'B') || """ +
+                $"""setweight(to_tsvector('{SearchConfiguration}', {FoldFunction}(coalesce("Description", ''))), 'C')""",
                 stored: true);
             item.HasIndex(SearchVector).HasMethod("GIN");
             item.HasOne(i => i.Collection)
