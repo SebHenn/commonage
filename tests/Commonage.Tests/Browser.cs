@@ -12,9 +12,11 @@ public static partial class Browser
             ["Input.Password"] = CommonageAppFactory.AdminPassword,
         });
 
-    public static async Task<HttpResponseMessage> PostFormAsync(HttpClient client, string url, Dictionary<string, string> fields)
+    /// <param name="pageUrl">The page that shows the form, if it is not <paramref name="url"/> itself.</param>
+    public static async Task<HttpResponseMessage> PostFormAsync(
+        HttpClient client, string url, Dictionary<string, string> fields, string? pageUrl = null)
     {
-        fields["__RequestVerificationToken"] = await GetAntiforgeryTokenAsync(client, url);
+        fields["__RequestVerificationToken"] = await GetAntiforgeryTokenAsync(client, pageUrl ?? url);
         var response = await client.PostAsync(url, new FormUrlEncodedContent(fields));
         response.EnsureSuccessStatusCode();
         return response;
@@ -33,11 +35,40 @@ public static partial class Browser
         return response;
     }
 
+    /// <summary>
+    /// Fills in the form on <paramref name="url"/> and sends it with files, as a browser does for multipart forms.
+    /// Hidden fields come from the page. The status code is not checked, so tests can look at refusals.
+    /// </summary>
+    public static async Task<HttpResponseMessage> SendFormWithFilesAsync(
+        HttpClient client, string url, Dictionary<string, string> fields, params (string FileName, byte[] Content)[] files)
+    {
+        var page = await client.GetStringAsync(url);
+        var form = new MultipartFormDataContent();
+        var sent = new HashSet<string>(fields.Keys);
+        foreach (Match input in Input().Matches(page))
+        {
+            // Every form on a page has its own copy of the antiforgery token; send each hidden field once.
+            if (Attribute(input.Value, "type") == "hidden" && Attribute(input.Value, "name") is { } name && sent.Add(name))
+                form.Add(new StringContent(System.Net.WebUtility.HtmlDecode(Attribute(input.Value, "value") ?? "")), name);
+        }
+        foreach (var (name, value) in fields)
+            form.Add(new StringContent(value), name);
+        foreach (var (fileName, content) in files)
+            form.Add(new ByteArrayContent(content), "Files", fileName);
+        return await client.PostAsync(url, form);
+    }
+
+    private static string? Attribute(string tag, string name) =>
+        Regex.Match(tag, $@"\s{name}=""([^""]*)""") is { Success: true } match ? match.Groups[1].Value : null;
+
     private static async Task<string> GetAntiforgeryTokenAsync(HttpClient client, string url)
     {
         var page = await client.GetStringAsync(url);
         return AntiforgeryToken().Match(page).Groups[1].Value;
     }
+
+    [GeneratedRegex(@"<input\s[^>]*>")]
+    private static partial Regex Input();
 
     [GeneratedRegex(@"name=""__RequestVerificationToken"" type=""hidden"" value=""([^""]+)""")]
     private static partial Regex AntiforgeryToken();

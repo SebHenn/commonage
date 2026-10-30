@@ -14,6 +14,9 @@ public class IndexModel(CommonageDbContext db) : PageModel
     public PagedList<ArchiveItem> Items { get; private set; } = PagedList<ArchiveItem>.Empty;
     public bool HasCollections { get; private set; }
 
+    /// <summary>Contributions nobody has reviewed yet.</summary>
+    public int WaitingCount { get; private set; }
+
     [BindProperty(SupportsGet = true, Name = "q")]
     public string? Text { get; set; }
 
@@ -26,6 +29,7 @@ public class IndexModel(CommonageDbContext db) : PageModel
     public async Task OnGetAsync(CancellationToken cancellationToken)
     {
         HasCollections = await db.Collections.AnyAsync(cancellationToken);
+        WaitingCount = await db.ArchiveItems.CountAsync(i => i.Status == ItemStatus.Submitted, cancellationToken);
 
         // Curators see every item, drafts included.
         var items = db.ArchiveItems.Filter(new ItemFilter(await db.ToSearchQueryAsync(Text, cancellationToken)));

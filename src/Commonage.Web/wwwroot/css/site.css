@@ -38,3 +38,12 @@ html {
   width: auto;
   height: auto;
 }
+
+/* The honeypot field on contribution forms: invisible to people, still filled in by spam programs. */
+.contact-field {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}

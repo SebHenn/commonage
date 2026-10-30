@@ -7,11 +7,19 @@
 <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
     <h1 class="me-auto mb-0">@T["Items"]</h1>
     <a asp-page="/Admin/Collections/Index" class="btn btn-outline-secondary">@T["Collections"]</a>
+    <a asp-page="/Admin/Contributions/Index" class="btn btn-outline-secondary">@T["Contribution links"]</a>
     @if (Model.HasCollections)
     {
         <a asp-page="/Admin/Items/Edit" class="btn btn-primary">@T["New item"]</a>
     }
 </div>
+
+@if (Model.WaitingCount > 0 && Model.Status != ItemStatus.Submitted)
+{
+    <div class="alert alert-info" role="status">
+        <a asp-page="/Admin/Index" asp-route-status="@ItemStatus.Submitted" class="alert-link">@T["Contributions waiting for review: {0}", Model.WaitingCount]</a>
+    </div>
+}
 
 @if (!Model.HasCollections)
 {
@@ -30,6 +38,8 @@ else
                 <option value="">@T["All statuses"]</option>
                 <option value="@ItemStatus.Draft" selected="@(Model.Status == ItemStatus.Draft)">@T["Draft"]</option>
                 <option value="@ItemStatus.Published" selected="@(Model.Status == ItemStatus.Published)">@T["Published"]</option>
+                <option value="@ItemStatus.Submitted" selected="@(Model.Status == ItemStatus.Submitted)">@T["Submitted"]</option>
+                <option value="@ItemStatus.Rejected" selected="@(Model.Status == ItemStatus.Rejected)">@T["Rejected"]</option>
             </select>
         </div>
         <div class="col-auto">

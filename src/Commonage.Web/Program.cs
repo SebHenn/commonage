@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using Commonage.Web;
+using Commonage.Web.Contributions;
 using Commonage.Web.Data;
 using Commonage.Web.Identity;
 using Commonage.Web.Media;
@@ -48,6 +49,11 @@ builder.Services.AddScoped<MediaUploadService>();
 builder.Services.AddSingleton<MediaProcessingQueue>();
 builder.Services.AddHostedService<MediaProcessor>();
 
+// Anyone with a contribution link can send in material, so the form is protected against automated spam.
+builder.Services.Configure<ContributionOptions>(builder.Configuration.GetSection(ContributionOptions.Section));
+builder.Services.AddSingleton<FormTimer>();
+builder.Services.AddContributionRateLimit();
+
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 // Write letters such as ü and ß as-is instead of as HTML entities. Razor still escapes markup characters.
 builder.Services.Configure<WebEncoderOptions>(options => options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.All));
@@ -91,6 +97,7 @@ app.UseRequestLocalization(new RequestLocalizationOptions
     SupportedUICultures = supportedCultures.Select(c => new CultureInfo(c)).ToList(),
 });
 
+app.UseRateLimiter();
 app.UseRouting();
 
 app.UseAuthentication();

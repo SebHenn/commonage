@@ -28,6 +28,10 @@
     {
         <p class="text-preserve-lines">@Model.Item.Description</p>
     }
+    @if (Model.Item.Contribution is { ShowName: true } contribution)
+    {
+        <p class="text-muted">@T["Contributed by {0}", contribution.ContributorName]</p>
+    }
     @if (Model.Item.Tags.Count > 0)
     {
         <h2 class="visually-hidden">@T["Tags"]</h2>

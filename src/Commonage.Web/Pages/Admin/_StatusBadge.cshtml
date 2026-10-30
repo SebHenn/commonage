@@ -1,9 +1,16 @@
 @model ItemStatus
-@if (Model == ItemStatus.Published)
+@switch (Model)
 {
-    <span class="badge text-bg-success">@T["Published"]</span>
-}
-else
-{
-    <span class="badge text-bg-secondary">@T["Draft"]</span>
+    case ItemStatus.Published:
+        <span class="badge text-bg-success">@T["Published"]</span>
+        break;
+    case ItemStatus.Submitted:
+        <span class="badge text-bg-warning">@T["Submitted"]</span>
+        break;
+    case ItemStatus.Rejected:
+        <span class="badge text-bg-danger">@T["Rejected"]</span>
+        break;
+    default:
+        <span class="badge text-bg-secondary">@T["Draft"]</span>
+        break;
 }

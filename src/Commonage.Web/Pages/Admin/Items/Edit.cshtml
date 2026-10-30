@@ -22,6 +22,54 @@
     }
 </div>
 
+@if (Model.Contribution is { } contribution)
+{
+    <section class="card mb-4 col-lg-8" aria-labelledby="contribution-heading">
+        <div class="card-body">
+            <h2 id="contribution-heading" class="h5">@T["Contribution"]</h2>
+            @if (Model.CurrentStatus == ItemStatus.Submitted)
+            {
+                <p>@T["Check the contribution, complete the details below, then publish it, accept it as a draft or reject it."]</p>
+            }
+            <dl class="row mb-0">
+                <dt class="col-sm-4">@T["Sent in by"]</dt>
+                <dd class="col-sm-8">
+                    @contribution.ContributorName
+                    <span class="text-muted">(@(contribution.ShowName ? T["may be named publicly"] : T["not to be named publicly"]))</span>
+                </dd>
+                @if (contribution.ContributorEmail is not null)
+                {
+                    <dt class="col-sm-4">@T["Email address"]</dt>
+                    <dd class="col-sm-8"><a href="mailto:@contribution.ContributorEmail">@contribution.ContributorEmail</a></dd>
+                }
+                <dt class="col-sm-4">@T["Who made it"]</dt>
+                <dd class="col-sm-8">
+                    @(contribution.Rights switch
+                    {
+                        RightsStatement.CreatedByContributor => T["The contributor"],
+                        RightsStatement.PermissionFromRightsHolder => T["Someone else; the contributor has permission or inherited the rights"],
+                        _ => T["Unknown"],
+                    })
+                    @if (contribution.RightsHolder is not null)
+                    {
+                        <br />@T["Photographer or author: {0}", contribution.RightsHolder]
+                    }
+                </dd>
+                <dt class="col-sm-4">@T["Sent in"]</dt>
+                <dd class="col-sm-8">
+                    @contribution.SubmittedAt.ToLocalTime().ToString("g")
+                    @if (contribution.ContributionLink is { } link)
+                    {
+                        <br /><a asp-page="/Admin/Contributions/Edit" asp-route-id="@link.Id">@link.Title</a>
+                    }
+                </dd>
+                <dt class="col-sm-4">@T["Consent"]</dt>
+                <dd class="col-sm-8 mb-0">@contribution.ConsentText</dd>
+            </dl>
+        </div>
+    </section>
+}
+
 <form method="post" class="col-lg-8">
     <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
     <div class="mb-3">
@@ -61,15 +109,25 @@
     </div>
 
     <div class="d-flex flex-wrap gap-2">
-        @if (Model.CurrentStatus == ItemStatus.Published)
+        @switch (Model.CurrentStatus)
         {
-            <button type="submit" class="btn btn-primary">@T["Save"]</button>
-            <button type="submit" name="command" value="unpublish" class="btn btn-outline-danger">@T["Unpublish"]</button>
-        }
-        else
-        {
-            <button type="submit" class="btn btn-outline-primary">@T["Save as draft"]</button>
-            <button type="submit" name="command" value="publish" class="btn btn-primary">@T["Save and publish"]</button>
+            case ItemStatus.Published:
+                <button type="submit" class="btn btn-primary">@T["Save"]</button>
+                <button type="submit" name="command" value="unpublish" class="btn btn-outline-danger">@T["Unpublish"]</button>
+                break;
+            case ItemStatus.Submitted:
+                <button type="submit" name="command" value="publish" class="btn btn-primary">@T["Save and publish"]</button>
+                <button type="submit" name="command" value="accept" class="btn btn-outline-primary">@T["Accept as draft"]</button>
+                <button type="submit" name="command" value="reject" class="btn btn-outline-danger">@T["Reject"]</button>
+                break;
+            case ItemStatus.Rejected:
+                <button type="submit" class="btn btn-outline-primary">@T["Save"]</button>
+                <button type="submit" name="command" value="accept" class="btn btn-outline-primary">@T["Accept as draft"]</button>
+                break;
+            default:
+                <button type="submit" class="btn btn-outline-primary">@T["Save as draft"]</button>
+                <button type="submit" name="command" value="publish" class="btn btn-primary">@T["Save and publish"]</button>
+                break;
         }
     </div>
 </form>
@@ -128,6 +186,14 @@
         <p class="form-text">@T["JPEG, PNG, TIFF or WebP. The original file is kept unchanged and is only visible to curators."]</p>
     }
 </section>
+
+@if (Model.CurrentStatus is ItemStatus.Submitted or ItemStatus.Rejected)
+{
+    <form method="post" asp-page-handler="Delete" asp-route-id="@Model.ItemId" class="mt-5"
+          onsubmit="return confirm('@T["Delete this contribution with all its photos? This cannot be undone."]');">
+        <button type="submit" class="btn btn-outline-danger">@T["Delete contribution"]</button>
+    </form>
+}
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

@@ -86,7 +86,17 @@ public class MediaProcessor(
             file.ProcessingError = exception.Message.Length <= 1000 ? exception.Message : exception.Message[..1000];
         }
 
-        await db.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await db.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            // A curator deleted the file, or its whole contribution, while the previews were being made.
+            // An exception here would stop the app, so the new previews are removed instead.
+            storage.Delete(file.PreviewKey);
+            storage.Delete(file.ThumbnailKey);
+        }
     }
 
     /// <summary>Shrinks the image to fit a square of the given size, applying the EXIF rotation, and drops all metadata.</summary>
