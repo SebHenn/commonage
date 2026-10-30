@@ -1,0 +1,24 @@
+@model IEnumerable<ItemSummary>
+
+<ul class="list-unstyled row g-3">
+    @foreach (var item in Model)
+    {
+        <li class="col-6 col-md-4 col-lg-3 item-card">
+            <a asp-page="/Items/Details" asp-route-id="@item.Id" class="d-block">
+                @if (item.ThumbnailMediaFileId is { } mediaFileId)
+                {
+                    <img src="/media/@mediaFileId/thumbnail" alt="" class="media-thumbnail rounded mb-1" loading="lazy" />
+                }
+                else
+                {
+                    <span class="media-thumbnail rounded mb-1 bg-light d-block" aria-hidden="true"></span>
+                }
+                @item.Title
+            </a>
+            @if (item.DateText is not null)
+            {
+                <small class="d-block text-muted">@item.DateText</small>
+            }
+        </li>
+    }
+</ul>

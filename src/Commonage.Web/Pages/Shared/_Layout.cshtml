@@ -23,6 +23,9 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-page="/Index">@T["Collections"]</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/Search">@T["Search"]</a>
+                        </li>
                         @if (User.IsInRole(Commonage.Web.Identity.Roles.Admin) || User.IsInRole(Commonage.Web.Identity.Roles.Curator))
                         {
                             <li class="nav-item">

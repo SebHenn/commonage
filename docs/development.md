@@ -51,6 +51,21 @@ Previews are generated in the background with [NetVips](https://github.com/kleis
 (libvips). They are rotated upright and contain no EXIF, so GPS coordinates stay in the private
 original.
 
+## Search and dates
+
+Visitors search at `/search`. Filters, sorting and paging are in `Search/ItemSearch.cs`; the date parser
+is `Domain/DateRange.cs` and has its own unit tests in `DateRangeTests`.
+
+Search ignores accents by passing documents and search text through the database function `commonage_fold`
+(see `Data/AccentFolding.cs`). A migration creates it from built-in PostgreSQL functions; at startup the app
+switches it to the `unaccent` extension if the server has it, and logs a warning if not. `AccentFoldingTests`
+checks both versions with text in several languages and scripts. To see which search words PostgreSQL makes of
+a text:
+
+```sh
+docker compose exec db psql -U commonage -c "select to_tsvector('simple', commonage_fold('Die Mühle an der Mühlenstraße'))"
+```
+
 ## Database changes
 
 After changing an entity or `CommonageDbContext`, create a migration and commit it:

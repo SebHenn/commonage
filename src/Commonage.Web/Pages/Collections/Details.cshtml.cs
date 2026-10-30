@@ -1,33 +1,31 @@
 using Commonage.Web.Data;
 using Commonage.Web.Domain;
+using Commonage.Web.Search;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 
 namespace Commonage.Web.Pages.Collections;
 
 public class DetailsModel(CommonageDbContext db) : PageModel
 {
-    public record ItemSummary(int Id, string Title, int? ThumbnailMediaFileId);
-
     public Collection Collection { get; private set; } = null!;
-    public IReadOnlyList<ItemSummary> Items { get; private set; } = [];
+    public PagedList<ItemSummary> Items { get; private set; } = PagedList<ItemSummary>.Empty;
 
-    public async Task<IActionResult> OnGetAsync(int id)
+    [BindProperty(SupportsGet = true, Name = QueryUrls.PageKey)]
+    public int PageNumber { get; set; } = 1;
+
+    public async Task<IActionResult> OnGetAsync(int id, CancellationToken cancellationToken)
     {
-        var collection = await db.Collections.FindAsync(id);
+        var collection = await db.Collections.FindAsync([id], cancellationToken);
         if (collection is null)
             return NotFound();
 
         Collection = collection;
         Items = await db.PublishedItems
-            .Where(i => i.CollectionId == id)
-            .OrderByDescending(i => i.PublishedAt)
-            .Select(i => new ItemSummary(
-                i.Id,
-                i.Title,
-                i.MediaFiles.Where(f => f.Status == ProcessingStatus.Ready).OrderBy(f => f.Id).Select(f => (int?)f.Id).FirstOrDefault()))
-            .ToListAsync();
+            .Filter(new ItemFilter(CollectionId: id))
+            .Sort(ItemSort.RecentlyAdded, query: null)
+            .Select(ItemSummary.FromItem)
+            .ToPagedListAsync(PageNumber, SearchModel.PageSize, cancellationToken);
         return Page();
     }
 }

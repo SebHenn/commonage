@@ -1,0 +1,18 @@
+@model IPagination
+@* Previous and next links keep every other query value, so filters stay applied while paging. *@
+@if (Model.TotalPages > 1)
+{
+    <nav aria-label="@T["Pages"]" class="d-flex flex-wrap gap-2 align-items-center justify-content-center my-4">
+        @if (Model.Page > 1)
+        {
+            <a class="btn btn-outline-secondary" rel="prev"
+               href="@Context.Request.WithQueryValue(QueryUrls.PageKey, Model.Page == 2 ? null : (Model.Page - 1).ToString())">@T["Previous"]</a>
+        }
+        <span class="px-2" aria-current="page">@T["Page {0} of {1}", Model.Page, Model.TotalPages]</span>
+        @if (Model.Page < Model.TotalPages)
+        {
+            <a class="btn btn-outline-secondary" rel="next"
+               href="@Context.Request.WithQueryValue(QueryUrls.PageKey, (Model.Page + 1).ToString())">@T["Next"]</a>
+        }
+    </nav>
+}

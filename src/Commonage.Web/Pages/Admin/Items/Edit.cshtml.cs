@@ -17,12 +17,16 @@ namespace Commonage.Web.Pages.Admin.Items;
 public class EditModel(CommonageDbContext db, MediaUploadService uploads, IStringLocalizer<SharedResource> localizer) : PageModel
 {
     private const long MaxUploadRequestBytes = 1024L * 1024 * 1024;
+    private const int MaxTagsPerItem = 30;
 
     [BindProperty]
     public InputModel Input { get; set; } = new();
 
     public int? ItemId { get; private set; }
     public ItemStatus? CurrentStatus { get; private set; }
+
+    /// <summary>The period the saved date stands for, shown so curators can check how it was understood.</summary>
+    public DateRange? CurrentDateRange { get; private set; }
     public SelectList CollectionOptions { get; private set; } = null!;
     public IReadOnlyList<MediaFile> MediaFiles { get; private set; } = [];
 
@@ -40,17 +44,31 @@ public class EditModel(CommonageDbContext db, MediaUploadService uploads, IStrin
         [Required(ErrorMessage = "Please choose a collection.")]
         [Display(Name = "Collection")]
         public int? CollectionId { get; set; }
+
+        [StringLength(DateRange.MaxTextLength, ErrorMessage = "The date can be at most {1} characters long.")]
+        [Display(Name = "Date")]
+        public string? Date { get; set; }
+
+        [Display(Name = "Tags")]
+        public string? Tags { get; set; }
     }
 
     public async Task<IActionResult> OnGetAsync(int? id, int? collectionId)
     {
         if (id is not null)
         {
-            var item = await db.ArchiveItems.FindAsync(id);
+            var item = await db.ArchiveItems.Include(i => i.Tags).FirstOrDefaultAsync(i => i.Id == id);
             if (item is null)
                 return NotFound();
 
-            Input = new InputModel { Title = item.Title, Description = item.Description, CollectionId = item.CollectionId };
+            Input = new InputModel
+            {
+                Title = item.Title,
+                Description = item.Description,
+                CollectionId = item.CollectionId,
+                Date = item.DateText,
+                Tags = string.Join(", ", item.Tags.Select(t => t.Name).Order(StringComparer.CurrentCultureIgnoreCase)),
+            };
             await ShowStateAsync(item);
         }
         else
@@ -68,13 +86,21 @@ public class EditModel(CommonageDbContext db, MediaUploadService uploads, IStrin
         ArchiveItem? item = null;
         if (id is not null)
         {
-            item = await db.ArchiveItems.FindAsync(id);
+            item = await db.ArchiveItems.Include(i => i.Tags).FirstOrDefaultAsync(i => i.Id == id);
             if (item is null)
                 return NotFound();
         }
 
         if (Input.CollectionId is not null && !await db.Collections.AnyAsync(c => c.Id == Input.CollectionId))
             ModelState.AddModelError("Input.CollectionId", localizer["Please choose a collection."]);
+        if (!string.IsNullOrWhiteSpace(Input.Date) && !DateRange.TryParse(Input.Date, out _))
+            ModelState.AddModelError("Input.Date", localizer["This date could not be understood. Please include a year, for example: 1953, 12.03.1953, circa 1950, 1950s, 1950–1955."]);
+
+        var tagNames = Tag.ParseList(Input.Tags);
+        if (tagNames.Any(name => name.Length > Tag.MaxLength))
+            ModelState.AddModelError("Input.Tags", localizer["A tag can be at most {0} characters long.", Tag.MaxLength]);
+        if (tagNames.Count > MaxTagsPerItem)
+            ModelState.AddModelError("Input.Tags", localizer["An item can have at most {0} tags.", MaxTagsPerItem]);
 
         if (!ModelState.IsValid)
         {
@@ -93,6 +119,8 @@ public class EditModel(CommonageDbContext db, MediaUploadService uploads, IStrin
         item.Title = Input.Title.Trim();
         item.Description = string.IsNullOrWhiteSpace(Input.Description) ? null : Input.Description.Trim();
         item.CollectionId = Input.CollectionId!.Value;
+        item.TrySetDate(Input.Date);
+        item.SetTags(await FindOrCreateTagsAsync(tagNames));
         item.UpdatedAt = now;
 
         switch (command)
@@ -163,7 +191,21 @@ public class EditModel(CommonageDbContext db, MediaUploadService uploads, IStrin
         ItemId = item?.Id;
         CurrentStatus = item?.Status;
         if (item is not null)
+        {
             MediaFiles = await db.MediaFiles.Where(f => f.ArchiveItemId == item.Id).OrderBy(f => f.Id).ToListAsync();
+            if (item.DateText is not null)
+                CurrentDateRange = new DateRange(item.DateFrom, item.DateTo);
+        }
+    }
+
+    /// <summary>Reuses existing tags regardless of case, so "mill street" joins the existing tag "Mill Street".</summary>
+    private async Task<List<Tag>> FindOrCreateTagsAsync(IReadOnlyList<string> names)
+    {
+        var normalizedNames = names.Select(Tag.Normalize).ToList();
+        var existing = await db.Tags.Where(t => normalizedNames.Contains(t.NormalizedName)).ToDictionaryAsync(t => t.NormalizedName);
+        return names
+            .Select(name => existing.GetValueOrDefault(Tag.Normalize(name)) ?? new Tag { Name = name, NormalizedName = Tag.Normalize(name) })
+            .ToList();
     }
 
     private async Task LoadCollectionsAsync()

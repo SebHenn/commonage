@@ -7,9 +7,14 @@ namespace Commonage.Web.Pages;
 
 public class IndexModel(CommonageDbContext db) : PageModel
 {
+    private const int MaxTags = 30;
+
     public record CollectionSummary(int Id, string Title, string? Description, int PublishedItemCount);
 
     public IReadOnlyList<CollectionSummary> Collections { get; private set; } = [];
+
+    /// <summary>The most used tags of published items, in alphabetical order.</summary>
+    public IReadOnlyList<string> Tags { get; private set; } = [];
 
     public async Task OnGetAsync()
     {
@@ -18,5 +23,15 @@ public class IndexModel(CommonageDbContext db) : PageModel
             .Select(c => new CollectionSummary(
                 c.Id, c.Title, c.Description, c.Items.Count(i => i.Status == ItemStatus.Published)))
             .ToListAsync();
+
+        var popularTags = await db.PublishedItems
+            .SelectMany(i => i.Tags)
+            .GroupBy(t => t.Name)
+            .OrderByDescending(g => g.Count())
+            .ThenBy(g => g.Key)
+            .Select(g => g.Key)
+            .Take(MaxTags)
+            .ToListAsync();
+        Tags = popularTags.Order(StringComparer.CurrentCultureIgnoreCase).ToList();
     }
 }
