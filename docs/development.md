@@ -88,8 +88,18 @@ How these work for the people running an archive is in [operations.md](operation
   in Git Bash on Windows (`MSYS_NO_PATHCONV=1`, and paths through `cygpath -m` for native programs such as curl).
   Run the restore test with `sh scripts/test-backup-restore.sh`; it uses its own Compose project and ports.
 
-Forms whose action cannot be undone ask first with a `data-confirm="..."` attribute (handled in `wwwroot/js/site.js`),
-not with inline script, so the question can be any text in any language.
+Pages must not contain inline script, inline event handlers (`onclick`) or `style` attributes: the Content Security
+Policy in `Security/SecurityHeaders.cs` blocks them, and `SecurityHeaderTests` fails if a page has any. Put behaviour
+in `wwwroot/js/site.js` and styles in `wwwroot/css/site.css`. Forms whose action cannot be undone ask first with a
+`data-confirm="..."` attribute, so the question can be any text in any language.
+
+## Demo content and production setup
+
+`Demo/DemoContent.cs` fills an empty archive with made-up content when `Demo:Language` is `en` or `de`
+(`COMMONAGE_DEMO` in Docker); the pictures are drawn in `Demo/DemoImages.cs`. Keep both languages in step when you
+change it. `compose.production.yaml` and `deploy/Caddyfile` are the HTTPS setup from [deployment.md](deployment.md);
+to try it locally, set `COMMONAGE_DOMAIN=localhost` (Caddy then uses its own local certificate authority) and use
+`;` instead of `:` in `COMPOSE_FILE` on Windows.
 
 ## Database changes
 

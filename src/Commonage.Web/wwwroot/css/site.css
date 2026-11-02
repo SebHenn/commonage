@@ -47,3 +47,8 @@ html {
   height: 1px;
   overflow: hidden;
 }
+
+/* The skip link moves focus to <main>; it needs no focus ring of its own. */
+main:focus {
+    outline: none;
+}

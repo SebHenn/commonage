@@ -1,0 +1,6 @@
+# Caddy gets and renews a Let's Encrypt certificate for the domain by itself, redirects HTTP to HTTPS and passes
+# requests on to the app. See docs/deployment.md.
+{$COMMONAGE_DOMAIN} {
+	encode zstd gzip
+	reverse_proxy web:8080
+}

@@ -14,6 +14,8 @@ public static class Accounts
     /// <summary>A disabled account is locked out until this date, which is how Identity keeps people from logging in.</summary>
     public static readonly DateTimeOffset DisabledUntil = new(9999, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
+    public const int MinimumPasswordLength = 12;
+
     public static bool IsDisabled(IdentityUser user) => user.LockoutEnd >= DisabledUntil;
 
     /// <summary>

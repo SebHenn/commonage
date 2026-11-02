@@ -1,15 +1,16 @@
-﻿<!DOCTYPE html>
+﻿@inject IConfiguration Configuration
+<!DOCTYPE html>
 <html lang="@System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Commonage</title>
-    <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Commonage.Web.styles.css" asp-append-version="true" />
 </head>
 <body class="d-flex flex-column min-vh-100">
+    <a href="#main" class="visually-hidden-focusable position-absolute top-0 start-0 z-3 m-2 p-2 bg-white border rounded">@T["Skip to content"]</a>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container">
@@ -45,9 +46,15 @@
                 </div>
             </div>
         </nav>
+        @if (Commonage.Web.Demo.DemoContent.LanguageOf(Configuration) is not null)
+        {
+            <div class="container">
+                <p class="alert alert-warning py-2 small" role="note">@T["This is a demo archive. Everything in it, people and pictures included, is made up."]</p>
+            </div>
+        }
     </header>
     <div class="container flex-grow-1">
-        <main role="main" class="pb-3">
+        <main id="main" tabindex="-1" class="pb-3">
             @if (TempData["Message"] is string message)
             {
                 <div class="alert alert-success" role="status">@message</div>
@@ -71,6 +78,11 @@
             @if (User.Identity?.IsAuthenticated != true)
             {
                 <a asp-page="/Account/Login" class="ms-auto">@T["Curator login"]</a>
+            }
+            else
+            {
+                @* Only for curators, who need it for updates and bug reports; visitors learn nothing about the software version. *@
+                <span class="ms-auto small">@T["Version {0}", Commonage.Web.AppVersion.Current]</span>
             }
         </div>
     </footer>

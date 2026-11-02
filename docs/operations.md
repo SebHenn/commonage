@@ -97,6 +97,14 @@ of Commonage; the app upgrades the database when it starts.
 up, deletes all containers and volumes, restores and compares. It runs in CI on every pull request, as its own
 Compose project on ports 18080 and 15432, so it can also run next to your own archive.
 
+## Demo archive
+
+`COMMONAGE_DEMO=en` or `COMMONAGE_DEMO=de` in `.env` fills a new, empty archive with made-up content when the app
+starts: three collections in the invented town of Lindenau, eight published items with drawn pictures, a draft, an
+open contribution link and a contribution waiting for review. Every page then says that it is a demo archive.
+Archives that already have a collection are never touched. It is meant for trying Commonage out, showing it to a
+group and the [five-task test](usability-test.md); for a real archive, start without it.
+
 ## Ports
 
 The app listens on `127.0.0.1:8080` and PostgreSQL on `127.0.0.1:5432`, reachable only from the server itself. Set

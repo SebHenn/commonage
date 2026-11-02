@@ -11,6 +11,12 @@ public class UploadOptions
     public int MaxFileSizeMegabytes { get; set; } = 200;
 
     public long MaxFileSizeBytes => MaxFileSizeMegabytes * 1024L * 1024L;
+
+    /// <summary>
+    /// Images with more pixels get no preview. A small file can claim to be a huge image (a "decompression bomb");
+    /// this keeps such a file from tying up the server. 250 megapixels is more than a large-format scan at 600 dpi.
+    /// </summary>
+    public int MaxPreviewMegapixels { get; set; } = 250;
 }
 
 public enum UploadError
