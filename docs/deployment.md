@@ -38,8 +38,11 @@ The database and the app itself are never exposed; only Caddy, the HTTPS front, 
 ```sh
 git clone https://github.com/SebHenn/commonage.git
 cd commonage
-git checkout v0.1.0        # a released version, not the development branch
+git checkout v0.1.1        # a released version, not the development branch
 ```
+
+This gives you the Compose files and the backup scripts. The app itself comes as a ready-made Docker image,
+`ghcr.io/sebhenn/commonage`, for x86 and ARM servers, so nothing is compiled on your server.
 
 ## 4. Configure
 
@@ -59,7 +62,11 @@ COMMONAGE_ADMIN_PASSWORD=<the second random value, or a long passphrase>
 
 COMMONAGE_DOMAIN=archive.example.org
 COMPOSE_FILE=compose.yaml:compose.production.yaml
+COMMONAGE_VERSION=0.1
 ```
+
+`COMMONAGE_VERSION=0.1` follows the bug-fix releases of 0.1 (0.1.1, 0.1.2, ...) whenever you update; a new minor
+version such as 0.2 only comes when you change this line.
 
 The `COMPOSE_FILE` line adds `compose.production.yaml`, so every `docker compose` command, and the backup scripts,
 use the production setup: HTTPS through Caddy, automatic restarts, and no ports open except 80 and 443. (On Windows
@@ -68,8 +75,14 @@ the separator is `;` instead of `:`.)
 ## 5. Start
 
 ```sh
-docker compose up -d --build
+docker compose up -d
 docker compose ps
+```
+
+To check that the image really was built from this repository by its release workflow:
+
+```sh
+gh attestation verify oci://ghcr.io/sebhenn/commonage:0.1 --owner SebHenn
 ```
 
 Within a minute Caddy has a certificate from Let's Encrypt. Open `https://archive.example.org`, log in with
@@ -99,15 +112,21 @@ night with cron, keep a week of them, and copy them off the server. For example,
 
 Read the release notes in `CHANGELOG.md` first. Then:
 
+A bug-fix release of your version (for example 0.1.2 when you run 0.1):
+
 ```sh
 scripts/backup.sh
-git fetch --tags
-git checkout v0.2.0          # the new version
-docker compose up -d --build
+git fetch --tags && git checkout v0.1.2
+docker compose pull
+docker compose up -d
 ```
 
-The app upgrades the database when it starts. If something goes wrong, check out the previous version and restore
-the backup you just made.
+A new minor version (for example 0.2): the same, but also set `COMMONAGE_VERSION=0.2` in `.env` before
+`docker compose pull`.
+
+The app upgrades the database when it starts. If something goes wrong, check out the previous version, set
+`COMMONAGE_VERSION` to the exact previous version (for example `0.1.1`), run `docker compose pull`, and restore the
+backup you just made.
 
 ## Keeping an eye on it
 
@@ -115,6 +134,12 @@ the backup you just made.
   check it every few minutes.
 - `docker compose logs --tail 100 web` shows the app's log; `docker compose logs caddy` shows certificate problems.
 - Keep the server's own updates switched on (`unattended-upgrades` on Debian and Ubuntu).
+
+## A changed version of Commonage
+
+If you change the code, build and publish your own image (for example with this repository's release workflow in your
+fork), set `COMMONAGE_IMAGE` to it in `.env`, and set `COMMONAGE_SOURCE_URL` to your fork, as the AGPL requires.
+Without `compose.production.yaml`, `docker compose up -d --build` builds the image from the checked-out code.
 
 ## Behind an existing web server
 
@@ -144,4 +169,5 @@ app creates (setup links) would start with `http://`.
 | `docker compose` says `Set COMMONAGE_DOMAIN in .env` | The `COMMONAGE_DOMAIN` line is missing in `.env`. |
 | The admin login does not work on a new archive | `COMMONAGE_ADMIN_*` must be set on the very first start; `docker compose logs web` says if the password was refused (at least 12 characters). |
 | The log shows `fail: ... Failed executing DbCommand ... "__EFMigrationsHistory"` on the very first start | Harmless: the database is still empty, and the app creates its tables right after. |
+| `docker compose pull` says the image cannot be found | `COMMONAGE_VERSION` names a version that has not been released; see the releases page. |
 | Uploads stop at a certain size | Each file may be up to 200 MB (`Uploads__MaxFileSizeMegabytes` in the `web` environment). |

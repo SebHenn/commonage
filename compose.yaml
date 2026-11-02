@@ -1,7 +1,8 @@
 # Development setup. Copy .env.example to .env first; the password lives only in .env.
 services:
   db:
-    image: postgres:18-alpine
+    # Pinned by digest; Dependabot updates it.
+    image: postgres:18-alpine@sha256:10a5c69a83035ab5239f5620d708520e8b28f5aa1f2b20143e6024532edadfb5
     environment:
       POSTGRES_DB: commonage
       POSTGRES_USER: commonage

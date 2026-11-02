@@ -1,0 +1,54 @@
+name: Pull request checks
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  # Refuses pull requests that add a dependency with a known vulnerability, or under a license that cannot be
+  # combined with the AGPL.
+  dependency-review:
+    # Needs GitHub's code scanning and dependency graph, which free plans offer for public repositories only.
+    if: ${{ !github.event.repository.private }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+        with:
+          fail-on-severity: moderate
+          deny-licenses: SSPL-1.0, BUSL-1.1, CC-BY-NC-4.0, CC-BY-NC-SA-4.0
+
+  # Every commit must carry a "Signed-off-by" line (git commit -s), certifying the Developer Certificate of Origin.
+  # See CONTRIBUTING.md. Dependabot's commits are exempt.
+  dco:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Check sign-offs
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          missing=0
+          for commit in $(git rev-list --no-merges "$BASE..$HEAD"); do
+            author=$(git show -s --format='%an <%ae>' "$commit")
+            case "$author" in "dependabot[bot] "*) continue ;; esac
+            if ! git show -s --format='%B' "$commit" | grep -q "^Signed-off-by: "; then
+              echo "::error::Commit $(git show -s --format='%h %s' "$commit") has no Signed-off-by line."
+              missing=1
+            fi
+          done
+          if [ "$missing" -ne 0 ]; then
+            echo "Sign off your commits with 'git commit -s' (or 'git rebase --signoff $BASE' for existing ones). See CONTRIBUTING.md."
+            exit 1
+          fi
+          echo "All commits are signed off."

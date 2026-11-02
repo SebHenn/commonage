@@ -1,0 +1,51 @@
+name: Bug report
+description: Something in Commonage does not work as it should.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a problem. **Please do not include real archive material or anyone's personal
+        data** (names, email addresses, photos of people) in this public issue. Security problems go to
+        [private reporting](https://github.com/SebHenn/commonage/security/advisories/new) instead.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: How can we see it ourselves?
+      placeholder: |
+        1. Log in as a curator
+        2. Open ...
+        3. ...
+  - type: input
+    id: version
+    attributes:
+      label: Commonage version
+      description: Curators see it at the bottom of every page.
+      placeholder: "0.1.1"
+  - type: dropdown
+    id: setup
+    attributes:
+      label: How is it running?
+      options:
+        - Published Docker image with compose.production.yaml
+        - Built from source with Docker Compose
+        - From an IDE (development)
+        - Something else
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and device, if it is about a page
+      placeholder: "Firefox on Windows, Safari on iPhone, ..."
+  - type: textarea
+    id: logs
+    attributes:
+      label: Log output
+      description: From `docker compose logs --tail 100 web`. Remove anything personal first.
+      render: text
