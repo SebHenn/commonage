@@ -228,6 +228,7 @@
   <data name="Someone else; the contributor has permission or inherited the rights" xml:space="preserve"><value>Jemand anderes; die einsendende Person hat die Erlaubnis oder die Rechte geerbt</value></data>
   <data name="Something went wrong" xml:space="preserve"><value>Etwas ist schiefgegangen</value></data>
   <data name="Sort by" xml:space="preserve"><value>Sortieren nach</value></data>
+  <data name="Source code" xml:space="preserve"><value>Quellcode</value></data>
   <data name="Status" xml:space="preserve"><value>Status</value></data>
   <data name="Submitted" xml:space="preserve"><value>Eingesendet</value></data>
   <data name="Tag: {0}" xml:space="preserve"><value>Schlagwort: {0}</value></data>

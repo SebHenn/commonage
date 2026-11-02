@@ -3,7 +3,7 @@
 All notable changes to Commonage. Versions follow [Semantic Versioning](https://semver.org/); before 1.0, a minor
 version may change things that need attention when updating, and these notes say so.
 
-## 0.1.0 (unreleased)
+## 0.1.0 (2026-11-02)
 
 The first version for real community archives.
 
@@ -42,3 +42,5 @@ The first version for real community archives.
 - Optional demo content in English or German (`COMMONAGE_DEMO`).
 - Security headers with a strict Content Security Policy, length-based password rules, accessibility review
   against WCAG 2.2 AA (docs/security.md, docs/accessibility.md).
+- Licensed under the GNU AGPL v3.0; every page links to the source code (`COMMONAGE_SOURCE_URL` for changed
+  versions).

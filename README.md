@@ -11,7 +11,8 @@ and communities use it to collect, preserve and share photographs, documents, re
 - **The group stays in control**: it runs the archive on its own server, can export everything in an open format at
   any time, handles contributors' requests to remove their data, and sees who changed what.
 
-> **Status:** v0.1 is being prepared. See [CHANGELOG.md](CHANGELOG.md) and [docs/roadmap.md](docs/roadmap.md).
+> **Status:** v0.1.0, the first version for real community archives. See [CHANGELOG.md](CHANGELOG.md) and
+> [docs/roadmap.md](docs/roadmap.md).
 
 ## Try it
 
@@ -35,6 +36,17 @@ and password from `.env`. The health check is at http://localhost:8080/health.
 - [Security](docs/security.md) and [accessibility](docs/accessibility.md): what is in place and what is still open.
   Report vulnerabilities as described in [SECURITY.md](SECURITY.md).
 - [Development](docs/development.md): working on the code.
+
+## License
+
+Commonage is free software under the [GNU Affero General Public License v3.0](LICENSE). You may run, study, change
+and share it. If you run a changed version for others, you must offer them its source code; set
+`COMMONAGE_SOURCE_URL` so the "Source code" link at the bottom of every page points to it.
+
+The license covers the software only. The photos, documents and stories in an archive belong to the community and
+the people who contributed them, under the terms they agreed to.
+
+Contributions are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Tech stack
 
