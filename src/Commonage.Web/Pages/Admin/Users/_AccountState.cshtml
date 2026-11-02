@@ -1,0 +1,13 @@
+@model Commonage.Web.Pages.Admin.Users.AccountState
+@switch (Model)
+{
+    case Commonage.Web.Pages.Admin.Users.AccountState.Disabled:
+        <span class="badge text-bg-secondary">@T["Disabled"]</span>
+        break;
+    case Commonage.Web.Pages.Admin.Users.AccountState.WaitingForSetup:
+        <span class="badge text-bg-warning">@T["Waiting for setup"]</span>
+        break;
+    default:
+        <span class="badge text-bg-success">@T["Active"]</span>
+        break;
+}

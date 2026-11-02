@@ -1,0 +1,88 @@
+@page "{id?}"
+@model Commonage.Web.Pages.Admin.Users.EditModel
+@using Commonage.Web.Identity
+@{
+    ViewData["Title"] = Model.Account is null ? T["New account"] : T["Account"];
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="/Admin/Index">@T["Items"]</a></li>
+        <li class="breadcrumb-item"><a asp-page="Index">@T["Accounts"]</a></li>
+    </ol>
+</nav>
+
+<div class="col-lg-8">
+    <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+        <h1 class="me-auto mb-0 text-break">@(Model.Account?.Email ?? ViewData["Title"])</h1>
+        @if (Model.Account is not null)
+        {
+            <partial name="_AccountState" model="Model.State" />
+        }
+    </div>
+
+    @if (Model.SetupLink is { } setupLink)
+    {
+        <div class="alert alert-info" role="status">
+            <h2 class="h5">@T["Setup link"]</h2>
+            <p>@T["Give this link to {0}, for example by email or in person. With it, they choose their own password. It works once and for seven days. It is shown only now; you can create a new one at any time.", Model.Account!.Email!]</p>
+            <label for="setup-link" class="visually-hidden">@T["Setup link"]</label>
+            <input id="setup-link" type="text" readonly value="@setupLink" class="form-control font-monospace" />
+        </div>
+    }
+
+    @if (Model.Account is null)
+    {
+        <p>@T["The new account gets a setup link instead of a password. Commonage sends no emails, so you pass the link on yourself."]</p>
+        <form method="post" asp-page-handler="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+            <div class="mb-3">
+                <label asp-for="Input.Email" class="form-label"></label>
+                <input asp-for="Input.Email" class="form-control" autocomplete="off" />
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+            <partial name="_RoleChoice" model="Model.Input.Role" />
+            <button type="submit" class="btn btn-primary">@T["Create account"]</button>
+        </form>
+    }
+    else if (Model.IsOwnAccount)
+    {
+        <p>@T["This is your own account. Another admin can change its role, disable or delete it."] <a asp-page="/Account/Password">@T["Change your password"]</a></p>
+    }
+    else
+    {
+        <form method="post" asp-page-handler="Role" asp-route-id="@Model.Account.Id" class="mb-4">
+            <partial name="_RoleChoice" model="Model.Input.Role" />
+            <button type="submit" class="btn btn-primary">@T["Save role"]</button>
+        </form>
+
+        <h2 class="h5">@T["Access"]</h2>
+        <div class="d-flex flex-wrap gap-2 mb-2">
+            <form method="post" asp-page-handler="SetupLink" asp-route-id="@Model.Account.Id">
+                <button type="submit" class="btn btn-outline-secondary">@T["Create a new setup link"]</button>
+            </form>
+            @if (Model.State == Commonage.Web.Pages.Admin.Users.AccountState.Disabled)
+            {
+                <form method="post" asp-page-handler="Enable" asp-route-id="@Model.Account.Id">
+                    <button type="submit" class="btn btn-outline-secondary">@T["Enable account"]</button>
+                </form>
+            }
+            else
+            {
+                <form method="post" asp-page-handler="Disable" asp-route-id="@Model.Account.Id">
+                    <button type="submit" class="btn btn-outline-secondary">@T["Disable account"]</button>
+                </form>
+            }
+        </div>
+        <p class="form-text">@T["A new setup link lets the person choose a new password, for example when they forgot theirs. Earlier links stop working. A disabled account cannot log in, but its history stays in the activity log."]</p>
+
+        <form method="post" asp-page-handler="Delete" asp-route-id="@Model.Account.Id" class="mt-5"
+              data-confirm="@T["Delete the account of {0}? This cannot be undone. The activity log keeps what the account did.", Model.Account.Email!]">
+            <button type="submit" class="btn btn-outline-danger">@T["Delete account"]</button>
+        </form>
+    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

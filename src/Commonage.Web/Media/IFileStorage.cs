@@ -35,7 +35,10 @@ public class LocalFileStorage(string rootPath) : IFileStorage
         File.Move(temporaryPath, path, overwrite: true);
     }
 
-    public Stream OpenRead(string key) => File.OpenRead(Resolve(key));
+    // FileShare.Delete lets a curator delete a file while it is being read, for example by the preview generator or an
+    // export. Linux always allows that; Windows would otherwise refuse the deletion.
+    public Stream OpenRead(string key) =>
+        new FileStream(Resolve(key), FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete, bufferSize: 4096, useAsync: true);
 
     public void Delete(string key)
     {

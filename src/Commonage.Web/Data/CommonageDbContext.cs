@@ -16,6 +16,7 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options)
     public DbSet<Tag> Tags => Set<Tag>();
     public DbSet<ContributionLink> ContributionLinks => Set<ContributionLink>();
     public DbSet<Contribution> Contributions => Set<Contribution>();
+    public DbSet<AuditEntry> AuditEntries => Set<AuditEntry>();
 
     // Keys that encrypt login cookies. Stored in the database so logins survive container rebuilds.
     public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
@@ -103,6 +104,18 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options)
                 .OnDelete(DeleteBehavior.Cascade);
             contribution.HasOne(c => c.ContributionLink)
                 .WithMany(l => l.Contributions)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        builder.Entity<AuditEntry>(entry =>
+        {
+            entry.Property(e => e.UserId).HasMaxLength(450);
+            entry.Property(e => e.UserName).HasMaxLength(256);
+            entry.Property(e => e.Action).HasConversion<string>().HasMaxLength(50);
+            entry.Property(e => e.Subject).HasMaxLength(AuditEntry.SubjectMaxLength);
+            entry.HasIndex(e => e.At);
+            entry.HasOne(e => e.ArchiveItem)
+                .WithMany()
                 .OnDelete(DeleteBehavior.SetNull);
         });
 

@@ -38,14 +38,23 @@ public class ArchiveItem
     public DateTime UpdatedAt { get; set; }
     public DateTime? PublishedAt { get; set; }
 
+    /// <summary>Withdrawn contributions cannot be published again; the contributor would have to send them in anew.</summary>
+    public bool CanBePublished => Status != ItemStatus.Withdrawn;
+
     public void Publish(DateTime now)
     {
+        if (!CanBePublished)
+            throw new InvalidOperationException("A withdrawn contribution cannot be published.");
         MarkReviewed(now);
         Status = ItemStatus.Published;
         PublishedAt ??= now;
     }
 
-    public void Unpublish() => Status = ItemStatus.Draft;
+    public void Unpublish()
+    {
+        if (Status == ItemStatus.Published)
+            Status = ItemStatus.Draft;
+    }
 
     /// <summary>Takes a contribution into the archive as a draft, for curators to complete before publishing.</summary>
     public void Accept(DateTime now)
@@ -58,6 +67,15 @@ public class ArchiveItem
     {
         MarkReviewed(now);
         Status = ItemStatus.Rejected;
+    }
+
+    /// <summary>Hides a contribution for good because the contributor withdrew their consent.</summary>
+    public void Withdraw(DateTime now)
+    {
+        if (Contribution is null)
+            throw new InvalidOperationException("Only contributions can be withdrawn.");
+        MarkReviewed(now);
+        Status = ItemStatus.Withdrawn;
     }
 
     /// <summary>Sets the date from free text. Returns false, and changes nothing, if no date can be read from it.</summary>

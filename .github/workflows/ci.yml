@@ -29,3 +29,10 @@ jobs:
           fetch-depth: 0
       # Scans the full git history so a secret committed and later deleted is still caught.
       - run: docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.24.2 git /repo --verbose --redact
+
+  backup-restore:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # Builds the Docker image, fills a new archive, backs it up, deletes it completely and restores it.
+      - run: sh scripts/test-backup-restore.sh

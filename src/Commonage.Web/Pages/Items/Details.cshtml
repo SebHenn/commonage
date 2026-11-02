@@ -28,9 +28,9 @@
     {
         <p class="text-preserve-lines">@Model.Item.Description</p>
     }
-    @if (Model.Item.Contribution is { ShowName: true } contribution)
+    @if (Model.Item.Contribution is { ShowName: true, ContributorName: { } contributorName })
     {
-        <p class="text-muted">@T["Contributed by {0}", contribution.ContributorName]</p>
+        <p class="text-muted">@T["Contributed by {0}", contributorName]</p>
     }
     @if (Model.Item.Tags.Count > 0)
     {

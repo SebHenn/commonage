@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Commonage.Web.Audit;
 using Commonage.Web.Contributions;
 using Commonage.Web.Data;
 using Commonage.Web.Domain;
@@ -19,6 +20,7 @@ namespace Commonage.Web.Pages.Contribute;
 public class IndexModel(
     CommonageDbContext db,
     MediaUploadService uploads,
+    AuditLog audit,
     FormTimer formTimer,
     IStringLocalizer<SharedResource> localizer,
     ILogger<IndexModel> logger) : PageModel
@@ -149,6 +151,7 @@ public class IndexModel(
         };
         item.TrySetDate(Input.Date);
         db.ArchiveItems.Add(item);
+        audit.Record(AuditAction.ContributionReceived, item.Title, item);
         await db.SaveChangesAsync(cancellationToken);
 
         foreach (var file in Files)

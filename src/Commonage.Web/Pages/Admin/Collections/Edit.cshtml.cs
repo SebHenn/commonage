@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Commonage.Web.Audit;
 using Commonage.Web.Data;
 using Commonage.Web.Domain;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,7 @@ using Microsoft.Extensions.Localization;
 
 namespace Commonage.Web.Pages.Admin.Collections;
 
-public class EditModel(CommonageDbContext db, IStringLocalizer<SharedResource> localizer) : PageModel
+public class EditModel(CommonageDbContext db, AuditLog audit, IStringLocalizer<SharedResource> localizer) : PageModel
 {
     [BindProperty]
     public InputModel Input { get; set; } = new();
@@ -56,6 +57,7 @@ public class EditModel(CommonageDbContext db, IStringLocalizer<SharedResource> l
             return Page();
         }
 
+        var isNew = collection is null;
         if (collection is null)
         {
             collection = new Collection { Title = "", CreatedAt = DateTime.UtcNow };
@@ -64,6 +66,7 @@ public class EditModel(CommonageDbContext db, IStringLocalizer<SharedResource> l
 
         collection.Title = Input.Title.Trim();
         collection.Description = string.IsNullOrWhiteSpace(Input.Description) ? null : Input.Description.Trim();
+        audit.Record(isNew ? AuditAction.CollectionCreated : AuditAction.CollectionChanged, collection.Title);
         await db.SaveChangesAsync();
 
         TempData["Message"] = localizer["Your changes are saved."].Value;

@@ -1,0 +1,40 @@
+@page
+@model Commonage.Web.Pages.Admin.Users.IndexModel
+@{
+    ViewData["Title"] = T["Accounts"];
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="/Admin/Index">@T["Items"]</a></li>
+    </ol>
+</nav>
+
+<div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+    <h1 class="me-auto mb-0">@ViewData["Title"]</h1>
+    <a asp-page="Edit" class="btn btn-primary">@T["New account"]</a>
+</div>
+
+<p class="col-lg-8">@T["Curators review contributions and look after the archive. Admins can also manage accounts, export the archive and read the activity log."]</p>
+
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th scope="col">@T["Email address"]</th>
+                <th scope="col">@T["Role"]</th>
+                <th scope="col">@T["Status"]</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var account in Model.Accounts)
+            {
+                <tr>
+                    <td class="text-break"><a asp-page="Edit" asp-route-id="@account.Id">@account.Name</a></td>
+                    <td>@(account.Role is null ? T["No role"] : T[account.Role])</td>
+                    <td><partial name="_AccountState" model="account.State" /></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

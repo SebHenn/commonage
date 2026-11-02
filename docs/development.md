@@ -74,6 +74,23 @@ record. Spam protection is in `Contributions/SpamProtection.cs` and configured i
 section (`MinimumFillSeconds`, `MaxSubmissionsPerHour`). The tests switch both off in `CommonageAppFactory`
 and test them separately in `ContributionTests`.
 
+## Accounts, activity log, export and backups
+
+How these work for the people running an archive is in [operations.md](operations.md). In the code:
+
+- Admin-only pages are protected by the `Administer` policy in `Program.cs` (`/Admin/Users`, `/Admin/Export`,
+  `/Admin/Activity`). Setup links come from `Identity/Accounts.cs`.
+- Every change a curator or admin makes should call `AuditLog.Record` before `SaveChanges`, with a new
+  `AuditAction` and its text in `Audit/AuditText.cs` if needed. Never put contributor details into an entry.
+- `Export/ArchiveExporter.cs` writes the export. If you change its format, raise `ArchiveExporter.Version` and
+  update operations.md.
+- `scripts/backup.sh`, `scripts/restore.sh` and `scripts/test-backup-restore.sh` are POSIX `sh` and must keep working
+  in Git Bash on Windows (`MSYS_NO_PATHCONV=1`, and paths through `cygpath -m` for native programs such as curl).
+  Run the restore test with `sh scripts/test-backup-restore.sh`; it uses its own Compose project and ports.
+
+Forms whose action cannot be undone ask first with a `data-confirm="..."` attribute (handled in `wwwroot/js/site.js`),
+not with inline script, so the question can be any text in any language.
+
 ## Database changes
 
 After changing an entity or `CommonageDbContext`, create a migration and commit it:

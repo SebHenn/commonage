@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Commonage.Web.Audit;
 using Commonage.Web.Data;
 using Commonage.Web.Domain;
 using Commonage.Web.Media;
@@ -14,10 +15,15 @@ namespace Commonage.Web.Pages.Admin.Items;
 // Authorization runs before the body is read, so anonymous requests are rejected without accepting a large upload.
 [RequestSizeLimit(MaxUploadRequestBytes)]
 [RequestFormLimits(MultipartBodyLengthLimit = MaxUploadRequestBytes)]
-public class EditModel(CommonageDbContext db, MediaUploadService uploads, IStringLocalizer<SharedResource> localizer) : PageModel
+public class EditModel(
+    CommonageDbContext db,
+    MediaUploadService uploads,
+    AuditLog audit,
+    IStringLocalizer<SharedResource> localizer) : PageModel
 {
     private const long MaxUploadRequestBytes = 1024L * 1024 * 1024;
     private const int MaxTagsPerItem = 30;
+    private const int HistoryLength = 20;
 
     [BindProperty]
     public InputModel Input { get; set; } = new();
@@ -32,6 +38,9 @@ public class EditModel(CommonageDbContext db, MediaUploadService uploads, IStrin
 
     /// <summary>Who sent the item in, for items that came through a contribution link.</summary>
     public Contribution? Contribution { get; private set; }
+
+    /// <summary>The latest entries of the activity log about this item, newest first.</summary>
+    public IReadOnlyList<AuditEntry> History { get; private set; } = [];
 
     public class InputModel
     {
@@ -112,7 +121,11 @@ public class EditModel(CommonageDbContext db, MediaUploadService uploads, IStrin
             return Page();
         }
 
+        if (command == "publish" && item is { CanBePublished: false })
+            return BadRequest();
+
         var now = DateTime.UtcNow;
+        var isNew = item is null;
         if (item is null)
         {
             item = new ArchiveItem { Title = "", Status = ItemStatus.Draft, CreatedAt = now };
@@ -125,23 +138,28 @@ public class EditModel(CommonageDbContext db, MediaUploadService uploads, IStrin
         item.TrySetDate(Input.Date);
         item.SetTags(await FindOrCreateTagsAsync(tagNames));
         item.UpdatedAt = now;
+        audit.Record(isNew ? AuditAction.ItemCreated : AuditAction.ItemChanged, item.Title, item);
 
         switch (command)
         {
             case "publish":
                 item.Publish(now);
+                audit.Record(AuditAction.ItemPublished, item.Title, item);
                 TempData["Message"] = localizer["The item is published."].Value;
                 break;
-            case "unpublish":
+            case "unpublish" when item.Status == ItemStatus.Published:
                 item.Unpublish();
+                audit.Record(AuditAction.ItemUnpublished, item.Title, item);
                 TempData["Message"] = localizer["The item is no longer public."].Value;
                 break;
             case "accept" when item.Status is ItemStatus.Submitted or ItemStatus.Rejected:
                 item.Accept(now);
+                audit.Record(AuditAction.ContributionAccepted, item.Title, item);
                 TempData["Message"] = localizer["The contribution is accepted as a draft."].Value;
                 break;
             case "reject" when item.Status == ItemStatus.Submitted:
                 item.Reject(now);
+                audit.Record(AuditAction.ContributionRejected, item.Title, item);
                 TempData["Message"] = localizer["The contribution is rejected. It stays hidden until you delete it."].Value;
                 break;
             default:
@@ -173,36 +191,80 @@ public class EditModel(CommonageDbContext db, MediaUploadService uploads, IStrin
         if (files.Count == 0)
             errors.Add(localizer["Please choose at least one photo."]);
         if (uploaded > 0)
+        {
+            audit.Record(AuditAction.PhotosAdded, item.Title, item);
+            await db.SaveChangesAsync(cancellationToken);
             TempData["Message"] = localizer["Photos uploaded: {0}. Previews are being created.", uploaded].Value;
+        }
         if (errors.Count > 0)
             TempData["Error"] = string.Join(" ", errors);
         return RedirectToPage(new { id });
     }
 
-    /// <summary>Deletes a contribution that will not be published, such as spam, with all its files.</summary>
+    /// <summary>
+    /// Deletes the item with its contribution record and all its files, for example spam, or material a contributor
+    /// asked to have removed. The activity log keeps the title and who deleted it.
+    /// </summary>
     public async Task<IActionResult> OnPostDeleteAsync(int id, CancellationToken cancellationToken)
     {
         var item = await db.ArchiveItems.Include(i => i.MediaFiles).FirstOrDefaultAsync(i => i.Id == id, cancellationToken);
         if (item is null)
             return NotFound();
-        if (item.Status is not (ItemStatus.Submitted or ItemStatus.Rejected))
-            return BadRequest();
 
         foreach (var file in item.MediaFiles.ToList())
             await uploads.DeleteAsync(file, cancellationToken);
+        // Deleting the item keeps this entry and clears its link to the item; the subject keeps the title.
+        audit.Record(AuditAction.ItemDeleted, item.Title);
         db.ArchiveItems.Remove(item);
         await db.SaveChangesAsync(cancellationToken);
 
-        TempData["Message"] = localizer["The contribution is deleted."].Value;
+        TempData["Message"] = localizer["The item is deleted."].Value;
         return RedirectToPage("/Admin/Index");
+    }
+
+    /// <summary>Hides a contribution for good because the contributor withdrew their consent.</summary>
+    public async Task<IActionResult> OnPostWithdrawAsync(int id, CancellationToken cancellationToken)
+    {
+        var item = await db.ArchiveItems.Include(i => i.Contribution).FirstOrDefaultAsync(i => i.Id == id, cancellationToken);
+        if (item is null)
+            return NotFound();
+        if (item.Contribution is null)
+            return BadRequest();
+
+        var now = DateTime.UtcNow;
+        item.Withdraw(now);
+        item.UpdatedAt = now;
+        audit.Record(AuditAction.ContributionWithdrawn, item.Title, item);
+        await db.SaveChangesAsync(cancellationToken);
+
+        TempData["Message"] = localizer["The contribution is marked as withdrawn. It is hidden and cannot be published again."].Value;
+        return RedirectToPage(new { id });
+    }
+
+    /// <summary>Removes the contributor's name and email address, for example because they asked for it.</summary>
+    public async Task<IActionResult> OnPostRemoveContributorDetailsAsync(int id, CancellationToken cancellationToken)
+    {
+        var item = await db.ArchiveItems.Include(i => i.Contribution).FirstOrDefaultAsync(i => i.Id == id, cancellationToken);
+        if (item is null)
+            return NotFound();
+        if (item.Contribution is null)
+            return BadRequest();
+
+        item.Contribution.RemovePersonalDetails(DateTime.UtcNow);
+        audit.Record(AuditAction.ContributorDetailsRemoved, item.Title, item);
+        await db.SaveChangesAsync(cancellationToken);
+
+        TempData["Message"] = localizer["The contributor's name and email address are removed."].Value;
+        return RedirectToPage(new { id });
     }
 
     public async Task<IActionResult> OnPostDeleteMediaAsync(int id, int mediaFileId, CancellationToken cancellationToken)
     {
-        var file = await db.MediaFiles.FirstOrDefaultAsync(f => f.Id == mediaFileId && f.ArchiveItemId == id, cancellationToken);
+        var file = await db.MediaFiles.Include(f => f.ArchiveItem).FirstOrDefaultAsync(f => f.Id == mediaFileId && f.ArchiveItemId == id, cancellationToken);
         if (file is null)
             return NotFound();
 
+        audit.Record(AuditAction.PhotoDeleted, file.ArchiveItem.Title, file.ArchiveItem);
         await uploads.DeleteAsync(file, cancellationToken);
         TempData["Message"] = localizer["The photo is deleted."].Value;
         return RedirectToPage(new { id });
@@ -216,6 +278,11 @@ public class EditModel(CommonageDbContext db, MediaUploadService uploads, IStrin
         if (item is not null)
         {
             MediaFiles = await db.MediaFiles.Where(f => f.ArchiveItemId == item.Id).OrderBy(f => f.Id).ToListAsync();
+            History = await db.AuditEntries
+                .Where(e => e.ArchiveItemId == item.Id)
+                .OrderByDescending(e => e.At).ThenByDescending(e => e.Id)
+                .Take(HistoryLength)
+                .ToListAsync();
             if (item.DateText is not null)
                 CurrentDateRange = new DateRange(item.DateFrom, item.DateTo);
         }
