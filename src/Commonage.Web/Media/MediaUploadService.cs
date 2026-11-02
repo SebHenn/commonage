@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using Commonage.Web.Data;
 using Commonage.Web.Domain;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 
 namespace Commonage.Web.Media;
@@ -20,6 +21,16 @@ public enum UploadError
     UnsupportedFormat,
 }
 
+public static class UploadErrorMessages
+{
+    public static string Describe(IStringLocalizer localizer, UploadError error, string fileName) => error switch
+    {
+        UploadError.Empty => localizer["{0} is empty.", fileName],
+        UploadError.TooLarge => localizer["{0} is too large.", fileName],
+        _ => localizer["{0} is not a supported photo format. Please use JPEG, PNG, TIFF or WebP.", fileName],
+    };
+}
+
 /// <summary>Validates an uploaded file, stores the original unchanged and queues preview generation.</summary>
 public class MediaUploadService(
     CommonageDbContext db,
@@ -27,19 +38,19 @@ public class MediaUploadService(
     MediaProcessingQueue queue,
     IOptions<UploadOptions> options)
 {
+    /// <summary>Checks a file without storing it, so a form can reject it before saving anything else.</summary>
+    public async Task<UploadError> CheckAsync(IFormFile upload, CancellationToken cancellationToken = default)
+    {
+        await using var content = upload.OpenReadStream();
+        return (await DetectAsync(upload, content, cancellationToken)).Error;
+    }
+
     public async Task<UploadError> AddAsync(ArchiveItem item, IFormFile upload, CancellationToken cancellationToken = default)
     {
-        if (upload.Length == 0)
-            return UploadError.Empty;
-        if (upload.Length > options.Value.MaxFileSizeBytes)
-            return UploadError.TooLarge;
-
         await using var content = upload.OpenReadStream();
-        var header = new byte[ImageFormats.HeaderLength];
-        var headerLength = await content.ReadAtLeastAsync(header, header.Length, throwOnEndOfStream: false, cancellationToken);
-        var contentType = ImageFormats.DetectContentType(header.AsSpan(0, headerLength));
-        if (contentType is null)
-            return UploadError.UnsupportedFormat;
+        var (error, contentType) = await DetectAsync(upload, content, cancellationToken);
+        if (error != UploadError.None)
+            return error;
 
         content.Position = 0;
         var sha256 = Convert.ToHexStringLower(await SHA256.HashDataAsync(content, cancellationToken));
@@ -49,7 +60,7 @@ public class MediaUploadService(
         {
             ArchiveItem = item,
             OriginalFileName = CleanFileName(upload.FileName),
-            ContentType = contentType,
+            ContentType = contentType!,
             SizeBytes = upload.Length,
             Sha256 = sha256,
             StorageId = Guid.NewGuid(),
@@ -70,6 +81,19 @@ public class MediaUploadService(
         await db.SaveChangesAsync(cancellationToken);
         foreach (var key in new[] { file.OriginalKey, file.PreviewKey, file.ThumbnailKey })
             storage.Delete(key);
+    }
+
+    private async Task<(UploadError Error, string? ContentType)> DetectAsync(IFormFile upload, Stream content, CancellationToken cancellationToken)
+    {
+        if (upload.Length == 0)
+            return (UploadError.Empty, null);
+        if (upload.Length > options.Value.MaxFileSizeBytes)
+            return (UploadError.TooLarge, null);
+
+        var header = new byte[ImageFormats.HeaderLength];
+        var headerLength = await content.ReadAtLeastAsync(header, header.Length, throwOnEndOfStream: false, cancellationToken);
+        var contentType = ImageFormats.DetectContentType(header.AsSpan(0, headerLength));
+        return contentType is null ? (UploadError.UnsupportedFormat, null) : (UploadError.None, contentType);
     }
 
     private static string CleanFileName(string fileName)

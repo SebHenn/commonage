@@ -14,6 +14,8 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options)
     public DbSet<ArchiveItem> ArchiveItems => Set<ArchiveItem>();
     public DbSet<MediaFile> MediaFiles => Set<MediaFile>();
     public DbSet<Tag> Tags => Set<Tag>();
+    public DbSet<ContributionLink> ContributionLinks => Set<ContributionLink>();
+    public DbSet<Contribution> Contributions => Set<Contribution>();
 
     // Keys that encrypt login cookies. Stored in the database so logins survive container rebuilds.
     public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
@@ -75,6 +77,33 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options)
             tag.Property(t => t.Name).HasMaxLength(Tag.MaxLength);
             tag.Property(t => t.NormalizedName).HasMaxLength(Tag.MaxLength);
             tag.HasIndex(t => t.NormalizedName).IsUnique();
+        });
+
+        builder.Entity<ContributionLink>(link =>
+        {
+            link.Property(l => l.Title).HasMaxLength(ContributionLink.TitleMaxLength);
+            link.Property(l => l.Introduction).HasMaxLength(ContributionLink.IntroductionMaxLength);
+            link.Property(l => l.Token).HasMaxLength(32);
+            link.HasIndex(l => l.Token).IsUnique();
+            link.HasOne(l => l.Collection)
+                .WithMany()
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        builder.Entity<Contribution>(contribution =>
+        {
+            contribution.Property(c => c.ContributorName).HasMaxLength(Contribution.NameMaxLength);
+            contribution.Property(c => c.ContributorEmail).HasMaxLength(Contribution.EmailMaxLength);
+            contribution.Property(c => c.RightsHolder).HasMaxLength(Contribution.RightsHolderMaxLength);
+            contribution.Property(c => c.ConsentText).HasMaxLength(4000);
+            contribution.HasIndex(c => c.ArchiveItemId).IsUnique();
+            contribution.HasOne(c => c.ArchiveItem)
+                .WithOne(i => i.Contribution)
+                .HasForeignKey<Contribution>(c => c.ArchiveItemId)
+                .OnDelete(DeleteBehavior.Cascade);
+            contribution.HasOne(c => c.ContributionLink)
+                .WithMany(l => l.Contributions)
+                .OnDelete(DeleteBehavior.SetNull);
         });
 
         builder.Entity<MediaFile>(file =>

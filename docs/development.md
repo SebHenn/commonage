@@ -66,6 +66,14 @@ a text:
 docker compose exec db psql -U commonage -c "select to_tsvector('simple', commonage_fold('Die Mühle an der Mühlenstraße'))"
 ```
 
+## Contributions
+
+Curators create contribution links under "Manage archive" → "Contribution links". The public form is
+`Pages/Contribute/Index.cshtml`; what it receives is an item with status `Submitted` plus a `Contribution`
+record. Spam protection is in `Contributions/SpamProtection.cs` and configured in the `Contributions`
+section (`MinimumFillSeconds`, `MaxSubmissionsPerHour`). The tests switch both off in `CommonageAppFactory`
+and test them separately in `ContributionTests`.
+
 ## Database changes
 
 After changing an entity or `CommonageDbContext`, create a migration and commit it:

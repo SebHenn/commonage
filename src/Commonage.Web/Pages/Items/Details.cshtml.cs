@@ -14,6 +14,7 @@ public class DetailsModel(CommonageDbContext db) : PageModel
     {
         var item = await db.PublishedItems
             .Include(i => i.Collection)
+            .Include(i => i.Contribution)
             .Include(i => i.Tags.OrderBy(t => t.Name))
             .Include(i => i.MediaFiles.Where(f => f.Status == ProcessingStatus.Ready).OrderBy(f => f.Id))
             .FirstOrDefaultAsync(i => i.Id == id);

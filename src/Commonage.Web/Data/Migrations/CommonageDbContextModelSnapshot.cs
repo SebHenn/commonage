@@ -130,6 +130,101 @@ namespace Commonage.Web.Data.Migrations
                     b.ToTable("Collections");
                 });
 
+            modelBuilder.Entity("Commonage.Web.Domain.Contribution", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ArchiveItemId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ConsentText")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<int?>("ContributionLinkId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ContributorEmail")
+                        .HasMaxLength(254)
+                        .HasColumnType("character varying(254)");
+
+                    b.Property<string>("ContributorName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime?>("ReviewedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Rights")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("RightsHolder")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<bool>("ShowName")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime>("SubmittedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ArchiveItemId")
+                        .IsUnique();
+
+                    b.HasIndex("ContributionLinkId");
+
+                    b.ToTable("Contributions");
+                });
+
+            modelBuilder.Entity("Commonage.Web.Domain.ContributionLink", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CollectionId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Introduction")
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CollectionId");
+
+                    b.HasIndex("Token")
+                        .IsUnique();
+
+                    b.ToTable("ContributionLinks");
+                });
+
             modelBuilder.Entity("Commonage.Web.Domain.MediaFile", b =>
                 {
                     b.Property<int>("Id")
@@ -458,6 +553,35 @@ namespace Commonage.Web.Data.Migrations
                     b.Navigation("Collection");
                 });
 
+            modelBuilder.Entity("Commonage.Web.Domain.Contribution", b =>
+                {
+                    b.HasOne("Commonage.Web.Domain.ArchiveItem", "ArchiveItem")
+                        .WithOne("Contribution")
+                        .HasForeignKey("Commonage.Web.Domain.Contribution", "ArchiveItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Commonage.Web.Domain.ContributionLink", "ContributionLink")
+                        .WithMany("Contributions")
+                        .HasForeignKey("ContributionLinkId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("ArchiveItem");
+
+                    b.Navigation("ContributionLink");
+                });
+
+            modelBuilder.Entity("Commonage.Web.Domain.ContributionLink", b =>
+                {
+                    b.HasOne("Commonage.Web.Domain.Collection", "Collection")
+                        .WithMany()
+                        .HasForeignKey("CollectionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Collection");
+                });
+
             modelBuilder.Entity("Commonage.Web.Domain.MediaFile", b =>
                 {
                     b.HasOne("Commonage.Web.Domain.ArchiveItem", "ArchiveItem")
@@ -522,12 +646,19 @@ namespace Commonage.Web.Data.Migrations
 
             modelBuilder.Entity("Commonage.Web.Domain.ArchiveItem", b =>
                 {
+                    b.Navigation("Contribution");
+
                     b.Navigation("MediaFiles");
                 });
 
             modelBuilder.Entity("Commonage.Web.Domain.Collection", b =>
                 {
                     b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("Commonage.Web.Domain.ContributionLink", b =>
+                {
+                    b.Navigation("Contributions");
                 });
 #pragma warning restore 612, 618
         }

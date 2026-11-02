@@ -1,0 +1,14 @@
+@page "/contribute/{token}/thanks"
+@model Commonage.Web.Pages.Contribute.ThanksModel
+@{
+    ViewData["Title"] = T["Thank you"];
+}
+
+<div class="col-lg-8">
+    <h1>@T["Thank you"]</h1>
+    <p>@T["We have received what you sent in. A curator will look at it, and it will appear in the archive once it is approved."]</p>
+    <p class="d-flex flex-wrap gap-3">
+        <a asp-page="Index" asp-route-token="@Model.Token">@T["Send in something else"]</a>
+        <a asp-page="/Index">@T["Browse the archive"]</a>
+    </p>
+</div>

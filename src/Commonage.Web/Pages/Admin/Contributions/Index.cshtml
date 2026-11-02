@@ -1,0 +1,66 @@
+@page
+@model Commonage.Web.Pages.Admin.Contributions.IndexModel
+@{
+    ViewData["Title"] = T["Contribution links"];
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="/Admin/Index">@T["Items"]</a></li>
+    </ol>
+</nav>
+
+<div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+    <h1 class="me-auto mb-0">@ViewData["Title"]</h1>
+    @if (Model.HasCollections)
+    {
+        <a asp-page="Edit" class="btn btn-primary">@T["New link"]</a>
+    }
+</div>
+
+<p class="col-lg-8">@T["Anyone with a contribution link can send in photos and stories for a collection. Share it with a group, put it in a newsletter or on a poster. What people send in waits for your review and is never public before you publish it."]</p>
+
+@if (!Model.HasCollections)
+{
+    <p>@T["Contributions go into a collection."] <a asp-page="/Admin/Collections/Edit">@T["Create your first collection"]</a></p>
+}
+else if (Model.Links.Count == 0)
+{
+    <p class="text-muted">@T["There are no contribution links yet."]</p>
+}
+else
+{
+    <ul class="list-unstyled">
+        @foreach (var link in Model.Links)
+        {
+            <li class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
+                        <h2 class="h5 mb-0 me-auto"><a asp-page="Edit" asp-route-id="@link.Id">@link.Title</a></h2>
+                        @if (link.IsActive)
+                        {
+                            <span class="badge text-bg-success">@T["Open"]</span>
+                        }
+                        else
+                        {
+                            <span class="badge text-bg-secondary">@T["Closed"]</span>
+                        }
+                    </div>
+                    <p class="text-muted small mb-2">
+                        @T["Collection: {0}", link.CollectionTitle] ·
+                        @T["Contributions: {0}", link.ContributionCount]
+                        @if (link.WaitingCount > 0)
+                        {
+                            <text>·</text> <a asp-page="/Admin/Index" asp-route-status="@ItemStatus.Submitted">@T["Waiting for review: {0}", link.WaitingCount]</a>
+                        }
+                    </p>
+                    @if (link.IsActive)
+                    {
+                        <label for="link-@link.Id" class="visually-hidden">@T["Address of the link"]</label>
+                        <input id="link-@link.Id" type="text" readonly value="@Model.AddressOf(link)" class="form-control form-control-sm font-monospace" />
+                    }
+                </div>
+            </li>
+        }
+    </ul>
+}

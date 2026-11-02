@@ -8,7 +8,7 @@ Estimates assume about 10 hours a week. Every milestone ends with something demo
 | **M1 Text records** ✅ | 2–4 | A curator logs in, creates and publishes a text-only record, and visitors see it. Drafts stay hidden. UI text is localisable (German and English). |
 | **M2 Photos** ✅ | 5–8 | Curators upload photos; originals stay private; previews are generated in the background without EXIF/GPS data. Files of unpublished items return 404. Show it to a partner group. |
 | **M3 Search and browse** ✅ | 9–11 | Tags, uncertain dates ("circa 1950"), PostgreSQL full-text search, filters, pagination, mobile layout. |
-| **M4 Contributions** | 12–15 | Anyone with the link can submit material with consent and rights details; curators approve or reject it. Spam protection; email optional. |
+| **M4 Contributions** ✅ | 12–15 | Anyone with the link can submit material with consent and rights details; curators approve or reject it. Spam protection; email optional. |
 | **M5 Trust** | 16–19 | Export (metadata + files), tested backup and restore, audit log, curator management, deletion of personal data. |
 | **M6 Release v0.1** | 20–22 | HTTPS deployment guide, documentation, demo content, accessibility and security review, five-task test with a real group. |
 
@@ -16,7 +16,25 @@ Estimates assume about 10 hours a week. Every milestone ends with something demo
 
 - One web application (Razor Pages) plus one test project. Split into more projects only when it hurts.
 - A contribution creates an `ArchiveItem` with status `Submitted`; publishing only changes its status.
-- Item status: `Draft` and `Published` so far; `Submitted`, `Rejected` and `Withdrawn` arrive with contributions (M4). Files will have their own `IsPublic` flag.
+- Item status: `Draft`, `Published`, `Submitted` (a contribution waiting for review) and `Rejected` (kept
+  hidden until a curator deletes it). `Withdrawn` is postponed to M5, together with deletion of personal data:
+  contributors withdraw by asking the archive, as the consent text says, because they have no account and
+  need not give an email address. Files will have their own `IsPublic` flag.
+- Contributions come in through contribution links: a curator creates a link for a collection ("Share your
+  photos of the Mill Street flood") and shares it. The address holds a random 128-bit token; closed and unknown
+  links show "not found". Links are closed, never deleted, so contributions keep their origin.
+- A `Contribution` record next to the item holds the contributor's name, optional email, whether their name
+  may be shown publicly, a rights statement (made it themselves / someone else with permission / unknown, plus
+  the photographer or author if known) and the consent text exactly as shown, in the contributor's language.
+  Only curators see it, except the name when the contributor chose to be credited.
+- Spam protection without third-party services: the unlisted link, the antiforgery token, a hidden honeypot
+  field, a minimum time between showing and sending the form (`Contributions:MinimumFillSeconds`, default 3,
+  measured with a data-protected timestamp) and a limit per IP address (`Contributions:MaxSubmissionsPerHour`,
+  default 30, generous because a community event may share one address). Detected spam gets the normal thank-you
+  page and is not saved. Behind a reverse proxy, forwarded headers must be configured (M6 deployment guide), or
+  every visitor counts as the proxy's address.
+- No emails are sent yet. Curators see waiting contributions on the item list. Only submitted and rejected items
+  can be deleted (with their files); deleting published items comes with M5.
 - Every public page queries `CommonageDbContext.PublishedItems`, never `ArchiveItems` directly.
 - Migrations are applied automatically at startup (single-instance self-hosting).
 - UI text is English-keyed and translated through `Resources/SharedResource.{culture}.resx`.

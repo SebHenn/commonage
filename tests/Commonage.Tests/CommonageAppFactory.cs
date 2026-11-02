@@ -33,6 +33,9 @@ public class CommonageAppFactory : WebApplicationFactory<Program>, IAsyncLifetim
         builder.UseSetting("InitialAdmin:Email", AdminEmail);
         builder.UseSetting("InitialAdmin:Password", AdminPassword);
         builder.UseSetting("Storage:RootPath", _storageRoot);
+        // Tests fill in forms instantly and from one address. Spam protection has its own tests.
+        builder.UseSetting("Contributions:MinimumFillSeconds", "0");
+        builder.UseSetting("Contributions:MaxSubmissionsPerHour", "1000");
     }
 }
 

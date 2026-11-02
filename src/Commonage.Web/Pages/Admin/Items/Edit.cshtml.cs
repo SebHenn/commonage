@@ -30,6 +30,9 @@ public class EditModel(CommonageDbContext db, MediaUploadService uploads, IStrin
     public SelectList CollectionOptions { get; private set; } = null!;
     public IReadOnlyList<MediaFile> MediaFiles { get; private set; } = [];
 
+    /// <summary>Who sent the item in, for items that came through a contribution link.</summary>
+    public Contribution? Contribution { get; private set; }
+
     public class InputModel
     {
         [Required(ErrorMessage = "Please enter a title.")]
@@ -57,7 +60,7 @@ public class EditModel(CommonageDbContext db, MediaUploadService uploads, IStrin
     {
         if (id is not null)
         {
-            var item = await db.ArchiveItems.Include(i => i.Tags).FirstOrDefaultAsync(i => i.Id == id);
+            var item = await FindItemAsync(id.Value);
             if (item is null)
                 return NotFound();
 
@@ -80,13 +83,13 @@ public class EditModel(CommonageDbContext db, MediaUploadService uploads, IStrin
         return Page();
     }
 
-    /// <param name="command">"publish" or "unpublish" changes the status; anything else only saves.</param>
+    /// <param name="command">"publish", "unpublish", "accept" or "reject" changes the status; anything else only saves.</param>
     public async Task<IActionResult> OnPostAsync(int? id, string? command)
     {
         ArchiveItem? item = null;
         if (id is not null)
         {
-            item = await db.ArchiveItems.Include(i => i.Tags).FirstOrDefaultAsync(i => i.Id == id);
+            item = await FindItemAsync(id.Value);
             if (item is null)
                 return NotFound();
         }
@@ -133,6 +136,14 @@ public class EditModel(CommonageDbContext db, MediaUploadService uploads, IStrin
                 item.Unpublish();
                 TempData["Message"] = localizer["The item is no longer public."].Value;
                 break;
+            case "accept" when item.Status is ItemStatus.Submitted or ItemStatus.Rejected:
+                item.Accept(now);
+                TempData["Message"] = localizer["The contribution is accepted as a draft."].Value;
+                break;
+            case "reject" when item.Status == ItemStatus.Submitted:
+                item.Reject(now);
+                TempData["Message"] = localizer["The contribution is rejected. It stays hidden until you delete it."].Value;
+                break;
             default:
                 TempData["Message"] = localizer["Your changes are saved."].Value;
                 break;
@@ -156,7 +167,7 @@ public class EditModel(CommonageDbContext db, MediaUploadService uploads, IStrin
             if (error == UploadError.None)
                 uploaded++;
             else
-                errors.Add(DescribeUploadError(error, file.FileName));
+                errors.Add(UploadErrorMessages.Describe(localizer, error, file.FileName));
         }
 
         if (files.Count == 0)
@@ -166,6 +177,24 @@ public class EditModel(CommonageDbContext db, MediaUploadService uploads, IStrin
         if (errors.Count > 0)
             TempData["Error"] = string.Join(" ", errors);
         return RedirectToPage(new { id });
+    }
+
+    /// <summary>Deletes a contribution that will not be published, such as spam, with all its files.</summary>
+    public async Task<IActionResult> OnPostDeleteAsync(int id, CancellationToken cancellationToken)
+    {
+        var item = await db.ArchiveItems.Include(i => i.MediaFiles).FirstOrDefaultAsync(i => i.Id == id, cancellationToken);
+        if (item is null)
+            return NotFound();
+        if (item.Status is not (ItemStatus.Submitted or ItemStatus.Rejected))
+            return BadRequest();
+
+        foreach (var file in item.MediaFiles.ToList())
+            await uploads.DeleteAsync(file, cancellationToken);
+        db.ArchiveItems.Remove(item);
+        await db.SaveChangesAsync(cancellationToken);
+
+        TempData["Message"] = localizer["The contribution is deleted."].Value;
+        return RedirectToPage("/Admin/Index");
     }
 
     public async Task<IActionResult> OnPostDeleteMediaAsync(int id, int mediaFileId, CancellationToken cancellationToken)
@@ -179,17 +208,11 @@ public class EditModel(CommonageDbContext db, MediaUploadService uploads, IStrin
         return RedirectToPage(new { id });
     }
 
-    private string DescribeUploadError(UploadError error, string fileName) => error switch
-    {
-        UploadError.Empty => localizer["{0} is empty.", fileName],
-        UploadError.TooLarge => localizer["{0} is too large.", fileName],
-        _ => localizer["{0} is not a supported photo format. Please use JPEG, PNG, TIFF or WebP.", fileName],
-    };
-
     private async Task ShowStateAsync(ArchiveItem? item)
     {
         ItemId = item?.Id;
         CurrentStatus = item?.Status;
+        Contribution = item?.Contribution;
         if (item is not null)
         {
             MediaFiles = await db.MediaFiles.Where(f => f.ArchiveItemId == item.Id).OrderBy(f => f.Id).ToListAsync();
@@ -197,6 +220,12 @@ public class EditModel(CommonageDbContext db, MediaUploadService uploads, IStrin
                 CurrentDateRange = new DateRange(item.DateFrom, item.DateTo);
         }
     }
+
+    private Task<ArchiveItem?> FindItemAsync(int id) =>
+        db.ArchiveItems
+            .Include(i => i.Tags)
+            .Include(i => i.Contribution).ThenInclude(c => c!.ContributionLink)
+            .FirstOrDefaultAsync(i => i.Id == id);
 
     /// <summary>Reuses existing tags regardless of case, so "mill street" joins the existing tag "Mill Street".</summary>
     private async Task<List<Tag>> FindOrCreateTagsAsync(IReadOnlyList<string> names)

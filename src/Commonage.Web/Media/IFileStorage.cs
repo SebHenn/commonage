@@ -11,6 +11,7 @@ public interface IFileStorage
     /// <exception cref="FileNotFoundException">No file is stored under the key.</exception>
     Stream OpenRead(string key);
 
+    /// <summary>Removes the file stored under the key. Does nothing if there is none, for example a preview that failed.</summary>
     void Delete(string key);
 }
 
@@ -36,7 +37,12 @@ public class LocalFileStorage(string rootPath) : IFileStorage
 
     public Stream OpenRead(string key) => File.OpenRead(Resolve(key));
 
-    public void Delete(string key) => File.Delete(Resolve(key));
+    public void Delete(string key)
+    {
+        var path = Resolve(key);
+        if (File.Exists(path))
+            File.Delete(path);
+    }
 
     private string Resolve(string key)
     {

@@ -3,6 +3,7 @@ namespace Commonage.Web.Domain;
 /// <summary>
 /// The central record of the archive. A photograph, a letter or an oral history are all archive items.
 /// Only items with <see cref="ItemStatus.Published"/> are visible to the public.
+/// Items sent in through a contribution link start as <see cref="ItemStatus.Submitted"/> and carry a <see cref="Contribution"/>.
 /// </summary>
 public class ArchiveItem
 {
@@ -15,6 +16,9 @@ public class ArchiveItem
     public Collection Collection { get; set; } = null!;
 
     public List<MediaFile> MediaFiles { get; set; } = [];
+
+    /// <summary>Who contributed the item and what they agreed to. Null for items curators created.</summary>
+    public Contribution? Contribution { get; set; }
 
     /// <summary>The date as the curator wrote it, for example "circa 1950". Shown to visitors.</summary>
     public string? DateText { get; private set; }
@@ -36,11 +40,25 @@ public class ArchiveItem
 
     public void Publish(DateTime now)
     {
+        MarkReviewed(now);
         Status = ItemStatus.Published;
         PublishedAt ??= now;
     }
 
     public void Unpublish() => Status = ItemStatus.Draft;
+
+    /// <summary>Takes a contribution into the archive as a draft, for curators to complete before publishing.</summary>
+    public void Accept(DateTime now)
+    {
+        MarkReviewed(now);
+        Status = ItemStatus.Draft;
+    }
+
+    public void Reject(DateTime now)
+    {
+        MarkReviewed(now);
+        Status = ItemStatus.Rejected;
+    }
 
     /// <summary>Sets the date from free text. Returns false, and changes nothing, if no date can be read from it.</summary>
     public bool TrySetDate(string? text)
@@ -56,6 +74,12 @@ public class ArchiveItem
 
         (DateText, DateFrom, DateTo) = (text.Trim(), range.From, range.To);
         return true;
+    }
+
+    private void MarkReviewed(DateTime now)
+    {
+        if (Contribution is not null && Status == ItemStatus.Submitted)
+            Contribution.ReviewedAt ??= now;
     }
 
     public void SetTags(IEnumerable<Tag> tags)
