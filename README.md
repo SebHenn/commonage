@@ -1,30 +1,42 @@
 # Commonage
 
-Commonage is a self-hosted web application for community archives. Local history groups,
-volunteer organisations and communities use it to collect, preserve and share photographs,
-documents, recordings and stories.
+Commonage is a self-hosted web application for community archives. Local history groups, volunteer organisations
+and communities use it to collect, preserve and share photographs, documents, recordings and stories.
 
-- **Contributors** submit material from their phone, without an account.
-- **Curators** review submissions and manage descriptions, rights and attribution.
-- **Visitors** browse and search the published archive.
+- **Contributors** send in material from their phone through a link, without an account, and say who made it and
+  what may be done with it.
+- **Curators** review what comes in, describe it with uncertain dates ("circa 1950", "1950s") and tags, and publish
+  it. Originals stay private; visitors see previews without location data.
+- **Visitors** browse collections and search the published archive, in English or German.
+- **The group stays in control**: it runs the archive on its own server, can export everything in an open format at
+  any time, handles contributors' requests to remove their data, and sees who changed what.
 
-> **Status:** early development. Nothing here is ready for real archives yet.
-> See [docs/roadmap.md](docs/roadmap.md).
+> **Status:** v0.1 is being prepared. See [CHANGELOG.md](CHANGELOG.md) and [docs/roadmap.md](docs/roadmap.md).
 
-## Quick start
+## Try it
 
 Requires Docker.
 
 ```sh
-cp .env.example .env    # then set your own POSTGRES_PASSWORD
+cp .env.example .env    # set your own passwords
 docker compose up --build
 ```
 
-Open http://localhost:8080. The health check is at http://localhost:8080/health.
+To look around in a made-up archive with photos, contributions and a waiting review, uncomment `COMMONAGE_DEMO=en`
+(or `de`) in `.env` before the first start.
 
-Running an archive (accounts, export, backup and restore): [docs/operations.md](docs/operations.md).
-For working on the code, see [docs/development.md](docs/development.md).
+Open http://localhost:8080 and log in with "Curator login" at the bottom of the page, using the admin email address
+and password from `.env`. The health check is at http://localhost:8080/health.
+
+## Documentation
+
+- [Putting an archive online](docs/deployment.md): a server, a domain and HTTPS.
+- [Running an archive](docs/operations.md): accounts, activity log, personal data, export, backup and restore.
+- [Security](docs/security.md) and [accessibility](docs/accessibility.md): what is in place and what is still open.
+  Report vulnerabilities as described in [SECURITY.md](SECURITY.md).
+- [Development](docs/development.md): working on the code.
 
 ## Tech stack
 
-C# / ASP.NET Core (.NET 10) with Razor Pages, PostgreSQL with EF Core, Docker Compose.
+C# / ASP.NET Core (.NET 10) with Razor Pages, PostgreSQL with EF Core, libvips for images, Docker Compose, Caddy for
+HTTPS.

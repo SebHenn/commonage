@@ -5,9 +5,11 @@ using Commonage.Web;
 using Commonage.Web.Audit;
 using Commonage.Web.Contributions;
 using Commonage.Web.Data;
+using Commonage.Web.Demo;
 using Commonage.Web.Export;
 using Commonage.Web.Identity;
 using Commonage.Web.Media;
+using Commonage.Web.Security;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
@@ -15,6 +17,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.WebEncoders;
 
 var builder = WebApplication.CreateBuilder(args);
+// Do not tell visitors which web server runs the archive.
+builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
 
 // The connection string comes from user-secrets (local development) or the
 // ConnectionStrings__Default environment variable (Docker). It is never stored in the repository.
@@ -31,6 +35,13 @@ builder.Services
     {
         options.User.RequireUniqueEmail = true;
         options.Lockout.AllowedForNewUsers = true;
+        // Length makes a password strong, not forced symbols (NIST SP 800-63B). A few words in a row are easy to
+        // remember and hard to guess.
+        options.Password.RequiredLength = Accounts.MinimumPasswordLength;
+        options.Password.RequireDigit = false;
+        options.Password.RequireLowercase = false;
+        options.Password.RequireUppercase = false;
+        options.Password.RequireNonAlphanumeric = false;
     })
     .AddEntityFrameworkStores<CommonageDbContext>()
     .AddDefaultTokenProviders()
@@ -92,6 +103,7 @@ using (var scope = app.Services.CreateScope())
     await db.Database.MigrateAsync();
     await AccentFolding.TryUseUnaccentAsync(db, app.Logger);
     await InitialAdminSeeder.SeedAsync(scope.ServiceProvider, app.Configuration, app.Logger);
+    await DemoContent.SeedAsync(scope.ServiceProvider, app.Configuration, app.Logger);
 }
 
 if (!app.Environment.IsDevelopment())
@@ -100,14 +112,11 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+// Empty error responses, such as "not found", get a page in the visitor's language. The status code stays.
+app.UseStatusCodePagesWithReExecute("/Error/{0}");
 app.UseHttpsRedirection();
 
-// Browsers must not guess content types, so an uploaded file can never be interpreted as a script or page.
-app.Use(async (context, next) =>
-{
-    context.Response.Headers.XContentTypeOptions = "nosniff";
-    await next();
-});
+app.UseSecurityHeaders();
 
 string[] supportedCultures = ["en", "de"];
 app.UseRequestLocalization(new RequestLocalizationOptions

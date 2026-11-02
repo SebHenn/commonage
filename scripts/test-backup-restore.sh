@@ -12,6 +12,8 @@ export MSYS_NO_PATHCONV=1
 cd "$(dirname "$0")/.."
 
 export COMPOSE_PROJECT_NAME=commonage-backup-test
+# The development setup only, even on a server whose .env switches on compose.production.yaml.
+export COMPOSE_FILE=compose.yaml
 export COMMONAGE_PORT=18080
 export COMMONAGE_DB_PORT=15432
 export POSTGRES_PASSWORD="backup-test-$(date +%s)"

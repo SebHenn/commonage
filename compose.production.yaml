@@ -1,0 +1,42 @@
+# Production additions to compose.yaml: HTTPS through Caddy, automatic restarts, nothing else reachable from outside.
+# Enable it with this line in .env, so every "docker compose" command (and the backup scripts) uses both files:
+#
+#   COMPOSE_FILE=compose.yaml:compose.production.yaml
+#
+# See docs/deployment.md.
+services:
+  caddy:
+    image: caddy:2.10.2-alpine
+    restart: unless-stopped
+    environment:
+      COMMONAGE_DOMAIN: ${COMMONAGE_DOMAIN:?Set COMMONAGE_DOMAIN in .env, for example archive.example.org}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      # Certificates. Losing them is harmless; Caddy gets new ones.
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - web
+
+  web:
+    restart: unless-stopped
+    environment:
+      # Caddy tells the app the visitor's address and that the connection is HTTPS. This trusts any proxy, which is
+      # safe only because the app is not reachable except through Caddy (see "ports" below).
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      # Requests for any other host name are refused, so links the app builds always use the archive's own address.
+      AllowedHosts: ${COMMONAGE_DOMAIN}
+    # Only Caddy talks to the app, over the internal network.
+    ports: !reset []
+
+  db:
+    restart: unless-stopped
+    ports: !reset []
+
+volumes:
+  caddy-data:
+  caddy-config:

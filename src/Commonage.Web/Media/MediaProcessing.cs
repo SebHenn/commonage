@@ -2,6 +2,7 @@ using System.Threading.Channels;
 using Commonage.Web.Data;
 using Commonage.Web.Domain;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using NetVips;
 
 namespace Commonage.Web.Media;
@@ -26,6 +27,7 @@ public class MediaProcessor(
     MediaProcessingQueue queue,
     IServiceScopeFactory scopeFactory,
     IFileStorage storage,
+    IOptions<UploadOptions> options,
     ILogger<MediaProcessor> logger) : BackgroundService
 {
     private const int PreviewSize = 1600;
@@ -63,6 +65,14 @@ public class MediaProcessor(
 
         try
         {
+            await using (var original = storage.OpenRead(file.OriginalKey))
+            {
+                // Only the header is read here; libvips decodes pixels when they are needed.
+                using var header = Image.NewFromStream(original, access: Enums.Access.Sequential);
+                if ((long)header.Width * header.Height > options.Value.MaxPreviewMegapixels * 1_000_000L)
+                    throw new VipsException($"The image has {header.Width} × {header.Height} pixels, more than the limit of {options.Value.MaxPreviewMegapixels} megapixels.");
+            }
+
             byte[] preview;
             await using (var original = storage.OpenRead(file.OriginalKey))
             {

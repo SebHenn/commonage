@@ -29,7 +29,7 @@
   <data name="Anyone with a contribution link can send in photos and stories for a collection. Share it with a group, put it in a newsletter or on a poster. What people send in waits for your review and is never public before you publish it." xml:space="preserve"><value>Mit einem Beitragslink kann jede Person Fotos und Geschichten für eine Sammlung einsenden. Teilen Sie ihn mit einer Gruppe, in einem Rundbrief oder auf einem Plakat. Eingesendetes wartet auf Ihre Prüfung und ist nie öffentlich, bevor Sie es veröffentlichen.</value></data>
   <data name="Apply filters" xml:space="preserve"><value>Filter anwenden</value></data>
   <data name="As precisely as you know it, for example: 1953, March 1953, circa 1950, 1950s." xml:space="preserve"><value>So genau, wie Sie es wissen, zum Beispiel: 1953, März 1953, um 1950, 1950er Jahre.</value></data>
-  <data name="At least 6 characters with an uppercase and a lowercase letter, a digit and a character such as - or !." xml:space="preserve"><value>Mindestens 6 Zeichen mit einem Groß- und einem Kleinbuchstaben, einer Ziffer und einem Zeichen wie - oder !.</value></data>
+  <data name="At least {0} characters. A few words in a row are easy to remember and hard to guess." xml:space="preserve"><value>Mindestens {0} Zeichen. Ein paar Wörter hintereinander sind leicht zu merken und schwer zu erraten.</value></data>
   <data name="Back to managing the archive" xml:space="preserve"><value>Zurück zur Archivverwaltung</value></data>
   <data name="Best match" xml:space="preserve"><value>Beste Treffer</value></data>
   <data name="Browse by tag" xml:space="preserve"><value>Nach Schlagwort stöbern</value></data>
@@ -107,10 +107,11 @@
   <data name="Exported the archive with contributors' personal data" xml:space="preserve"><value>Archiv mit personenbezogenen Daten der Einsendenden exportiert</value></data>
   <data name="Filters" xml:space="preserve"><value>Filter</value></data>
   <data name="Find everything a person has sent in, for example when they ask what the archive holds about them, or ask for it to be deleted." xml:space="preserve"><value>Finden Sie alles, was eine Person eingesendet hat, zum Beispiel wenn sie wissen möchte, was das Archiv über sie gespeichert hat, oder um Löschung bittet.</value></data>
-  <data name="For the account {0}. Use at least 6 characters with an uppercase and a lowercase letter, a digit and a character such as - or !. A longer password is safer than a complicated one." xml:space="preserve"><value>Für das Konto {0}. Verwenden Sie mindestens 6 Zeichen mit einem Groß- und einem Kleinbuchstaben, einer Ziffer und einem Zeichen wie - oder !. Ein längeres Passwort ist sicherer als ein kompliziertes.</value></data>
+  <data name="For the account {0}. Use at least {1} characters. A few words in a row are easy to remember and hard to guess." xml:space="preserve"><value>Für das Konto {0}. Verwenden Sie mindestens {1} Zeichen. Ein paar Wörter hintereinander sind leicht zu merken und schwer zu erraten.</value></data>
   <data name="Found when visitors filter by: {0}" xml:space="preserve"><value>Wird beim Filtern nach Zeitraum gefunden für: {0}</value></data>
   <data name="From year" xml:space="preserve"><value>Von Jahr</value></data>
   <data name="Give this link to {0}, for example by email or in person. With it, they choose their own password. It works once and for seven days. It is shown only now; you can create a new one at any time." xml:space="preserve"><value>Geben Sie diesen Link an {0} weiter, zum Beispiel per E-Mail oder persönlich. Damit wählt die Person ihr eigenes Passwort. Er funktioniert einmal und sieben Tage lang. Er wird nur jetzt angezeigt; Sie können jederzeit einen neuen erstellen.</value></data>
+  <data name="Go to the start page" xml:space="preserve"><value>Zur Startseite</value></data>
   <data name="History" xml:space="preserve"><value>Verlauf</value></data>
   <data name="I agree that the archive may keep what I send in, describe it and publish it on this website. If I chose so above, my name is shown with it. I can ask the archive to take it down at any time." xml:space="preserve"><value>Ich bin einverstanden, dass das Archiv meinen Beitrag aufbewahrt, beschreibt und auf dieser Website veröffentlicht. Wenn ich es oben gewählt habe, wird mein Name dabei angezeigt. Ich kann das Archiv jederzeit bitten, ihn wieder zu entfernen.</value></data>
   <data name="I don't know who made it." xml:space="preserve"><value>Ich weiß nicht, wer es gemacht hat.</value></data>
@@ -164,6 +165,7 @@
   <data name="Open" xml:space="preserve"><value>Offen</value></data>
   <data name="Open: the link accepts contributions" xml:space="preserve"><value>Offen: Über den Link können Beiträge eingesendet werden</value></data>
   <data name="Original" xml:space="preserve"><value>Original</value></data>
+  <data name="Page not found" xml:space="preserve"><value>Seite nicht gefunden</value></data>
   <data name="Page {0} of {1}" xml:space="preserve"><value>Seite {0} von {1}</value></data>
   <data name="Pages" xml:space="preserve"><value>Seiten</value></data>
   <data name="Password" xml:space="preserve"><value>Passwort</value></data>
@@ -187,12 +189,14 @@
   <data name="Please enter your email address." xml:space="preserve"><value>Bitte geben Sie Ihre E-Mail-Adresse ein.</value></data>
   <data name="Please enter your name." xml:space="preserve"><value>Bitte geben Sie Ihren Namen ein.</value></data>
   <data name="Please enter your password." xml:space="preserve"><value>Bitte geben Sie Ihr Passwort ein.</value></data>
+  <data name="Please go back, reload the page and try again." xml:space="preserve"><value>Bitte gehen Sie zurück, laden Sie die Seite neu und versuchen Sie es noch einmal.</value></data>
   <data name="Please tell us who made it." xml:space="preserve"><value>Bitte sagen Sie uns, wer es gemacht hat.</value></data>
   <data name="Previews are being created. Reload the page in a moment." xml:space="preserve"><value>Vorschauen werden erstellt. Laden Sie die Seite gleich neu.</value></data>
   <data name="Previous" xml:space="preserve"><value>Zurück</value></data>
   <data name="Published" xml:space="preserve"><value>Veröffentlicht</value></data>
   <data name="Published the item" xml:space="preserve"><value>Eintrag veröffentlicht</value></data>
   <data name="Recently added" xml:space="preserve"><value>Zuletzt hinzugefügt</value></data>
+  <data name="Reference for them: {0}" xml:space="preserve"><value>Angabe für das Team: {0}</value></data>
   <data name="Reject" xml:space="preserve"><value>Ablehnen</value></data>
   <data name="Rejected" xml:space="preserve"><value>Abgelehnt</value></data>
   <data name="Rejected the contribution" xml:space="preserve"><value>Beitrag abgelehnt</value></data>
@@ -219,8 +223,10 @@
   <data name="Sent in by" xml:space="preserve"><value>Eingesendet von</value></data>
   <data name="Setup link" xml:space="preserve"><value>Einrichtungslink</value></data>
   <data name="Show my name with what I send in" xml:space="preserve"><value>Meinen Namen bei meinem Beitrag anzeigen</value></data>
+  <data name="Skip to content" xml:space="preserve"><value>Zum Inhalt springen</value></data>
   <data name="Someone else made it, and I have their permission or inherited the rights." xml:space="preserve"><value>Jemand anderes hat es gemacht, und ich habe die Erlaubnis dieser Person oder die Rechte geerbt.</value></data>
   <data name="Someone else; the contributor has permission or inherited the rights" xml:space="preserve"><value>Jemand anderes; die einsendende Person hat die Erlaubnis oder die Rechte geerbt</value></data>
+  <data name="Something went wrong" xml:space="preserve"><value>Etwas ist schiefgegangen</value></data>
   <data name="Sort by" xml:space="preserve"><value>Sortieren nach</value></data>
   <data name="Status" xml:space="preserve"><value>Status</value></data>
   <data name="Submitted" xml:space="preserve"><value>Eingesendet</value></data>
@@ -230,6 +236,7 @@
   <data name="The account is deleted." xml:space="preserve"><value>Das Konto ist gelöscht.</value></data>
   <data name="The account is disabled. The person is logged out within a minute." xml:space="preserve"><value>Das Konto ist deaktiviert. Die Person wird innerhalb einer Minute abgemeldet.</value></data>
   <data name="The account is enabled again." xml:space="preserve"><value>Das Konto ist wieder aktiviert.</value></data>
+  <data name="The archive could not complete this request. Please try again in a moment. If it keeps happening, tell the people who run this archive." xml:space="preserve"><value>Das Archiv konnte diese Anfrage nicht ausführen. Bitte versuchen Sie es gleich noch einmal. Wenn es weiter passiert, sagen Sie bitte dem Team Bescheid, das dieses Archiv betreibt.</value></data>
   <data name="The archive has no collections yet." xml:space="preserve"><value>Das Archiv enthält noch keine Sammlungen.</value></data>
   <data name="The contribution is accepted as a draft." xml:space="preserve"><value>Der Beitrag ist als Entwurf übernommen.</value></data>
   <data name="The contribution is deleted." xml:space="preserve"><value>Der Beitrag ist gelöscht.</value></data>
@@ -258,6 +265,7 @@
   <data name="The password must contain an uppercase letter." xml:space="preserve"><value>Das Passwort muss einen Großbuchstaben enthalten.</value></data>
   <data name="The password must contain at least {0} different characters." xml:space="preserve"><value>Das Passwort muss mindestens {0} verschiedene Zeichen enthalten.</value></data>
   <data name="The photo is deleted." xml:space="preserve"><value>Das Foto wurde gelöscht.</value></data>
+  <data name="The request could not be processed" xml:space="preserve"><value>Die Anfrage konnte nicht verarbeitet werden</value></data>
   <data name="The title can be at most {1} characters long." xml:space="preserve"><value>Der Titel darf höchstens {1} Zeichen lang sein.</value></data>
   <data name="The two passwords are not the same." xml:space="preserve"><value>Die beiden Passwörter stimmen nicht überein.</value></data>
   <data name="There are no collections yet." xml:space="preserve"><value>Es gibt noch keine Sammlungen.</value></data>
@@ -267,8 +275,10 @@
   <data name="This account is disabled. Please ask an admin." xml:space="preserve"><value>Dieses Konto ist deaktiviert. Bitte wenden Sie sich an einen Admin.</value></data>
   <data name="This collection has no published items yet." xml:space="preserve"><value>Diese Sammlung enthält noch keine veröffentlichten Einträge.</value></data>
   <data name="This date could not be understood. Please include a year, for example: 1953, 12.03.1953, circa 1950, 1950s, 1950–1955." xml:space="preserve"><value>Diese Datierung wurde nicht verstanden. Bitte geben Sie ein Jahr an, zum Beispiel: 1953, 12.03.1953, ca. 1950, 1950er, 1950–1955.</value></data>
+  <data name="This is a demo archive. Everything in it, people and pictures included, is made up." xml:space="preserve"><value>Das ist ein Demo-Archiv. Alles darin, auch die Personen und Bilder, ist erfunden.</value></data>
   <data name="This is your own account. Another admin can change its role, disable or delete it." xml:space="preserve"><value>Das ist Ihr eigenes Konto. Ein anderer Admin kann seine Rolle ändern, es deaktivieren oder löschen.</value></data>
   <data name="This link is no longer valid. Please ask an admin for a new one." xml:space="preserve"><value>Dieser Link ist nicht mehr gültig. Bitte fragen Sie einen Admin nach einem neuen.</value></data>
+  <data name="This page does not exist, or it is not public (any more)." xml:space="preserve"><value>Diese Seite gibt es nicht, oder sie ist nicht (mehr) öffentlich.</value></data>
   <data name="Title" xml:space="preserve"><value>Titel</value></data>
   <data name="To year" xml:space="preserve"><value>Bis Jahr</value></data>
   <data name="Toggle navigation" xml:space="preserve"><value>Navigation ein- oder ausblenden</value></data>
@@ -278,6 +288,7 @@
   <data name="Unpublished the item" xml:space="preserve"><value>Veröffentlichung des Eintrags zurückgenommen</value></data>
   <data name="Up to {0} photos: JPEG, PNG, TIFF or WebP." xml:space="preserve"><value>Bis zu {0} Fotos: JPEG, PNG, TIFF oder WebP.</value></data>
   <data name="Upload" xml:space="preserve"><value>Hochladen</value></data>
+  <data name="Version {0}" xml:space="preserve"><value>Version {0}</value></data>
   <data name="View public page" xml:space="preserve"><value>Öffentliche Seite ansehen</value></data>
   <data name="Waiting for review: {0}" xml:space="preserve"><value>Warten auf Prüfung: {0}</value></data>
   <data name="Waiting for setup" xml:space="preserve"><value>Wartet auf Einrichtung</value></data>

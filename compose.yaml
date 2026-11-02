@@ -23,6 +23,8 @@ services:
       # Only used on first start, when the archive has no users yet.
       InitialAdmin__Email: ${COMMONAGE_ADMIN_EMAIL:-}
       InitialAdmin__Password: ${COMMONAGE_ADMIN_PASSWORD:-}
+      # "en" or "de" fills an empty archive with made-up demo content. See docs/operations.md.
+      Demo__Language: ${COMMONAGE_DEMO:-}
     volumes:
       - media-data:/app/App_Data
     ports:
