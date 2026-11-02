@@ -16,11 +16,32 @@ public static partial class Browser
     public static async Task<HttpResponseMessage> PostFormAsync(
         HttpClient client, string url, Dictionary<string, string> fields, string? pageUrl = null)
     {
-        fields["__RequestVerificationToken"] = await GetAntiforgeryTokenAsync(client, pageUrl ?? url);
-        var response = await client.PostAsync(url, new FormUrlEncodedContent(fields));
+        var response = await SendFormAsync(client, url, fields, pageUrl);
         response.EnsureSuccessStatusCode();
         return response;
     }
+
+    /// <summary>Like <see cref="PostFormAsync"/>, but leaves the status code to the test, so it can look at refusals.</summary>
+    public static async Task<HttpResponseMessage> SendFormAsync(
+        HttpClient client, string url, Dictionary<string, string> fields, string? pageUrl = null)
+    {
+        fields["__RequestVerificationToken"] = await GetAntiforgeryTokenAsync(client, pageUrl ?? url);
+        return await client.PostAsync(url, new FormUrlEncodedContent(fields));
+    }
+
+    /// <summary>Whether the client can open the curators' pages, rather than being sent to the login page.</summary>
+    public static async Task<bool> IsLoggedInAsync(HttpClient client)
+    {
+        var response = await client.GetAsync("/Admin");
+        return response.IsSuccessStatusCode && response.RequestMessage!.RequestUri!.AbsolutePath == "/Admin";
+    }
+
+    public static async Task LogInAsync(HttpClient client, string email, string password) =>
+        await PostFormAsync(client, "/Account/Login", new()
+        {
+            ["Input.Email"] = email,
+            ["Input.Password"] = password,
+        });
 
     /// <summary>Uploads a file through the upload form on <paramref name="pageUrl"/>.</summary>
     public static async Task<HttpResponseMessage> UploadAsync(HttpClient client, string pageUrl, string handler, string fileName, byte[] content)

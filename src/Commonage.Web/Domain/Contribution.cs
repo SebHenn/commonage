@@ -30,7 +30,8 @@ public class Contribution
     public int? ContributionLinkId { get; set; }
     public ContributionLink? ContributionLink { get; set; }
 
-    public required string ContributorName { get; set; }
+    /// <summary>Null once a curator removed the contributor's details at their request.</summary>
+    public string? ContributorName { get; set; }
 
     /// <summary>Optional. Only used by curators to ask about this contribution.</summary>
     public string? ContributorEmail { get; set; }
@@ -50,4 +51,19 @@ public class Contribution
 
     /// <summary>When a curator first published, accepted or rejected the contribution.</summary>
     public DateTime? ReviewedAt { get; set; }
+
+    /// <summary>When a curator removed the contributor's name and email address, usually because they asked for it.</summary>
+    public DateTime? PersonalDetailsRemovedAt { get; set; }
+
+    /// <summary>
+    /// Removes what identifies the contributor: name and email address. The rights statement, the photographer or
+    /// author and the consent text stay, because the archive needs them to keep using the material.
+    /// </summary>
+    public void RemovePersonalDetails(DateTime now)
+    {
+        ContributorName = null;
+        ContributorEmail = null;
+        ShowName = false;
+        PersonalDetailsRemovedAt ??= now;
+    }
 }

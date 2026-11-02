@@ -22,6 +22,7 @@ docker compose up --build
 
 Open http://localhost:8080. The health check is at http://localhost:8080/health.
 
+Running an archive (accounts, export, backup and restore): [docs/operations.md](docs/operations.md).
 For working on the code, see [docs/development.md](docs/development.md).
 
 ## Tech stack

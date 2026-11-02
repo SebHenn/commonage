@@ -31,11 +31,22 @@
             {
                 <p>@T["Check the contribution, complete the details below, then publish it, accept it as a draft or reject it."]</p>
             }
+            else if (Model.CurrentStatus == ItemStatus.Withdrawn)
+            {
+                <p>@T["The contributor withdrew their consent. The item stays hidden and cannot be published again. Delete it once it is no longer needed."]</p>
+            }
             <dl class="row mb-0">
                 <dt class="col-sm-4">@T["Sent in by"]</dt>
                 <dd class="col-sm-8">
-                    @contribution.ContributorName
-                    <span class="text-muted">(@(contribution.ShowName ? T["may be named publicly"] : T["not to be named publicly"]))</span>
+                    @if (contribution.PersonalDetailsRemovedAt is { } removedAt)
+                    {
+                        <span class="text-muted">@T["Name and email address removed on {0}", removedAt.ToLocalTime().ToString("d")]</span>
+                    }
+                    else
+                    {
+                        @contribution.ContributorName
+                        <span class="text-muted">(@(contribution.ShowName ? T["may be named publicly"] : T["not to be named publicly"]))</span>
+                    }
                 </dd>
                 @if (contribution.ContributorEmail is not null)
                 {
@@ -66,6 +77,26 @@
                 <dt class="col-sm-4">@T["Consent"]</dt>
                 <dd class="col-sm-8 mb-0">@contribution.ConsentText</dd>
             </dl>
+            @if (contribution.PersonalDetailsRemovedAt is null || Model.CurrentStatus != ItemStatus.Withdrawn)
+            {
+                <h3 class="h6 mt-4">@T["If the contributor asks"]</h3>
+                <div class="d-flex flex-wrap gap-2">
+                    @if (contribution.PersonalDetailsRemovedAt is null)
+                    {
+                        <form method="post" asp-page-handler="RemoveContributorDetails" asp-route-id="@Model.ItemId"
+                              data-confirm="@T["Remove the contributor's name and email address? The material, the rights statement and the consent text stay. This cannot be undone."]">
+                            <button type="submit" class="btn btn-sm btn-outline-secondary">@T["Remove name and email address"]</button>
+                        </form>
+                    }
+                    @if (Model.CurrentStatus != ItemStatus.Withdrawn)
+                    {
+                        <form method="post" asp-page-handler="Withdraw" asp-route-id="@Model.ItemId"
+                              data-confirm="@T["Mark this contribution as withdrawn? It is hidden at once and cannot be published again."]">
+                            <button type="submit" class="btn btn-sm btn-outline-secondary">@T["Mark as withdrawn"]</button>
+                        </form>
+                    }
+                </div>
+            }
         </div>
     </section>
 }
@@ -124,6 +155,9 @@
                 <button type="submit" class="btn btn-outline-primary">@T["Save"]</button>
                 <button type="submit" name="command" value="accept" class="btn btn-outline-primary">@T["Accept as draft"]</button>
                 break;
+            case ItemStatus.Withdrawn:
+                <button type="submit" class="btn btn-outline-primary">@T["Save"]</button>
+                break;
             default:
                 <button type="submit" class="btn btn-outline-primary">@T["Save as draft"]</button>
                 <button type="submit" name="command" value="publish" class="btn btn-primary">@T["Save and publish"]</button>
@@ -163,7 +197,7 @@
                                 <div class="d-flex flex-wrap gap-2 mt-1">
                                     <a href="/admin/media/@file.Id/original">@T["Original"]</a>
                                     <form method="post" asp-page-handler="DeleteMedia" asp-route-id="@Model.ItemId" asp-route-mediaFileId="@file.Id"
-                                          onsubmit="return confirm('@T["Delete this photo and its original file?"]');">
+                                          data-confirm="@T["Delete this photo and its original file?"]">
                                         <button type="submit" class="btn btn-link btn-sm p-0 text-danger">@T["Delete"]</button>
                                     </form>
                                 </div>
@@ -187,11 +221,28 @@
     }
 </section>
 
-@if (Model.CurrentStatus is ItemStatus.Submitted or ItemStatus.Rejected)
+@if (Model.ItemId is not null)
 {
+    @if (Model.History.Count > 0)
+    {
+        <section class="mt-5 col-lg-8" aria-labelledby="history-heading">
+            <h2 id="history-heading" class="h4">@T["History"]</h2>
+            <ul class="list-unstyled small">
+                @foreach (var entry in Model.History)
+                {
+                    <li class="mb-1">
+                        <time datetime="@entry.At.ToString("O")" class="text-muted">@entry.At.ToLocalTime().ToString("g")</time>
+                        · @AuditText.Describe(T, entry.Action)
+                        · @(entry.UserName ?? T["Contributor"])
+                    </li>
+                }
+            </ul>
+        </section>
+    }
+
     <form method="post" asp-page-handler="Delete" asp-route-id="@Model.ItemId" class="mt-5"
-          onsubmit="return confirm('@T["Delete this contribution with all its photos? This cannot be undone."]');">
-        <button type="submit" class="btn btn-outline-danger">@T["Delete contribution"]</button>
+          data-confirm="@T["Delete this item with all its photos and original files? This cannot be undone."]">
+        <button type="submit" class="btn btn-outline-danger">@T["Delete item"]</button>
     </form>
 }
 

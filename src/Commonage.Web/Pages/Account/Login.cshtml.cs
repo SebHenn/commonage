@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Commonage.Web.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -36,8 +37,14 @@ public class LoginModel(SignInManager<IdentityUser> signInManager, IStringLocali
         if (result.Succeeded)
             return LocalRedirect(Url.IsLocalUrl(returnUrl) ? returnUrl : "/Admin");
 
-        ModelState.AddModelError(string.Empty, result.IsLockedOut
-            ? localizer["Too many failed attempts. Please try again in a few minutes."]
+        // Only someone who knows the password learns that the account is disabled.
+        var disabled = result.IsLockedOut
+            && await signInManager.UserManager.FindByNameAsync(Input.Email) is { } user
+            && Accounts.IsDisabled(user)
+            && await signInManager.UserManager.CheckPasswordAsync(user, Input.Password);
+        ModelState.AddModelError(string.Empty,
+            disabled ? localizer["This account is disabled. Please ask an admin."]
+            : result.IsLockedOut ? localizer["Too many failed attempts. Please try again in a few minutes."]
             : localizer["The email address or password is incorrect."]);
         return Page();
     }

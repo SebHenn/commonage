@@ -105,6 +105,46 @@ namespace Commonage.Web.Data.Migrations
                     b.ToTable("ArchiveItems");
                 });
 
+            modelBuilder.Entity("Commonage.Web.Domain.AuditEntry", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<int?>("ArchiveItemId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("At")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Subject")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("UserId")
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ArchiveItemId");
+
+                    b.HasIndex("At");
+
+                    b.ToTable("AuditEntries");
+                });
+
             modelBuilder.Entity("Commonage.Web.Domain.Collection", b =>
                 {
                     b.Property<int>("Id")
@@ -154,9 +194,11 @@ namespace Commonage.Web.Data.Migrations
                         .HasColumnType("character varying(254)");
 
                     b.Property<string>("ContributorName")
-                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime?>("PersonalDetailsRemovedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("ReviewedAt")
                         .HasColumnType("timestamp with time zone");
@@ -551,6 +593,16 @@ namespace Commonage.Web.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Collection");
+                });
+
+            modelBuilder.Entity("Commonage.Web.Domain.AuditEntry", b =>
+                {
+                    b.HasOne("Commonage.Web.Domain.ArchiveItem", "ArchiveItem")
+                        .WithMany()
+                        .HasForeignKey("ArchiveItemId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("ArchiveItem");
                 });
 
             modelBuilder.Entity("Commonage.Web.Domain.Contribution", b =>

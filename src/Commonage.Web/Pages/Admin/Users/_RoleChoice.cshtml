@@ -1,0 +1,19 @@
+@model string
+@using Commonage.Web.Identity
+<fieldset class="mb-3">
+    <legend class="form-label fs-6">@T["Role"]</legend>
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="Input.Role" id="role-curator" value="@Roles.Curator" checked="@(Model != Roles.Admin)" />
+        <label class="form-check-label" for="role-curator">
+            @T["Curator"]
+            <span class="d-block form-text mt-0">@T["Reviews contributions, describes, publishes and deletes items, manages collections and contribution links."]</span>
+        </label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="Input.Role" id="role-admin" value="@Roles.Admin" checked="@(Model == Roles.Admin)" />
+        <label class="form-check-label" for="role-admin">
+            @T["Admin"]
+            <span class="d-block form-text mt-0">@T["Can also manage accounts, export the archive and read the activity log."]</span>
+        </label>
+    </div>
+</fieldset>

@@ -1,0 +1,9 @@
+@page
+@{
+    ViewData["Title"] = T["No access"];
+    HttpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
+}
+
+<h1>@ViewData["Title"]</h1>
+<p>@T["Your account cannot open this page. Ask an admin if you need it."]</p>
+<p><a asp-page="/Admin/Index">@T["Back to managing the archive"]</a></p>

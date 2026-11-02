@@ -1,0 +1,67 @@
+@page
+@model Commonage.Web.Pages.Admin.ContributorsModel
+@{
+    ViewData["Title"] = T["Contributors"];
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="/Admin/Index">@T["Items"]</a></li>
+    </ol>
+</nav>
+
+<h1>@ViewData["Title"]</h1>
+<div class="col-lg-8">
+    <p>@T["Find everything a person has sent in, for example when they ask what the archive holds about them, or ask for it to be deleted."]</p>
+    <p>@T["On each contribution you can remove their name and email address, mark it as withdrawn, or delete the item with its files. Backups keep older copies until they are replaced."]</p>
+</div>
+
+<form method="get" role="search" class="row g-2 mb-3 col-lg-8">
+    <div class="col">
+        <label for="contributor-search" class="visually-hidden">@T["Name or email address"]</label>
+        <input id="contributor-search" type="search" name="q" value="@Model.Text" class="form-control" placeholder="@T["Name or email address"]" />
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-outline-primary">@T["Search"]</button>
+    </div>
+</form>
+
+@if (!string.IsNullOrWhiteSpace(Model.Text))
+{
+    @if (Model.Results.Count == 0)
+    {
+        <p class="text-muted">@T["No contributions match."]</p>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th scope="col">@T["Contributor"]</th>
+                        <th scope="col">@T["Item"]</th>
+                        <th scope="col">@T["Status"]</th>
+                        <th scope="col" class="d-none d-md-table-cell">@T["Sent in"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var contribution in Model.Results)
+                    {
+                        <tr>
+                            <td class="text-break">
+                                @contribution.ContributorName
+                                @if (contribution.ContributorEmail is not null)
+                                {
+                                    <br /><span class="text-muted small">@contribution.ContributorEmail</span>
+                                }
+                            </td>
+                            <td><a asp-page="/Admin/Items/Edit" asp-route-id="@contribution.ArchiveItemId">@contribution.ArchiveItem.Title</a></td>
+                            <td><partial name="_StatusBadge" model="contribution.ArchiveItem.Status" /></td>
+                            <td class="d-none d-md-table-cell">@contribution.SubmittedAt.ToLocalTime().ToString("d")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+}

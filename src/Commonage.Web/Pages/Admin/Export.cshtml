@@ -1,0 +1,30 @@
+@page
+@model Commonage.Web.Pages.Admin.ExportModel
+@{
+    ViewData["Title"] = T["Export the archive"];
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="/Admin/Index">@T["Items"]</a></li>
+    </ol>
+</nav>
+
+<div class="col-lg-8">
+    <h1>@ViewData["Title"]</h1>
+    <p>@T["Download everything in the archive as one ZIP file: all original files, and all descriptions as a JSON file and as a table for spreadsheet programs. The export needs no Commonage to read, so the archive's material is never locked in."]</p>
+    <p>@T["A large archive can take a while. Keep this page open until the download has finished."]</p>
+
+    <form method="post">
+        <div class="form-check mb-2">
+            <input asp-for="PublishedOnly" class="form-check-input" />
+            <label asp-for="PublishedOnly" class="form-check-label">@T["Only published items"]</label>
+        </div>
+        <div class="form-check mb-3">
+            <input asp-for="IncludePersonalData" class="form-check-input" aria-describedby="personal-data-help" />
+            <label asp-for="IncludePersonalData" class="form-check-label">@T["Include contributors' names and email addresses"]</label>
+            <div id="personal-data-help" class="form-text">@T["Only for a complete copy, such as a move to another server. Keep such a file as carefully as the archive itself."]</div>
+        </div>
+        <button type="submit" class="btn btn-primary">@T["Download export"]</button>
+    </form>
+</div>

@@ -1,4 +1,7 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
-
-// Write your JavaScript code.
+// Forms marked with data-confirm ask before they are sent, for actions that cannot be undone.
+// The question is an attribute rather than inline script, so any text in any language is safe in it.
+document.addEventListener('submit', event => {
+    const question = event.target.dataset.confirm;
+    if (question && !window.confirm(question))
+        event.preventDefault();
+});

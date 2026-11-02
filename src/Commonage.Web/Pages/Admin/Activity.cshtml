@@ -1,0 +1,57 @@
+@page
+@model Commonage.Web.Pages.Admin.ActivityModel
+@{
+    ViewData["Title"] = T["Activity log"];
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="/Admin/Index">@T["Items"]</a></li>
+    </ol>
+</nav>
+
+<h1>@ViewData["Title"]</h1>
+<p class="col-lg-8">@T["Who changed what in the archive, newest first. The log keeps no contributor details, and nobody can change or delete its entries in the app."]</p>
+
+@if (Model.Entries.TotalCount == 0)
+{
+    <p class="text-muted">@T["Nothing has been recorded yet."]</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-sm align-middle">
+            <thead>
+                <tr>
+                    <th scope="col">@T["When"]</th>
+                    <th scope="col">@T["Who"]</th>
+                    <th scope="col">@T["What"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var entry in Model.Entries.Items)
+                {
+                    <tr>
+                        <td class="text-nowrap"><time datetime="@entry.At.ToString("O")">@entry.At.ToLocalTime().ToString("g")</time></td>
+                        <td class="text-break">@(entry.UserName ?? T["Contributor"])</td>
+                        <td>
+                            @AuditText.Describe(T, entry.Action)@if (entry.Subject is not null)
+                            {
+                                <text>: </text>
+                                @if (entry.ArchiveItemId is { } itemId)
+                                {
+                                    <a asp-page="/Admin/Items/Edit" asp-route-id="@itemId">@entry.Subject</a>
+                                }
+                                else
+                                {
+                                    @entry.Subject
+                                }
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <partial name="_Pager" model="Model.Entries" />
+}

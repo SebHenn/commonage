@@ -9,17 +9,17 @@ Estimates assume about 10 hours a week. Every milestone ends with something demo
 | **M2 Photos** ✅ | 5–8 | Curators upload photos; originals stay private; previews are generated in the background without EXIF/GPS data. Files of unpublished items return 404. Show it to a partner group. |
 | **M3 Search and browse** ✅ | 9–11 | Tags, uncertain dates ("circa 1950"), PostgreSQL full-text search, filters, pagination, mobile layout. |
 | **M4 Contributions** ✅ | 12–15 | Anyone with the link can submit material with consent and rights details; curators approve or reject it. Spam protection; email optional. |
-| **M5 Trust** | 16–19 | Export (metadata + files), tested backup and restore, audit log, curator management, deletion of personal data. |
+| **M5 Trust** ✅ | 16–19 | Export (metadata + files), tested backup and restore, audit log, curator management, deletion of personal data. |
 | **M6 Release v0.1** | 20–22 | HTTPS deployment guide, documentation, demo content, accessibility and security review, five-task test with a real group. |
 
 ## Decisions
 
 - One web application (Razor Pages) plus one test project. Split into more projects only when it hurts.
 - A contribution creates an `ArchiveItem` with status `Submitted`; publishing only changes its status.
-- Item status: `Draft`, `Published`, `Submitted` (a contribution waiting for review) and `Rejected` (kept
-  hidden until a curator deletes it). `Withdrawn` is postponed to M5, together with deletion of personal data:
-  contributors withdraw by asking the archive, as the consent text says, because they have no account and
-  need not give an email address. Files will have their own `IsPublic` flag.
+- Item status: `Draft`, `Published`, `Submitted` (a contribution waiting for review), `Rejected` (kept
+  hidden until a curator deletes it) and `Withdrawn` (the contributor took back their consent: hidden, and it
+  can never be published again without a new contribution). Contributors withdraw by asking the archive, as the
+  consent text says, because they have no account and need not give an email address.
 - Contributions come in through contribution links: a curator creates a link for a collection ("Share your
   photos of the Mill Street flood") and shares it. The address holds a random 128-bit token; closed and unknown
   links show "not found". Links are closed, never deleted, so contributions keep their origin.
@@ -33,8 +33,29 @@ Estimates assume about 10 hours a week. Every milestone ends with something demo
   default 30, generous because a community event may share one address). Detected spam gets the normal thank-you
   page and is not saved. Behind a reverse proxy, forwarded headers must be configured (M6 deployment guide), or
   every visitor counts as the proxy's address.
-- No emails are sent yet. Curators see waiting contributions on the item list. Only submitted and rejected items
-  can be deleted (with their files); deleting published items comes with M5.
+- No emails are sent. Curators see waiting contributions on the item list. Any item can be deleted with its
+  files and contribution record.
+- Personal data: "Contributors" finds a person's contributions by part of their name or email address. Curators
+  can remove a contributor's name and email address (the rights statement, the photographer or author and the
+  consent text stay, because the archive needs them to keep using the material), mark a contribution as withdrawn,
+  or delete the item. Backups keep removed data until they are replaced; docs/operations.md says so.
+- Two roles: curators manage the archive; admins can also manage accounts, export and read the activity log.
+  New accounts get a one-time setup link (an Identity password-reset token, valid seven days) that the admin
+  passes on, because Commonage sends no emails. Admins cannot change, disable or delete their own account, so an
+  admin always remains. Disabling locks the account out and changes its security stamp, which is checked every
+  minute, so open logins end quickly. Identity's messages are translated through `LocalizedIdentityErrorDescriber`.
+- The activity log (`AuditEntry`) is written by `AuditLog.Record` into the same `SaveChanges` as the change it
+  describes, so there is never a change without an entry or the other way round. Actions are stored by name. An
+  entry keeps the item's title and the account name as they were, so it still makes sense after either is deleted
+  (the link to the item is set to null). It never holds contributor names or email addresses, so removing a
+  contributor's data never touches the log. Entries are kept indefinitely for now.
+- Export: one ZIP with `archive.json` (complete, versioned format), `items.csv` (for spreadsheets, protected
+  against formula injection), the original files and a README; streamed to the browser, so no temporary copy is
+  needed. Files are checked against their SHA-256 while exporting. Contributor names and emails only on request.
+  Admins only, and every export is logged.
+- Backup and restore are shell scripts around `pg_dump`/`pg_restore` and `tar` on the Docker volumes, not an
+  app feature: they work when the app does not, and restore a complete archive including accounts and login keys.
+  `scripts/test-backup-restore.sh` tests the full cycle in CI.
 - Every public page queries `CommonageDbContext.PublishedItems`, never `ArchiveItems` directly.
 - Migrations are applied automatically at startup (single-instance self-hosting).
 - UI text is English-keyed and translated through `Resources/SharedResource.{culture}.resx`.

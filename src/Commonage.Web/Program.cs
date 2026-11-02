@@ -2,8 +2,10 @@ using System.Globalization;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using Commonage.Web;
+using Commonage.Web.Audit;
 using Commonage.Web.Contributions;
 using Commonage.Web.Data;
+using Commonage.Web.Export;
 using Commonage.Web.Identity;
 using Commonage.Web.Media;
 using Microsoft.AspNetCore.DataProtection;
@@ -31,14 +33,25 @@ builder.Services
         options.Lockout.AllowedForNewUsers = true;
     })
     .AddEntityFrameworkStores<CommonageDbContext>()
-    .AddDefaultTokenProviders();
+    .AddDefaultTokenProviders()
+    .AddErrorDescriber<LocalizedIdentityErrorDescriber>();
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Account/Login";
-    options.AccessDeniedPath = "/Account/Login";
+    options.AccessDeniedPath = "/Account/AccessDenied";
 });
+// Logins are checked against the account every minute, so a disabled account or a changed role takes effect quickly.
+builder.Services.Configure<SecurityStampValidatorOptions>(options => options.ValidationInterval = TimeSpan.FromMinutes(1));
+// Setup links for new accounts are handed over in person or by the admin's own email, so they stay valid for a week.
+builder.Services.Configure<DataProtectionTokenProviderOptions>(options => options.TokenLifespan = TimeSpan.FromDays(7));
 builder.Services.AddAuthorizationBuilder()
-    .AddPolicy(Policies.ManageArchive, policy => policy.RequireRole(Roles.Admin, Roles.Curator));
+    .AddPolicy(Policies.ManageArchive, policy => policy.RequireRole(Roles.Admin, Roles.Curator))
+    .AddPolicy(Policies.Administer, policy => policy.RequireRole(Roles.Admin));
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddScoped<AuditLog>();
+builder.Services.AddScoped<ArchiveExporter>();
 
 // Uploaded originals and their previews. In Docker this directory is a persistent volume.
 var storageRoot = Path.GetFullPath(
@@ -57,7 +70,14 @@ builder.Services.AddContributionRateLimit();
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 // Write letters such as ü and ß as-is instead of as HTML entities. Razor still escapes markup characters.
 builder.Services.Configure<WebEncoderOptions>(options => options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.All));
-builder.Services.AddRazorPages(options => options.Conventions.AuthorizeFolder("/Admin", Policies.ManageArchive))
+builder.Services.AddRazorPages(options =>
+    {
+        options.Conventions.AuthorizeFolder("/Admin", Policies.ManageArchive);
+        options.Conventions.AuthorizeFolder("/Admin/Users", Policies.Administer);
+        options.Conventions.AuthorizePage("/Admin/Export", Policies.Administer);
+        options.Conventions.AuthorizePage("/Admin/Activity", Policies.Administer);
+        options.Conventions.AuthorizePage("/Account/Password");
+    })
     .AddViewLocalization()
     .AddDataAnnotationsLocalization(options =>
         options.DataAnnotationLocalizerProvider = (_, factory) => factory.Create(typeof(SharedResource)));

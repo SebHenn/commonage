@@ -1,0 +1,38 @@
+using Commonage.Web.Data;
+using Commonage.Web.Domain;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+
+namespace Commonage.Web.Pages.Admin;
+
+/// <summary>
+/// Finds everything a person has sent in, by name or email address, for when they ask what the archive holds about
+/// them, or ask for it to be corrected or deleted.
+/// </summary>
+public class ContributorsModel(CommonageDbContext db) : PageModel
+{
+    private const int MaxResults = 200;
+
+    [BindProperty(SupportsGet = true, Name = "q")]
+    public string? Text { get; set; }
+
+    public IReadOnlyList<Contribution> Results { get; private set; } = [];
+
+    public async Task OnGetAsync(CancellationToken cancellationToken)
+    {
+        var text = Text?.Trim();
+        if (string.IsNullOrEmpty(text))
+            return;
+
+        // The typed text is matched literally, so % and _ are not wildcards.
+        var pattern = "%" + text.Replace(@"\", @"\\").Replace("%", @"\%").Replace("_", @"\_") + "%";
+        Results = await db.Contributions
+            .AsNoTracking()
+            .Include(c => c.ArchiveItem)
+            .Where(c => EF.Functions.ILike(c.ContributorName!, pattern) || EF.Functions.ILike(c.ContributorEmail!, pattern))
+            .OrderBy(c => c.ContributorName).ThenByDescending(c => c.SubmittedAt)
+            .Take(MaxResults)
+            .ToListAsync(cancellationToken);
+    }
+}
