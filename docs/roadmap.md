@@ -10,10 +10,14 @@ Estimates assume about 10 hours a week. Every milestone ends with something demo
 | **M3 Search and browse** ✅ | 9–11 | Tags, uncertain dates ("circa 1950"), PostgreSQL full-text search, filters, pagination, mobile layout. |
 | **M4 Contributions** ✅ | 12–15 | Anyone with the link can submit material with consent and rights details; curators approve or reject it. Spam protection; email optional. |
 | **M5 Trust** ✅ | 16–19 | Export (metadata + files), tested backup and restore, audit log, curator management, deletion of personal data. |
-| **M6 Release v0.1** | 20–22 | HTTPS deployment guide, documentation, demo content, accessibility and security review, five-task test with a real group. *All done except the five-task test ([plan](usability-test.md)) and the license.* |
+| **M6 Release v0.1** ✅ | 20–22 | HTTPS deployment guide, documentation, demo content, accessibility and security review, five-task test with a real group ([results](usability-test.md#results)). Released as v0.1.0 under the AGPL-3.0. |
 
 ## Decisions
 
+- License: **GNU AGPL v3.0**. What is built on Commonage stays open, also when it is offered as a hosted service;
+  groups running it unchanged have nothing to do. Every page links to the source code (`Source:Url`, default the
+  main repository). Contributions come in under the same license with a DCO sign-off, no contributor agreement.
+  The license covers the software, never the archives' content.
 - One web application (Razor Pages) plus one test project. Split into more projects only when it hurts.
 - A contribution creates an `ArchiveItem` with status `Submitted`; publishing only changes its status.
 - Item status: `Draft`, `Published`, `Submitted` (a contribution waiting for review), `Rejected` (kept
@@ -173,7 +177,3 @@ See the "Languages" decision above for the rules that already apply.
 - How long the activity log is kept, and whether old entries are thinned out.
 - Encrypting the keys that protect logins and setup links (Data Protection) with a key outside the database.
 
-## Open decisions
-
-- License (AGPL-3.0 is the current favourite). Must be chosen before the repository is made public and v0.1.0 is
-  tagged.

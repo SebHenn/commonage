@@ -60,4 +60,5 @@ before v0.1 is announced; plan the rest. Record the date, the group and the resu
 
 ## Results
 
-*Not run yet.*
+**v0.1, November 2026:** run with a real community group on the demo archive. All five tasks were completed
+successfully, so the success criteria are met and v0.1.0 can be released.
