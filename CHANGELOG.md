@@ -3,6 +3,13 @@
 All notable changes to Commonage. Versions follow [Semantic Versioning](https://semver.org/); before 1.0, a minor
 version may change things that need attention when updating, and these notes say so.
 
+## Unreleased
+
+### Project
+
+- Dependabot's patch and minor updates merge by themselves once all checks pass; major updates still wait for
+  review. GitHub Actions updates are grouped the same way as NuGet updates.
+
 ## 0.1.1 (2026-11-03)
 
 ### Running an archive

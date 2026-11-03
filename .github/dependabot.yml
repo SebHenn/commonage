@@ -1,5 +1,6 @@
 # Weekly update pull requests for everything Commonage depends on. Minor and patch updates of one kind come as a
-# single pull request; major updates come one by one, because they may need code changes.
+# single pull request; major updates come one by one, because they may need code changes. Patch and minor updates
+# merge by themselves once all checks pass (.github/workflows/dependabot-auto-merge.yml); major ones wait for review.
 # Not covered: Bootstrap, jQuery and jQuery Validation, which are copied into src/Commonage.Web/wwwroot/lib.
 # Check those by hand before each release (see docs/development.md).
 version: 2
@@ -33,8 +34,8 @@ updates:
       interval: weekly
       day: monday
     groups:
-      actions:
-        patterns: ["*"]
+      actions-minor-and-patch:
+        update-types: [minor, patch]
     commit-message:
       prefix: ci
 

@@ -1,0 +1,82 @@
+name: Dependabot auto-merge
+
+# Dependabot's patch and minor updates merge by themselves once every required check has passed. Major updates wait
+# for a maintainer. Because main only accepts pull requests that are up to date, each change to main asks Dependabot
+# to rebase the next waiting update, so the updates go through one after another.
+#
+# Needs DEPENDABOT_AUTOMERGE_TOKEN as an Actions secret and as a Dependabot secret: a maintainer's fine-grained token
+# for this repository only, with "Contents" and "Pull requests" set to read and write. GitHub Actions' own token is
+# not enough: Dependabot ignores commands from it, and merges made with it would not run the checks on main.
+# Without the secret, this workflow does nothing and updates are merged by hand. See docs/development.md.
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  enable-auto-merge:
+    if: github.event_name == 'pull_request' && github.actor == 'dependabot[bot]' && github.event.pull_request.user.login == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      # Reads the update type from Dependabot's commit message. For a group, it is the largest update in the group.
+      - id: meta
+        uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98 # v3.1.0
+      - name: Turn on auto-merge for patch and minor updates
+        env:
+          UPDATE_TYPE: ${{ steps.meta.outputs.update-type }}
+          ECOSYSTEM: ${{ steps.meta.outputs.package-ecosystem }}
+          FROM: ${{ steps.meta.outputs.previous-version }}
+          TO: ${{ steps.meta.outputs.new-version }}
+          PR: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.DEPENDABOT_AUTOMERGE_TOKEN }}
+        run: |
+          case "$UPDATE_TYPE" in
+            version-update:semver-patch | version-update:semver-minor) ;;
+            "")
+              # The same image tag with a new digest: the image was rebuilt, usually with security fixes.
+              case "$ECOSYSTEM" in docker | docker_compose) ;; *) echo "Unknown update type; waits for a maintainer."; exit 0 ;; esac
+              if [ "$FROM" != "$TO" ]; then echo "Unknown update type; waits for a maintainer."; exit 0; fi
+              ;;
+            *) echo "$UPDATE_TYPE waits for a maintainer."; exit 0 ;;
+          esac
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::warning::DEPENDABOT_AUTOMERGE_TOKEN is not set, so this update has to be merged by hand."
+            exit 0
+          fi
+          gh pr merge --auto --squash "$PR"
+
+  rebase-next:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    concurrency:
+      group: dependabot-rebase-next
+    steps:
+      - name: Ask Dependabot to rebase the next waiting update
+        env:
+          GH_TOKEN: ${{ secrets.DEPENDABOT_AUTOMERGE_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then echo "DEPENDABOT_AUTOMERGE_TOKEN is not set; nothing to do."; exit 0; fi
+          # Oldest first, and only updates waiting for auto-merge. One at a time: rebasing them all at once would
+          # only make them fall behind again as soon as the first one is merged.
+          for pr in $(gh pr list --author app/dependabot --state open --json number,autoMergeRequest,createdAt \
+                        --jq 'sort_by(.createdAt) | .[] | select(.autoMergeRequest != null) | .number'); do
+            failed=$(gh pr checks "$pr" --required --json bucket --jq '[.[] | select(.bucket == "fail")] | length' || true)
+            if [ "${failed:-0}" -gt 0 ]; then echo "#$pr has failing checks and waits for a maintainer."; continue; fi
+            head=$(gh pr view "$pr" --json headRefOid --jq .headRefOid)
+            behind=$(gh api "repos/$GH_REPO/compare/main...$head" --jq .behind_by)
+            if [ "$behind" -eq 0 ]; then echo "#$pr is up to date and will merge when its checks pass."; exit 0; fi
+            gh pr comment "$pr" --body "@dependabot rebase"
+            echo "Asked Dependabot to rebase #$pr."
+            exit 0
+          done
+          echo "No Dependabot update is waiting."
