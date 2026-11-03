@@ -33,7 +33,8 @@ vulnerability, see [SECURITY.md](../SECURITY.md).
 | Containers | The app runs as a non-root user. The database and the app have no ports open to the internet. |
 | Personal data | Contributor details are visible to curators only, removable on request, never written to the activity log or to logs (EF Core does not log parameter values). Exports include them only on request; each export is logged. |
 | Errors | Visitors see a plain page with a reference number; details go to the log. |
-| Repository | CI scans the whole history for secrets (gitleaks), builds with warnings as errors, and runs all tests and the backup-and-restore test. `dotnet list package --vulnerable` reported nothing at the v0.1 review. |
+| Repository | CI scans the whole history for secrets (gitleaks), builds with warnings as errors, and runs all tests and the backup-and-restore test. CodeQL analyses the C# code and the workflows; dependency review refuses pull requests that add vulnerable dependencies; Dependabot proposes updates weekly; OpenSSF Scorecard rates the setup. `main` only changes through pull requests with passing checks, and release tags cannot be moved or deleted. |
+| Supply chain | GitHub Actions are pinned to commits and container images to digests, so a moved tag cannot change what runs. Workflows have read-only tokens unless a job needs more. Release images are built by the release workflow only after a maintainer approves it, and carry a software bill of materials and a signed build attestation (`gh attestation verify`). |
 
 ## Known limits and open points
 
@@ -55,4 +56,6 @@ vulnerability, see [SECURITY.md](../SECURITY.md).
 dotnet list package --vulnerable --include-transitive
 ```
 
-Run it before every release. Dependabot or a similar service should do it on the repository once it is public.
+Dependabot does this continuously on the repository; running it before a release costs nothing. Bootstrap, jQuery and
+jQuery Validation are copied into `wwwroot/lib` and are not seen by Dependabot: check them by hand before a
+release.

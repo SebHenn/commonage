@@ -3,6 +3,20 @@
 All notable changes to Commonage. Versions follow [Semantic Versioning](https://semver.org/); before 1.0, a minor
 version may change things that need attention when updating, and these notes say so.
 
+## 0.1.1 (unreleased)
+
+### Running an archive
+
+- Ready-made Docker images for x86 and ARM servers at `ghcr.io/sebhenn/commonage`, with a software bill of materials
+  and a signed build attestation. `compose.production.yaml` uses them (`COMMONAGE_VERSION`), so servers no longer
+  compile Commonage; updating is `docker compose pull`.
+- Base images and the database and Caddy images are pinned by digest.
+
+### Project
+
+- Public repository setup: Dependabot, CodeQL, dependency review, OpenSSF Scorecard, a sign-off (DCO) check,
+  issue and pull request templates, CODEOWNERS, and pinned GitHub Actions.
+
 ## 0.1.0 (2026-11-02)
 
 The first version for real community archives.

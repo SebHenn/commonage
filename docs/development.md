@@ -101,6 +101,19 @@ change it. `compose.production.yaml` and `deploy/Caddyfile` are the HTTPS setup 
 to try it locally, set `COMMONAGE_DOMAIN=localhost` (Caddy then uses its own local certificate authority) and use
 `;` instead of `:` in `COMPOSE_FILE` on Windows.
 
+## Releasing
+
+1. In a pull request: raise `<Version>` in `Directory.Build.props`, give the `CHANGELOG.md` entry its date, and
+   update the version in docs/deployment.md (`git checkout vX.Y.Z`). Check Bootstrap, jQuery and jQuery Validation in
+   `wwwroot/lib` for security releases (Dependabot does not see them).
+2. After merging, tag the merge commit on `main` and push the tag:
+   `git tag -a v0.1.1 -m "Commonage 0.1.1" && git push origin v0.1.1`.
+3. The Release workflow waits for approval in the `release` environment (Actions tab → the run → "Review
+   deployments"). Approving it builds and publishes the images for x86 and ARM, with SBOM and attestation.
+4. Create the GitHub release from the CHANGELOG entry (`gh release create v0.1.1 --notes-file ...`).
+
+Release tags cannot be moved or deleted once pushed; a mistake is fixed with the next patch version.
+
 ## Database changes
 
 After changing an entity or `CommonageDbContext`, create a migration and commit it:

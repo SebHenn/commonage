@@ -1,0 +1,18 @@
+name: Idea or wish
+description: Something Commonage should do, or do differently.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: Check the [roadmap](https://github.com/SebHenn/commonage/blob/main/docs/roadmap.md) first; it may already be planned.
+  - type: textarea
+    id: need
+    attributes:
+      label: What do you or your group need?
+      description: Describe the situation and who it is for (visitors, contributors, curators, admins, people running the server), rather than a solution.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Do you have an idea how it could work?

@@ -1,0 +1,55 @@
+# Weekly update pull requests for everything Commonage depends on. Minor and patch updates of one kind come as a
+# single pull request; major updates come one by one, because they may need code changes.
+# Not covered: Bootstrap, jQuery and jQuery Validation, which are copied into src/Commonage.Web/wwwroot/lib.
+# Check those by hand before each release (see docs/development.md).
+version: 2
+
+updates:
+  - package-ecosystem: nuget
+    directories:
+      - /src/Commonage.Web
+      - /tests/Commonage.Tests
+      - /
+    schedule:
+      interval: weekly
+      day: monday
+    groups:
+      nuget-minor-and-patch:
+        update-types: [minor, patch]
+    commit-message:
+      prefix: deps
+
+  - package-ecosystem: dotnet-sdk
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: deps
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    groups:
+      actions:
+        patterns: ["*"]
+    commit-message:
+      prefix: ci
+
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: deps
+
+  - package-ecosystem: docker-compose
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: deps
