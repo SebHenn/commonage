@@ -1,6 +1,7 @@
 # Contributing
 
-Thank you for helping. Bug reports, ideas, translations and code are all welcome.
+Thank you for helping. Bug reports, ideas, translations and code are all welcome. Everyone taking part follows the
+[Code of Conduct](CODE_OF_CONDUCT.md).
 
 - **Bugs and ideas**: open an issue. Never include real archive material or anyone's personal data.
 - **Security problems**: do not open an issue; see [SECURITY.md](SECURITY.md).

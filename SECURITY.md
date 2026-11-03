@@ -4,6 +4,9 @@ Please do not report security problems in public issues. Use GitHub's private vu
 on the repository page, open **Security** → **Report a vulnerability**. Describe what you found and how to
 reproduce it. You will get an answer within a week.
 
+If you have no GitHub account, write to [commonage-project@outlook.com](mailto:commonage-project@outlook.com)
+instead, with "Security" in the subject.
+
 Community archives hold unpublished material and personal data of contributors, so please give us time to release
 a fix before you publish details.
 
