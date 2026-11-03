@@ -101,6 +101,22 @@ change it. `compose.production.yaml` and `deploy/Caddyfile` are the HTTPS setup 
 to try it locally, set `COMMONAGE_DOMAIN=localhost` (Caddy then uses its own local certificate authority) and use
 `;` instead of `:` in `COMPOSE_FILE` on Windows.
 
+## Dependency updates
+
+Dependabot opens update pull requests every Monday. Patch and minor updates, and rebuilt base images with an
+unchanged tag, merge by themselves once every required check has passed. Each change to `main` asks Dependabot to
+rebase the next waiting update (`.github/workflows/dependabot-auto-merge.yml`), since `main` only accepts pull
+requests that are up to date. An update whose checks fail stays open for a maintainer.
+
+Major updates are never merged automatically. Read the release notes, check in the CI log that all tests ran (a test
+runner that finds no tests still succeeds), then merge.
+
+The automation uses the secret `DEPENDABOT_AUTOMERGE_TOKEN`, stored twice under Settings → Secrets and variables:
+once under Actions and once under Dependabot. It is a maintainer's fine-grained token for this repository only, with
+"Contents" and "Pull requests" set to read and write. GitHub Actions' own token cannot do this job: Dependabot ignores
+its commands, and merges made with it do not run the checks on `main`. When the token expires, the workflow shows a
+warning on each update and updates are merged by hand until a new token is stored.
+
 ## Releasing
 
 1. In a pull request: raise `<Version>` in `Directory.Build.props`, give the `CHANGELOG.md` entry its date, and
