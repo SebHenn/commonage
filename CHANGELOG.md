@@ -3,7 +3,7 @@
 All notable changes to Commonage. Versions follow [Semantic Versioning](https://semver.org/); before 1.0, a minor
 version may change things that need attention when updating, and these notes say so.
 
-## 0.1.1 (unreleased)
+## 0.1.1 (2026-11-03)
 
 ### Running an archive
 
@@ -16,6 +16,7 @@ version may change things that need attention when updating, and these notes say
 
 - Public repository setup: Dependabot, CodeQL, dependency review, OpenSSF Scorecard, a sign-off (DCO) check,
   issue and pull request templates, CODEOWNERS, and pinned GitHub Actions.
+- Code of Conduct (Contributor Covenant 2.1) and a contact address for people without a GitHub account.
 
 ## 0.1.0 (2026-11-02)
 
