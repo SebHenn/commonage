@@ -1,4 +1,8 @@
-# Roadmap to v0.1
+# Roadmap
+
+v0.1 is done; what comes next is under [After v0.1](#after-v01).
+
+## To v0.1
 
 Estimates assume about 10 hours a week. Every milestone ends with something demonstrable.
 
@@ -127,9 +131,338 @@ Estimates assume about 10 hours a week. Every milestone ends with something demo
 
 ## After v0.1
 
+Planned in November 2026 from audits of the code (visitors and contributors, curators and admins, and product gaps
+compared with Omeka S, Mukurtu, CollectiveAccess and AtoM), an adversarial review of the plan, and a walk through the
+running demo archive at phone, tablet and desktop width, acting out the main tasks. Only one usability test exists so
+far and it recorded no per-task detail, so this order is a judgement, not evidence. It is checked with real groups at
+the start of M7 and again at the end of M14, and it changes if they say otherwise.
+
+The walk-through also showed what to keep: the public pages checked at 320 px have no sideways scrolling, in German
+too; the review page explains the contribution and the consent clearly; and uncertain dates read naturally.
+
+The aim of the next stretch: the archive is safe to trust with real material, looks like the group's own, and a
+volunteer can get through a shoebox of 300 photos in an evening.
+
+### Milestones
+
+Sizes are weeks at 10 hours a week, as a measure of relative effort, not dates. They add up to about 54 weeks; allow
+15–20% more for holidays, fixes and translation. v0.1 took far less calendar time than its estimate, so measure the
+real pace over M7 and M8 before promising dates. Each milestone is a minor release (M7 is v0.2).
+
+| Milestone | Size | Done when |
+|---|---|---|
+| **M7 Nothing gets lost** | 3 | A deleted item can be restored for 30 days. A nearly full disk refuses uploads with a friendly message instead of stopping the database. Two curators editing one item do not silently overwrite each other. Admins see when the last backup ran. The README says what works today. |
+| **M8 Safety net** | 3 | `scripts/update.sh` upgrades a server with a backup first and rolls back after a failed upgrade, and CI proves both starting from the previous published image. Browser and axe tests run in CI at phone and desktop width. |
+| **M9 Quick wins** | 2 | A contributor sees "Understood as 1945 to 1955" before sending, so an unreadable date no longer costs them their chosen photos. Every form has a working error summary. A curator goes through a filtered list with "Save and next". The browser's large-font setting takes effect. |
+| **M10 Archive identity and trust pages** | 4 | An admin sets the name, logo and colour without touching code, and buttons and links really change colour. About, Contact, Privacy and Imprint pages are linked wherever a contributor needs them. A checklist guides a new admin through setup. |
+| **M11 Look and feel** | 4 | The demo archive opens with the group's name, recent photos and collection image cards, sharp on a phone and with portraits uncropped. Search shows active filters as removable chips. Pages work in right-to-left and in a long-text test language. |
+| **M12 Catalogue fields** | 3 | A curator records rights, credit, reference number, where the original is kept and alt text on an item, and can filter for what is missing. |
+| **M13 Shoebox** | 4 | A curator turns 300 scans into drafts with shared values, sees progress and can retry failures, is warned about identical files, and publishes a chosen set in one action. An item without a real title cannot be published. |
+| **M14 Phone-first sending** | 4 | Over slow mobile data, a contributor sees their chosen photos, watches a progress bar and cannot send twice. A second usability round has run, including someone over 70 and a screen reader user, and a week of fixes is done. |
+| **M15 Readable items** | 4 | A visitor reads a scanned letter at full size, sees "Photo 2 of 4" with its caption, and moves on to the next item or to items from the same time. Curators reorder, rotate and describe each photo. |
+| **M16 Rights and sharing** | 3 | Every item page says whether it may be reused, in plain language. "Cite this item" gives a line to copy. A link pasted into a messenger shows the picture and the archive's name. |
+| **M17 Language reach** | 5 | A translator without Git has tried Weblate on a few pages. Missing translations fail a test. Counts read correctly under Polish plural rules. Item text carries the right `lang`. Dates that are accepted today are still accepted. |
+| **M18 Accounts and system** | 4 | A curator logs in with an authenticator app. Login keys are encrypted with a key outside the database, and the backup test still passes. An admin sees version, disk use, failed previews (with retry) and backup age on one page. |
+| **M19 Discovery** | 3 | A visitor taps "1960s" and finds the flood, opens "Places" and picks "Mill Street". A curator merges "Mill St" into "Mill Street". |
+| **M20 Community knowledge** | 4 | With the feature switched on, a visitor says "that's my aunt on the left" or asks for removal from an item page, and a curator handles it. A curator prints a poster with a QR code for a contribution link. |
+| **M21 Import and scale** | 4 | A group imports a spreadsheet and a ZIP of scans after a dry run that lists every problem. A 50,000-item archive on a small ARM server stays fast and exports without running out of memory. |
+
+The review after M14 also decides what comes next. PDF documents, audio or an earlier import may well replace M15
+onwards, depending on what the groups say.
+
+### What each milestone holds
+
+Items marked *(can slip)* move to a later milestone when the time runs out.
+
+**M7 Nothing gets lost**
+
+- First, talk to the test group for half an hour: what stops them using it now, do they have a catalogue to import,
+  are documents or recordings waiting? Write down the answers and adjust this plan.
+- Bin: deleting sets `DeletedAt`; Restore; purge after 30 days. "Delete permanently now" stays for personal-data
+  requests. Public pages and the curator list leave binned items out. Today any curator can delete originals for good
+  behind one confirmation, and the suggested backup rotation keeps only a week.
+- Disk guard for contributor and curator uploads: refuse early from `Content-Length` when free space on the media
+  volume or the temporary upload path is low, and add a daily limit on anonymous uploads per link. Today a link can
+  take 15 GB an hour from one address.
+- Optimistic concurrency (`xmin`) on `ArchiveItem`, with a translated message that keeps the typed text.
+- `data-warn-unsaved` for all forms on the edit page. Uploading a photo must never save half-typed text, because on a
+  published item that would make it public.
+- Login limit per address, generous enough for a shared connection.
+- Backup age and free space as an admin banner: `backup.sh` writes a timestamp that the app can read. Document that
+  uptime monitors need a keyword check, because a degraded `/health` still answers 200.
+- Contributors search also finds the photographer or author. Decide whether exports without personal data leave that
+  name out (they include it today).
+- Correct the docs: the README promises documents and recordings, but only images and text work today; its status and
+  the update advice in `security.md` are out of date; describe moving servers by backup and restore.
+
+**M8 Safety net**
+
+- `scripts/update.sh`: check free space, back up, pull, wait for `https://$COMMONAGE_DOMAIN/health` or a Compose
+  health check (the app has no open port in production), and roll back through `restore.sh --yes` plus the old version
+  and tag, warning that changes since the backup are lost. The script must survive replacing itself.
+- CI starts the previous published image with `compose.production.yaml`, upgrades it to the candidate, and also forces
+  a failed upgrade.
+- Playwright with axe in CI on the main pages at 390 and 1280 px, one smoke test per JavaScript behaviour, and a run
+  without JavaScript. A short manual zoom and screen reader checklist for each release.
+- `SecurityHeaderTests` finds pages by itself instead of using a list, which today misses the contribution form,
+  Thanks and Login.
+- A test that fails when a new domain property is neither exported nor explicitly excluded.
+- A written update policy: how fast a security fix ships, how long an older minor version gets fixes, and how
+  operators follow releases. Pinned servers otherwise stop receiving fixes without noticing.
+
+**M9 Quick wins**
+
+- One shared way to show field errors, for all forms: a summary that lists them with links, `aria-describedby` merged
+  with existing help links, and focus on the summary. Today's `ModelOnly` summary stays empty after field errors.
+- A rate-limited date check showing "Understood as …" on the contribution form and the curator form, before saving.
+  Saved items already show "Found when visitors filter by", so the wording can match. Sending is disabled after the
+  first click.
+- A file picker in the page's language. The browser's own control follows the browser's language, so an English page
+  shows "Dateien auswählen" on a German computer, and the other way round. Use a translated button with the chosen
+  file names, keeping the native control without JavaScript.
+- Text-only items get a designed tile showing that they are text. Today they appear as an empty grey box in search and
+  collections, which looks like a picture failed to load.
+- Unambiguous dates and times in the curator pages. `en` shows `11/4/2026`, which means different days to American
+  and British readers.
+- Small things seen on screen: the search placeholder is cut off on narrow phones in German ("Archiv durchsuch"), and
+  the Filters button on phones looks disabled.
+- Remove the fixed root font size. Larger targets for the language buttons and tag pills, a heading on search results,
+  `aria-current` in the navigation.
+- Collections and Search always visible on phones; a breadcrumb on collection pages; admin navigation on every admin
+  page, with touch-friendly controls.
+- For curators: "Save and next" and "Save and add another", thumbnails and collection, tag and "needs" filters in the
+  item list, the review queue oldest first and moving on to the next contribution after a decision. On a review, the
+  photos come first: today they sit below the form and below the Publish and Reject buttons, about 1,400 px down.
+  The edit page's heading names the item instead of saying "Edit item". Draft preview *(can slip)*.
+
+**M10 Archive identity and trust pages**
+
+- `ArchiveSettings` with `DefaultLanguage` and texts stored per language from the start: name, tagline, intro, contact,
+  colour, logo. `DefaultLanguage` also becomes the fallback language, which today is always English. `lang` uses the
+  full culture name, so `pt-BR` and `zh-Hant` survive.
+- The archive's time zone. Curator pages and the activity log use the server's clock, which is UTC in the Docker image
+  unless an operator sets `TZ`, and the docs do not mention it: in the walk-through, a German afternoon showed up an
+  hour early. Check that the image has the time zone data this needs.
+- Logo: new image code sharing the NetVips helpers, since the preview pipeline only writes JPEG and is tied to
+  `MediaFile`.
+- `/branding.css`, because inline styles are forbidden. It must set Bootstrap's button component variables,
+  `--bs-link-color-rgb` with hover and the focus ring, since `--bs-primary` alone changes neither buttons nor links.
+  Check contrast for link text, button text and hover, suggest a darker shade, version the address by settings hash,
+  and prove it with a browser test.
+- The archive's name in the title, navigation and footer, with "Powered by Commonage" and the source link staying.
+- Fixed pages: About, Contact and withdrawal, Privacy, Imprint. Plain text with auto-links. Empty pages stay unlinked,
+  and the checklist shows that they are unset. The consent text promises people can ask for removal, and today nothing
+  says how.
+- "This form belongs to {0}" on the contribution form; a reference code on Thanks, which says that no email follows.
+- The "allow search engines" switch works at once: `noindex` on public pages and a basic `robots.txt`.
+- A "Getting started" checklist on the admin page: name, contact, legal pages, first collection, first link, backup
+  seen, restore tested.
+- A short translatable curator handbook, including how to handle a removal request from someone in a photo, how to
+  describe a photo, and how to record offline donations. Extended with each workflow milestone.
+
+**M11 Look and feel**
+
+- First the structural part of languages, so the design is tested in both directions once: one `SupportedLanguages`
+  list, `dir` and Bootstrap's RTL stylesheet, a picker that scales, and pseudo and RTL test languages in the browser
+  tests.
+- A cheap seeded benchmark at 5–10k items before adding home page queries.
+- Design foundation: remove the template's `_Layout.cshtml.css` and its stylesheet link, and put tokens for accent,
+  surface, text, radius and spacing in `site.css`, on top of Bootstrap's variables. Readable body text, prose limited to
+  68 characters, consistent cards with a visible focus state, logical properties only. System fonts only, because no
+  single font covers every script. New admin screens from M12 on are built on this.
+- Home page: the group's name and intro, search, recently added photos, collection cards with images, tags last.
+  Today the first screen on a phone has no picture at all, and the page's heading is "Collections".
+- Item page: on wide screens the text sits beside the photo. Today the description comes after every photo, so one
+  added portrait pushed it about 1,600 px down, and the first photo alone runs past the bottom of an 800 px high
+  screen. Photos stop sitting to one side with an empty column next to them.
+- The language picker moves to the header. In the footer, a visitor who does not read the page's language has to find
+  it at the bottom of a long page.
+- Clearer navigation: "Collections" means the public list in the top bar and the management page in the admin row, the
+  site name and "Collections" lead to the same place, and links dominate with large underlined blue headings. A
+  slimmer demo notice: with the header, it takes up about 130 px of a phone screen.
+- Images: an 800 px thumbnail with `srcset`, `contain` instead of cropping, the first preview loaded eagerly, ETags.
+- One regeneration mechanism, also behind "retry failed" and rotation later: published files stay Ready and keep
+  serving while new versions replace them atomically, because setting them back to Pending makes published photos
+  return 404. Decide the 800 and 3000 px sizes together and backfill once.
+- Search: removable filter chips, selects that apply at once, a helpful empty state. Print stylesheet *(can slip)*.
+
+**M12 Catalogue fields**
+
+Comes before bulk entry so a shoebox evening does not create backfill work.
+
+- `Rights` as rightsstatements.org and Creative Commons URIs with plain labels, an archive-wide default, `RightsHolder`
+  and `Credit`. A contributor's answer can propose a statement; an open licence is never assumed. Publishing a credit
+  takes an explicit curator action, because those names were collected as curator-only.
+- Reference number, where the original is kept, received from and when, internal notes, all curator-only and left out
+  of public search. Names here are covered by the personal-data tools.
+- A plain `AltText` on the photo, and curators can correct contributor details.
+- "Needs rights" and "needs alt text" filters. Export format bump; the existing `rights` CSV columns are renamed
+  deliberately, because they mean the contributor's answer.
+- A simple spreadsheet import here if the M7 talk shows a group needs it.
+
+**M13 Shoebox**
+
+- Files sent one at a time with progress, retry and safe resume; a documented limit for the path without JavaScript.
+  One large POST would hit the request limit with a few dozen TIFFs.
+- Photos on the New item form, instead of "Save the item first, then add photos". "Save as draft" becomes the main
+  button there; today that is "Save and publish", on an item that cannot have photos yet.
+- "Add many photos": one draft per file, with shared date, tags, rights and collection. A placeholder title is a flag
+  shown through the resource files, never stored text, and it blocks publishing.
+- Bulk actions on the selection or the whole filter: publish, add tag, set date, move collection, set rights. One audit
+  entry per item, and a confirmation that shows the count.
+- Duplicate warning through an index on `Sha256`, and a badge on contributions, never revealed to contributors.
+- Previews appear without a reload, with visible queue progress. Tag suggestions *(can slip)*.
+
+**M14 Phone-first sending**
+
+- A shorter form with photos first. It is about 1,900 px long on a phone today and asks for a title before anything
+  else, while a person arrives with a photo in mind. A full-width Send button, and no repeated sentence about curators
+  looking at everything.
+- `contribute.js` as progressive enhancement: file list, early checks, progress, no double sending. Thumbnails of
+  chosen files need `img-src blob:`, allowed only on these routes (the policy is one global string today).
+- Text drafts in `localStorage`: title, date and description only, never name, email or rights holder, with an expiry
+  and a "Clear this draft" control, because events share devices.
+- Try HEIC on a real iPhone. The browser may already convert it, and the bundled libvips probably has no HEVC decoder.
+- Second usability round with new tasks: send three photos over mobile data with a wrong date, read a letter, find
+  everything from the 1950s in one street. A week of fixes follows, then decide what comes after this milestone.
+
+**M15 Readable items**
+
+- `Position`, `Caption` and `Rotation` on photos, Move earlier/later buttons, "use as cover". `AltText` per photo
+  closes the alt-text item. "Move to a new item" and photo descriptions from contributors *(can slip)*.
+- A public "large" image of about 3000 px, a per-archive setting, served through the published check, relying on
+  browser zoom instead of a lightbox.
+- Numbered thumbnail strip with captions. Previous and next, "More from {0}", "From the same time". Dates link to
+  search.
+- Description as the documented place for a transcript, with a "needs transcription" flag, since zoom helps only
+  sighted visitors and handwriting cannot be searched.
+
+**M16 Rights and sharing**
+
+- Rights and approved credit on item pages. An optional reuse question and new consent wording on the form; earlier
+  contributions stay under their stored text. Their consent covers "this website", which matters for harvesting later.
+- "Cite this item", `rel=canonical`, a share button.
+- Link previews, an Atom feed and a sitemap, all following the search engine switch.
+
+**M17 Language reach**
+
+The structural part is in M11. This is the rest of [Languages](#languages), reordered, since no group has asked for
+a third language yet:
+
+- A spike on plurals first: Weblate's RESX format has no plural support and needs an English base file, which the
+  repository does not have, because English keys live in code. Compare ICU syntax in one value with other formats.
+- A generated base file and a test that fails when a key is missing.
+- Decide Weblate hosting, how its commits pass the sign-off check, and how translators accept the license. Consent and
+  privacy strings need a reviewer, because the consent text is what a person agreed to.
+- `DateVocabulary` and the content-language setting. First define the policy (content languages plus the current
+  interface language), with regression tests that today's accepted dates stay accepted.
+- Export README and demo content translated; a decision on language per item for mixed archives.
+- A third language is a goal that does not block the milestone, since it depends on a volunteer.
+
+Until then, write counts in label form (`Photos: {0}`), which needs no plural grammar.
+
+**M18 Accounts and system**
+
+- Authenticator two-factor login with recovery codes, using a QR encoder that M20 reuses. Admins can require it. Setup
+  links stay the recovery path, because no email is sent. State where the secrets are protected.
+- Data Protection keys encrypted with a key outside the database, including restore docs, the backup test (which
+  relies on old logins still working) and what happens if that key is lost.
+- System page: version, disk use and growth, failed previews with retry, `unaccent` state, last migration. Storage
+  checks in `/health`.
+- How long the activity log and Rejected or Withdrawn items are kept; activity log filters.
+
+**M19 Discovery**
+
+- Decade timeline with predefined CSS classes for bar widths, because the policy forbids inline styles.
+- Tag page with rename, merge and delete unused. `Tag.Kind` (topic, place, person) with `/places` and `/people`. Naming
+  living people stays a curator's decision.
+- Collections: order, date span, cover, default sort, delete when empty.
+
+**M20 Community knowledge**
+
+- "Do you know more about this?", off by default: information, correction or removal request, stored as a private note,
+  protected like the contribution form, and covered by the personal-data tools.
+- "Help wanted" flag and a "Can you help?" page. Dashboard cards for what needs attention.
+- Links: copy button, a printable poster with QR code (checked against the no-inline-style test), and an opt-in
+  invitation on the collection page, which gives up being unlisted. A clear page for closed links.
+
+**M21 Import and scale**
+
+- CSV with its own template, without id or status columns, with defined handling of the apostrophe that exports add
+  for spreadsheet safety. ZIP or a folder on the media volume. A dry run lists unreadable dates, unknown collections,
+  missing files and duplicates.
+- A 50,000-item benchmark on a small ARM container. Expected fixes: a composite index, cached counts, capped deep
+  paging, and export streaming the JSON as well as the query, since today the whole document stays in memory.
+
+### Rules for every milestone
+
+- A change to the data model updates the export, its format version and `operations.md`.
+- New pages are covered by the security header and browser tests. New text is in the resource files, with German.
+- New screens work on a phone, with a keyboard and without JavaScript where they can.
+- Each release passes the upgrade test and says in its notes whether regeneration needs to run.
+- By M13: a short maintainer handover note, an architecture overview in `development.md`, `good first issue` labels,
+  a second release approver when someone is available, and a README note that exports, backups and images stay usable
+  if the project stops. The release approval and the Dependabot token currently depend on one person.
+
+### Later, roughly by value
+
+1. **PDF documents.** The bundled libvips has neither PDFium nor poppler, so this means a separate poppler step, with
+   its parser risk, image size and ARM build to weigh. Text goes into search. AVIF and GIF in the same pass.
+2. **Oral histories.** Audio through ffmpeg, range requests, native player, metadata stripped, and a transcript as part
+   of the feature, because accessibility requires it.
+3. **Visibility levels.** Record without media first, then members only and embargo dates. `PublishedItems` becomes
+   `VisibleItems(viewer)`.
+4. **Stories and exhibitions.** Ordered text and item blocks, plain text, one layout.
+5. **Helper role.** Describes and uploads, but cannot publish, delete or see contributors' email addresses.
+6. **Description history** with restore, and changed field names in the activity log.
+7. **Display names** and "last login" for accounts.
+8. **People as entities.** Name variants and person pages, hidden by default for people who may be living.
+9. **Dublin Core**, and `/items/{id}.json` through `rel=alternate` (inline JSON-LD would break the security policy).
+10. **IIIF** manifests with static tiles and a vendored viewer, once alt text and rights exist.
+11. **OAI-PMH**, off by default, limited by consent and rights.
+12. **Optional email** with the group's own mailbox: digest, password reset, receipt. The app must work without it.
+13. **Places with coordinates and a self-hosted map** (vendored MapLibre and one regional PMTiles file).
+14. **Short video** without re-encoding. **S3-compatible storage**, always through the permission-checking endpoint.
+    **OCR for typed documents** as an opt-in container. **Near-duplicates** through a perceptual hash.
+15. **Reading Commonage's own export**, for merging archives. Moving a server already works through backup and restore.
+
+### Not planned
+
+- **Several archives in one installation.** A tenant key would touch every query, backup, export and personal-data
+  rule. Document one Compose project per archive behind a shared Caddy instead.
+- **Cultural protocols in Mukurtu's style.** A partial copy would give false assurance. Point those communities to
+  Mukurtu.
+- **Public comment threads.** Moderation load, spam and statements about third parties; M20's private notes meet the
+  need.
+- **Mandatory email, newsletters, visitor accounts.** Contributors needing no email is a core promise.
+- **Server-side AI** (transcription, handwriting recognition, face recognition, auto-tagging). Too heavy for small
+  servers, cloud services break the no-third-party rule, and face recognition creates biometric data nobody consented
+  to. Document a local whisper.cpp workflow for transcripts.
+- **A dynamic IIIF image server, or video transcoding and streaming.** Another service and too much load. Long films
+  can be linked from the group's own PeerTube.
+- **Third-party map tiles, web fonts from CDNs, analytics, automatic update checks.** At most a version check that an
+  admin clicks.
+- **Rich text, Markdown or HTML in descriptions and pages.** XSS risk and policy exceptions, for little gain.
+- **Configurable custom fields.** Too complex at this scale; a few fixed fields are enough.
+- **A JavaScript-heavy interface.** No single-page app, and no drag-and-drop as the only way to reorder.
+
+### Open decisions
+
+1. **Order: decided, as above.** Look and feel comes before the shoebox work, so new curator screens are built once on
+   the final design, and M9 brings the quickest curator improvements forward. It changes only if the M7 talk shows a
+   group is digitising now and needs the shoebox first.
+2. **Default legal texts.** A factual default privacy text marked as a template to adapt, and no default imprint.
+3. **Optional email.** Decide after M20, from whether contributions wait for weeks in practice.
+4. **Exports without personal data.** Whether they leave out the photographer or author (M7).
+5. **Support policy.** How long older minor versions get security fixes (M8).
+6. **Weblate.** Hosted or self-hosted, and how translators accept the license (M17).
+
 ### Languages
 
 See the "Languages" decision above for the rules that already apply.
+
+These are the plans in detail. The structural part lands in M11 and most of the rest in M17; what is left
+(sorting, search without spaces, language-aware search, other calendars) follows once the content language exists.
 
 - **Interface languages.** One list of UI languages instead of three (today in `Program.cs`, `SetLanguage`
   and the layout's language buttons), a language picker that scales beyond two, and correct plural forms.
@@ -175,10 +508,10 @@ See the "Languages" decision above for the rules that already apply.
 
 ### Trust and accessibility
 
-- Two-factor authentication for curators and admins.
-- A limit on login attempts per address, not only per account.
-- A description (alt text) for each photo, written by curators and suggested by contributors.
-- Field errors linked to their fields with `aria-describedby`; a session with screen reader users.
-- How long the activity log is kept, and whether old entries are thinned out.
-- Encrypting the keys that protect logins and setup links (Data Protection) with a key outside the database.
+The earlier list, now placed in the milestones:
 
+- A limit on login attempts per address: M7.
+- Field errors linked to their fields with `aria-describedby`: M9.
+- A description (alt text) for each photo: M12 and M15, with suggestions from contributors if time allows.
+- A session with screen reader users: M14.
+- Two-factor authentication, encrypted Data Protection keys, and how long the activity log is kept: M18.
