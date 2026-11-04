@@ -4,12 +4,6 @@
     ViewData["Title"] = T["Collections"];
 }
 
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a asp-page="/Admin/Index">@T["Items"]</a></li>
-    </ol>
-</nav>
-
 <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
     <h1 class="me-auto mb-0">@T["Collections"]</h1>
     <a asp-page="/Admin/Collections/Edit" class="btn btn-primary">@T["New collection"]</a>

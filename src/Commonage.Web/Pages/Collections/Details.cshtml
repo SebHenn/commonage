@@ -4,6 +4,12 @@
     ViewData["Title"] = Model.Collection.Title;
 }
 
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="/Index">@T["Collections"]</a></li>
+    </ol>
+</nav>
+
 <h1>@Model.Collection.Title</h1>
 @if (!string.IsNullOrWhiteSpace(Model.Collection.Description))
 {

@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Threading.RateLimiting;
+using Commonage.Web.Forms;
 using Commonage.Web.Identity;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Localization;
@@ -44,6 +45,14 @@ public static class SpamProtection
             options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
             options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
             {
+                // Asked while someone types, so a group behind one address needs a lot of these. It only stops abuse.
+                if (context.Request.Path.StartsWithSegments(DateCheck.Path))
+                {
+                    return RateLimitPartition.GetFixedWindowLimiter(
+                        "date check " + context.Connection.RemoteIpAddress,
+                        _ => new FixedWindowRateLimiterOptions { PermitLimit = 3000, Window = TimeSpan.FromHours(1) });
+                }
+
                 if (!HttpMethods.IsPost(context.Request.Method))
                     return RateLimitPartition.GetNoLimiter("not limited");
 

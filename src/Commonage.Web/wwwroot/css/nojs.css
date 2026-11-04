@@ -1,0 +1,8 @@
+/* Only loaded without JavaScript: what would stay folded away is simply shown, and the buttons that unfold it are hidden. */
+.collapse:not(.show) {
+  display: block;
+}
+
+[data-bs-toggle="collapse"] {
+  display: none;
+}

@@ -35,7 +35,7 @@
     {
         <p>@T["The new account gets a setup link instead of a password. Commonage sends no emails, so you pass the link on yourself."]</p>
         <form method="post" asp-page-handler="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+            <partial name="_ErrorSummary" />
             <div class="mb-3">
                 <label asp-for="Input.Email" class="form-label"></label>
                 <input asp-for="Input.Email" class="form-control" autocomplete="off" />

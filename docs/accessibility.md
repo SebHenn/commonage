@@ -13,8 +13,9 @@ people using screen readers or only a keyboard.
 - **Structure**: one `h1` per page, headings in order, landmarks (header, main, footer), a "Skip to content" link as
   the first thing the keyboard reaches, breadcrumbs as a labelled `nav`, the page language in `<html lang>`.
 - **Forms**: every field has a visible label; groups of radio buttons and checkboxes are `fieldset`s with a
-  `legend`; help texts are linked with `aria-describedby`; error summaries are `role="alert"`; messages after saving
-  are `role="status"`.
+  `legend`; help texts and error messages are linked with `aria-describedby`; a form that comes back with mistakes
+  starts with a `role="alert"` summary that gets the focus and links to the fields; messages after saving are
+  `role="status"`.
 - **Images**: item photos are described by the item's title; thumbnails next to a title link are decorative
   (`alt=""`).
 - **Keyboard**: everything works with Tab, Enter and Space, with Bootstrap's visible focus ring. Confirmation dialogs
@@ -37,8 +38,6 @@ Automated checks cannot judge these, so check them by hand on the pages that cha
 
 - **Photos have no description of their own.** The item title stands in for every photo of an item. Curators
   should be able to describe each photo (alt text), and contributors could suggest one.
-- **Field errors are not linked to their field** with `aria-describedby`; screen readers announce `aria-invalid`
-  and the error summary, but not the specific message when the field gets focus.
 - **No right-to-left layout** yet (see "Languages" in the roadmap).
 - **Not yet tested with real assistive technology** (NVDA, VoiceOver, TalkBack). This belongs in the five-task test
   or a separate session with a screen reader user.

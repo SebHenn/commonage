@@ -1,12 +1,12 @@
 @page "{id:int?}"
 @model Commonage.Web.Pages.Admin.Items.EditModel
 @{
-    ViewData["Title"] = Model.ItemId is null ? T["New item"] : T["Edit item"];
+    ViewData["Title"] = Model.ItemId is null ? T["New item"] : T["Edit: {0}", Model.SavedTitle ?? ""];
 }
 
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a asp-page="/Admin/Index">@T["Items"]</a></li>
+        <li class="breadcrumb-item"><a href="@(Model.Back ?? Commonage.Web.Search.AdminItemList.Page)">@T["Items"]</a></li>
     </ol>
 </nav>
 
@@ -20,7 +20,25 @@
     {
         <a asp-page="/Items/Details" asp-route-id="@Model.ItemId">@T["View public page"]</a>
     }
+    else if (Model.ItemId is not null)
+    {
+        <a asp-page="/Admin/Items/Preview" asp-route-id="@Model.ItemId">@T["Preview"]</a>
+    }
+    @if (Model.PreviousId is { } previousId)
+    {
+        <a asp-route-id="@previousId" asp-route-back="@Model.Back" rel="prev">@T["Previous item"]</a>
+    }
+    @if (Model.NextId is { } nextId)
+    {
+        <a asp-route-id="@nextId" asp-route-back="@Model.Back" rel="next">@T["Next item"]</a>
+    }
 </div>
+
+@* In a review, the material comes first: it is what the decision is about. *@
+@if (Model.CurrentStatus == ItemStatus.Submitted)
+{
+    <partial name="_Photos" model="Model" />
+}
 
 @if (Model.Contribution is { } contribution)
 {
@@ -40,7 +58,7 @@
                 <dd class="col-sm-8">
                     @if (contribution.PersonalDetailsRemovedAt is { } removedAt)
                     {
-                        <span class="text-muted">@T["Name and email address removed on {0}", removedAt.ToLocalTime().ToString("d")]</span>
+                        <span class="text-muted">@T["Name and email address removed on {0}", Dates.Day(removedAt)]</span>
                     }
                     else
                     {
@@ -68,7 +86,7 @@
                 </dd>
                 <dt class="col-sm-4">@T["Sent in"]</dt>
                 <dd class="col-sm-8">
-                    @contribution.SubmittedAt.ToLocalTime().ToString("g")
+                    @Dates.Moment(contribution.SubmittedAt)
                     @if (contribution.ContributionLink is { } link)
                     {
                         <br /><a asp-page="/Admin/Contributions/Edit" asp-route-id="@link.Id">@link.Title</a>
@@ -119,8 +137,8 @@
     </section>
 }
 
-<form method="post" class="col-lg-8" data-warn-unsaved="@(Model.FormHasUnsavedText ? "dirty" : "")">
-    <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+<form method="post" class="col-lg-8" data-warn-unsaved="@(Model.FormHasUnsavedText ? "dirty" : "")" data-send-once>
+    <partial name="_ErrorSummary" />
     <input type="hidden" asp-for="Input.Version" />
     <div class="mb-3">
         <label asp-for="Input.Title" class="form-label"></label>
@@ -136,13 +154,15 @@
     </div>
     <div class="mb-3">
         <label asp-for="Input.Date" class="form-label"></label>
-        <input asp-for="Input.Date" class="form-control" aria-describedby="date-help" />
+        <input asp-for="Input.Date" class="form-control" aria-describedby="date-help date-result" data-date-result="date-result" />
         <span asp-validation-for="Input.Date" class="text-danger"></span>
         <div id="date-help" class="form-text">
             @T["Write the date as precisely as it is known, for example: 1953, 12.03.1953, March 1953, circa 1950, 1950s, 1950–1955, before 1945."]
+        </div>
+        <div id="date-result" class="form-text" role="status">
             @if (Model.CurrentDateRange is { } range)
             {
-                <br />@T["Found when visitors filter by: {0}", range]
+                @T["Found when visitors filter by: {0}", range]
             }
         </div>
     </div>
@@ -163,6 +183,10 @@
         {
             case ItemStatus.Published:
                 <button type="submit" class="btn btn-primary">@T["Save"]</button>
+                @if (Model.NextId is not null)
+                {
+                    <button type="submit" name="then" value="next" class="btn btn-outline-primary">@T["Save and next"]</button>
+                }
                 <button type="submit" name="command" value="unpublish" class="btn btn-outline-danger">@T["Unpublish"]</button>
                 break;
             case ItemStatus.Submitted:
@@ -179,73 +203,24 @@
                 break;
             default:
                 <button type="submit" class="btn btn-outline-primary">@T["Save as draft"]</button>
+                @if (Model.NextId is not null)
+                {
+                    <button type="submit" name="then" value="next" class="btn btn-outline-primary">@T["Save and next"]</button>
+                }
+                @if (Model.ItemId is null)
+                {
+                    <button type="submit" name="then" value="another" class="btn btn-outline-primary">@T["Save and add another"]</button>
+                }
                 <button type="submit" name="command" value="publish" class="btn btn-primary">@T["Save and publish"]</button>
                 break;
         }
     </div>
 </form>
 
-<section class="mt-5" aria-labelledby="photos-heading">
-    <h2 id="photos-heading" class="h4">@T["Photos"]</h2>
-    @if (Model.ItemId is null)
-    {
-        <p class="text-muted">@T["Save the item first, then add photos."]</p>
-    }
-    else
-    {
-        @if (Model.MediaFiles.Count > 0)
-        {
-            <div class="row g-3 mb-3">
-                @foreach (var file in Model.MediaFiles)
-                {
-                    <div class="col-6 col-md-4 col-lg-3">
-                        <div class="card h-100">
-                            @if (file.Status == ProcessingStatus.Ready)
-                            {
-                                <img src="/admin/media/@file.Id/thumbnail" class="card-img-top media-thumbnail" alt="@file.OriginalFileName" loading="lazy" />
-                            }
-                            else
-                            {
-                                <div class="card-img-top media-thumbnail d-flex align-items-center justify-content-center bg-light text-muted small p-2 text-center">
-                                    @(file.Status == ProcessingStatus.Pending ? T["Creating preview…"] : T["No preview could be created."])
-                                </div>
-                            }
-                            <div class="card-body p-2 small">
-                                <div class="text-truncate" title="@file.OriginalFileName">@file.OriginalFileName</div>
-                                <div class="text-muted">@((file.SizeBytes / 1024.0 / 1024.0).ToString("0.0")) MB</div>
-                                <div class="d-flex flex-wrap gap-2 mt-1">
-                                    <a href="/admin/media/@file.Id/original">@T["Original"]</a>
-                                    <form method="post" asp-page-handler="DeleteMedia" asp-route-id="@Model.ItemId" asp-route-mediaFileId="@file.Id"
-                                          data-confirm="@T["Move this photo to the bin? You can restore it there for {0} days.", Commonage.Web.Data.ArchiveBin.RetentionDays]">
-                                        <button type="submit" class="btn btn-link btn-sm p-0 text-danger">@T["Move to bin"]</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                }
-            </div>
-            @if (Model.MediaFiles.Any(f => f.Status == ProcessingStatus.Pending))
-            {
-                <p class="text-muted small">@T["Previews are being created. Reload the page in a moment."]</p>
-            }
-        }
-
-        @if (Model.CanUpload)
-        {
-            <form method="post" asp-page-handler="Upload" asp-route-id="@Model.ItemId" enctype="multipart/form-data" class="d-flex flex-wrap gap-2 align-items-center">
-                <label for="photo-upload" class="visually-hidden">@T["Choose photos"]</label>
-                <input id="photo-upload" type="file" name="files" accept="@Commonage.Web.Media.ImageFormats.AcceptAttribute" multiple class="form-control w-auto" required />
-                <button type="submit" class="btn btn-outline-primary">@T["Upload"]</button>
-            </form>
-            <p class="form-text">@T["JPEG, PNG, TIFF or WebP. The original file is kept unchanged and is only visible to curators."]</p>
-        }
-        else
-        {
-            <p class="alert alert-warning" role="status">@T["The disk is nearly full, so no photos can be added at the moment. Tell the person who runs the server."]</p>
-        }
-    }
-</section>
+@if (Model.CurrentStatus != ItemStatus.Submitted)
+{
+    <partial name="_Photos" model="Model" />
+}
 
 @if (Model.ItemId is not null)
 {
@@ -257,7 +232,7 @@
                 @foreach (var entry in Model.History)
                 {
                     <li class="mb-1">
-                        <time datetime="@entry.At.ToString("O")" class="text-muted">@entry.At.ToLocalTime().ToString("g")</time>
+                        <time datetime="@entry.At.ToString("O")" class="text-muted">@Dates.Moment(entry.At)</time>
                         · @AuditText.Describe(T, entry.Action)
                         · @AuditText.Who(T, entry)
                     </li>

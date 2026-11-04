@@ -5,12 +5,6 @@
     ViewData["Title"] = T["Bin"];
 }
 
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a asp-page="/Admin/Index">@T["Items"]</a></li>
-    </ol>
-</nav>
-
 <h1>@ViewData["Title"]</h1>
 <p class="col-lg-8">@T["Deleted items and photos stay here for {0} days, hidden from everyone but curators. You can restore them until then. After that they are deleted for good, with their original files.", ArchiveBin.RetentionDays]</p>
 
@@ -40,8 +34,8 @@
                             <h3 class="h6">@item.Title</h3>
                             <p class="small text-muted mb-2">
                                 @item.Collection.Title · <partial name="_StatusBadge" model="item.Status" /><br />
-                                @T["Moved to the bin on {0}", item.DeletedAt!.Value.ToLocalTime().ToString("d")]<br />
-                                @T["Deleted for good on {0}", ArchiveBin.GoneForGoodOn(item.DeletedAt.Value).ToLocalTime().ToString("d")]
+                                @T["Moved to the bin on {0}", Dates.Day(item.DeletedAt!.Value)]<br />
+                                @T["Deleted for good on {0}", Dates.Day(ArchiveBin.GoneForGoodOn(item.DeletedAt.Value))]
                             </p>
                             <div class="d-flex flex-wrap gap-2">
                                 <form method="post" asp-page-handler="RestoreItem" asp-route-id="@item.Id">
@@ -81,8 +75,8 @@
                             <h3 class="h6 text-break">@file.OriginalFileName</h3>
                             <p class="small text-muted mb-2">
                                 @T["From: {0}", file.ArchiveItem.Title]<br />
-                                @T["Moved to the bin on {0}", file.DeletedAt!.Value.ToLocalTime().ToString("d")]<br />
-                                @T["Deleted for good on {0}", ArchiveBin.GoneForGoodOn(file.DeletedAt.Value).ToLocalTime().ToString("d")]
+                                @T["Moved to the bin on {0}", Dates.Day(file.DeletedAt!.Value)]<br />
+                                @T["Deleted for good on {0}", Dates.Day(ArchiveBin.GoneForGoodOn(file.DeletedAt.Value))]
                             </p>
                             <div class="d-flex flex-wrap gap-2">
                                 <form method="post" asp-page-handler="RestorePhoto" asp-route-id="@file.Id">

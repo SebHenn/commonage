@@ -4,12 +4,6 @@
     ViewData["Title"] = T["Export the archive"];
 }
 
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a asp-page="/Admin/Index">@T["Items"]</a></li>
-    </ol>
-</nav>
-
 <div class="col-lg-8">
     <h1>@ViewData["Title"]</h1>
     <p>@T["Download everything in the archive as one ZIP file: all original files, and all descriptions as a JSON file and as a table for spreadsheet programs. The export needs no Commonage to read, so the archive's material is never locked in."]</p>

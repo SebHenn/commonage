@@ -5,6 +5,27 @@ version may change things that need attention when updating, and these notes say
 
 ## Unreleased
 
+### For visitors and contributors
+
+- The contribution form says how it understands a date while it is typed, and notices a missing agreement before chosen
+  photos are lost.
+- Forms that come back with a mistake list what to correct, with links to the fields. Screen readers read the message
+  when a field gets the focus.
+- A form cannot be sent twice by clicking twice.
+- The file picker speaks the page's language, not the browser's.
+- Collections and Search are always visible on phones, and everything works without JavaScript there.
+- The browser's font size setting takes effect. Language buttons and tags are easier to hit on a touch screen.
+- Items without a picture show a "Text" tile instead of an empty grey box.
+
+### For curators
+
+- "Save and next" goes through a filtered list, and "Save and add another" starts the next item in the same collection.
+- The item list shows pictures, filters by collection, tag and what is still missing, and can be sorted. Waiting
+  contributions come oldest first, and after a decision the next one opens.
+- A review shows the photos first. Drafts can be previewed as visitors will see them.
+- Every management page has the same navigation.
+- Dates write the month out, because 11/4/2026 means different days to different readers.
+
 ### For people who run an archive
 
 - `scripts/update.sh` updates to a new release. It makes a backup first, and if the new version does not come up, it goes

@@ -4,6 +4,7 @@ using Commonage.Web.Data;
 using Commonage.Web.Domain;
 using Commonage.Web.Media;
 using Commonage.Web.Operations;
+using Commonage.Web.Search;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -50,6 +51,22 @@ public class EditModel(
 
     /// <summary>The item as someone else saved it while this person was editing it. Their own text stays in the form.</summary>
     public ArchiveItem? SavedByOthers { get; private set; }
+
+    /// <summary>The list this item was opened from, with its filters, to go on to the next item and to come back to.</summary>
+    [BindProperty(SupportsGet = true)]
+    public string? Back
+    {
+        get => _back;
+        set => _back = AdminItemList.FilterFrom(value) is null ? null : value;
+    }
+
+    private string? _back;
+
+    public int? PreviousId { get; private set; }
+    public int? NextId { get; private set; }
+
+    /// <summary>The title as saved, for the heading, while the form may hold another one.</summary>
+    public string? SavedTitle { get; private set; }
 
     /// <summary>Whether the form holds text that is not saved, even though the page was just loaded.</summary>
     public bool FormHasUnsavedText => SavedByOthers is not null || !ModelState.IsValid;
@@ -115,7 +132,8 @@ public class EditModel(
     }
 
     /// <param name="command">"publish", "unpublish", "accept" or "reject" changes the status; anything else only saves.</param>
-    public async Task<IActionResult> OnPostAsync(int? id, string? command)
+    /// <param name="then">"next" goes on to the next item of the list, "another" to a new item.</param>
+    public async Task<IActionResult> OnPostAsync(int? id, string? command, string? then)
     {
         ArchiveItem? item = null;
         if (id is not null)
@@ -149,6 +167,10 @@ public class EditModel(
         // If someone else saved the item since this form was opened, saving fails instead of overwriting their work.
         if (item is not null && Input.Version is { } version)
             db.Entry(item).Property(i => i.Version).OriginalValue = version;
+
+        // Worked out before saving, because saving can move this item within the list or out of it.
+        await LoadNeighboursAsync(id);
+        var wasWaiting = item?.Status == ItemStatus.Submitted;
 
         var now = DateTime.UtcNow;
         var isNew = item is null;
@@ -202,7 +224,31 @@ public class EditModel(
             TempData.Remove("Message");
             return await ShowChangesByOthersAsync(item.Id);
         }
-        return RedirectToPage(new { id = item.Id });
+
+        // After a decision on a contribution, the next one is what most curators want to see.
+        if (wasWaiting && item.Status != ItemStatus.Submitted)
+        {
+            var next = await db.ArchiveItems
+                .Where(i => i.Status == ItemStatus.Submitted)
+                .OrderBy(i => i.CreatedAt).ThenBy(i => i.Id)
+                .Select(i => (int?)i.Id)
+                .FirstOrDefaultAsync();
+            var queue = $"{AdminItemList.Page}?status={ItemStatus.Submitted}";
+            return next is null ? LocalRedirect(queue) : RedirectToPage(new { id = next, back = queue });
+        }
+
+        return then switch
+        {
+            "next" when NextId is not null => RedirectToPage(new { id = NextId, back = Back }),
+            "another" => RedirectToPage(new { collectionId = item.CollectionId }),
+            _ => RedirectToPage(new { id = item.Id, back = Back }),
+        };
+    }
+
+    private async Task LoadNeighboursAsync(int? id)
+    {
+        if (id is { } itemId && AdminItemList.FilterFrom(Back) is { } filter)
+            (PreviousId, NextId) = await db.NeighboursAsync(filter, itemId, HttpContext.RequestAborted);
     }
 
     /// <summary>Nothing was saved. Shows what the others saved, and keeps what this person typed in the form.</summary>
@@ -221,6 +267,8 @@ public class EditModel(
         await LoadCollectionsAsync();
         return Page();
     }
+
+    private IActionResult BackToItem(int id) => RedirectToPage(new { id, back = Back });
 
     public async Task<IActionResult> OnPostUploadAsync(int id, List<IFormFile> files, CancellationToken cancellationToken)
     {
@@ -249,7 +297,7 @@ public class EditModel(
         }
         if (errors.Count > 0)
             TempData["Error"] = string.Join(" ", errors);
-        return RedirectToPage(new { id });
+        return BackToItem(id);
     }
 
     /// <summary>Moves the item to the bin, where it can be restored or deleted for good, see <see cref="ArchiveBin"/>.</summary>
@@ -283,7 +331,7 @@ public class EditModel(
         await db.SaveChangesAsync(cancellationToken);
 
         TempData["Message"] = localizer["The contribution is marked as withdrawn. It is hidden and cannot be published again."].Value;
-        return RedirectToPage(new { id });
+        return BackToItem(id);
     }
 
     /// <summary>Removes the contributor's name and email address, for example because they asked for it.</summary>
@@ -300,7 +348,7 @@ public class EditModel(
         await db.SaveChangesAsync(cancellationToken);
 
         TempData["Message"] = localizer["The contributor's name and email address are removed."].Value;
-        return RedirectToPage(new { id });
+        return BackToItem(id);
     }
 
     public async Task<IActionResult> OnPostDeleteMediaAsync(int id, int mediaFileId, CancellationToken cancellationToken)
@@ -313,13 +361,15 @@ public class EditModel(
         audit.Record(AuditAction.PhotoMovedToBin, file.ArchiveItem.Title, file.ArchiveItem);
         await db.SaveChangesAsync(cancellationToken);
         TempData["Message"] = localizer["The photo is in the bin. You can restore it there for {0} days.", ArchiveBin.RetentionDays].Value;
-        return RedirectToPage(new { id });
+        return BackToItem(id);
     }
 
     private async Task ShowStateAsync(ArchiveItem? item)
     {
         ItemId = item?.Id;
+        SavedTitle = item?.Title;
         CurrentStatus = item?.Status;
+        await LoadNeighboursAsync(item?.Id);
         Contribution = item?.Contribution;
         if (item is not null)
         {

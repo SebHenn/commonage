@@ -1,0 +1,66 @@
+@model Commonage.Web.Pages.Admin.Items.EditModel
+
+<section class="mt-5" aria-labelledby="photos-heading">
+    <h2 id="photos-heading" class="h4">@T["Photos"]</h2>
+    @if (Model.ItemId is null)
+    {
+        <p class="text-muted">@T["Save the item first, then add photos."]</p>
+    }
+    else
+    {
+        @if (Model.MediaFiles.Count > 0)
+        {
+            <div class="row g-3 mb-3">
+                @foreach (var file in Model.MediaFiles)
+                {
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <div class="card h-100">
+                            @if (file.Status == ProcessingStatus.Ready)
+                            {
+                                <img src="/admin/media/@file.Id/thumbnail" class="card-img-top media-thumbnail" alt="@file.OriginalFileName" loading="lazy" />
+                            }
+                            else
+                            {
+                                <div class="card-img-top media-thumbnail d-flex align-items-center justify-content-center bg-light text-muted small p-2 text-center">
+                                    @(file.Status == ProcessingStatus.Pending ? T["Creating preview…"] : T["No preview could be created."])
+                                </div>
+                            }
+                            <div class="card-body p-2 small d-flex flex-column">
+                                <div class="text-truncate" title="@file.OriginalFileName">@file.OriginalFileName</div>
+                                <div class="text-muted mb-2">@((file.SizeBytes / 1024.0 / 1024.0).ToString("0.0")) MB</div>
+                                <div class="d-flex flex-wrap gap-2 mt-auto justify-content-between">
+                                    <a href="/admin/media/@file.Id/original" class="btn btn-sm btn-outline-secondary">@T["Original"]</a>
+                                    <form method="post" asp-page-handler="DeleteMedia" asp-route-id="@Model.ItemId" asp-route-mediaFileId="@file.Id" asp-route-back="@Model.Back"
+                                          data-confirm="@T["Move this photo to the bin? You can restore it there for {0} days.", Commonage.Web.Data.ArchiveBin.RetentionDays]">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">@T["Move to bin"]</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            @if (Model.MediaFiles.Any(f => f.Status == ProcessingStatus.Pending))
+            {
+                <p class="text-muted small">@T["Previews are being created. Reload the page in a moment."]</p>
+            }
+        }
+
+        @if (Model.CanUpload)
+        {
+            <form method="post" asp-page-handler="Upload" asp-route-id="@Model.ItemId" asp-route-back="@Model.Back" enctype="multipart/form-data" class="d-flex flex-wrap gap-2 align-items-center">
+                <label for="photo-upload" class="visually-hidden">@T["Choose photos"]</label>
+                <input id="photo-upload" type="file" name="files" accept="@Commonage.Web.Media.ImageFormats.AcceptAttribute" multiple class="form-control w-auto"
+                       data-val="true" data-val-required="@T["Please choose at least one photo."]"
+                       data-choose-text="@T["Choose photos"]" data-none-text="@T["No photos chosen"]" />
+                <button type="submit" class="btn btn-outline-primary">@T["Upload"]</button>
+                <span data-valmsg-for="files" data-valmsg-replace="true" class="text-danger w-100"></span>
+            </form>
+            <p class="form-text">@T["JPEG, PNG, TIFF or WebP. The original file is kept unchanged and is only visible to curators."]</p>
+        }
+        else
+        {
+            <p class="alert alert-warning" role="status">@T["The disk is nearly full, so no photos can be added at the moment. Tell the person who runs the server."]</p>
+        }
+    }
+</section>
