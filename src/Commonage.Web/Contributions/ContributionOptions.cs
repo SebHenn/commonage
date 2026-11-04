@@ -9,6 +9,12 @@ public class ContributionOptions
     public int MinimumFillSeconds { get; set; } = 3;
 
     /// <summary>
+    /// What one contribution link can take in within a day. Enough for a busy community event, but an open link cannot
+    /// fill the disk overnight.
+    /// </summary>
+    public int MaxUploadMegabytesPerLinkPerDay { get; set; } = 5000;
+
+    /// <summary>
     /// Submissions per IP address and hour. Generous, because everyone at a community event may share one
     /// address. Behind a reverse proxy, forwarded headers must be configured or all visitors share the proxy's.
     /// </summary>

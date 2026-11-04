@@ -1,7 +1,8 @@
 # Commonage
 
 Commonage is a self-hosted web application for community archives. Local history groups, volunteer organisations
-and communities use it to collect, preserve and share photographs, documents, recordings and stories.
+and communities use it to collect, preserve and share photographs and stories. Scans of documents work as images today;
+PDFs and sound recordings are planned.
 
 - **Contributors** send in material from their phone through a link, without an account, and say who made it and
   what may be done with it.
@@ -11,7 +12,7 @@ and communities use it to collect, preserve and share photographs, documents, re
 - **The group stays in control**: it runs the archive on its own server, can export everything in an open format at
   any time, handles contributors' requests to remove their data, and sees who changed what.
 
-> **Status:** v0.1.0, the first version for real community archives. See [CHANGELOG.md](CHANGELOG.md) and
+> **Status:** v0.2, an early version for real community archives. See [CHANGELOG.md](CHANGELOG.md) and
 > [docs/roadmap.md](docs/roadmap.md).
 
 ## Try it

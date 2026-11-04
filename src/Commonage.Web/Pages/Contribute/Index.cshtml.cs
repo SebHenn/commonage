@@ -4,10 +4,12 @@ using Commonage.Web.Contributions;
 using Commonage.Web.Data;
 using Commonage.Web.Domain;
 using Commonage.Web.Media;
+using Commonage.Web.Operations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 
 namespace Commonage.Web.Pages.Contribute;
 
@@ -15,6 +17,7 @@ namespace Commonage.Web.Pages.Contribute;
 /// The form behind a contribution link. Anyone with the link can use it, so everything sent in stays private
 /// as <see cref="ItemStatus.Submitted"/> until a curator publishes it.
 /// </summary>
+[AcceptsUploads]
 [RequestSizeLimit(MaxRequestBytes)]
 [RequestFormLimits(MultipartBodyLengthLimit = MaxRequestBytes)]
 public class IndexModel(
@@ -22,6 +25,8 @@ public class IndexModel(
     MediaUploadService uploads,
     AuditLog audit,
     FormTimer formTimer,
+    ArchiveHealth health,
+    IOptions<ContributionOptions> options,
     IStringLocalizer<SharedResource> localizer,
     ILogger<IndexModel> logger) : PageModel
 {
@@ -46,6 +51,9 @@ public class IndexModel(
     public string? FormStarted { get; set; }
 
     public ContributionLink Link { get; private set; } = null!;
+
+    /// <summary>When the disk is nearly full, people are told so before they fill in the form.</summary>
+    public bool CanTakeContributions => health.CanAcceptUploads();
 
     public class InputModel
     {
@@ -119,10 +127,14 @@ public class IndexModel(
                 ModelState.AddModelError("Files", UploadErrorMessages.Describe(localizer, error, file.FileName));
         }
 
+        var linkIsFull = Files.Count > 0 && await WouldExceedDailyLimitAsync(link, cancellationToken);
+        if (linkIsFull)
+            ModelState.AddModelError("Files", localizer["A lot has been sent through this link today. Please try again tomorrow, or send this without photos."]);
+
         if (!ModelState.IsValid)
         {
             // Browsers do not keep chosen files when a form is shown again.
-            if (Files.Count > 0)
+            if (Files.Count > 0 && !linkIsFull)
                 ModelState.AddModelError("Files", localizer["Please choose your photos again."]);
             Link = link;
             return Page();
@@ -163,6 +175,17 @@ public class IndexModel(
     /// <summary>Shown next to the consent checkbox and stored with the contribution, in the contributor's language.</summary>
     public string ConsentStatement => localizer[
         "I agree that the archive may keep what I send in, describe it and publish it on this website. If I chose so above, my name is shown with it. I can ask the archive to take it down at any time."];
+
+    /// <summary>Counts what is in the bin too, because it still takes up disk space.</summary>
+    private async Task<bool> WouldExceedDailyLimitAsync(ContributionLink link, CancellationToken cancellationToken)
+    {
+        var since = DateTime.UtcNow.AddDays(-1);
+        var received = await db.MediaFiles
+            .IgnoreQueryFilters()
+            .Where(f => f.ArchiveItem.Contribution!.ContributionLinkId == link.Id && f.UploadedAt >= since)
+            .SumAsync(f => f.SizeBytes, cancellationToken);
+        return received + Files.Sum(f => f.Length) > options.Value.MaxUploadMegabytesPerLinkPerDay * 1024L * 1024L;
+    }
 
     private Task<ContributionLink?> FindLinkAsync(string token) =>
         db.ContributionLinks.FirstOrDefaultAsync(l => l.Token == token && l.IsActive);

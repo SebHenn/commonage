@@ -7,8 +7,8 @@ This guide is for the people who run a Commonage archive with Docker Compose. Th
 
 Admins manage accounts under "Manage archive" → "Accounts".
 
-- **Curators** review contributions, describe, publish and delete items, and manage collections and contribution
-  links.
+- **Curators** review contributions, describe, publish and delete items, empty the bin, and manage collections and
+  contribution links.
 - **Admins** can also manage accounts, export the archive and read the activity log.
 
 Commonage sends no emails. A new account gets a **setup link** instead of a password; the admin passes it on (by
@@ -25,23 +25,50 @@ has no accounts yet.
 ## Activity log
 
 "Manage archive" → "Activity log" (admins) lists who did what and when: items created, changed, published,
-unpublished and deleted, photos added and deleted, contributions received, accepted, rejected and withdrawn,
+unpublished, moved to the bin, restored and deleted, photos added and deleted, contributions received, accepted, rejected and withdrawn,
 contributor details removed, collections and links changed, accounts managed, exports. Each item's edit page shows
 its own history to all curators.
 
 The log keeps the title of an item even after the item is deleted, and the account name even after the account is
 deleted. It holds no contributor names or email addresses. The app never changes or deletes entries.
 
+## The bin
+
+Deleting an item or a photo moves it to the bin ("Manage archive" → "Bin"), so a mistake can be undone. It disappears
+from the archive at once, public pages and exports included, but curators can restore it for 30 days. After that the
+archive deletes it for good, with its original files; the activity log records this as "Automatic". An item comes
+back as it was, so a published item is public again.
+
+"Delete for good" in the bin does not wait for the 30 days. Use it for spam that takes up space, and when someone asks
+for their material to be removed.
+
+## Disk space and limits
+
+A full disk also stops the database, so the archive stops taking in files before that happens:
+
+- Below 1 GB free (`Uploads__MinimumFreeMegabytes`), uploads and contributions are refused with a friendly message.
+  Curators can still edit text.
+- Below 5 GB free (`Uploads__WarnFreeMegabytes`), admins see a notice on "Manage archive".
+- One contribution link takes in at most 5 GB of files a day (`Contributions__MaxUploadMegabytesPerLinkPerDay`). After
+  that, people can still send text. Raise it for a big event.
+- One address can try to log in 100 times an hour (`Login__MaxAttemptsPerHour`), on top of the lockout of a single
+  account.
+
+These go in the `environment` of the `web` service if you need other values. What is in the bin counts towards the disk
+until it is deleted.
+
 ## Personal data
 
 Contributors may ask what the archive holds about them, or ask for it to be changed or removed. "Manage archive" →
-"Contributors" finds everything a person sent in, by part of their name or email address. On each item, curators can:
+"Contributors" finds everything a person sent in or is named as the photographer or author of, by part of their name
+or email address, including items in the bin. On each item, curators can:
 
 - **Remove name and email address.** The material stays, with its rights statement, photographer or author and
   consent text; the contributor is no longer credited.
 - **Mark as withdrawn.** For a contributor who takes back their consent. The item is hidden at once and can never
   be published again; it would have to be sent in anew.
-- **Delete the item**, with all its photos and original files.
+- **Move the item to the bin, then "Delete for good"** there, with all its photos and original files. Until that second
+  step, the data is still in the archive.
 
 Backups still contain removed data until they are replaced. Delete backups you no longer need.
 
@@ -64,6 +91,8 @@ changed since the upload; both need looking into.
 Contributors' names and email addresses are only included when asked for (`"includesPersonalData": true`). Such a
 file needs the same care as the archive itself. Every export is recorded in the activity log.
 
+Items and photos in the bin are not part of an export.
+
 ## Backup and restore
 
 A backup is the database (everything except the files) plus the uploaded files. Run from the folder with
@@ -83,6 +112,10 @@ another place, keep several, and delete old ones you no longer need: they contai
 contributors' personal data. A simple schedule is a daily backup (for example with cron) that keeps the last seven,
 and a weekly copy to an external disk.
 
+A finished backup also tells the app when it ran. Admins see the date on "Manage archive", and a notice if the last
+backup is more than three days old (`Backups__WarnAfterDays`) or none is recorded. Commonage sends no emails, so this
+notice is how a failing nightly backup gets noticed.
+
 To restore, for example on a new server with a fresh checkout and your `.env`:
 
 ```sh
@@ -91,7 +124,9 @@ scripts/restore.sh backups/commonage-20261101-143532
 
 It checks the checksums, asks you to type `restore`, stops the app, replaces the database and all files, and starts
 the app again. Logins and setup links from before the backup keep working. Restore into the same or a newer version
-of Commonage; the app upgrades the database when it starts.
+of Commonage; the app upgrades the database when it starts. This is also how to move an archive to a new server: back
+up, copy the folder, restore. Addresses of items, accounts and logins all stay the same. After a restore the backup date
+stays as it was on that server, or none is recorded on a new one, until the next backup runs.
 
 `scripts/test-backup-restore.sh` checks the whole cycle: it creates an archive through the web interface, backs it
 up, deletes all containers and volumes, restores and compares. It runs in CI on every pull request, as its own

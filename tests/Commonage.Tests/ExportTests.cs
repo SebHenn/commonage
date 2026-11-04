@@ -39,7 +39,7 @@ public class ExportTests(CommonageAppFactory app)
     }
 
     [Fact]
-    public async Task Without_personal_data_no_contributor_name_or_email_is_in_the_export()
+    public async Task Without_personal_data_no_name_or_email_is_in_the_export()
     {
         var item = await app.CreateContributionAsync(ItemStatus.Submitted, name: "Hidden Person", email: "hidden-person@example.org");
         using var admin = app.CreateClient();
@@ -55,7 +55,22 @@ public class ExportTests(CommonageAppFactory app)
             var text = Encoding.UTF8.GetString(Read(zip, entry.FullName));
             Assert.DoesNotContain("Hidden Person", text);
             Assert.DoesNotContain("hidden-person@example.org", text);
+            Assert.DoesNotContain("Heinz Muster", text);
         }
+    }
+
+    [Fact]
+    public async Task Items_in_the_bin_are_not_exported()
+    {
+        var binned = await app.CreateContributionAsync(ItemStatus.Published);
+        using var admin = app.CreateClient();
+        await Browser.LogInAsCuratorAsync(admin);
+        var page = $"/Admin/Items/Edit/{binned.Id}";
+        await Browser.PostFormAsync(admin, $"{page}?handler=Delete", new(), page);
+
+        using var zip = await ExportAsync(admin, publishedOnly: false, includePersonalData: false);
+
+        Assert.DoesNotContain(binned.Title, Encoding.UTF8.GetString(Read(zip, "archive.json")));
     }
 
     [Fact]

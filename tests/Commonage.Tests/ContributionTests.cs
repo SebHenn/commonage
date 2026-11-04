@@ -116,6 +116,7 @@ public class ContributionTests(CommonageAppFactory app)
         });
         var statusAfterReject = await WithDbAsync(db => db.ArchiveItems.Where(i => i.Id == item.Id).Select(i => i.Status).SingleAsync());
         await Browser.PostFormAsync(curator, $"/Admin/Items/Edit/{item.Id}?handler=Delete", [], pageUrl: $"/Admin/Items/Edit/{item.Id}");
+        await Browser.PostFormAsync(curator, $"/Admin/Bin?handler=DeleteItem&id={item.Id}", [], pageUrl: "/Admin/Bin");
 
         Assert.Equal(ItemStatus.Rejected, statusAfterReject);
         Assert.False(await WithDbAsync(db => db.ArchiveItems.AnyAsync(i => i.Id == item.Id)));

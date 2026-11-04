@@ -36,6 +36,9 @@ public class CommonageAppFactory : WebApplicationFactory<Program>, IAsyncLifetim
         // Tests fill in forms instantly and from one address. Spam protection has its own tests.
         builder.UseSetting("Contributions:MinimumFillSeconds", "0");
         builder.UseSetting("Contributions:MaxSubmissionsPerHour", "1000");
+        builder.UseSetting("Login:MaxAttemptsPerHour", "100000");
+        // How full the test machine's disk is must not decide a test. Disk space has its own tests.
+        builder.UseSetting("Uploads:MinimumFreeMegabytes", "1");
     }
 }
 

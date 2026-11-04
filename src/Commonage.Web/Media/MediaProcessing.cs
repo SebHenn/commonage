@@ -48,7 +48,9 @@ public class MediaProcessor(
     {
         using var scope = scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CommonageDbContext>();
+        // Photos in the bin included: they may come back, and should then have their previews.
         var pending = await db.MediaFiles
+            .IgnoreQueryFilters()
             .Where(f => f.Status == ProcessingStatus.Pending)
             .Select(f => f.Id)
             .ToListAsync(cancellationToken);
@@ -59,7 +61,7 @@ public class MediaProcessor(
     {
         using var scope = scopeFactory.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<CommonageDbContext>();
-        var file = await db.MediaFiles.FindAsync([mediaFileId], cancellationToken);
+        var file = await db.MediaFiles.IgnoreQueryFilters().FirstOrDefaultAsync(f => f.Id == mediaFileId, cancellationToken);
         if (file is null || file.Status != ProcessingStatus.Pending)
             return;
 

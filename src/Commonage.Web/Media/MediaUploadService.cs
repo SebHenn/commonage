@@ -17,6 +17,12 @@ public class UploadOptions
     /// this keeps such a file from tying up the server. 250 megapixels is more than a large-format scan at 600 dpi.
     /// </summary>
     public int MaxPreviewMegapixels { get; set; } = 250;
+
+    /// <summary>Uploads are refused when less than this is free, because a full disk also stops the database.</summary>
+    public int MinimumFreeMegabytes { get; set; } = 1024;
+
+    /// <summary>Admins get a notice when less than this is free.</summary>
+    public int WarnFreeMegabytes { get; set; } = 5120;
 }
 
 public enum UploadError

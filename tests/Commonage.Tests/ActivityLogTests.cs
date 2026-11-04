@@ -23,16 +23,17 @@ public class ActivityLogTests(CommonageAppFactory app)
         });
         var history = await curator.GetStringAsync(page);
         await Browser.PostFormAsync(curator, $"{page}?handler=Delete", new(), page);
+        await Browser.PostFormAsync(curator, $"/Admin/Bin?handler=DeleteItem&id={contribution.Id}", new(), "/Admin/Bin");
 
         var entries = await app.WithDbAsync(db => db.AuditEntries
             .Where(e => e.Subject == contribution.Title)
             .OrderBy(e => e.Id)
             .ToListAsync());
-        Assert.Equal([AuditAction.ItemChanged, AuditAction.ItemPublished, AuditAction.ItemDeleted], entries.Select(e => e.Action));
+        Assert.Equal([AuditAction.ItemChanged, AuditAction.ItemPublished, AuditAction.ItemMovedToBin, AuditAction.ItemDeleted], entries.Select(e => e.Action));
         Assert.All(entries, e => Assert.Equal(curatorEmail, e.UserName));
         Assert.All(entries, e => Assert.Null(e.ArchiveItemId));
         Assert.Contains("Published the item", history);
-        Assert.Contains($"Deleted the item: {contribution.Title}", await admin.GetStringAsync("/Admin/Activity"));
+        Assert.Contains($"Deleted the item for good: {contribution.Title}", await admin.GetStringAsync("/Admin/Activity"));
         curator.Dispose();
     }
 

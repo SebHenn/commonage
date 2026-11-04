@@ -33,7 +33,7 @@ else
                 {
                     <tr>
                         <td class="text-nowrap"><time datetime="@entry.At.ToString("O")">@entry.At.ToLocalTime().ToString("g")</time></td>
-                        <td class="text-break">@(entry.UserName ?? T["Contributor"])</td>
+                        <td class="text-break">@AuditText.Who(T, entry)</td>
                         <td>
                             @AuditText.Describe(T, entry.Action)@if (entry.Subject is not null)
                             {

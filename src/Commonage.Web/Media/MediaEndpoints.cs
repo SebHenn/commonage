@@ -39,7 +39,8 @@ public static class MediaEndpoints
     private static async Task<IResult> ServeDerivativeAsync(
         int id, string variant, CommonageDbContext db, IFileStorage storage, HttpContext context)
     {
-        var file = await db.MediaFiles.FirstOrDefaultAsync(f => f.Id == id && f.Status == ProcessingStatus.Ready);
+        // Curators also see what is in the bin, to decide whether to restore it.
+        var file = await db.MediaFiles.IgnoreQueryFilters().FirstOrDefaultAsync(f => f.Id == id && f.Status == ProcessingStatus.Ready);
         if (file is null)
             return Results.NotFound();
 
@@ -49,7 +50,7 @@ public static class MediaEndpoints
 
     private static async Task<IResult> ServeOriginalAsync(int id, CommonageDbContext db, IFileStorage storage, HttpContext context)
     {
-        var file = await db.MediaFiles.FindAsync(id);
+        var file = await db.MediaFiles.IgnoreQueryFilters().FirstOrDefaultAsync(f => f.Id == id);
         if (file is null)
             return Results.NotFound();
 

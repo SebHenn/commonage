@@ -1,5 +1,6 @@
 using Commonage.Web.Data;
 using Commonage.Web.Domain;
+using Commonage.Web.Operations;
 using Commonage.Web.Search;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -7,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Commonage.Web.Pages.Admin;
 
-public class IndexModel(CommonageDbContext db) : PageModel
+public class IndexModel(CommonageDbContext db, ArchiveHealth health) : PageModel
 {
     private const int PageSize = 50;
 
@@ -16,6 +17,8 @@ public class IndexModel(CommonageDbContext db) : PageModel
 
     /// <summary>Contributions nobody has reviewed yet.</summary>
     public int WaitingCount { get; private set; }
+
+    public ArchiveHealth Health => health;
 
     [BindProperty(SupportsGet = true, Name = "q")]
     public string? Text { get; set; }

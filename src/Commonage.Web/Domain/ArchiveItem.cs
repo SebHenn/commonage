@@ -38,6 +38,16 @@ public class ArchiveItem
     public DateTime UpdatedAt { get; set; }
     public DateTime? PublishedAt { get; set; }
 
+    /// <summary>When the item was moved to the bin. Items in the bin are hidden from everything but the bin page.</summary>
+    public DateTime? DeletedAt { get; private set; }
+
+    /// <summary>Changes with every save. Lets a form notice that someone else changed the item since it was opened.</summary>
+    public uint Version { get; private set; }
+
+    public void MoveToBin(DateTime now) => DeletedAt = now;
+
+    public void RestoreFromBin() => DeletedAt = null;
+
     /// <summary>Withdrawn contributions cannot be published again; the contributor would have to send them in anew.</summary>
     public bool CanBePublished => Status != ItemStatus.Withdrawn;
 

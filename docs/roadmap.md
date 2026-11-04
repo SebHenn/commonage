@@ -41,12 +41,12 @@ Estimates assume about 10 hours a week. Every milestone ends with something demo
   default 30, generous because a community event may share one address). Detected spam gets the normal thank-you
   page and is not saved. Behind a reverse proxy, forwarded headers must be configured ([deployment.md](deployment.md)),
   or every visitor counts as the proxy's address.
-- No emails are sent. Curators see waiting contributions on the item list. Any item can be deleted with its
-  files and contribution record.
+- No emails are sent. Curators see waiting contributions on the item list. Any item can be moved to the bin, and from
+  there deleted with its files and contribution record.
 - Personal data: "Contributors" finds a person's contributions by part of their name or email address. Curators
   can remove a contributor's name and email address (the rights statement, the photographer or author and the
   consent text stay, because the archive needs them to keep using the material), mark a contribution as withdrawn,
-  or delete the item. Backups keep removed data until they are replaced; docs/operations.md says so.
+  or move the item to the bin and delete it there. Backups keep removed data until they are replaced; docs/operations.md says so.
 - Two roles: curators manage the archive; admins can also manage accounts, export and read the activity log.
   New accounts get a one-time setup link (an Identity password-reset token, valid seven days) that the admin
   passes on, because Commonage sends no emails. Admins cannot change, disable or delete their own account, so an
@@ -121,6 +121,14 @@ Estimates assume about 10 hours a week. Every milestone ends with something demo
 - Filtering, sorting and paging live in `Search/ItemSearch.cs` and take the base query as input, so public
   pages still start from `PublishedItems`. The page number is the query value `p`, because `page` is reserved
   by Razor Pages.
+- Deleting never removes anything at once: items and photos go to a bin for 30 days first, hidden by EF Core query
+  filters so no query can show them by accident (`Data/ArchiveBin.cs`). Pages that need them ask with
+  `IgnoreQueryFilters`. "Delete for good" exists for personal-data requests and spam.
+- `ArchiveItem` carries PostgreSQL's `xmin` as a concurrency token. A form sends the version it opened, so a save from an
+  outdated form fails, shows both versions and keeps what was typed; saving again is a deliberate overwrite.
+- Uploads are refused before any of the request is read when the disk is nearly full (`Operations/ArchiveHealth.cs`),
+  because a full disk also stops PostgreSQL. `backup.sh` writes `App_Data/last-backup`, outside the media folder, so a
+  restore cannot bring back an old date.
 - Original uploads are never modified. Files are stored under generated names and served through an
   endpoint that checks permissions. Only curators can download originals; visitors see previews of
   published items. (The per-file `IsPublic` flag is postponed until a group needs it.)
@@ -134,8 +142,9 @@ Estimates assume about 10 hours a week. Every milestone ends with something demo
 Planned in November 2026 from audits of the code (visitors and contributors, curators and admins, and product gaps
 compared with Omeka S, Mukurtu, CollectiveAccess and AtoM), an adversarial review of the plan, and a walk through the
 running demo archive at phone, tablet and desktop width, acting out the main tasks. Only one usability test exists so
-far and it recorded no per-task detail, so this order is a judgement, not evidence. It is checked with real groups at
-the start of M7 and again at the end of M14, and it changes if they say otherwise.
+far and it recorded no per-task detail, so this order is a judgement, not evidence. A tester tries the app between
+milestones and reports what comes up, and the order changes if that calls for it. Nothing waits for scheduled sessions:
+every milestone is tested in the running app, in addition to the automated tests.
 
 The walk-through also showed what to keep: the public pages checked at 320 px have no sideways scrolling, in German
 too; the review page explains the contribution and the consent clearly; and uncertain dates read naturally.
@@ -151,14 +160,14 @@ real pace over M7 and M8 before promising dates. Each milestone is a minor relea
 
 | Milestone | Size | Done when |
 |---|---|---|
-| **M7 Nothing gets lost** | 3 | A deleted item can be restored for 30 days. A nearly full disk refuses uploads with a friendly message instead of stopping the database. Two curators editing one item do not silently overwrite each other. Admins see when the last backup ran. The README says what works today. |
+| **M7 Nothing gets lost** ✅ | 3 | A deleted item can be restored for 30 days. A nearly full disk refuses uploads with a friendly message instead of stopping the database. Two curators editing one item do not silently overwrite each other. Admins see when the last backup ran. The README says what works today. |
 | **M8 Safety net** | 3 | `scripts/update.sh` upgrades a server with a backup first and rolls back after a failed upgrade, and CI proves both starting from the previous published image. Browser and axe tests run in CI at phone and desktop width. |
 | **M9 Quick wins** | 2 | A contributor sees "Understood as 1945 to 1955" before sending, so an unreadable date no longer costs them their chosen photos. Every form has a working error summary. A curator goes through a filtered list with "Save and next". The browser's large-font setting takes effect. |
 | **M10 Archive identity and trust pages** | 4 | An admin sets the name, logo and colour without touching code, and buttons and links really change colour. About, Contact, Privacy and Imprint pages are linked wherever a contributor needs them. A checklist guides a new admin through setup. |
 | **M11 Look and feel** | 4 | The demo archive opens with the group's name, recent photos and collection image cards, sharp on a phone and with portraits uncropped. Search shows active filters as removable chips. Pages work in right-to-left and in a long-text test language. |
 | **M12 Catalogue fields** | 3 | A curator records rights, credit, reference number, where the original is kept and alt text on an item, and can filter for what is missing. |
 | **M13 Shoebox** | 4 | A curator turns 300 scans into drafts with shared values, sees progress and can retry failures, is warned about identical files, and publishes a chosen set in one action. An item without a real title cannot be published. |
-| **M14 Phone-first sending** | 4 | Over slow mobile data, a contributor sees their chosen photos, watches a progress bar and cannot send twice. A second usability round has run, including someone over 70 and a screen reader user, and a week of fixes is done. |
+| **M14 Phone-first sending** | 4 | Over slow mobile data, a contributor sees their chosen photos, watches a progress bar and cannot send twice. The new tasks are walked through in the running app and given to the tester, and a week of fixes is done. |
 | **M15 Readable items** | 4 | A visitor reads a scanned letter at full size, sees "Photo 2 of 4" with its caption, and moves on to the next item or to items from the same time. Curators reorder, rotate and describe each photo. |
 | **M16 Rights and sharing** | 3 | Every item page says whether it may be reused, in plain language. "Cite this item" gives a line to copy. A link pasted into a messenger shows the picture and the archive's name. |
 | **M17 Language reach** | 5 | A translator without Git has tried Weblate on a few pages. Missing translations fail a test. Counts read correctly under Polish plural rules. Item text carries the right `lang`. Dates that are accepted today are still accepted. |
@@ -176,24 +185,18 @@ Items marked *(can slip)* move to a later milestone when the time runs out.
 
 **M7 Nothing gets lost**
 
-- First, talk to the test group for half an hour: what stops them using it now, do they have a catalogue to import,
-  are documents or recordings waiting? Write down the answers and adjust this plan.
-- Bin: deleting sets `DeletedAt`; Restore; purge after 30 days. "Delete permanently now" stays for personal-data
-  requests. Public pages and the curator list leave binned items out. Today any curator can delete originals for good
-  behind one confirmation, and the suggested backup rotation keeps only a week.
+- Bin: deleting an item or a photo sets `DeletedAt`; Restore; purge after 30 days. "Delete for good" stays for
+  personal-data requests. Query filters leave binned material out of every query unless a page asks for it.
 - Disk guard for contributor and curator uploads: refuse early from `Content-Length` when free space on the media
-  volume or the temporary upload path is low, and add a daily limit on anonymous uploads per link. Today a link can
-  take 15 GB an hour from one address.
+  volume or the temporary upload path is low, and add a daily limit on anonymous uploads per link.
 - Optimistic concurrency (`xmin`) on `ArchiveItem`, with a translated message that keeps the typed text.
 - `data-warn-unsaved` for all forms on the edit page. Uploading a photo must never save half-typed text, because on a
   published item that would make it public.
 - Login limit per address, generous enough for a shared connection.
-- Backup age and free space as an admin banner: `backup.sh` writes a timestamp that the app can read. Document that
-  uptime monitors need a keyword check, because a degraded `/health` still answers 200.
-- Contributors search also finds the photographer or author. Decide whether exports without personal data leave that
-  name out (they include it today).
-- Correct the docs: the README promises documents and recordings, but only images and text work today; its status and
-  the update advice in `security.md` are out of date; describe moving servers by backup and restore.
+- Backup age and free space as an admin notice: `backup.sh` writes a timestamp that the app can read.
+- Contributors search also finds the photographer or author, and exports without personal data leave that name out.
+- Correct the docs: what the README promises, the update advice in `security.md`, and moving servers by backup and
+  restore.
 
 **M8 Safety net**
 
@@ -298,7 +301,7 @@ Comes before bulk entry so a shoebox evening does not create backfill work.
 - A plain `AltText` on the photo, and curators can correct contributor details.
 - "Needs rights" and "needs alt text" filters. Export format bump; the existing `rights` CSV columns are renamed
   deliberately, because they mean the contributor's answer.
-- A simple spreadsheet import here if the M7 talk shows a group needs it.
+- A simple spreadsheet import here if a tester or group reports needing it.
 
 **M13 Shoebox**
 
@@ -323,8 +326,9 @@ Comes before bulk entry so a shoebox evening does not create backfill work.
 - Text drafts in `localStorage`: title, date and description only, never name, email or rights holder, with an expiry
   and a "Clear this draft" control, because events share devices.
 - Try HEIC on a real iPhone. The browser may already convert it, and the bundled libvips probably has no HEVC decoder.
-- Second usability round with new tasks: send three photos over mobile data with a wrong date, read a letter, find
-  everything from the 1950s in one street. A week of fixes follows, then decide what comes after this milestone.
+- A walk-through of new tasks, also given to the tester: send three photos over mobile data with a wrong date, read a
+  letter, find everything from the 1950s in one street. It would help to have someone over 70 and a screen reader user
+  try it, but nothing waits for that. A week of fixes follows, then decide what comes after this milestone.
 
 **M15 Readable items**
 
@@ -368,7 +372,7 @@ Until then, write counts in label form (`Photos: {0}`), which needs no plural gr
 - Data Protection keys encrypted with a key outside the database, including restore docs, the backup test (which
   relies on old logins still working) and what happens if that key is lost.
 - System page: version, disk use and growth, failed previews with retry, `unaccent` state, last migration. Storage
-  checks in `/health`.
+  checks in `/health`, with a note for uptime monitors that a degraded answer is still HTTP 200.
 - How long the activity log and Rejected or Withdrawn items are kept; activity log filters.
 
 **M19 Discovery**
@@ -449,11 +453,11 @@ Until then, write counts in label form (`Photos: {0}`), which needs no plural gr
 ### Open decisions
 
 1. **Order: decided, as above.** Look and feel comes before the shoebox work, so new curator screens are built once on
-   the final design, and M9 brings the quickest curator improvements forward. It changes only if the M7 talk shows a
-   group is digitising now and needs the shoebox first.
+   the final design, and M9 brings the quickest curator improvements forward. It changes only if the tester's reports
+   show a group is digitising now and needs the shoebox first.
 2. **Default legal texts.** A factual default privacy text marked as a template to adapt, and no default imprint.
 3. **Optional email.** Decide after M20, from whether contributions wait for weeks in practice.
-4. **Exports without personal data.** Whether they leave out the photographer or author (M7).
+4. **Exports without personal data: decided.** They leave out the names of photographers and authors too (M7).
 5. **Support policy.** How long older minor versions get security fixes (M8).
 6. **Weblate.** Hosted or self-hosted, and how translators accept the license (M17).
 

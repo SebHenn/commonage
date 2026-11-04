@@ -12,8 +12,8 @@
 
 <h1>@ViewData["Title"]</h1>
 <div class="col-lg-8">
-    <p>@T["Find everything a person has sent in, for example when they ask what the archive holds about them, or ask for it to be deleted."]</p>
-    <p>@T["On each contribution you can remove their name and email address, mark it as withdrawn, or delete the item with its files. Backups keep older copies until they are replaced."]</p>
+    <p>@T["Find everything a person has sent in or is named as the photographer or author of, for example when they ask what the archive holds about them, or ask for it to be deleted."]</p>
+    <p>@T["On each contribution you can remove their name and email address, mark it as withdrawn, or move the item to the bin and delete it there for good. Backups keep older copies until they are replaced."]</p>
 </div>
 
 <form method="get" role="search" class="row g-2 mb-3 col-lg-8">
@@ -54,9 +54,22 @@
                                 {
                                     <br /><span class="text-muted small">@contribution.ContributorEmail</span>
                                 }
+                                @if (contribution.RightsHolder is not null)
+                                {
+                                    <br /><span class="text-muted small">@T["Photographer or author: {0}", contribution.RightsHolder]</span>
+                                }
                             </td>
                             <td><a asp-page="/Admin/Items/Edit" asp-route-id="@contribution.ArchiveItemId">@contribution.ArchiveItem.Title</a></td>
-                            <td><partial name="_StatusBadge" model="contribution.ArchiveItem.Status" /></td>
+                            <td>
+                                @if (contribution.ArchiveItem.DeletedAt is null)
+                                {
+                                    <partial name="_StatusBadge" model="contribution.ArchiveItem.Status" />
+                                }
+                                else
+                                {
+                                    <span class="badge text-bg-dark">@T["In the bin"]</span>
+                                }
+                            </td>
                             <td class="d-none d-md-table-cell">@contribution.SubmittedAt.ToLocalTime().ToString("d")</td>
                         </tr>
                     }

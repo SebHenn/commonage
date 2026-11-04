@@ -32,3 +32,9 @@ docker compose run --rm --no-deps -T --entrypoint tar web -C /app/App_Data -cf -
 
 (cd "$folder" && sha256 database.dump media.tar > SHA256SUMS)
 echo "Backup written to $folder"
+
+# Admins see this date in the app. It sits next to the media folder, so restoring an old backup does not bring back an
+# old date. Failing to write it leaves the backup as good as it is, so it only gets a warning.
+if ! date -u +%Y-%m-%dT%H:%M:%SZ | docker compose run --rm --no-deps -T --entrypoint sh web -c 'cat > /app/App_Data/last-backup'; then
+    echo "Warning: could not tell the app about this backup, so it may show the last backup as overdue." >&2
+fi

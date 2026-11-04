@@ -28,6 +28,12 @@ public enum AuditAction
     PasswordChanged,
     ArchiveExported,
     ArchiveExportedWithPersonalData,
+    ItemMovedToBin,
+    ItemRestored,
+    ItemPurged,
+    PhotoMovedToBin,
+    PhotoRestored,
+    PhotoPurged,
 }
 
 /// <summary>
@@ -41,7 +47,7 @@ public class AuditEntry
     public long Id { get; set; }
     public DateTime At { get; set; }
 
-    /// <summary>The account that acted, or null for visitors, such as a contributor sending something in.</summary>
+    /// <summary>The account that acted, or null for contributors and for what the archive does by itself.</summary>
     public string? UserId { get; set; }
 
     /// <summary>The account's name at the time, kept when the account is deleted later.</summary>

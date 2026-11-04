@@ -7,8 +7,8 @@ using Microsoft.EntityFrameworkCore;
 namespace Commonage.Web.Pages.Admin;
 
 /// <summary>
-/// Finds everything a person has sent in, by name or email address, for when they ask what the archive holds about
-/// them, or ask for it to be corrected or deleted.
+/// Finds everything a person has sent in or is named as the photographer or author of, by name or email address, for
+/// when they ask what the archive holds about them, or ask for it to be corrected or deleted.
 /// </summary>
 public class ContributorsModel(CommonageDbContext db) : PageModel
 {
@@ -27,10 +27,14 @@ public class ContributorsModel(CommonageDbContext db) : PageModel
 
         // The typed text is matched literally, so % and _ are not wildcards.
         var pattern = "%" + text.Replace(@"\", @"\\").Replace("%", @"\%").Replace("_", @"\_") + "%";
+        // Items in the bin included: until they are gone for good, the archive still holds this person's data.
         Results = await db.Contributions
+            .IgnoreQueryFilters()
             .AsNoTracking()
             .Include(c => c.ArchiveItem)
-            .Where(c => EF.Functions.ILike(c.ContributorName!, pattern) || EF.Functions.ILike(c.ContributorEmail!, pattern))
+            .Where(c => EF.Functions.ILike(c.ContributorName!, pattern)
+                || EF.Functions.ILike(c.ContributorEmail!, pattern)
+                || EF.Functions.ILike(c.RightsHolder!, pattern))
             .OrderBy(c => c.ContributorName).ThenByDescending(c => c.SubmittedAt)
             .Take(MaxResults)
             .ToListAsync(cancellationToken);

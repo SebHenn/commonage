@@ -3,7 +3,31 @@
 All notable changes to Commonage. Versions follow [Semantic Versioning](https://semver.org/); before 1.0, a minor
 version may change things that need attention when updating, and these notes say so.
 
-## Unreleased
+## 0.2.0 (2026-11-04)
+
+Protection against losing material. Updating needs no steps beyond the usual ones, but set `COMMONAGE_VERSION=0.2` in
+`.env` (see docs/deployment.md), and update your copy of the scripts so `scripts/backup.sh` can report its date.
+
+### For curators
+
+- Deleting an item or a photo moves it to the new bin, where it can be restored for 30 days. After that it is deleted
+  for good by itself; "Delete for good" does it sooner, for example when someone asks for removal.
+- When two people edit one item, the second one to save now sees both versions instead of silently overwriting the
+  first. Nothing is lost.
+- Forms warn before unsaved text is lost, for example when uploading a photo or switching language.
+
+### For admins
+
+- "Manage archive" shows when the last backup ran and warns when it is overdue or missing, and when the disk is
+  filling up.
+- "Contributors" also finds photographers and authors, and items in the bin.
+- Exports without personal data now also leave out the names of photographers and authors.
+
+### Protection
+
+- Uploads and contributions are refused before a nearly full disk can stop the database.
+- One contribution link takes in at most 5 GB of files a day, and one address can try to log in 100 times an hour. Both
+  can be changed.
 
 ### Project
 

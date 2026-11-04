@@ -39,6 +39,9 @@ public class MediaFile
 
     public DateTime UploadedAt { get; set; }
 
+    /// <summary>When the photo was moved to the bin on its own. Photos in the bin are hidden from everything but the bin page.</summary>
+    public DateTime? DeletedAt { get; set; }
+
     public string OriginalKey => $"originals/{StorageId:N}";
     public string PreviewKey => $"previews/{StorageId:N}.jpg";
     public string ThumbnailKey => $"thumbnails/{StorageId:N}.jpg";

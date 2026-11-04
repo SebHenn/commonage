@@ -102,6 +102,8 @@ cp "$jar" "$work/cookies-before.txt"
 echo "Backing up..."
 sh scripts/backup.sh "$work/backups"
 backup=$(ls -d "$work"/backups/commonage-*)
+MSYS_NO_PATHCONV=1 docker compose run --rm --no-deps -T --entrypoint cat web /app/App_Data/last-backup | grep -Eq '^[0-9]{4}-[0-9]{2}-[0-9]{2}T' \
+    || fail "the backup did not record its date for the app"
 
 echo "Deleting the archive completely..."
 docker compose down --volumes >/dev/null 2>&1
