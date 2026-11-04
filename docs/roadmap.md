@@ -80,7 +80,9 @@ Estimates assume about 10 hours a week. Every milestone ends with something demo
   attestation; production pulls them (`COMMONAGE_VERSION`), development still builds from source.
 - Repository: squash merges only; `main` and `v*` tags protected by rulesets; required checks; Dependabot, CodeQL,
   dependency review, Scorecard and a DCO sign-off check. One maintainer for now, so pull requests need passing
-  checks but no approving review; nobody can bypass the rules.
+  checks but no approving review; nobody can bypass the rules. GitHub does not let authors approve their own pull
+  requests, so Scorecard's branch protection and code review alerts are dismissed for this reason. Require a review
+  when a second maintainer joins.
 - Every public page queries `CommonageDbContext.PublishedItems`, never `ArchiveItems` directly.
 - Migrations are applied automatically at startup (single-instance self-hosting).
 - UI text is English-keyed and translated through `Resources/SharedResource.{culture}.resx`.

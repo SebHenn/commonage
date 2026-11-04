@@ -4,8 +4,8 @@ FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0@sha256:de4fe90a
 ARG TARGETARCH
 WORKDIR /src
 COPY global.json Directory.Build.props ./
-COPY src/Commonage.Web/Commonage.Web.csproj src/Commonage.Web/
-RUN dotnet restore src/Commonage.Web/Commonage.Web.csproj -a $TARGETARCH
+COPY src/Commonage.Web/Commonage.Web.csproj src/Commonage.Web/packages.lock.json src/Commonage.Web/
+RUN dotnet restore src/Commonage.Web/Commonage.Web.csproj -a $TARGETARCH --locked-mode
 COPY src/ src/
 RUN dotnet publish src/Commonage.Web/Commonage.Web.csproj -c Release -a $TARGETARCH --self-contained false -o /app --no-restore
 

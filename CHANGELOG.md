@@ -25,6 +25,8 @@ Protection against losing material. Updating needs no steps beyond the usual one
 
 ### Protection
 
+- The language cookie is only sent over HTTPS, and scripts cannot read it.
+- Every package is pinned by content hash when the app is built.
 - Uploads and contributions are refused before a nearly full disk can stop the database.
 - One contribution link takes in at most 5 GB of files a day, and one address can try to log in 100 times an hour. Both
   can be changed.
