@@ -53,7 +53,10 @@ public partial class SecurityHeaderTests(CommonageAppFactory app)
             var html = await response.Content.ReadAsStringAsync();
             if (InlineScript().IsMatch(html) || EventHandlerAttribute().IsMatch(html) || StyleAttributeOrElement().IsMatch(html))
                 results.Add($"{url} contains inline script or style");
-            if (!response.IsSuccessStatusCode && !route.StartsWith("/Error", StringComparison.OrdinalIgnoreCase))
+            // These two answer with an error status on purpose, and show their page all the same.
+            var answersWithError = route.StartsWith("/Error", StringComparison.OrdinalIgnoreCase)
+                || route.Equals("/Account/AccessDenied", StringComparison.OrdinalIgnoreCase);
+            if (!response.IsSuccessStatusCode && !answersWithError)
                 results.Add($"{url} answered {(int)response.StatusCode}, so it was not checked");
         }
 
