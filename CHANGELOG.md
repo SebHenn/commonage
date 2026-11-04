@@ -3,7 +3,11 @@
 All notable changes to Commonage. Versions follow [Semantic Versioning](https://semver.org/); before 1.0, a minor
 version may change things that need attention when updating, and these notes say so.
 
-## Unreleased
+## 0.3.0 (2026-11-04)
+
+Your archive under your own name, quicker work for curators, and safe updates. Set `COMMONAGE_VERSION=0.3` in `.env`. From
+this version on, `scripts/update.sh` does that for you. See docs/deployment.md. After updating, an admin should open
+"Settings".
 
 ### For visitors and contributors
 
@@ -25,6 +29,18 @@ version may change things that need attention when updating, and these notes say
 - A review shows the photos first. Drafts can be previewed as visitors will see them.
 - Every management page has the same navigation.
 - Dates write the month out, because 11/4/2026 means different days to different readers.
+
+### Your archive, your name
+
+- Admins set the archive's name, logo, colour, language and time zone under "Settings", with no files to edit. Too light a
+  colour is refused, with a similar one that works.
+- About, Contact, Privacy and Imprint pages, written as plain text and linked from every page. Privacy starts from a
+  description of what Commonage stores: a template to adapt, not legal advice.
+- A checklist guides a new admin through setting up, and stays until everything is done.
+- Contributors see whose form this is, get a reference to quote, and are told that no email follows.
+- Search engines can be asked to leave the archive out. Contribution forms, logins and management pages are always left out.
+- A handbook for curators, in English and German, including how to handle a removal request.
+- The export format is now version 2, with the archive's settings and logo.
 
 ### For people who run an archive
 

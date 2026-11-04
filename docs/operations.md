@@ -32,6 +32,20 @@ its own history to all curators.
 The log keeps the title of an item even after the item is deleted, and the account name even after the account is
 deleted. It holds no contributor names or email addresses. The app never changes or deletes entries.
 
+## Settings
+
+"Manage archive" → "Settings" (admins) makes the archive your group's own, without touching any files on the server: its
+name, logo and colour, the language it falls back to, the time zone for curators' pages, and whether search engines may
+list it. A colour too light for white text is refused, with a similar one that works.
+
+The pages About, Contact, Privacy and Imprint are written there too, as plain text. An empty page is not shown, except
+Privacy, which comes with a description of what Commonage stores. **That text is a template and not legal advice.** Adapt it
+to what your group does, and find out whether your country requires an imprint.
+
+The list on "Manage archive" shows what is left to set up, and stays until everything is done.
+
+Curators have their own guide: [curator-handbook.md](curator-handbook.md) ([deutsch](handbuch-kuratoren.md)).
+
 ## The bin
 
 Deleting an item or a photo moves it to the bin ("Manage archive" → "Bin"), so a mistake can be undone. It disappears
@@ -84,7 +98,7 @@ the material can always move to another system, or be handed to a public archive
 | `files/<item id>/<file id>-<name>` | The original files, exactly as uploaded. |
 | `README.txt` | A short description of the above. |
 
-`archive.json` has `"format": "commonage-export"` and `"version": 1`. While exporting, every file is checked against
+`archive.json` has `"format": "commonage-export"` and `"version": 2`. Version 2 added `settings` with the archive's name, pages and colours, and the logo under `branding/`. While exporting, every file is checked against
 its checksum. A file entry with `"problem": "missing"` was not found in storage, `"checksumMismatch"` means it has
 changed since the upload; both need looking into.
 
@@ -113,7 +127,7 @@ contributors' personal data. A simple schedule is a daily backup (for example wi
 and a weekly copy to an external disk.
 
 A finished backup also tells the app when it ran. Admins see the date on "Manage archive", and a notice if the last
-backup is more than three days old (`Backups__WarnAfterDays`) or none is recorded. Commonage sends no emails, so this
+backup is more than three days old (`Backups__WarnAfterDays`). With none recorded, the "Getting started" list says so. Commonage sends no emails, so this
 notice is how a failing nightly backup gets noticed.
 
 To restore, for example on a new server with a fresh checkout and your `.env`:

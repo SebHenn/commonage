@@ -43,6 +43,8 @@ vulnerability, see [SECURITY.md](../SECURITY.md).
   failed attempts").
 - **Deleted material stays for 30 days.** Items and photos in the bin keep their files and personal data until they are
   deleted for good, which curators can do at once when someone asks for removal.
+- **The default privacy text is a template**, describing what Commonage stores. Each group has to adapt it and check its
+  own legal duties, including whether it needs an imprint.
 - **Keys that protect login cookies and setup links are stored unencrypted in the database.** Whoever has the
   database (or a backup) could forge logins. Protect backups accordingly.
 - **Images are decoded by libvips**, a large C library. Keep the Docker image up to date by installing each new

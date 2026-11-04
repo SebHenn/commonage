@@ -1,18 +1,34 @@
 ﻿@inject IConfiguration Configuration
+@inject Commonage.Web.Operations.ArchiveProfile Profile
 @{
+    var identity = await Profile.GetAsync();
+    var isPrivatePage = new[] { "/Admin", "/Account", "/Contribute" }.Any(p => (ViewContext.RouteData.Values["page"]?.ToString() ?? "").StartsWith(p, StringComparison.OrdinalIgnoreCase));
     var currentPage = ViewContext.RouteData.Values["page"]?.ToString() ?? "";
     var canManage = User.IsInRole(Commonage.Web.Identity.Roles.Admin) || User.IsInRole(Commonage.Web.Identity.Roles.Curator);
     string? Current(params string[] pages) => pages.Any(p => currentPage.StartsWith(p, StringComparison.OrdinalIgnoreCase)) ? "page" : null;
 }
 <!DOCTYPE html>
-<html lang="@System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName">
+<html lang="@System.Globalization.CultureInfo.CurrentUICulture.Name">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Commonage</title>
+    <title>@ViewData["Title"] - @identity.Name</title>
+    @if (isPrivatePage || !identity.AllowSearchEngines)
+    {
+        <meta name="robots" content="noindex" />
+    }
+    @if (identity.LogoId is { } iconId)
+    {
+        <link rel="icon" type="image/png" href="/branding/@iconId/favicon" />
+        <link rel="apple-touch-icon" href="/branding/@iconId/icon" />
+    }
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Commonage.Web.styles.css" asp-append-version="true" />
+    @if (identity.AccentColor is not null)
+    {
+        <link rel="stylesheet" href="@Commonage.Web.Operations.BrandingEndpoints.StylesheetPath?v=@identity.BrandingVersion" />
+    }
     <noscript><link rel="stylesheet" href="~/css/nojs.css" asp-append-version="true" /></noscript>
 </head>
 <body class="d-flex flex-column min-vh-100">
@@ -20,7 +36,13 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">Commonage</a>
+                <a class="navbar-brand text-wrap" asp-area="" asp-page="/Index">
+                    @if (identity.LogoId is { } logoId)
+                    {
+                        <img src="/branding/@logoId/logo" alt="" class="navbar-logo" />
+                    }
+                    @identity.Name
+                </a>
                 @* What visitors need is always visible, also on a phone. Only what signed-in people need folds away. *@
                 <ul class="navbar-nav flex-row gap-3 me-auto">
                     <li class="nav-item">
@@ -74,8 +96,25 @@
 
     <footer class="border-top text-muted py-3">
         <div class="container d-flex flex-wrap gap-3 align-items-center">
-            <span>Commonage</span>
-            <a href="@Commonage.Web.SourceCode.UrlFrom(Configuration)" rel="noopener">@T["Source code"]</a>
+            @if (identity.NameIsSet)
+            {
+                <span>@identity.Name</span>
+            }
+            @if (identity.Text(ArchiveTextKind.About) is not null)
+            {
+                <a asp-page="/Info" asp-route-slug="about">@T["About this archive"]</a>
+            }
+            @if (identity.Text(ArchiveTextKind.Contact) is not null)
+            {
+                <a asp-page="/Info" asp-route-slug="contact">@T["Contact"]</a>
+            }
+            <a asp-page="/Info" asp-route-slug="privacy">@T["Privacy"]</a>
+            @if (identity.Text(ArchiveTextKind.Imprint) is not null)
+            {
+                <a asp-page="/Info" asp-route-slug="imprint">@T["Imprint"]</a>
+            }
+            <span class="small">@T["Made with {0}", Commonage.Web.Operations.ArchiveIdentity.SoftwareName]</span>
+            <a href="@Commonage.Web.SourceCode.UrlFrom(Configuration)" rel="noopener" class="small">@T["Source code"]</a>
             <form method="post" asp-page="/SetLanguage" asp-route-returnUrl="@(Context.Request.Path + Context.Request.QueryString)" class="d-flex gap-1">
                 <button type="submit" name="culture" value="en" class="btn btn-link btn-sm language-button" lang="en">English</button>
                 <span aria-hidden="true">·</span>

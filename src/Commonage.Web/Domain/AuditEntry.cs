@@ -34,6 +34,8 @@ public enum AuditAction
     PhotoMovedToBin,
     PhotoRestored,
     PhotoPurged,
+    SettingsChanged,
+    RestoreTested,
 }
 
 /// <summary>

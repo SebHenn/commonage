@@ -76,6 +76,9 @@ builder.Services.AddScoped<MediaUploadService>();
 builder.Services.AddSingleton<MediaProcessingQueue>();
 builder.Services.AddHostedService<MediaProcessor>();
 builder.Services.AddScoped<ArchiveBin>();
+builder.Services.AddMemoryCache();
+builder.Services.AddSingleton<ArchiveProfile>();
+builder.Services.AddSingleton<LogoImages>();
 builder.Services.AddHostedService<ArchiveBinPurger>();
 
 // Free disk space and the age of the last backup: admins see them, and a nearly full disk stops uploads.
@@ -103,6 +106,7 @@ builder.Services.AddRazorPages(options =>
         options.Conventions.AuthorizeFolder("/Admin/Users", Policies.Administer);
         options.Conventions.AuthorizePage("/Admin/Export", Policies.Administer);
         options.Conventions.AuthorizePage("/Admin/Activity", Policies.Administer);
+        options.Conventions.AuthorizePage("/Admin/Settings", Policies.Administer);
         options.Conventions.AuthorizePage("/Account/Password");
     })
     .AddViewLocalization()
@@ -135,11 +139,22 @@ app.UseHttpsRedirection();
 app.UseSecurityHeaders();
 
 string[] supportedCultures = ["en", "de"];
-app.UseRequestLocalization(new RequestLocalizationOptions
+var localization = new RequestLocalizationOptions
 {
     DefaultRequestCulture = new RequestCulture("en"),
     SupportedCultures = supportedCultures.Select(c => new CultureInfo(c)).ToList(),
     SupportedUICultures = supportedCultures.Select(c => new CultureInfo(c)).ToList(),
+};
+// After the visitor's own choice and their browser's languages comes the language the group chose for its archive.
+localization.RequestCultureProviders.Add(new CustomRequestCultureProvider(async context =>
+    new ProviderCultureResult((await context.RequestServices.GetRequiredService<ArchiveProfile>().GetAsync()).DefaultLanguage)));
+app.UseRequestLocalization(localization);
+
+app.Use(async (context, next) =>
+{
+    var zone = (await context.RequestServices.GetRequiredService<ArchiveProfile>().GetAsync()).TimeZoneId;
+    Dates.Zone.Value = zone is not null && TimeZoneInfo.TryFindSystemTimeZoneById(zone, out var found) ? found : null;
+    await next(context);
 });
 
 app.UseRateLimiter();
@@ -152,6 +167,7 @@ app.UseUploadGuard();
 app.MapHealthChecks("/health");
 app.MapMediaEndpoints();
 app.MapDateCheck();
+app.MapBrandingEndpoints();
 app.MapStaticAssets();
 app.MapRazorPages()
    .WithStaticAssets();

@@ -144,6 +144,18 @@ public static class DemoContent
         }
 
         db.ArchiveItems.AddRange(items);
+        // A made-up group, so the demo shows an archive as a group would set it up.
+        db.ArchiveSettings.Add(new ArchiveSettings { DefaultLanguage = language, PrivacyReviewed = true, ImprintNotNeeded = true });
+        void Text(ArchiveTextKind kind, string text) => db.ArchiveTexts.Add(new ArchiveText { Language = language, Kind = kind, Text = text });
+        Text(ArchiveTextKind.Name, T("Lindenau History Group", "Geschichtsverein Lindenau"));
+        Text(ArchiveTextKind.Tagline, T("Photos and memories from a town that does not exist.", "Fotos und Erinnerungen aus einem Ort, den es nicht gibt."));
+        Text(ArchiveTextKind.About, T(
+            "The Lindenau History Group is made up, like everything in this demo. A real group would say here who they are and how the archive came about.",
+            "Den Geschichtsverein Lindenau gibt es nicht, wie alles in dieser Demo. Eine echte Gruppe würde hier sagen, wer sie ist und wie das Archiv entstanden ist."));
+        Text(ArchiveTextKind.Contact, T(
+            "A real group would say here how to reach them, for example: archive@example.org",
+            "Eine echte Gruppe würde hier sagen, wie sie zu erreichen ist, zum Beispiel: archiv@example.org"));
+
         await db.SaveChangesAsync();
         logger.LogInformation("Filled the empty archive with demo content ({Language}).", language);
 

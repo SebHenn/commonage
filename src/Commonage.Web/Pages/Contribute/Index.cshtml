@@ -6,6 +6,10 @@
 
 <div class="col-lg-8">
     <h1>@Model.Link.Title</h1>
+    @if (Model.Identity.NameIsSet)
+    {
+        <p class="text-muted">@T["This form belongs to {0}.", Model.Identity.Name]</p>
+    }
     @if (!string.IsNullOrWhiteSpace(Model.Link.Introduction))
     {
         <p class="text-preserve-lines">@Model.Link.Introduction</p>
@@ -104,6 +108,10 @@
             <input asp-for="Input.Consent" class="form-check-input" data-required-message="@T["Please agree, so that we can include what you send in."]" />
             <label asp-for="Input.Consent" class="form-check-label">@Model.ConsentStatement</label>
             <div><span asp-validation-for="Input.Consent" class="text-danger"></span></div>
+            @if (Model.Identity.Text(ArchiveTextKind.Contact) is not null)
+            {
+                <div class="form-text"><a asp-page="/Info" asp-route-slug="contact">@T["How to reach the archive"]</a></div>
+            }
         </div>
 
         <button type="submit" class="btn btn-primary">@T["Send"]</button>

@@ -70,7 +70,9 @@ public partial class SecurityHeaderTests(CommonageAppFactory app)
             : item.Id.ToString();
         var url = route
             .Replace("{token}", token)
-            .Replace("{id:int}", id);
+            .Replace("{id:int}", id)
+            // The pages about the archive: this one always exists.
+            .Replace("{slug:regex(^(about|contact|privacy|imprint)$)}", "privacy");
         // Optional parts are left out, which gives the form for a new record or the page without details.
         return OptionalPart().Replace(url, "").TrimEnd('/') is { Length: > 0 } filled ? filled : "/";
     }

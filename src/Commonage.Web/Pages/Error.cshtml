@@ -1,5 +1,6 @@
 ﻿@page "{code:int?}"
 @model ErrorModel
+@inject Commonage.Web.Operations.ArchiveProfile Profile
 @{
     ViewData["Title"] = Model.Status switch
     {
@@ -18,6 +19,10 @@
     {
         case 404:
             <p>@T["This page does not exist, or it is not public (any more)."]</p>
+            @if ((await Profile.GetAsync()).Text(ArchiveTextKind.Contact) is not null)
+            {
+                <p><a asp-page="/Info" asp-route-slug="contact">@T["Contact the archive"]</a></p>
+            }
             break;
         case 403:
             <p>@T["Your account cannot open this page. Ask an admin if you need it."]</p>

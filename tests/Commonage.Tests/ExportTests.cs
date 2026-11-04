@@ -70,7 +70,9 @@ public class ExportTests(CommonageAppFactory app)
     [InlineData(typeof(MediaFile), "file", "id originalFileName contentType sizeBytes sha256 uploadedAt",
         "ArchiveItemId, ArchiveItem: the file is listed under its item. StorageId, OriginalKey, PreviewKey, ThumbnailKey: storage details. "
         + "Status, ProcessingError, PreviewWidth, PreviewHeight: previews are made anew. DeletedAt: the bin is not exported.")]
-    [InlineData(typeof(Contribution), "contribution", "contributorName contributorEmail showName rights rightsHolder consentText submittedAt reviewedAt personalDetailsRemovedAt contributionLink",
+    [InlineData(typeof(ArchiveSettings), "settings", "defaultLanguage accentColor timeZone allowSearchEngines privacyReviewed imprintNotNeeded restoreTestedAt logo texts",
+        "Id, TheOnlyId: there is only one. LogoId: as logo.")]
+    [InlineData(typeof(Contribution), "contribution", "contributorName contributorEmail showName rights rightsHolder consentText referenceCode submittedAt reviewedAt personalDetailsRemovedAt contributionLink",
         "Id, ArchiveItemId, ArchiveItem: listed under its item. ContributionLinkId: the link is named.")]
     [InlineData(typeof(Collection), "collection", "id title description createdAt", "Items: each item names its collection.")]
     public async Task Every_field_is_exported_or_left_out_on_purpose(Type type, string part, string exported, string leftOut)
@@ -86,6 +88,7 @@ public class ExportTests(CommonageAppFactory app)
             "item" => exportedItem,
             "file" => exportedItem.GetProperty("files")[0],
             "contribution" => exportedItem.GetProperty("contribution"),
+            "settings" => JsonDocument.Parse(Read(zip, "archive.json")).RootElement.GetProperty("settings"),
             _ => JsonDocument.Parse(Read(zip, "archive.json")).RootElement.GetProperty("collections")[0],
         };
 
@@ -131,7 +134,7 @@ public class ExportTests(CommonageAppFactory app)
         Assert.Contains(published.Id, ids);
         Assert.DoesNotContain(waiting.Id, ids);
         Assert.Equal(["Published"], statuses);
-        Assert.Equal(1, document.GetProperty("version").GetInt32());
+        Assert.Equal(2, document.GetProperty("version").GetInt32());
     }
 
     [Fact]

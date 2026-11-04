@@ -20,6 +20,19 @@ public class Contribution
     public const int NameMaxLength = 200;
     public const int EmailMaxLength = 254;
     public const int RightsHolderMaxLength = 300;
+    public const int ReferenceCodeLength = 9;
+
+    /// <summary>
+    /// What a contributor can quote when they ask about what they sent, since they have no account. Random, so it reveals
+    /// nothing, and without letters that are easily mixed up.
+    /// </summary>
+    public string? ReferenceCode { get; set; }
+
+    public static string NewReferenceCode()
+    {
+        var code = System.Security.Cryptography.RandomNumberGenerator.GetString("23456789ABCDEFGHJKMNPQRSTVWXYZ", 8);
+        return $"{code[..4]}-{code[4..]}";
+    }
 
     public int Id { get; set; }
 

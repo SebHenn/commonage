@@ -9,9 +9,15 @@ namespace Commonage.Web;
 /// </summary>
 public static partial class Dates
 {
-    public static string Day(DateTime utc) => utc.ToLocalTime().ToString(DayPattern(), CultureInfo.CurrentCulture);
+    /// <summary>The archive's time zone for this request, or null for the server's clock.</summary>
+    public static AsyncLocal<TimeZoneInfo?> Zone { get; } = new();
 
-    public static string Moment(DateTime utc) => $"{Day(utc)} {utc.ToLocalTime().ToString("t", CultureInfo.CurrentCulture)}";
+    public static string Day(DateTime utc) => Local(utc).ToString(DayPattern(), CultureInfo.CurrentCulture);
+
+    public static string Moment(DateTime utc) => $"{Day(utc)} {Local(utc).ToString("t", CultureInfo.CurrentCulture)}";
+
+    private static DateTime Local(DateTime utc) =>
+        Zone.Value is { } zone ? TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(utc, DateTimeKind.Utc), zone) : utc.ToLocalTime();
 
     /// <summary>The culture's own long date, in its own word order, without the name of the weekday.</summary>
     private static string DayPattern() =>

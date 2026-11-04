@@ -34,7 +34,8 @@ public class ContributorsModel(CommonageDbContext db) : PageModel
             .Include(c => c.ArchiveItem)
             .Where(c => EF.Functions.ILike(c.ContributorName!, pattern)
                 || EF.Functions.ILike(c.ContributorEmail!, pattern)
-                || EF.Functions.ILike(c.RightsHolder!, pattern))
+                || EF.Functions.ILike(c.RightsHolder!, pattern)
+                || EF.Functions.ILike(c.ReferenceCode!, pattern))
             .OrderBy(c => c.ContributorName).ThenByDescending(c => c.SubmittedAt)
             .Take(MaxResults)
             .ToListAsync(cancellationToken);

@@ -5,8 +5,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Commonage.Web.Pages;
 
-public class IndexModel(CommonageDbContext db) : PageModel
+public class IndexModel(CommonageDbContext db, Commonage.Web.Operations.ArchiveProfile profile) : PageModel
 {
+    public Commonage.Web.Operations.ArchiveIdentity Identity { get; private set; } = null!;
+
     private const int MaxTags = 30;
 
     public record CollectionSummary(int Id, string Title, string? Description, int PublishedItemCount);
@@ -18,6 +20,7 @@ public class IndexModel(CommonageDbContext db) : PageModel
 
     public async Task OnGetAsync()
     {
+        Identity = await profile.GetAsync();
         Collections = await db.Collections
             .OrderBy(c => c.Title)
             .Select(c => new CollectionSummary(

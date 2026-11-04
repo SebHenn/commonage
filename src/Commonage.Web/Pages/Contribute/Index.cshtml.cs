@@ -26,6 +26,7 @@ public class IndexModel(
     AuditLog audit,
     FormTimer formTimer,
     ArchiveHealth health,
+    ArchiveProfile profile,
     IOptions<ContributionOptions> options,
     IStringLocalizer<SharedResource> localizer,
     ILogger<IndexModel> logger) : PageModel
@@ -54,6 +55,8 @@ public class IndexModel(
 
     /// <summary>When the disk is nearly full, people are told so before they fill in the form.</summary>
     public bool CanTakeContributions => health.CanAcceptUploads();
+
+    public ArchiveIdentity Identity { get; private set; } = null!;
 
     public class InputModel
     {
@@ -99,6 +102,7 @@ public class IndexModel(
             return NotFound();
 
         Link = link;
+        Identity = await profile.GetAsync();
         FormStarted = formTimer.Start();
         return Page();
     }
@@ -112,6 +116,7 @@ public class IndexModel(
         if (!string.IsNullOrEmpty(Website) || !formTimer.WasFilledInByAPerson(FormStarted))
         {
             logger.LogInformation("Discarded an automated-looking contribution to link {LinkId}.", link.Id);
+            TempData["Reference"] = Contribution.NewReferenceCode();
             return RedirectToPage("Thanks", new { token });
         }
 
@@ -137,6 +142,7 @@ public class IndexModel(
             if (Files.Count > 0 && !linkIsFull)
                 ModelState.AddModelError("Files", localizer["Please choose your photos again."]);
             Link = link;
+            Identity = await profile.GetAsync();
             return Page();
         }
 
@@ -158,6 +164,7 @@ public class IndexModel(
                 Rights = Input.Rights!.Value,
                 RightsHolder = string.IsNullOrWhiteSpace(Input.RightsHolder) ? null : Input.RightsHolder.Trim(),
                 ConsentText = ConsentStatement,
+                ReferenceCode = Contribution.NewReferenceCode(),
                 SubmittedAt = now,
             },
         };
@@ -169,6 +176,7 @@ public class IndexModel(
         foreach (var file in Files)
             await uploads.AddAsync(item, file, cancellationToken);
 
+        TempData["Reference"] = item.Contribution.ReferenceCode;
         return RedirectToPage("Thanks", new { token });
     }
 

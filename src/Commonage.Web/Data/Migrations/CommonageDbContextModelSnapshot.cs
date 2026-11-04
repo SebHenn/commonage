@@ -114,6 +114,64 @@ namespace Commonage.Web.Data.Migrations
                     b.ToTable("ArchiveItems");
                 });
 
+            modelBuilder.Entity("Commonage.Web.Domain.ArchiveSettings", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("AccentColor")
+                        .HasMaxLength(7)
+                        .HasColumnType("character varying(7)");
+
+                    b.Property<bool>("AllowSearchEngines")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("DefaultLanguage")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<bool>("ImprintNotNeeded")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid?>("LogoId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("PrivacyReviewed")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("RestoreTestedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("TimeZone")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ArchiveSettings");
+                });
+
+            modelBuilder.Entity("Commonage.Web.Domain.ArchiveText", b =>
+                {
+                    b.Property<string>("Language")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("Kind")
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasMaxLength(20000)
+                        .HasColumnType("character varying(20000)");
+
+                    b.HasKey("Language", "Kind");
+
+                    b.ToTable("ArchiveTexts");
+                });
+
             modelBuilder.Entity("Commonage.Web.Domain.AuditEntry", b =>
                 {
                     b.Property<long>("Id")
@@ -209,6 +267,10 @@ namespace Commonage.Web.Data.Migrations
                     b.Property<DateTime?>("PersonalDetailsRemovedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("ReferenceCode")
+                        .HasMaxLength(9)
+                        .HasColumnType("character varying(9)");
+
                     b.Property<DateTime?>("ReviewedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -231,6 +293,9 @@ namespace Commonage.Web.Data.Migrations
                         .IsUnique();
 
                     b.HasIndex("ContributionLinkId");
+
+                    b.HasIndex("ReferenceCode")
+                        .IsUnique();
 
                     b.ToTable("Contributions");
                 });

@@ -4,6 +4,15 @@
     ViewData["Title"] = T["Collections"];
 }
 
+@if (Model.Identity.Text(ArchiveTextKind.Tagline) is { } tagline)
+{
+    <p class="lead mb-2">@tagline</p>
+}
+@if (Model.Identity.Text(ArchiveTextKind.Intro) is { } intro)
+{
+    <p class="text-preserve-lines">@Commonage.Web.Forms.PlainText.WithLinks(intro)</p>
+}
+
 <form method="get" asp-page="/Search" role="search" class="input-group mb-4">
     <label for="home-search" class="visually-hidden">@T["Search the archive"]</label>
     <input id="home-search" type="search" name="q" class="form-control" placeholder="@T["Search the archive"]" />

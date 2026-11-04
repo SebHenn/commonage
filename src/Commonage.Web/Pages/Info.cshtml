@@ -1,0 +1,20 @@
+@page "/{slug:regex(^(about|contact|privacy|imprint)$)}"
+@model InfoModel
+@{
+    ViewData["Title"] = Model.Heading;
+}
+
+<div class="col-lg-8">
+    <h1>@Model.Heading</h1>
+    @if (Model.Text is not null)
+    {
+        <p class="text-preserve-lines">@Commonage.Web.Forms.PlainText.WithLinks(Model.Text)</p>
+    }
+    else
+    {
+        @foreach (var paragraph in Model.DefaultParagraphs)
+        {
+            <p>@paragraph</p>
+        }
+    }
+</div>
