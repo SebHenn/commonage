@@ -110,23 +110,31 @@ night with cron, keep a week of them, and copy them off the server. For example,
 
 ## Updating
 
-Read the release notes in `CHANGELOG.md` first. Then:
+Only the newest minor version gets security fixes ([SECURITY.md](../SECURITY.md)), so update regularly. To hear about
+new releases, follow the [release feed](https://github.com/SebHenn/commonage/releases.atom) or choose **Watch** →
+**Releases** on GitHub.
 
-A bug-fix release of your version (for example 0.2.1 when you run 0.2):
+Read the release notes in `CHANGELOG.md`, then:
+
+```sh
+scripts/update.sh                    # the newest release
+scripts/update.sh 0.3                # or the newest 0.3.x
+scripts/update.sh 0.3 /srv/backups   # with the backup in another folder
+```
+
+It checks that there is room, makes a backup, switches to the new version and waits until the app answers; the app
+upgrades the database when it starts. If the new version does not come up, the script goes back to the previous version
+and restores the backup, so the archive is as it was. Anything added during those minutes would be lost, so update when
+nobody is working on the archive. The archive is down for a short time either way.
+
+The script is part of Commonage from version 0.3. To get from 0.2 to it once, by hand:
 
 ```sh
 scripts/backup.sh
-git fetch --tags && git checkout v0.2.1
-docker compose pull
-docker compose up -d
+git fetch --tags && git checkout v0.3.0
 ```
 
-A new minor version (for example 0.3): the same, but also set `COMMONAGE_VERSION=0.3` in `.env` before
-`docker compose pull`.
-
-The app upgrades the database when it starts. If something goes wrong, check out the previous version, set
-`COMMONAGE_VERSION` to the exact previous version (for example `0.2.0`), run `docker compose pull`, and restore the
-backup you just made.
+Set `COMMONAGE_VERSION=0.3` in `.env`, then run `docker compose pull` and `docker compose up -d`.
 
 ## Keeping an eye on it
 

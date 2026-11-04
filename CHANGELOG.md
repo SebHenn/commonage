@@ -3,6 +3,22 @@
 All notable changes to Commonage. Versions follow [Semantic Versioning](https://semver.org/); before 1.0, a minor
 version may change things that need attention when updating, and these notes say so.
 
+## Unreleased
+
+### For people who run an archive
+
+- `scripts/update.sh` updates to a new release. It makes a backup first, and if the new version does not come up, it goes
+  back and restores the backup. See docs/deployment.md.
+- `SECURITY.md` says which versions get fixes, how soon, and how to follow releases.
+
+### Project
+
+- Browser tests in CI: axe on every main page at phone and desktop width, each JavaScript behaviour, and the main tasks
+  without JavaScript.
+- CI tests updating from the previous published release, including a failed update.
+- The check for inline script and style finds all pages by itself. A new field in the data model has to be exported or be
+  left out on purpose, or a test fails.
+
 ## 0.2.0 (2026-11-04)
 
 Protection against losing material. Updating needs no steps beyond the usual ones, but set `COMMONAGE_VERSION=0.2` in

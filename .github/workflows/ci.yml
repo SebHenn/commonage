@@ -29,7 +29,22 @@ jobs:
       - run: dotnet restore --locked-mode
       - run: dotnet build --no-restore -c Release
       # The tests start PostgreSQL in Docker through Testcontainers.
-      - run: dotnet test --no-build -c Release
+      - run: dotnet test tests/Commonage.Tests --no-build -c Release
+
+  browser-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: 10.0.x
+      - run: dotnet restore --locked-mode
+      - run: dotnet build --no-restore -c Release
+      # In the Chrome that GitHub's runners have installed. Checks every main page with axe, at phone and desktop width.
+      - run: dotnet test tests/Commonage.BrowserTests --no-build -c Release
 
   backup-restore:
     runs-on: ubuntu-latest
@@ -40,6 +55,18 @@ jobs:
           persist-credentials: false
       # Builds the Docker image, fills a new archive, backs it up, deletes it completely and restores it.
       - run: sh scripts/test-backup-restore.sh
+
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # Needs the release tags, to start from the previous release.
+          fetch-depth: 0
+          persist-credentials: false
+      # Starts the previous published release, tries an update that fails, then updates to this code.
+      - run: sh scripts/test-update.sh
 
   secret-scan:
     runs-on: ubuntu-latest

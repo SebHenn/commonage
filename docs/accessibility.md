@@ -21,7 +21,17 @@ people using screen readers or only a keyboard.
   are the browser's own.
 - **Colour**: Bootstrap 5 colours, which meet AA contrast; status is never shown by colour alone (badges carry text).
 
-To repeat the automated check, run axe in the browser (for example the axe DevTools extension) on the pages above.
+`tests/Commonage.BrowserTests` repeats the automated check with axe on every main page, at phone and desktop width, on
+every pull request.
+
+## Before each release
+
+Automated checks cannot judge these, so check them by hand on the pages that changed:
+
+- Zoom to 200% and 400%: nothing is cut off, and only long content scrolls sideways.
+- Set a large font size in the browser's settings: the text grows with it.
+- Go through a task with the keyboard alone: the focus is always visible and in a sensible order.
+- Listen to a task with a screen reader (VoiceOver, NVDA or TalkBack), if one is at hand.
 
 ## Known gaps
 

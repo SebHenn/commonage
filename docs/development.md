@@ -84,7 +84,7 @@ How these work for the people running an archive is in [operations.md](operation
   `AuditAction` and its text in `Audit/AuditText.cs` if needed. Never put contributor details into an entry.
 - `Export/ArchiveExporter.cs` writes the export. If you change its format, raise `ArchiveExporter.Version` and
   update operations.md.
-- `scripts/backup.sh`, `scripts/restore.sh` and `scripts/test-backup-restore.sh` are POSIX `sh` and must keep working
+- `scripts/backup.sh`, `scripts/restore.sh`, `scripts/update.sh` and their tests are POSIX `sh` and must keep working
   in Git Bash on Windows (`MSYS_NO_PATHCONV=1`, and paths through `cygpath -m` for native programs such as curl).
   Run the restore test with `sh scripts/test-backup-restore.sh`; it uses its own Compose project and ports.
 
@@ -100,6 +100,21 @@ in `wwwroot/js/site.js` and styles in `wwwroot/css/site.css`. Forms whose action
 change it. `compose.production.yaml` and `deploy/Caddyfile` are the HTTPS setup from [deployment.md](deployment.md);
 to try it locally, set `COMMONAGE_DOMAIN=localhost` (Caddy then uses its own local certificate authority) and use
 `;` instead of `:` in `COMPOSE_FILE` on Windows.
+
+## Tests
+
+`dotnet test` runs everything. It needs Docker, for PostgreSQL, and Chrome installed, for the browser tests.
+
+- `tests/Commonage.Tests` drives the app over HTTP. It covers rules and data, and is quick.
+- `tests/Commonage.BrowserTests` drives the real app in Chrome with Playwright. It runs axe on every main page at phone
+  and desktop width, checks for sideways scrolling and anything the browser refused (such as a Content Security Policy
+  violation), tests each JavaScript behaviour, and does the main tasks with JavaScript switched off. Add new pages to
+  `AccessibilityTests`, and a test for each new behaviour in `wwwroot/js`.
+- `scripts/test-backup-restore.sh` and `scripts/test-update.sh` run whole archives in Docker. The second needs ports 80
+  and 443 free.
+
+Before a release, also check by hand what automated tests cannot judge
+([accessibility.md](accessibility.md#before-each-release)).
 
 ## Dependency updates
 
@@ -125,7 +140,8 @@ warning on each update and updates are merged by hand until a new token is store
 1. In a pull request: raise `<Version>` in `Directory.Build.props`, give the `CHANGELOG.md` entry its date, and
    update the version in docs/deployment.md (`git checkout vX.Y.Z`). Check Bootstrap, jQuery and jQuery Validation in
    `wwwroot/lib` for security releases (Dependabot does not see them).
-2. After merging, tag the merge commit on `main` and push the tag:
+2. After merging, tag the merge commit on `main` and push the tag. Do this soon: bug-fix releases are how security fixes
+   reach servers, including rebuilt base images from Dependabot.
    `git tag -a v0.1.1 -m "Commonage 0.1.1" && git push origin v0.1.1`.
 3. The Release workflow waits for approval in the `release` environment (Actions tab → the run → "Review
    deployments"). Approving it builds and publishes the images for x86 and ARM, with SBOM and attestation.
