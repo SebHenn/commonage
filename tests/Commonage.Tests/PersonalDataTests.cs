@@ -86,10 +86,11 @@ public class PersonalDataTests(CommonageAppFactory app)
         var file = await app.WithDbAsync(db => db.MediaFiles.SingleAsync(f => f.ArchiveItemId == item.Id));
 
         await Browser.PostFormAsync(curator, $"{page}?handler=Delete", new(), page);
+        await Browser.PostFormAsync(curator, $"/Admin/Bin?handler=DeleteItem&id={item.Id}", new(), "/Admin/Bin");
 
         using var visitor = app.CreateClient();
         Assert.Equal(HttpStatusCode.NotFound, (await visitor.GetAsync($"/items/{item.Id}")).StatusCode);
-        Assert.False(await app.WithDbAsync(db => db.Contributions.AnyAsync(c => c.ArchiveItemId == item.Id)));
+        Assert.False(await app.WithDbAsync(db => db.Contributions.IgnoreQueryFilters().AnyAsync(c => c.ArchiveItemId == item.Id)));
         var storage = app.Services.GetRequiredService<IFileStorage>();
         Assert.Throws<FileNotFoundException>(() => storage.OpenRead(file.OriginalKey));
     }

@@ -6,6 +6,8 @@
         404 => T["Page not found"],
         403 => T["No access"],
         400 => T["The request could not be processed"],
+        429 => T["Too many attempts"],
+        507 => T["The archive's storage is full"],
         _ => T["Something went wrong"],
     };
 }
@@ -22,6 +24,12 @@
             break;
         case 400:
             <p>@T["Please go back, reload the page and try again."]</p>
+            break;
+        case 429:
+            <p>@T["Too many attempts came from your network in the last hour. Please try again later."]</p>
+            break;
+        case 507:
+            <p>@T["The archive cannot take in anything new at the moment, so what you sent was not saved. Please go back and try again later. If it keeps happening, tell the people who run this archive."]</p>
             break;
         default:
             <p>@T["The archive could not complete this request. Please try again in a moment. If it keeps happening, tell the people who run this archive."]</p>

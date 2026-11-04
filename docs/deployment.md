@@ -38,7 +38,7 @@ The database and the app itself are never exposed; only Caddy, the HTTPS front, 
 ```sh
 git clone https://github.com/SebHenn/commonage.git
 cd commonage
-git checkout v0.1.1        # a released version, not the development branch
+git checkout v0.2.0        # a released version, not the development branch
 ```
 
 This gives you the Compose files and the backup scripts. The app itself comes as a ready-made Docker image,
@@ -62,10 +62,10 @@ COMMONAGE_ADMIN_PASSWORD=<the second random value, or a long passphrase>
 
 COMMONAGE_DOMAIN=archive.example.org
 COMPOSE_FILE=compose.yaml:compose.production.yaml
-COMMONAGE_VERSION=0.1
+COMMONAGE_VERSION=0.2
 ```
 
-`COMMONAGE_VERSION=0.1` follows the bug-fix releases of 0.1 (0.1.1, 0.1.2, ...) whenever you update; a new minor
+`COMMONAGE_VERSION=0.2` follows the bug-fix releases of 0.2 (0.2.1, 0.2.2, ...) whenever you update; a new minor
 version such as 0.2 only comes when you change this line.
 
 The `COMPOSE_FILE` line adds `compose.production.yaml`, so every `docker compose` command, and the backup scripts,
@@ -112,20 +112,20 @@ night with cron, keep a week of them, and copy them off the server. For example,
 
 Read the release notes in `CHANGELOG.md` first. Then:
 
-A bug-fix release of your version (for example 0.1.2 when you run 0.1):
+A bug-fix release of your version (for example 0.2.1 when you run 0.2):
 
 ```sh
 scripts/backup.sh
-git fetch --tags && git checkout v0.1.2
+git fetch --tags && git checkout v0.2.1
 docker compose pull
 docker compose up -d
 ```
 
-A new minor version (for example 0.2): the same, but also set `COMMONAGE_VERSION=0.2` in `.env` before
+A new minor version (for example 0.3): the same, but also set `COMMONAGE_VERSION=0.3` in `.env` before
 `docker compose pull`.
 
 The app upgrades the database when it starts. If something goes wrong, check out the previous version, set
-`COMMONAGE_VERSION` to the exact previous version (for example `0.1.1`), run `docker compose pull`, and restore the
+`COMMONAGE_VERSION` to the exact previous version (for example `0.2.0`), run `docker compose pull`, and restore the
 backup you just made.
 
 ## Keeping an eye on it

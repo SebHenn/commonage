@@ -42,6 +42,13 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options)
     /// <summary>Items the public may see. Every public page must start from this query.</summary>
     public IQueryable<ArchiveItem> PublishedItems => ArchiveItems.Where(i => i.Status == ItemStatus.Published);
 
+    /// <summary>Items in the bin. Query filters hide them from every other query, see <see cref="OnModelCreating"/>.</summary>
+    public IQueryable<ArchiveItem> BinnedItems => ArchiveItems.IgnoreQueryFilters().Where(i => i.DeletedAt != null);
+
+    /// <summary>Photos in the bin on their own. The photos of an item in the bin go and come back with the item.</summary>
+    public IQueryable<MediaFile> BinnedPhotos =>
+        MediaFiles.IgnoreQueryFilters().Where(f => f.DeletedAt != null && f.ArchiveItem.DeletedAt == null);
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -54,6 +61,8 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options)
 
         builder.Entity<ArchiveItem>(item =>
         {
+            item.HasQueryFilter(i => i.DeletedAt == null);
+            item.Property(i => i.Version).IsRowVersion();
             item.Property(i => i.Title).HasMaxLength(300);
             item.Property(i => i.Description).HasMaxLength(20000);
             item.Property(i => i.DateText).HasMaxLength(DateRange.MaxTextLength);
@@ -93,6 +102,7 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options)
 
         builder.Entity<Contribution>(contribution =>
         {
+            contribution.HasQueryFilter(c => c.ArchiveItem.DeletedAt == null);
             contribution.Property(c => c.ContributorName).HasMaxLength(Contribution.NameMaxLength);
             contribution.Property(c => c.ContributorEmail).HasMaxLength(Contribution.EmailMaxLength);
             contribution.Property(c => c.RightsHolder).HasMaxLength(Contribution.RightsHolderMaxLength);
@@ -121,6 +131,7 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options)
 
         builder.Entity<MediaFile>(file =>
         {
+            file.HasQueryFilter(f => f.DeletedAt == null && f.ArchiveItem.DeletedAt == null);
             file.Property(f => f.OriginalFileName).HasMaxLength(255);
             file.Property(f => f.ContentType).HasMaxLength(100);
             file.Property(f => f.Sha256).HasMaxLength(64).IsFixedLength();

@@ -101,8 +101,27 @@
     </section>
 }
 
-<form method="post" class="col-lg-8">
+@if (Model.SavedByOthers is { } saved)
+{
+    <section class="alert alert-warning col-lg-8" role="alert" aria-labelledby="conflict-heading">
+        <h2 id="conflict-heading" class="h5">@T["Someone else changed this item while you were working on it"]</h2>
+        <p>@T["Your changes are not saved yet. They are still in the form below. Compare them with the version saved by the other person. If you save again, your version replaces theirs."]</p>
+        <dl class="row mb-0">
+            <dt class="col-sm-3">@T["Title"]</dt>
+            <dd class="col-sm-9">@saved.Title</dd>
+            <dt class="col-sm-3">@T["Date"]</dt>
+            <dd class="col-sm-9">@saved.DateText</dd>
+            <dt class="col-sm-3">@T["Tags"]</dt>
+            <dd class="col-sm-9">@string.Join(", ", saved.Tags.Select(t => t.Name))</dd>
+            <dt class="col-sm-3">@T["Description"]</dt>
+            <dd class="col-sm-9 mb-0 text-preserve-lines">@saved.Description</dd>
+        </dl>
+    </section>
+}
+
+<form method="post" class="col-lg-8" data-warn-unsaved="@(Model.FormHasUnsavedText ? "dirty" : "")">
     <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+    <input type="hidden" asp-for="Input.Version" />
     <div class="mb-3">
         <label asp-for="Input.Title" class="form-label"></label>
         <input asp-for="Input.Title" class="form-control" />
@@ -197,8 +216,8 @@
                                 <div class="d-flex flex-wrap gap-2 mt-1">
                                     <a href="/admin/media/@file.Id/original">@T["Original"]</a>
                                     <form method="post" asp-page-handler="DeleteMedia" asp-route-id="@Model.ItemId" asp-route-mediaFileId="@file.Id"
-                                          data-confirm="@T["Delete this photo and its original file?"]">
-                                        <button type="submit" class="btn btn-link btn-sm p-0 text-danger">@T["Delete"]</button>
+                                          data-confirm="@T["Move this photo to the bin? You can restore it there for {0} days.", Commonage.Web.Data.ArchiveBin.RetentionDays]">
+                                        <button type="submit" class="btn btn-link btn-sm p-0 text-danger">@T["Move to bin"]</button>
                                     </form>
                                 </div>
                             </div>
@@ -212,12 +231,19 @@
             }
         }
 
-        <form method="post" asp-page-handler="Upload" asp-route-id="@Model.ItemId" enctype="multipart/form-data" class="d-flex flex-wrap gap-2 align-items-center">
-            <label for="photo-upload" class="visually-hidden">@T["Choose photos"]</label>
-            <input id="photo-upload" type="file" name="files" accept="@Commonage.Web.Media.ImageFormats.AcceptAttribute" multiple class="form-control w-auto" required />
-            <button type="submit" class="btn btn-outline-primary">@T["Upload"]</button>
-        </form>
-        <p class="form-text">@T["JPEG, PNG, TIFF or WebP. The original file is kept unchanged and is only visible to curators."]</p>
+        @if (Model.CanUpload)
+        {
+            <form method="post" asp-page-handler="Upload" asp-route-id="@Model.ItemId" enctype="multipart/form-data" class="d-flex flex-wrap gap-2 align-items-center">
+                <label for="photo-upload" class="visually-hidden">@T["Choose photos"]</label>
+                <input id="photo-upload" type="file" name="files" accept="@Commonage.Web.Media.ImageFormats.AcceptAttribute" multiple class="form-control w-auto" required />
+                <button type="submit" class="btn btn-outline-primary">@T["Upload"]</button>
+            </form>
+            <p class="form-text">@T["JPEG, PNG, TIFF or WebP. The original file is kept unchanged and is only visible to curators."]</p>
+        }
+        else
+        {
+            <p class="alert alert-warning" role="status">@T["The disk is nearly full, so no photos can be added at the moment. Tell the person who runs the server."]</p>
+        }
     }
 </section>
 
@@ -233,7 +259,7 @@
                     <li class="mb-1">
                         <time datetime="@entry.At.ToString("O")" class="text-muted">@entry.At.ToLocalTime().ToString("g")</time>
                         · @AuditText.Describe(T, entry.Action)
-                        · @(entry.UserName ?? T["Contributor"])
+                        · @AuditText.Who(T, entry)
                     </li>
                 }
             </ul>
@@ -241,8 +267,8 @@
     }
 
     <form method="post" asp-page-handler="Delete" asp-route-id="@Model.ItemId" class="mt-5"
-          data-confirm="@T["Delete this item with all its photos and original files? This cannot be undone."]">
-        <button type="submit" class="btn btn-outline-danger">@T["Delete item"]</button>
+          data-confirm="@T["Move this item to the bin? It disappears from the archive at once. You can restore it there for {0} days.", Commonage.Web.Data.ArchiveBin.RetentionDays]">
+        <button type="submit" class="btn btn-outline-danger">@T["Move to bin"]</button>
     </form>
 }
 

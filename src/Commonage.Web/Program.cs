@@ -9,11 +9,13 @@ using Commonage.Web.Demo;
 using Commonage.Web.Export;
 using Commonage.Web.Identity;
 using Commonage.Web.Media;
+using Commonage.Web.Operations;
 using Commonage.Web.Security;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.WebEncoders;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -72,11 +74,24 @@ builder.Services.Configure<UploadOptions>(builder.Configuration.GetSection("Uplo
 builder.Services.AddScoped<MediaUploadService>();
 builder.Services.AddSingleton<MediaProcessingQueue>();
 builder.Services.AddHostedService<MediaProcessor>();
+builder.Services.AddScoped<ArchiveBin>();
+builder.Services.AddHostedService<ArchiveBinPurger>();
+
+// Free disk space and the age of the last backup: admins see them, and a nearly full disk stops uploads.
+builder.Services.Configure<BackupOptions>(builder.Configuration.GetSection(BackupOptions.Section));
+builder.Services.AddSingleton<IDiskSpace, SystemDiskSpace>();
+builder.Services.AddSingleton(services => new ArchiveHealth(
+    storageRoot,
+    services.GetRequiredService<IDiskSpace>(),
+    services.GetRequiredService<IOptions<UploadOptions>>(),
+    services.GetRequiredService<IOptions<BackupOptions>>(),
+    services.GetRequiredService<TimeProvider>()));
 
 // Anyone with a contribution link can send in material, so the form is protected against automated spam.
 builder.Services.Configure<ContributionOptions>(builder.Configuration.GetSection(ContributionOptions.Section));
 builder.Services.AddSingleton<FormTimer>();
-builder.Services.AddContributionRateLimit();
+builder.Services.Configure<LoginOptions>(builder.Configuration.GetSection(LoginOptions.Section));
+builder.Services.AddRateLimits();
 
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 // Write letters such as ü and ß as-is instead of as HTML entities. Razor still escapes markup characters.
@@ -131,6 +146,7 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseUploadGuard();
 
 app.MapHealthChecks("/health");
 app.MapMediaEndpoints();

@@ -3,6 +3,7 @@ using Commonage.Web.Audit;
 using Commonage.Web.Data;
 using Commonage.Web.Domain;
 using Commonage.Web.Media;
+using Commonage.Web.Operations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -13,12 +14,14 @@ namespace Commonage.Web.Pages.Admin.Items;
 
 // Upload requests may carry several large scans. Each file is still checked against Uploads:MaxFileSizeMegabytes.
 // Authorization runs before the body is read, so anonymous requests are rejected without accepting a large upload.
+[AcceptsUploads]
 [RequestSizeLimit(MaxUploadRequestBytes)]
 [RequestFormLimits(MultipartBodyLengthLimit = MaxUploadRequestBytes)]
 public class EditModel(
     CommonageDbContext db,
     MediaUploadService uploads,
     AuditLog audit,
+    ArchiveHealth health,
     IStringLocalizer<SharedResource> localizer) : PageModel
 {
     private const long MaxUploadRequestBytes = 1024L * 1024 * 1024;
@@ -42,6 +45,15 @@ public class EditModel(
     /// <summary>The latest entries of the activity log about this item, newest first.</summary>
     public IReadOnlyList<AuditEntry> History { get; private set; } = [];
 
+    /// <summary>When the disk is nearly full, curators are told so instead of being offered the upload form.</summary>
+    public bool CanUpload => health.CanAcceptUploads();
+
+    /// <summary>The item as someone else saved it while this person was editing it. Their own text stays in the form.</summary>
+    public ArchiveItem? SavedByOthers { get; private set; }
+
+    /// <summary>Whether the form holds text that is not saved, even though the page was just loaded.</summary>
+    public bool FormHasUnsavedText => SavedByOthers is not null || !ModelState.IsValid;
+
     public class InputModel
     {
         [Required(ErrorMessage = "Please enter a title.")]
@@ -63,6 +75,9 @@ public class EditModel(
 
         [Display(Name = "Tags")]
         public string? Tags { get; set; }
+
+        /// <summary>The item's version when the form was opened, to notice changes made by someone else since.</summary>
+        public uint? Version { get; set; }
     }
 
     public async Task<IActionResult> OnGetAsync(int? id, int? collectionId)
@@ -71,7 +86,13 @@ public class EditModel(
         {
             var item = await FindItemAsync(id.Value);
             if (item is null)
-                return NotFound();
+            {
+                // Links in the activity log and the contributor search still lead somewhere after a deletion.
+                if (!await db.BinnedItems.AnyAsync(i => i.Id == id))
+                    return NotFound();
+                TempData["Message"] = localizer["This item is in the bin."].Value;
+                return RedirectToPage("/Admin/Bin");
+            }
 
             Input = new InputModel
             {
@@ -80,6 +101,7 @@ public class EditModel(
                 CollectionId = item.CollectionId,
                 Date = item.DateText,
                 Tags = string.Join(", ", item.Tags.Select(t => t.Name).Order(StringComparer.CurrentCultureIgnoreCase)),
+                Version = item.Version,
             };
             await ShowStateAsync(item);
         }
@@ -124,6 +146,10 @@ public class EditModel(
         if (command == "publish" && item is { CanBePublished: false })
             return BadRequest();
 
+        // If someone else saved the item since this form was opened, saving fails instead of overwriting their work.
+        if (item is not null && Input.Version is { } version)
+            db.Entry(item).Property(i => i.Version).OriginalValue = version;
+
         var now = DateTime.UtcNow;
         var isNew = item is null;
         if (item is null)
@@ -167,8 +193,33 @@ public class EditModel(
                 break;
         }
 
-        await db.SaveChangesAsync();
+        try
+        {
+            await db.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            TempData.Remove("Message");
+            return await ShowChangesByOthersAsync(item.Id);
+        }
         return RedirectToPage(new { id = item.Id });
+    }
+
+    /// <summary>Nothing was saved. Shows what the others saved, and keeps what this person typed in the form.</summary>
+    private async Task<IActionResult> ShowChangesByOthersAsync(int id)
+    {
+        db.ChangeTracker.Clear();
+        var current = await FindItemAsync(id);
+        if (current is null)
+            return NotFound();
+
+        SavedByOthers = current;
+        // The next save is a deliberate decision to replace the other version, so it may go through.
+        ModelState.Remove("Input.Version");
+        Input.Version = current.Version;
+        await ShowStateAsync(current);
+        await LoadCollectionsAsync();
+        return Page();
     }
 
     public async Task<IActionResult> OnPostUploadAsync(int id, List<IFormFile> files, CancellationToken cancellationToken)
@@ -201,24 +252,18 @@ public class EditModel(
         return RedirectToPage(new { id });
     }
 
-    /// <summary>
-    /// Deletes the item with its contribution record and all its files, for example spam, or material a contributor
-    /// asked to have removed. The activity log keeps the title and who deleted it.
-    /// </summary>
+    /// <summary>Moves the item to the bin, where it can be restored or deleted for good, see <see cref="ArchiveBin"/>.</summary>
     public async Task<IActionResult> OnPostDeleteAsync(int id, CancellationToken cancellationToken)
     {
-        var item = await db.ArchiveItems.Include(i => i.MediaFiles).FirstOrDefaultAsync(i => i.Id == id, cancellationToken);
+        var item = await db.ArchiveItems.FirstOrDefaultAsync(i => i.Id == id, cancellationToken);
         if (item is null)
             return NotFound();
 
-        foreach (var file in item.MediaFiles.ToList())
-            await uploads.DeleteAsync(file, cancellationToken);
-        // Deleting the item keeps this entry and clears its link to the item; the subject keeps the title.
-        audit.Record(AuditAction.ItemDeleted, item.Title);
-        db.ArchiveItems.Remove(item);
+        item.MoveToBin(DateTime.UtcNow);
+        audit.Record(AuditAction.ItemMovedToBin, item.Title, item);
         await db.SaveChangesAsync(cancellationToken);
 
-        TempData["Message"] = localizer["The item is deleted."].Value;
+        TempData["Message"] = localizer["The item is in the bin. You can restore it there for {0} days.", ArchiveBin.RetentionDays].Value;
         return RedirectToPage("/Admin/Index");
     }
 
@@ -264,9 +309,10 @@ public class EditModel(
         if (file is null)
             return NotFound();
 
-        audit.Record(AuditAction.PhotoDeleted, file.ArchiveItem.Title, file.ArchiveItem);
-        await uploads.DeleteAsync(file, cancellationToken);
-        TempData["Message"] = localizer["The photo is deleted."].Value;
+        file.DeletedAt = DateTime.UtcNow;
+        audit.Record(AuditAction.PhotoMovedToBin, file.ArchiveItem.Title, file.ArchiveItem);
+        await db.SaveChangesAsync(cancellationToken);
+        TempData["Message"] = localizer["The photo is in the bin. You can restore it there for {0} days.", ArchiveBin.RetentionDays].Value;
         return RedirectToPage(new { id });
     }
 

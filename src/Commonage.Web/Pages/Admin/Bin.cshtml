@@ -1,0 +1,102 @@
+@page
+@using Commonage.Web.Data
+@model Commonage.Web.Pages.Admin.BinModel
+@{
+    ViewData["Title"] = T["Bin"];
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="/Admin/Index">@T["Items"]</a></li>
+    </ol>
+</nav>
+
+<h1>@ViewData["Title"]</h1>
+<p class="col-lg-8">@T["Deleted items and photos stay here for {0} days, hidden from everyone but curators. You can restore them until then. After that they are deleted for good, with their original files.", ArchiveBin.RetentionDays]</p>
+
+@if (Model.Items.Count == 0 && Model.Photos.Count == 0)
+{
+    <p class="text-muted">@T["The bin is empty."]</p>
+}
+
+@if (Model.Items.Count > 0)
+{
+    <section class="mb-5" aria-labelledby="bin-items-heading">
+        <h2 id="bin-items-heading" class="h4">@T["Items"]</h2>
+        @if (Model.Items.Count == BinModel.MaxShown)
+        {
+            <p class="text-muted small">@T["Showing the newest {0}.", BinModel.MaxShown]</p>
+        }
+        <div class="row g-3">
+            @foreach (var item in Model.Items)
+            {
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card h-100">
+                        @if (item.MediaFiles.FirstOrDefault() is { } photo)
+                        {
+                            <img src="/admin/media/@photo.Id/thumbnail" class="card-img-top media-thumbnail" alt="" loading="lazy" />
+                        }
+                        <div class="card-body">
+                            <h3 class="h6">@item.Title</h3>
+                            <p class="small text-muted mb-2">
+                                @item.Collection.Title · <partial name="_StatusBadge" model="item.Status" /><br />
+                                @T["Moved to the bin on {0}", item.DeletedAt!.Value.ToLocalTime().ToString("d")]<br />
+                                @T["Deleted for good on {0}", ArchiveBin.GoneForGoodOn(item.DeletedAt.Value).ToLocalTime().ToString("d")]
+                            </p>
+                            <div class="d-flex flex-wrap gap-2">
+                                <form method="post" asp-page-handler="RestoreItem" asp-route-id="@item.Id">
+                                    <button type="submit" class="btn btn-sm btn-primary">@T["Restore"]</button>
+                                </form>
+                                <form method="post" asp-page-handler="DeleteItem" asp-route-id="@item.Id"
+                                      data-confirm="@T["Delete this item for good, with all its photos and original files? This cannot be undone."]">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">@T["Delete for good"]</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+}
+
+@if (Model.Photos.Count > 0)
+{
+    <section aria-labelledby="bin-photos-heading">
+        <h2 id="bin-photos-heading" class="h4">@T["Photos"]</h2>
+        @if (Model.Photos.Count == BinModel.MaxShown)
+        {
+            <p class="text-muted small">@T["Showing the newest {0}.", BinModel.MaxShown]</p>
+        }
+        <div class="row g-3">
+            @foreach (var file in Model.Photos)
+            {
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card h-100">
+                        @if (file.Status == ProcessingStatus.Ready)
+                        {
+                            <img src="/admin/media/@file.Id/thumbnail" class="card-img-top media-thumbnail" alt="" loading="lazy" />
+                        }
+                        <div class="card-body">
+                            <h3 class="h6 text-break">@file.OriginalFileName</h3>
+                            <p class="small text-muted mb-2">
+                                @T["From: {0}", file.ArchiveItem.Title]<br />
+                                @T["Moved to the bin on {0}", file.DeletedAt!.Value.ToLocalTime().ToString("d")]<br />
+                                @T["Deleted for good on {0}", ArchiveBin.GoneForGoodOn(file.DeletedAt.Value).ToLocalTime().ToString("d")]
+                            </p>
+                            <div class="d-flex flex-wrap gap-2">
+                                <form method="post" asp-page-handler="RestorePhoto" asp-route-id="@file.Id">
+                                    <button type="submit" class="btn btn-sm btn-primary">@T["Restore"]</button>
+                                </form>
+                                <form method="post" asp-page-handler="DeletePhoto" asp-route-id="@file.Id"
+                                      data-confirm="@T["Delete this photo and its original file for good? This cannot be undone."]">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">@T["Delete for good"]</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+}

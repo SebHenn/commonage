@@ -13,7 +13,7 @@
 
 <h1>@ViewData["Title"]</h1>
 
-<form method="post" class="col-lg-8">
+<form method="post" class="col-lg-8" data-warn-unsaved="@(ModelState.IsValid ? "" : "dirty")">
     <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
     <div class="mb-3">
         <label asp-for="Input.Title" class="form-label"></label>

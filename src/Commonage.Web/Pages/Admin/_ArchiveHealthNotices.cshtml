@@ -1,0 +1,28 @@
+@model Commonage.Web.Operations.ArchiveHealth
+@* What admins need to act on to keep the archive safe. Commonage sends no emails, so this page is where they learn it. *@
+@{
+    var freeGigabytes = Model.FreeBytes is { } free ? (free / 1024.0 / 1024.0 / 1024.0).ToString("0.0") : null;
+}
+
+@if (Model.DaysSinceLastBackup is null)
+{
+    <p class="alert alert-warning" role="status">@T["No backup is recorded for this archive. Whoever runs the server should set up nightly backups with scripts/backup.sh, as described in docs/operations.md."]</p>
+}
+else if (Model.BackupIsOverdue)
+{
+    <p class="alert alert-warning" role="status">@T["Days since the last backup: {0}. Whoever runs the server should check that the nightly backup still works.", Model.DaysSinceLastBackup]</p>
+}
+
+@if (!Model.CanAcceptUploads())
+{
+    <p class="alert alert-danger" role="alert">@T["The disk is nearly full, so the archive has stopped accepting uploads and contributions. Free disk space (GB): {0}. Whoever runs the server should make room.", freeGigabytes ?? ""]</p>
+}
+else if (Model.IsLowOnSpace)
+{
+    <p class="alert alert-warning" role="status">@T["The disk is filling up. Free disk space (GB): {0}. Uploads stop before it is full.", freeGigabytes ?? ""]</p>
+}
+
+@if (Model.LastBackupAt is { } lastBackup && !Model.BackupIsOverdue)
+{
+    <p class="small text-muted">@T["Last backup: {0}", lastBackup.ToLocalTime().ToString("g")]</p>
+}

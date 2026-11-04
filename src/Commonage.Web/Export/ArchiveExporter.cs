@@ -138,7 +138,7 @@ public class ArchiveExporter(CommonageDbContext db, IFileStorage storage, TimePr
             options.IncludePersonalData ? contribution.ContributorEmail : null,
             contribution.ShowName,
             contribution.Rights,
-            contribution.RightsHolder,
+            options.IncludePersonalData ? contribution.RightsHolder : null,
             contribution.ConsentText,
             contribution.SubmittedAt,
             contribution.ReviewedAt,
@@ -180,7 +180,8 @@ public class ArchiveExporter(CommonageDbContext db, IFileStorage storage, TimePr
         files/         The original files exactly as they were uploaded, in one folder per item:
                        files/<item id>/<file id>-<original file name>
 
-        "includesPersonalData" in archive.json says whether contributors' names and email addresses
+        "includesPersonalData" in archive.json says whether the names of contributors, photographers and
+        authors and contributors' email addresses
         are included. If they are, keep this file as carefully as the archive itself.
 
         A file with "problem": "missing" was not found on the server; "checksumMismatch" means it
