@@ -1,0 +1,28 @@
+@{
+    Layout = "_Layout";
+    var page = ViewContext.RouteData.Values["page"]?.ToString() ?? "";
+
+    // The section of the management pages this page belongs to, so its link is marked as the current one.
+    string? Current(string section) => page.StartsWith(section, StringComparison.OrdinalIgnoreCase) ? "page" : null;
+    string? CurrentItems() => page.Equals("/Admin/Index", StringComparison.OrdinalIgnoreCase) || page.StartsWith("/Admin/Items", StringComparison.OrdinalIgnoreCase) ? "page" : null;
+}
+
+<nav aria-label="@T["Manage archive"]" class="nav nav-pills admin-nav mb-4">
+    <a asp-page="/Admin/Index" class="nav-link" aria-current="@CurrentItems()">@T["Items"]</a>
+    <a asp-page="/Admin/Collections/Index" class="nav-link" aria-current="@Current("/Admin/Collections")">@T["Collections"]</a>
+    <a asp-page="/Admin/Contributions/Index" class="nav-link" aria-current="@Current("/Admin/Contributions")">@T["Contribution links"]</a>
+    <a asp-page="/Admin/Contributors" class="nav-link" aria-current="@Current("/Admin/Contributors")">@T["Contributors"]</a>
+    <a asp-page="/Admin/Bin" class="nav-link" aria-current="@Current("/Admin/Bin")">@T["Bin"]</a>
+    @if (User.IsInRole(Commonage.Web.Identity.Roles.Admin))
+    {
+        <a asp-page="/Admin/Users/Index" class="nav-link" aria-current="@Current("/Admin/Users")">@T["Accounts"]</a>
+        <a asp-page="/Admin/Activity" class="nav-link" aria-current="@Current("/Admin/Activity")">@T["Activity log"]</a>
+        <a asp-page="/Admin/Export" class="nav-link" aria-current="@Current("/Admin/Export")">@T["Export"]</a>
+    }
+</nav>
+
+@RenderBody()
+
+@section Scripts {
+    @await RenderSectionAsync("Scripts", required: false)
+}

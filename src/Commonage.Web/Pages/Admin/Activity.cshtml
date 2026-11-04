@@ -4,12 +4,6 @@
     ViewData["Title"] = T["Activity log"];
 }
 
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a asp-page="/Admin/Index">@T["Items"]</a></li>
-    </ol>
-</nav>
-
 <h1>@ViewData["Title"]</h1>
 <p class="col-lg-8">@T["Who changed what in the archive, newest first. The log keeps no contributor details, and nobody can change or delete its entries in the app."]</p>
 
@@ -32,7 +26,7 @@ else
                 @foreach (var entry in Model.Entries.Items)
                 {
                     <tr>
-                        <td class="text-nowrap"><time datetime="@entry.At.ToString("O")">@entry.At.ToLocalTime().ToString("g")</time></td>
+                        <td class="text-nowrap"><time datetime="@entry.At.ToString("O")">@Dates.Moment(entry.At)</time></td>
                         <td class="text-break">@AuditText.Who(T, entry)</td>
                         <td>
                             @AuditText.Describe(T, entry.Action)@if (entry.Subject is not null)

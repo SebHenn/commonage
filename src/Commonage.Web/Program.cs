@@ -7,6 +7,7 @@ using Commonage.Web.Contributions;
 using Commonage.Web.Data;
 using Commonage.Web.Demo;
 using Commonage.Web.Export;
+using Commonage.Web.Forms;
 using Commonage.Web.Identity;
 using Commonage.Web.Media;
 using Commonage.Web.Operations;
@@ -150,6 +151,7 @@ app.UseUploadGuard();
 
 app.MapHealthChecks("/health");
 app.MapMediaEndpoints();
+app.MapDateCheck();
 app.MapStaticAssets();
 app.MapRazorPages()
    .WithStaticAssets();

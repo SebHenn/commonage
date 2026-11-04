@@ -6,11 +6,14 @@
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <data name="A closed link shows “not found”. You can open it again at any time." xml:space="preserve"><value>Ein geschlossener Link zeigt „nicht gefunden“. Sie können ihn jederzeit wieder öffnen.</value></data>
   <data name="A curator looks at everything sent in before it appears in the archive." xml:space="preserve"><value>Alles, was Sie einsenden, wird vom Archiv geprüft, bevor es dort erscheint.</value></data>
+  <data name="A date" xml:space="preserve"><value>Ein Datum</value></data>
+  <data name="A description" xml:space="preserve"><value>Eine Beschreibung</value></data>
   <data name="A few words, for example: Flood in Mill Street" xml:space="preserve"><value>Ein paar Worte, zum Beispiel: Hochwasser in der Mühlenstraße</value></data>
   <data name="A large archive can take a while. Keep this page open until the download has finished." xml:space="preserve"><value>Bei einem großen Archiv kann das eine Weile dauern. Lassen Sie diese Seite geöffnet, bis der Download abgeschlossen ist.</value></data>
   <data name="A lot has been sent through this link today. Please try again tomorrow, or send this without photos." xml:space="preserve"><value>Über diesen Link wurde heute schon sehr viel eingesendet. Bitte versuchen Sie es morgen noch einmal, oder senden Sie es ohne Fotos.</value></data>
   <data name="A new setup link lets the person choose a new password, for example when they forgot theirs. Earlier links stop working. A disabled account cannot log in, but its history stays in the activity log." xml:space="preserve"><value>Mit einem neuen Einrichtungslink kann die Person ein neues Passwort wählen, zum Beispiel wenn sie ihres vergessen hat. Frühere Links funktionieren dann nicht mehr. Ein deaktiviertes Konto kann sich nicht anmelden, sein Verlauf bleibt aber im Aktivitätsprotokoll.</value></data>
   <data name="A tag can be at most {0} characters long." xml:space="preserve"><value>Ein Schlagwort darf höchstens {0} Zeichen lang sein.</value></data>
+  <data name="A working preview" xml:space="preserve"><value>Eine funktionierende Vorschau</value></data>
   <data name="About the material" xml:space="preserve"><value>Zum Material</value></data>
   <data name="About you" xml:space="preserve"><value>Zu Ihnen</value></data>
   <data name="Accept as draft" xml:space="preserve"><value>Als Entwurf übernehmen</value></data>
@@ -28,10 +31,12 @@
   <data name="All statuses" xml:space="preserve"><value>Alle Status</value></data>
   <data name="An item can have at most {0} tags." xml:space="preserve"><value>Ein Eintrag kann höchstens {0} Schlagwörter haben.</value></data>
   <data name="Anyone with a contribution link can send in photos and stories for a collection. Share it with a group, put it in a newsletter or on a poster. What people send in waits for your review and is never public before you publish it." xml:space="preserve"><value>Mit einem Beitragslink kann jede Person Fotos und Geschichten für eine Sammlung einsenden. Teilen Sie ihn mit einer Gruppe, in einem Rundbrief oder auf einem Plakat. Eingesendetes wartet auf Ihre Prüfung und ist nie öffentlich, bevor Sie es veröffentlichen.</value></data>
+  <data name="Anything" xml:space="preserve"><value>Egal</value></data>
   <data name="Apply filters" xml:space="preserve"><value>Filter anwenden</value></data>
   <data name="As precisely as you know it, for example: 1953, March 1953, circa 1950, 1950s." xml:space="preserve"><value>So genau, wie Sie es wissen, zum Beispiel: 1953, März 1953, um 1950, 1950er Jahre.</value></data>
   <data name="At least {0} characters. A few words in a row are easy to remember and hard to guess." xml:space="preserve"><value>Mindestens {0} Zeichen. Ein paar Wörter hintereinander sind leicht zu merken und schwer zu erraten.</value></data>
   <data name="Automatic" xml:space="preserve"><value>Automatisch</value></data>
+  <data name="Back to editing" xml:space="preserve"><value>Zurück zum Bearbeiten</value></data>
   <data name="Back to managing the archive" xml:space="preserve"><value>Zurück zur Archivverwaltung</value></data>
   <data name="Best match" xml:space="preserve"><value>Beste Treffer</value></data>
   <data name="Bin" xml:space="preserve"><value>Papierkorb</value></data>
@@ -105,6 +110,7 @@
   <data name="Edit collection" xml:space="preserve"><value>Sammlung bearbeiten</value></data>
   <data name="Edit contribution link" xml:space="preserve"><value>Beitragslink bearbeiten</value></data>
   <data name="Edit item" xml:space="preserve"><value>Eintrag bearbeiten</value></data>
+  <data name="Edit: {0}" xml:space="preserve"><value>Bearbeiten: {0}</value></data>
   <data name="Email" xml:space="preserve"><value>E-Mail</value></data>
   <data name="Email address" xml:space="preserve"><value>E-Mail-Adresse</value></data>
   <data name="Enable account" xml:space="preserve"><value>Konto aktivieren</value></data>
@@ -165,10 +171,12 @@
   <data name="New password again" xml:space="preserve"><value>Neues Passwort wiederholen</value></data>
   <data name="Newest first" xml:space="preserve"><value>Neueste zuerst</value></data>
   <data name="Next" xml:space="preserve"><value>Weiter</value></data>
+  <data name="Next item" xml:space="preserve"><value>Nächster Eintrag</value></data>
   <data name="No access" xml:space="preserve"><value>Kein Zugriff</value></data>
   <data name="No backup is recorded for this archive. Whoever runs the server should set up nightly backups with scripts/backup.sh, as described in docs/operations.md." xml:space="preserve"><value>Für dieses Archiv ist keine Sicherung verzeichnet. Wer den Server betreut, sollte nächtliche Sicherungen mit scripts/backup.sh einrichten, wie in docs/operations.md beschrieben.</value></data>
   <data name="No contributions match." xml:space="preserve"><value>Keine Beiträge gefunden.</value></data>
   <data name="No items match." xml:space="preserve"><value>Keine Einträge gefunden.</value></data>
+  <data name="No photos chosen" xml:space="preserve"><value>Keine Fotos ausgewählt</value></data>
   <data name="No preview could be created." xml:space="preserve"><value>Es konnte keine Vorschau erstellt werden.</value></data>
   <data name="No role" xml:space="preserve"><value>Keine Rolle</value></data>
   <data name="not to be named publicly" xml:space="preserve"><value>soll nicht öffentlich genannt werden</value></data>
@@ -192,8 +200,10 @@
   <data name="Photos" xml:space="preserve"><value>Fotos</value></data>
   <data name="Photos (optional)" xml:space="preserve"><value>Fotos (optional)</value></data>
   <data name="Photos uploaded: {0}. Previews are being created." xml:space="preserve"><value>Hochgeladene Fotos: {0}. Vorschauen werden erstellt.</value></data>
+  <data name="Photos: {0}" xml:space="preserve"><value>Fotos: {0}</value></data>
   <data name="Places, people or topics, separated by commas." xml:space="preserve"><value>Orte, Personen oder Themen, durch Kommas getrennt.</value></data>
   <data name="Please agree, so that we can include what you send in." xml:space="preserve"><value>Bitte stimmen Sie zu, damit wir Ihren Beitrag aufnehmen können.</value></data>
+  <data name="Please check the following:" xml:space="preserve"><value>Bitte prüfen Sie Folgendes:</value></data>
   <data name="Please choose a collection." xml:space="preserve"><value>Bitte wählen Sie eine Sammlung aus.</value></data>
   <data name="Please choose a role." xml:space="preserve"><value>Bitte wählen Sie eine Rolle.</value></data>
   <data name="Please choose at least one photo." xml:space="preserve"><value>Bitte wählen Sie mindestens ein Foto aus.</value></data>
@@ -209,8 +219,13 @@
   <data name="Please enter your password." xml:space="preserve"><value>Bitte geben Sie Ihr Passwort ein.</value></data>
   <data name="Please go back, reload the page and try again." xml:space="preserve"><value>Bitte gehen Sie zurück, laden Sie die Seite neu und versuchen Sie es noch einmal.</value></data>
   <data name="Please tell us who made it." xml:space="preserve"><value>Bitte sagen Sie uns, wer es gemacht hat.</value></data>
+  <data name="Preview" xml:space="preserve"><value>Vorschau</value></data>
+  <data name="Preview. This item is public." xml:space="preserve"><value>Vorschau. Dieser Eintrag ist öffentlich.</value></data>
+  <data name="Preview. Visitors cannot see this item." xml:space="preserve"><value>Vorschau. Besucher können diesen Eintrag nicht sehen.</value></data>
+  <data name="Preview: {0}" xml:space="preserve"><value>Vorschau: {0}</value></data>
   <data name="Previews are being created. Reload the page in a moment." xml:space="preserve"><value>Vorschauen werden erstellt. Laden Sie die Seite gleich neu.</value></data>
   <data name="Previous" xml:space="preserve"><value>Zurück</value></data>
+  <data name="Previous item" xml:space="preserve"><value>Vorheriger Eintrag</value></data>
   <data name="Published" xml:space="preserve"><value>Veröffentlicht</value></data>
   <data name="Published the item" xml:space="preserve"><value>Eintrag veröffentlicht</value></data>
   <data name="Recently added" xml:space="preserve"><value>Zuletzt hinzugefügt</value></data>
@@ -225,9 +240,12 @@
   <data name="Restore" xml:space="preserve"><value>Wiederherstellen</value></data>
   <data name="Restored a photo from the bin" xml:space="preserve"><value>Hat ein Foto aus dem Papierkorb wiederhergestellt</value></data>
   <data name="Restored the item from the bin" xml:space="preserve"><value>Hat den Eintrag aus dem Papierkorb wiederhergestellt</value></data>
+  <data name="Results" xml:space="preserve"><value>Ergebnisse</value></data>
   <data name="Reviews contributions, describes, publishes and deletes items, manages collections and contribution links." xml:space="preserve"><value>Prüft Beiträge, beschreibt, veröffentlicht und löscht Einträge, verwaltet Sammlungen und Beitragslinks.</value></data>
   <data name="Role" xml:space="preserve"><value>Rolle</value></data>
   <data name="Save" xml:space="preserve"><value>Speichern</value></data>
+  <data name="Save and add another" xml:space="preserve"><value>Speichern und weiteren anlegen</value></data>
+  <data name="Save and next" xml:space="preserve"><value>Speichern und weiter</value></data>
   <data name="Save and publish" xml:space="preserve"><value>Speichern und veröffentlichen</value></data>
   <data name="Save as draft" xml:space="preserve"><value>Als Entwurf speichern</value></data>
   <data name="Save password" xml:space="preserve"><value>Passwort speichern</value></data>
@@ -253,9 +271,12 @@
   <data name="Sort by" xml:space="preserve"><value>Sortieren nach</value></data>
   <data name="Source code" xml:space="preserve"><value>Quellcode</value></data>
   <data name="Status" xml:space="preserve"><value>Status</value></data>
+  <data name="Still needs" xml:space="preserve"><value>Fehlt noch</value></data>
   <data name="Submitted" xml:space="preserve"><value>Eingesendet</value></data>
+  <data name="Tag" xml:space="preserve"><value>Schlagwort</value></data>
   <data name="Tag: {0}" xml:space="preserve"><value>Schlagwort: {0}</value></data>
   <data name="Tags" xml:space="preserve"><value>Schlagwörter</value></data>
+  <data name="Text" xml:space="preserve"><value>Text</value></data>
   <data name="Thank you" xml:space="preserve"><value>Vielen Dank</value></data>
   <data name="The account is deleted." xml:space="preserve"><value>Das Konto ist gelöscht.</value></data>
   <data name="The account is disabled. The person is logged out within a minute." xml:space="preserve"><value>Das Konto ist deaktiviert. Die Person wird innerhalb einer Minute abgemeldet.</value></data>
@@ -322,6 +343,7 @@
   <data name="Too many attempts" xml:space="preserve"><value>Zu viele Versuche</value></data>
   <data name="Too many attempts came from your network in the last hour. Please try again later." xml:space="preserve"><value>In der letzten Stunde kamen zu viele Versuche aus Ihrem Netzwerk. Bitte versuchen Sie es später noch einmal.</value></data>
   <data name="Too many failed attempts. Please try again in a few minutes." xml:space="preserve"><value>Zu viele Fehlversuche. Bitte versuchen Sie es in einigen Minuten erneut.</value></data>
+  <data name="Understood as: {0}" xml:space="preserve"><value>Verstanden als: {0}</value></data>
   <data name="Unknown" xml:space="preserve"><value>Unbekannt</value></data>
   <data name="Unpublish" xml:space="preserve"><value>Veröffentlichung zurückziehen</value></data>
   <data name="Unpublished the item" xml:space="preserve"><value>Veröffentlichung des Eintrags zurückgenommen</value></data>

@@ -4,19 +4,6 @@
     ViewData["Title"] = T["Manage archive"];
 }
 
-<nav aria-label="@T["Manage archive"]" class="d-flex flex-wrap gap-2 mb-4">
-    <a asp-page="/Admin/Collections/Index" class="btn btn-sm btn-outline-secondary">@T["Collections"]</a>
-    <a asp-page="/Admin/Contributions/Index" class="btn btn-sm btn-outline-secondary">@T["Contribution links"]</a>
-    <a asp-page="/Admin/Contributors" class="btn btn-sm btn-outline-secondary">@T["Contributors"]</a>
-    <a asp-page="/Admin/Bin" class="btn btn-sm btn-outline-secondary">@T["Bin"]</a>
-    @if (User.IsInRole(Commonage.Web.Identity.Roles.Admin))
-    {
-        <a asp-page="/Admin/Users/Index" class="btn btn-sm btn-outline-secondary">@T["Accounts"]</a>
-        <a asp-page="/Admin/Activity" class="btn btn-sm btn-outline-secondary">@T["Activity log"]</a>
-        <a asp-page="/Admin/Export" class="btn btn-sm btn-outline-secondary">@T["Export"]</a>
-    }
-</nav>
-
 @if (User.IsInRole(Commonage.Web.Identity.Roles.Admin))
 {
     <partial name="_ArchiveHealthNotices" model="Model.Health" />
@@ -43,13 +30,13 @@
 }
 else
 {
-    <form method="get" role="search" class="row g-2 mb-3">
-        <div class="col-12 col-md">
-            <label for="admin-search" class="visually-hidden">@T["Search items"]</label>
-            <input id="admin-search" type="search" name="q" value="@Model.Text" class="form-control" placeholder="@T["Search items"]" />
+    <form method="get" role="search" class="row g-2 mb-3 align-items-end">
+        <div class="col-12 col-md-4">
+            <label for="admin-search" class="form-label small mb-1">@T["Search items"]</label>
+            <input id="admin-search" type="search" name="q" value="@Model.Text" class="form-control" />
         </div>
-        <div class="col">
-            <label for="admin-status" class="visually-hidden">@T["Status"]</label>
+        <div class="col-6 col-md-4">
+            <label for="admin-status" class="form-label small mb-1">@T["Status"]</label>
             <select id="admin-status" name="status" class="form-select">
                 <option value="">@T["All statuses"]</option>
                 <option value="@ItemStatus.Draft" selected="@(Model.Status == ItemStatus.Draft)">@T["Draft"]</option>
@@ -59,14 +46,47 @@ else
                 <option value="@ItemStatus.Withdrawn" selected="@(Model.Status == ItemStatus.Withdrawn)">@T["Withdrawn"]</option>
             </select>
         </div>
-        <div class="col-auto">
+        <div class="col-6 col-md-4">
+            <label for="admin-collection" class="form-label small mb-1">@T["Collection"]</label>
+            <select id="admin-collection" name="collection" asp-items="Model.CollectionOptions" class="form-select">
+                <option value="">@T["All collections"]</option>
+            </select>
+        </div>
+        <div class="col-6 col-md-4">
+            <label for="admin-tag" class="form-label small mb-1">@T["Tag"]</label>
+            <input id="admin-tag" type="search" name="tag" value="@Model.Tag" class="form-control" />
+        </div>
+        <div class="col-6 col-md-4">
+            <label for="admin-needs" class="form-label small mb-1">@T["Still needs"]</label>
+            <select id="admin-needs" name="needs" class="form-select">
+                <option value="">@T["Anything"]</option>
+                <option value="@ItemNeed.Description" selected="@(Model.Needs == ItemNeed.Description)">@T["A description"]</option>
+                <option value="@ItemNeed.Date" selected="@(Model.Needs == ItemNeed.Date)">@T["A date"]</option>
+                <option value="@ItemNeed.Tags" selected="@(Model.Needs == ItemNeed.Tags)">@T["Tags"]</option>
+                <option value="@ItemNeed.Photos" selected="@(Model.Needs == ItemNeed.Photos)">@T["Photos"]</option>
+                <option value="@ItemNeed.PreviewFailed" selected="@(Model.Needs == ItemNeed.PreviewFailed)">@T["A working preview"]</option>
+            </select>
+        </div>
+        <div class="col-6 col-md-2">
+            <label for="admin-sort" class="form-label small mb-1">@T["Sort by"]</label>
+            <select id="admin-sort" name="sort" class="form-select">
+                <option value="@AdminItemSort.LastChanged" selected="@(Model.Filter.EffectiveSort == AdminItemSort.LastChanged)">@T["Last changed"]</option>
+                <option value="@AdminItemSort.OldestFirst" selected="@(Model.Filter.EffectiveSort == AdminItemSort.OldestFirst)">@T["Oldest first"]</option>
+                <option value="@AdminItemSort.Title" selected="@(Model.Filter.EffectiveSort == AdminItemSort.Title)">@T["Title"]</option>
+            </select>
+        </div>
+        <div class="col-6 col-md-2 d-flex flex-wrap gap-2 align-items-center">
             <button type="submit" class="btn btn-outline-primary">@T["Search"]</button>
+            @if (Model.HasFilters)
+            {
+                <a asp-page="/Admin/Index">@T["Clear filters"]</a>
+            }
         </div>
     </form>
 
     @if (Model.Items.TotalCount == 0)
     {
-        <p class="text-muted">@(Model.Text is null && Model.Status is null ? T["There are no items yet."] : T["No items match."])</p>
+        <p class="text-muted">@(Model.HasFilters ? T["No items match."] : T["There are no items yet."])</p>
     }
     else
     {
@@ -74,6 +94,7 @@ else
             <table class="table align-middle">
                 <thead>
                     <tr>
+                        <th scope="col"><span class="visually-hidden">@T["Photos"]</span></th>
                         <th scope="col">@T["Title"]</th>
                         <th scope="col" class="d-none d-md-table-cell">@T["Collection"]</th>
                         <th scope="col">@T["Status"]</th>
@@ -84,10 +105,22 @@ else
                     @foreach (var item in Model.Items.Items)
                     {
                         <tr>
-                            <td><a asp-page="/Admin/Items/Edit" asp-route-id="@item.Id">@item.Title</a></td>
-                            <td class="d-none d-md-table-cell">@item.Collection.Title</td>
+                            <td class="admin-list-picture">
+                                @if (item.ThumbnailMediaFileId is { } thumbnail)
+                                {
+                                    <img src="/admin/media/@thumbnail/thumbnail" alt="" class="rounded" loading="lazy" />
+                                }
+                            </td>
+                            <td>
+                                <a asp-page="/Admin/Items/Edit" asp-route-id="@item.Id" asp-route-back="@Model.ListUrl">@item.Title</a>
+                                @if (item.PhotoCount > 1)
+                                {
+                                    <span class="d-block small text-muted">@T["Photos: {0}", item.PhotoCount]</span>
+                                }
+                            </td>
+                            <td class="d-none d-md-table-cell">@item.CollectionTitle</td>
                             <td><partial name="_StatusBadge" model="item.Status" /></td>
-                            <td class="d-none d-md-table-cell">@item.UpdatedAt.ToLocalTime().ToString("g")</td>
+                            <td class="d-none d-md-table-cell">@Dates.Moment(item.UpdatedAt)</td>
                         </tr>
                     }
                 </tbody>

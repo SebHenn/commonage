@@ -15,6 +15,7 @@ public sealed class BrowserFixture : WebApplicationFactory<Program>, IAsyncLifet
     private readonly PostgreSqlContainer _db = new PostgreSqlBuilder("postgres:18-alpine").Build();
     private readonly string _storageRoot = Path.Combine(Path.GetTempPath(), "commonage-browser-tests", Guid.NewGuid().ToString("N"));
     private IPlaywright? _playwright;
+    private IBrowserContext? _lastContext;
 
     public IBrowser Chrome { get; private set; } = null!;
 
@@ -67,7 +68,11 @@ public sealed class BrowserFixture : WebApplicationFactory<Program>, IAsyncLifet
     /// <summary>A new browser session of its own, as if on another device.</summary>
     public async Task<IPage> NewPageAsync(int width = 1280, int height = 800, bool javaScript = true)
     {
-        var context = await Chrome.NewContextAsync(new BrowserNewContextOptions
+        // The tests run one after the other. Sessions left open would use up the machine's connections.
+        if (_lastContext is not null)
+            await _lastContext.CloseAsync();
+
+        var context = _lastContext = await Chrome.NewContextAsync(new BrowserNewContextOptions
         {
             BaseURL = BaseUrl,
             ViewportSize = new ViewportSize { Width = width, Height = height },

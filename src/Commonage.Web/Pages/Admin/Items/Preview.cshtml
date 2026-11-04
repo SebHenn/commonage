@@ -1,0 +1,15 @@
+@page "{id:int}"
+@model Commonage.Web.Pages.Admin.Items.PreviewModel
+@{
+    ViewData["Title"] = T["Preview: {0}", Model.Item.Title];
+    ViewData["MediaAddress"] = "/admin/media";
+}
+
+<div class="alert alert-info d-flex flex-wrap gap-2 align-items-center" role="status">
+    <span class="me-auto">
+        @(Model.Item.Status == ItemStatus.Published ? T["Preview. This item is public."] : T["Preview. Visitors cannot see this item."])
+    </span>
+    <a asp-page="/Admin/Items/Edit" asp-route-id="@Model.Item.Id" class="alert-link">@T["Back to editing"]</a>
+</div>
+
+<partial name="_ItemArticle" model="Model.Item" view-data="ViewData" />

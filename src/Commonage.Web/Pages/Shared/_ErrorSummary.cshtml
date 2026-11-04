@@ -1,0 +1,29 @@
+@* What is wrong with a form that came back from the server, with links to the fields. It gets the focus, so screen readers
+   read it and people on phones find it. *@
+@{
+    var errors = ViewData.ModelState
+        .Where(entry => entry.Value is { Errors.Count: > 0 })
+        .SelectMany(entry => entry.Value!.Errors.Select(error => (Field: entry.Key, error.ErrorMessage)))
+        .ToList();
+}
+@if (errors.Count > 0)
+{
+    <div class="alert alert-danger" role="alert" tabindex="-1" data-focus-on-load>
+        <p class="fw-bold mb-1">@T["Please check the following:"]</p>
+        <ul class="mb-0">
+            @foreach (var (field, message) in errors)
+            {
+                <li>
+                    @if (string.IsNullOrEmpty(field))
+                    {
+                        @message
+                    }
+                    else
+                    {
+                        <a href="#@Html.GenerateIdFromName(field)" class="link-danger">@message</a>
+                    }
+                </li>
+            }
+        </ul>
+    </div>
+}

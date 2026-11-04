@@ -20,7 +20,7 @@
     <div class="row g-4">
         <div class="col-lg-3">
             @* On small screens the filters fold away so the results come first. *@
-            <button class="btn btn-outline-secondary w-100 d-lg-none" type="button" data-bs-toggle="collapse"
+            <button class="btn btn-outline-primary w-100 d-lg-none" type="button" data-bs-toggle="collapse"
                     data-bs-target="#search-filters" aria-expanded="@(Model.HasFilters ? "true" : "false")" aria-controls="search-filters">
                 @T["Filters"]
             </button>
@@ -78,6 +78,7 @@
         </div>
 
         <div class="col-lg-9">
+            <h2 class="visually-hidden">@T["Results"]</h2>
             <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
                 <p class="mb-0 me-auto" role="status">@T["Items found: {0}", Model.Results.TotalCount]</p>
                 @if (Model.Tag is not null)

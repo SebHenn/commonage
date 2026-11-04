@@ -4,12 +4,6 @@
     ViewData["Title"] = T["Contributors"];
 }
 
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a asp-page="/Admin/Index">@T["Items"]</a></li>
-    </ol>
-</nav>
-
 <h1>@ViewData["Title"]</h1>
 <div class="col-lg-8">
     <p>@T["Find everything a person has sent in or is named as the photographer or author of, for example when they ask what the archive holds about them, or ask for it to be deleted."]</p>
@@ -70,7 +64,7 @@
                                     <span class="badge text-bg-dark">@T["In the bin"]</span>
                                 }
                             </td>
-                            <td class="d-none d-md-table-cell">@contribution.SubmittedAt.ToLocalTime().ToString("d")</td>
+                            <td class="d-none d-md-table-cell">@Dates.Day(contribution.SubmittedAt)</td>
                         </tr>
                     }
                 </tbody>

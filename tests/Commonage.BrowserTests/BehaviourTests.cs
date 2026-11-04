@@ -139,7 +139,7 @@ public class BehaviourTests(BrowserFixture app)
         await page.GotoAsync(app.ContributionPath);
 
         await page.FillAsync("[name='Input.Title']", "Sent without JavaScript");
-        await page.SetInputFilesAsync("#photos", Path.Combine("Fixtures", "photo.jpg"));
+        await page.SetInputFilesAsync("#Files", Path.Combine("Fixtures", "photo.jpg"));
         await page.CheckAsync("[name='Input.Rights'] >> nth=0");
         await page.FillAsync("[name='Input.Name']", "Ada Contributor");
         await page.CheckAsync("[name='Input.Consent']");

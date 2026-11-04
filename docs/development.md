@@ -101,6 +101,22 @@ change it. `compose.production.yaml` and `deploy/Caddyfile` are the HTTPS setup 
 to try it locally, set `COMMONAGE_DOMAIN=localhost` (Caddy then uses its own local certificate authority) and use
 `;` instead of `:` in `COMPOSE_FILE` on Windows.
 
+## Forms
+
+A form with fields starts with `<partial name="_ErrorSummary" />`. `asp-validation-for` and `asp-for` then link messages
+and fields by themselves (`Forms/FieldErrors.cs`, `site.js`). Other behaviour is switched on by attributes, handled in
+`wwwroot/js/site.js`, because the Content Security Policy forbids inline script:
+
+- `data-confirm`: asks before sending.
+- `data-warn-unsaved`: warns before leaving with unsaved changes.
+- `data-send-once`: a second click does nothing. For forms that upload, or that would otherwise look like a conflict.
+- `data-date-result`: on a date field, says how the date is understood while it is typed.
+- `data-choose-text` and `data-none-text`: a file picker in the page's language. Without JavaScript, the browser's own
+  control stays.
+- `data-required-message`: a required checkbox, which ASP.NET's validation leaves out.
+
+Without JavaScript, `css/nojs.css` shows what would otherwise stay folded away.
+
 ## Tests
 
 `dotnet test` runs everything. It needs Docker, for PostgreSQL, and Chrome installed, for the browser tests.
@@ -163,14 +179,6 @@ dotnet ef migrations add <DescriptiveName> --project src/Commonage.Web --output-
 UI text is written in English and used as the key, for example `@T["Save"]` in a page. German
 translations live in `src/Commonage.Web/Resources/SharedResource.de.resx`. Text without a
 translation is shown in English, so add the German entry whenever you add new UI text.
-
-## Tests
-
-```sh
-dotnet test
-```
-
-Integration tests start a throwaway PostgreSQL container, so Docker must be running.
 
 ## Secrets and private data
 
