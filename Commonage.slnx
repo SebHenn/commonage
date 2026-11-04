@@ -3,6 +3,7 @@
     <Project Path="src/Commonage.Web/Commonage.Web.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/Commonage.BrowserTests/Commonage.BrowserTests.csproj" />
     <Project Path="tests/Commonage.Tests/Commonage.Tests.csproj" />
   </Folder>
 </Solution>

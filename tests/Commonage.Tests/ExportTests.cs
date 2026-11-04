@@ -59,6 +59,48 @@ public class ExportTests(CommonageAppFactory app)
         }
     }
 
+    /// <summary>
+    /// A new field has to be exported or be left out on purpose. Otherwise an archive would lose it when it moves away,
+    /// and nobody would notice until then. Names are as they appear in archive.json.
+    /// </summary>
+    [Theory]
+    [InlineData(typeof(ArchiveItem), "item", "id collectionId title description status createdAt updatedAt publishedAt contribution files tags",
+        "Collection: by collectionId. MediaFiles: as files. DateText, DateFrom, DateTo: as date. TagNames: repeats tags. "
+        + "CanBePublished: follows from status. DeletedAt: the bin is not exported. Version: only for open forms.")]
+    [InlineData(typeof(MediaFile), "file", "id originalFileName contentType sizeBytes sha256 uploadedAt",
+        "ArchiveItemId, ArchiveItem: the file is listed under its item. StorageId, OriginalKey, PreviewKey, ThumbnailKey: storage details. "
+        + "Status, ProcessingError, PreviewWidth, PreviewHeight: previews are made anew. DeletedAt: the bin is not exported.")]
+    [InlineData(typeof(Contribution), "contribution", "contributorName contributorEmail showName rights rightsHolder consentText submittedAt reviewedAt personalDetailsRemovedAt contributionLink",
+        "Id, ArchiveItemId, ArchiveItem: listed under its item. ContributionLinkId: the link is named.")]
+    [InlineData(typeof(Collection), "collection", "id title description createdAt", "Items: each item names its collection.")]
+    public async Task Every_field_is_exported_or_left_out_on_purpose(Type type, string part, string exported, string leftOut)
+    {
+        var item = await app.CreateContributionAsync(ItemStatus.Published);
+        using var admin = app.CreateClient();
+        await Browser.LogInAsCuratorAsync(admin);
+        await Browser.UploadAsync(admin, $"/Admin/Items/Edit/{item.Id}", "Upload", "photo.jpg", TestData.Photo);
+        using var zip = await ExportAsync(admin, publishedOnly: false, includePersonalData: true);
+        var exportedItem = FindItem(zip, item.Id);
+        var json = part switch
+        {
+            "item" => exportedItem,
+            "file" => exportedItem.GetProperty("files")[0],
+            "contribution" => exportedItem.GetProperty("contribution"),
+            _ => JsonDocument.Parse(Read(zip, "archive.json")).RootElement.GetProperty("collections")[0],
+        };
+
+        foreach (var name in exported.Split(' '))
+            Assert.True(json.TryGetProperty(name, out _), $"{name} is said to be exported, but is not in archive.json.");
+
+        var known = exported.Split(' ').Select(n => char.ToUpperInvariant(n[0]) + n[1..]).ToHashSet();
+        var missing = type.GetProperties()
+            .Select(p => p.Name)
+            .Where(name => !known.Contains(name) && !System.Text.RegularExpressions.Regex.IsMatch(leftOut, $@"\b{name}\b"))
+            .ToList();
+        Assert.True(missing.Count == 0, $"{type.Name} has fields that are neither exported nor left out on purpose: {string.Join(", ", missing)}. "
+            + "Add them to the export and docs/operations.md, or say here why they stay out.");
+    }
+
     [Fact]
     public async Task Items_in_the_bin_are_not_exported()
     {
