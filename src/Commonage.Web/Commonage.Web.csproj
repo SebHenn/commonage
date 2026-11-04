@@ -5,6 +5,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>50f890f6-a367-466e-a534-fe070b5f0603</UserSecretsId>
+    <!-- The Docker build compiles for these. They must be in packages.lock.json for its locked restore. -->
+    <RuntimeIdentifiers>linux-x64;linux-arm64</RuntimeIdentifiers>
   </PropertyGroup>
 
   <ItemGroup>

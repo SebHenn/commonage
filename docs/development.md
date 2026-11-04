@@ -103,6 +103,9 @@ to try it locally, set `COMMONAGE_DOMAIN=localhost` (Caddy then uses its own loc
 
 ## Dependency updates
 
+`packages.lock.json` pins every NuGet package by content hash, and CI and the Docker build refuse anything else. After
+changing a package reference, run `dotnet restore` and commit the changed lock files. Dependabot updates them by itself.
+
 Dependabot opens update pull requests every Monday. Patch and minor updates, and rebuilt base images with an
 unchanged tag, merge by themselves once every required check has passed. Each change to `main` asks Dependabot to
 rebase the next waiting update (`.github/workflows/dependabot-auto-merge.yml`), since `main` only accepts pull
