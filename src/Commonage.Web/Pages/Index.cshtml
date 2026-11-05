@@ -1,17 +1,20 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = T["Collections"];
+    ViewData["Title"] = Model.Identity.Name;
 }
 
-@if (Model.Identity.Text(ArchiveTextKind.Tagline) is { } tagline)
-{
-    <p class="lead mb-2">@tagline</p>
-}
-@if (Model.Identity.Text(ArchiveTextKind.Intro) is { } intro)
-{
-    <p class="text-preserve-lines">@Commonage.Web.Forms.PlainText.WithLinks(intro)</p>
-}
+<div class="home-intro">
+    <h1>@Model.Identity.Name</h1>
+    @if (Model.Identity.Text(ArchiveTextKind.Tagline) is { } tagline)
+    {
+        <p class="lead mb-2 prose">@tagline</p>
+    }
+    @if (Model.Identity.Text(ArchiveTextKind.Intro) is { } intro)
+    {
+        <p class="text-preserve-lines prose">@Commonage.Web.Forms.PlainText.WithLinks(intro)</p>
+    }
+</div>
 
 <form method="get" asp-page="/Search" role="search" class="input-group mb-4">
     <label for="home-search" class="visually-hidden">@T["Search the archive"]</label>
@@ -19,33 +22,30 @@
     <button type="submit" class="btn btn-primary">@T["Search"]</button>
 </form>
 
-<h1>@T["Collections"]</h1>
+@if (Model.Recent.Count > 0)
+{
+    <section class="home-section" aria-labelledby="recent-heading">
+        <h2 id="recent-heading">@T["Recently added"]</h2>
+        <partial name="_ItemCards" model="Model.Recent" />
+    </section>
+}
 
-@if (Model.Collections.Count == 0)
-{
-    <p class="text-muted">@T["The archive has no collections yet."]</p>
-}
-else
-{
-    <ul class="list-unstyled">
-        @foreach (var collection in Model.Collections)
-        {
-            <li class="mb-3">
-                <h2 class="h4 mb-1"><a asp-page="/Collections/Details" asp-route-id="@collection.Id">@collection.Title</a></h2>
-                @if (!string.IsNullOrWhiteSpace(collection.Description))
-                {
-                    <p class="mb-1">@collection.Description</p>
-                }
-                <small class="text-muted">@T["Items: {0}", collection.PublishedItemCount]</small>
-            </li>
-        }
-    </ul>
-}
+<section class="home-section" aria-labelledby="collections-heading">
+    <h2 id="collections-heading">@T["Collections"]</h2>
+    @if (Model.Collections.Count == 0)
+    {
+        <p class="text-muted">@T["The archive has no collections yet."]</p>
+    }
+    else
+    {
+        <partial name="_CollectionCards" model="Model.Collections" />
+    }
+</section>
 
 @if (Model.Tags.Count > 0)
 {
-    <section class="mt-5" aria-labelledby="tags-heading">
-        <h2 id="tags-heading" class="h4">@T["Browse by tag"]</h2>
+    <section class="home-section" aria-labelledby="tags-heading">
+        <h2 id="tags-heading">@T["Browse by tag"]</h2>
         <ul class="list-unstyled d-flex flex-wrap gap-2">
             @foreach (var tag in Model.Tags)
             {

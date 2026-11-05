@@ -72,7 +72,7 @@ public class ArchiveSettingsTests(CommonageAppFactory app)
 
         var home = await visitor.GetStringAsync("/");
 
-        Assert.Contains("- Commonage</title>", home);
+        Assert.Contains("<title>Commonage</title>", home);
         Assert.Equal(HttpStatusCode.NotFound, (await visitor.GetAsync("/about")).StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, (await visitor.GetAsync("/imprint")).StatusCode);
         Assert.DoesNotContain("href=\"/about\"", home);
@@ -97,7 +97,8 @@ public class ArchiveSettingsTests(CommonageAppFactory app)
         var contact = await visitor.GetStringAsync("/contact");
 
         Assert.Contains("Your changes are saved", await saved.Content.ReadAsStringAsync());
-        Assert.Contains("- Mill Street History Group</title>", home);
+        Assert.Contains("<title>Mill Street History Group</title>", home);
+        Assert.Contains("- Mill Street History Group</title>", await visitor.GetStringAsync("/search"));
         Assert.Contains("Memories of one street", home);
         Assert.Contains("Made with Commonage", home);
         Assert.Contains("href=\"/contact\"", home);
@@ -236,8 +237,8 @@ public class ArchiveSettingsTests(CommonageAppFactory app)
         using var english = new HttpRequestMessage(HttpMethod.Get, "/search");
         english.Headers.Add("Accept-Language", "en");
 
-        Assert.Contains("<html lang=\"de\">", await (await visitor.SendAsync(french)).Content.ReadAsStringAsync());
-        Assert.Contains("<html lang=\"en\">", await (await visitor.SendAsync(english)).Content.ReadAsStringAsync());
+        Assert.Contains("<html lang=\"de\"", await (await visitor.SendAsync(french)).Content.ReadAsStringAsync());
+        Assert.Contains("<html lang=\"en\"", await (await visitor.SendAsync(english)).Content.ReadAsStringAsync());
     }
 
     [Fact]

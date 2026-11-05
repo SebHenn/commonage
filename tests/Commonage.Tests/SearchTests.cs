@@ -177,10 +177,10 @@ public partial class SearchTests(CommonageAppFactory app)
     private static string[] CardTitles(string html) =>
         ItemCard().Matches(html).Select(m => CardTitle().Match(m.Value).Groups[1].Value.Trim()).ToArray();
 
-    [GeneratedRegex(@"<li class=""[^""]*item-card[^""]*"">.*?</li>", RegexOptions.Singleline)]
+    [GeneratedRegex(@"<li[^>]*>\s*<a[^>]*item-card[^>]*>.*?</li>", RegexOptions.Singleline)]
     private static partial Regex ItemCard();
 
-    // The title follows the thumbnail placeholder, as seeded items have no photos.
-    [GeneratedRegex(@"</span>\s*([^<]+?)\s*</a>", RegexOptions.Singleline)]
+    // The title has its own element in the card.
+    [GeneratedRegex(@"class=""item-card-title"">\s*([^<]+?)\s*</span>", RegexOptions.Singleline)]
     private static partial Regex CardTitle();
 }

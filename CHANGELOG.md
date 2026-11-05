@@ -3,7 +3,29 @@
 All notable changes to Commonage. Versions follow [Semantic Versioning](https://semver.org/); before 1.0, a minor
 version may change things that need attention when updating, and these notes say so.
 
-## 0.3.0 (2026-11-04)
+## Unreleased
+
+### For visitors
+
+- A new look: the start page opens with the group's name and welcome text, recently added photos and collections with
+  pictures. System fonts, comfortable text, and cards that work the same everywhere.
+- Photos are sharp on phones with fine screens and are no longer cut to fit. An item's text sits beside its photo on wide
+  screens, instead of below all of them.
+- Search shows active filters to remove one by one, a choice in a list applies at once, and a search without results
+  offers a way on.
+- The language menu is at the top of every page.
+- Pages print cleanly, with their address.
+
+### For people who run an archive
+
+- Older photos get the new picture size in the background, with nothing going offline. See docs/operations.md.
+
+### Project
+
+- Interface languages are one list, in `SupportedLanguages.cs`. Pages switch to right-to-left by language, and browser tests
+  try that, and much longer text.
+
+## 0.3.0 (2026-11-05)
 
 Your archive under your own name, quicker work for curators, and safe updates. Set `COMMONAGE_VERSION=0.3` in `.env`. From
 this version on, `scripts/update.sh` does that for you. See docs/deployment.md. After updating, an admin should open

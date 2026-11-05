@@ -91,7 +91,7 @@ public class MediaUploadService(
     {
         db.MediaFiles.Remove(file);
         await db.SaveChangesAsync(cancellationToken);
-        foreach (var key in new[] { file.OriginalKey, file.PreviewKey, file.ThumbnailKey })
+        foreach (var key in new[] { file.OriginalKey, file.PreviewKey, file.ThumbnailKey, file.CardKey })
             storage.Delete(key);
     }
 

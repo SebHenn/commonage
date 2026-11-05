@@ -3,37 +3,49 @@
    public one only serves published items. *@
 @{
     var mediaAddress = ViewData["MediaAddress"] as string ?? "/media";
+    var first = true;
 }
 
-<article>
-    <h1>@Model.Title</h1>
-    @if (Model.DateText is not null)
+<article class="item-layout @(Model.MediaFiles.Count > 0 ? "item-layout-with-media" : "")">
+    <div class="item-head">
+        <h1>@Model.Title</h1>
+        @if (Model.DateText is not null)
+        {
+            <p class="text-muted mb-0">@Model.DateText</p>
+        }
+    </div>
+    @if (Model.MediaFiles.Count > 0)
     {
-        <p class="text-muted">@Model.DateText</p>
-    }
-    @foreach (var file in Model.MediaFiles)
-    {
-        <figure class="mb-4">
-            <img src="@mediaAddress/@file.Id/preview" alt="@Model.Title" width="@file.PreviewWidth" height="@file.PreviewHeight"
-                 class="media-preview rounded" loading="lazy" />
-        </figure>
-    }
-    @if (!string.IsNullOrWhiteSpace(Model.Description))
-    {
-        <p class="text-preserve-lines">@Model.Description</p>
-    }
-    @if (Model.Contribution is { ShowName: true, ContributorName: { } contributorName })
-    {
-        <p class="text-muted">@T["Contributed by {0}", contributorName]</p>
-    }
-    @if (Model.Tags.Count > 0)
-    {
-        <h2 class="visually-hidden">@T["Tags"]</h2>
-        <ul class="list-unstyled d-flex flex-wrap gap-2">
-            @foreach (var tag in Model.Tags)
+        <div class="item-media">
+            @foreach (var file in Model.MediaFiles)
             {
-                <li><a asp-page="/Search" asp-route-tag="@tag.Name" class="badge rounded-pill text-bg-light border tag-link">@tag.Name</a></li>
+                @* The first picture is what the page is about, so it does not wait. *@
+                <figure>
+                    <img src="@mediaAddress/@file.Id/preview" alt="@Model.Title" width="@file.PreviewWidth" height="@file.PreviewHeight"
+                         class="media-preview rounded" loading="@(first ? "eager" : "lazy")" fetchpriority="@(first ? "high" : "auto")" />
+                </figure>
+                first = false;
             }
-        </ul>
+        </div>
     }
+    <div class="item-text prose">
+        @if (!string.IsNullOrWhiteSpace(Model.Description))
+        {
+            <p class="text-preserve-lines">@Model.Description</p>
+        }
+        @if (Model.Contribution is { ShowName: true, ContributorName: { } contributorName })
+        {
+            <p class="text-muted">@T["Contributed by {0}", contributorName]</p>
+        }
+        @if (Model.Tags.Count > 0)
+        {
+            <h2 class="visually-hidden">@T["Tags"]</h2>
+            <ul class="list-unstyled d-flex flex-wrap gap-2">
+                @foreach (var tag in Model.Tags)
+                {
+                    <li><a asp-page="/Search" asp-route-tag="@tag.Name" class="badge rounded-pill text-bg-light border tag-link">@tag.Name</a></li>
+                }
+            </ul>
+        }
+    </div>
 </article>

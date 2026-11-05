@@ -101,6 +101,12 @@ change it. `compose.production.yaml` and `deploy/Caddyfile` are the HTTPS setup 
 to try it locally, set `COMMONAGE_DOMAIN=localhost` (Caddy then uses its own local certificate authority) and use
 `;` instead of `:` in `COMPOSE_FILE` on Windows.
 
+## Look and languages
+
+`wwwroot/css/site.css` starts with the design's tokens, on top of Bootstrap's variables, so `/branding.css` can override
+them. Use logical properties (`margin-inline-start`, `ms-*`), never left and right, and system fonts only. A new interface
+language is its resource file and one line in `SupportedLanguages.cs`.
+
 ## Forms
 
 A form with fields starts with `<partial name="_ErrorSummary" />`. `asp-validation-for` and `asp-for` then link messages
@@ -122,8 +128,8 @@ Without JavaScript, `css/nojs.css` shows what would otherwise stay folded away.
 `dotnet test` runs everything. It needs Docker, for PostgreSQL, and Chrome installed, for the browser tests.
 
 - `tests/Commonage.Tests` drives the app over HTTP. It covers rules and data, and is quick.
-- `tests/Commonage.BrowserTests` drives the real app in Chrome with Playwright. It runs axe on every main page at phone
-  and desktop width, checks for sideways scrolling and anything the browser refused (such as a Content Security Policy
+- `tests/Commonage.BrowserTests` drives the real app in Chrome with Playwright. It also tries pages from right to left
+  and in a made-up language with much longer text. It runs axe on every main page at phone and desktop width, checks for sideways scrolling and anything the browser refused (such as a Content Security Policy
   violation), tests each JavaScript behaviour, and does the main tasks with JavaScript switched off. Add new pages to
   `AccessibilityTests`, and a test for each new behaviour in `wwwroot/js`.
 - `scripts/test-backup-restore.sh` and `scripts/test-update.sh` run whole archives in Docker. The second needs ports 80

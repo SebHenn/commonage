@@ -6,14 +6,14 @@
 
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a asp-page="/Index">@T["Collections"]</a></li>
+        <li class="breadcrumb-item"><a asp-page="/Collections/Index">@T["Collections"]</a></li>
     </ol>
 </nav>
 
 <h1>@Model.Collection.Title</h1>
 @if (!string.IsNullOrWhiteSpace(Model.Collection.Description))
 {
-    <p class="lead text-preserve-lines">@Model.Collection.Description</p>
+    <p class="lead text-preserve-lines prose">@Model.Collection.Description</p>
 }
 
 @if (Model.Items.TotalCount == 0)

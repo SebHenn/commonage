@@ -2,6 +2,7 @@ using Commonage.Web.Data;
 using Commonage.Web.Domain;
 using Commonage.Web.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Net.Http.Headers;
 
 namespace Commonage.Web.Media;
 
@@ -11,7 +12,7 @@ namespace Commonage.Web.Media;
 /// </summary>
 public static class MediaEndpoints
 {
-    private const string VariantPattern = "{variant:regex(^(preview|thumbnail)$)}";
+    private const string VariantPattern = "{variant:regex(^(preview|thumbnail|card)$)}";
 
     public static void MapMediaEndpoints(this WebApplication app)
     {
@@ -31,9 +32,12 @@ public static class MediaEndpoints
         if (file is null)
             return Results.NotFound();
 
-        // Short lifetime so an unpublished item disappears from browser caches soon.
+        // Short lifetime so an unpublished item disappears from browser caches soon. After that, browsers ask again and
+        // get "not changed" without the picture being sent, but only while the item is still public, as checked above.
         context.Response.Headers.CacheControl = "public, max-age=600";
-        return Results.Stream(storage.OpenRead(KeyFor(file, variant)), "image/jpeg");
+        return Results.Stream(storage.OpenRead(KeyFor(file, variant)), "image/jpeg",
+            lastModified: file.UploadedAt,
+            entityTag: new EntityTagHeaderValue($"\"{file.StorageId:N}-{variant}-{file.DerivativeVersion}\""));
     }
 
     private static async Task<IResult> ServeDerivativeAsync(
@@ -58,6 +62,11 @@ public static class MediaEndpoints
         return Results.Stream(storage.OpenRead(file.OriginalKey), file.ContentType, fileDownloadName: file.OriginalFileName);
     }
 
-    private static string KeyFor(MediaFile file, string variant) =>
-        variant == "thumbnail" ? file.ThumbnailKey : file.PreviewKey;
+    private static string KeyFor(MediaFile file, string variant) => variant switch
+    {
+        "thumbnail" => file.ThumbnailKey,
+        // Until the archive has made the larger size for an older file, the smaller one has to do.
+        "card" => file.DerivativeVersion >= 2 ? file.CardKey : file.ThumbnailKey,
+        _ => file.PreviewKey,
+    };
 }
