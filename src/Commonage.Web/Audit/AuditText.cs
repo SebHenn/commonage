@@ -41,6 +41,7 @@ public static class AuditText
         AuditAction.ArchiveExportedWithPersonalData => localizer["Exported the archive with contributors' personal data"],
         AuditAction.SettingsChanged => localizer["Changed the archive settings"],
         AuditAction.RestoreTested => localizer["Noted that a restore was tested"],
+        AuditAction.ContributorDetailsChanged => localizer["Corrected the contributor's details"],
         _ => action.ToString(),
     };
 

@@ -12,6 +12,19 @@ For the people who look after what an archive holds. You need no technical knowl
 - **Tags:** the places, people and topics someone might look for. Before adding a new one, check whether it already
   exists under a slightly different name.
 
+## Rights, credit and what only you see
+
+Open **Rights and credit** on an item:
+
+- **What may others do with it?** Choose honestly. "Not checked yet" is a fine answer. Choose a free licence only if whoever
+  holds the rights really gave it. Someone sending in a photo agreed to publication on this website, not to reuse by others.
+- **Who holds the rights?** Only curators see this.
+- **Credit** is for visitors. Write one only if this person may be named publicly.
+
+**Catalogue details** are for you: reference number, where the original is kept, who gave it to you and when, and notes. They
+stay out of public pages and public search. Each photo also has a field for **what it shows**, in a sentence, for people who
+cannot see it.
+
 ## Working through many items
 
 Open the item list and filter it: by collection, or by what is "still needed", such as a date. Open the first item and use

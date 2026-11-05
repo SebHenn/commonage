@@ -23,11 +23,13 @@ public class EditModel(
     MediaUploadService uploads,
     AuditLog audit,
     ArchiveHealth health,
+    ArchiveProfile profile,
     IStringLocalizer<SharedResource> localizer) : PageModel
 {
     private const long MaxUploadRequestBytes = 1024L * 1024 * 1024;
     private const int MaxTagsPerItem = 30;
     private const int HistoryLength = 20;
+    private const int MaxAltTextLength = 1000;
 
     [BindProperty]
     public InputModel Input { get; set; } = new();
@@ -68,6 +70,18 @@ public class EditModel(
     /// <summary>The title as saved, for the heading, while the form may hold another one.</summary>
     public string? SavedTitle { get; private set; }
 
+    /// <summary>What applies when the item has no statement of its own.</summary>
+    public string? DefaultRightsLabel { get; private set; }
+
+    /// <summary>The statement in the form is only a suggestion, from what a contributor answered.</summary>
+    public bool RightsWereProposed { get; private set; }
+
+    /// <summary>Filled-in sections stay open, so nothing there goes unnoticed, and empty ones out of the way.</summary>
+    public bool CatalogueHasContent => !string.IsNullOrEmpty(Input.RightsUri) || !string.IsNullOrEmpty(Input.RightsHolder)
+        || !string.IsNullOrEmpty(Input.Credit) || !string.IsNullOrEmpty(Input.ReferenceNumber) || !string.IsNullOrEmpty(Input.OriginalLocation)
+        || !string.IsNullOrEmpty(Input.ReceivedFrom) || !string.IsNullOrEmpty(Input.ReceivedOn) || !string.IsNullOrEmpty(Input.InternalNotes)
+        || !ModelState.IsValid;
+
     /// <summary>Whether the form holds text that is not saved, even though the page was just loaded.</summary>
     public bool FormHasUnsavedText => SavedByOthers is not null || !ModelState.IsValid;
 
@@ -92,6 +106,40 @@ public class EditModel(
 
         [Display(Name = "Tags")]
         public string? Tags { get; set; }
+
+        [Display(Name = "What may others do with it?")]
+        public string? RightsUri { get; set; }
+
+        [StringLength(300, ErrorMessage = "This text can be at most {1} characters long.")]
+        [Display(Name = "Who holds the rights?")]
+        public string? RightsHolder { get; set; }
+
+        [StringLength(300, ErrorMessage = "This text can be at most {1} characters long.")]
+        [Display(Name = "Credit")]
+        public string? Credit { get; set; }
+
+        [StringLength(100, ErrorMessage = "This text can be at most {1} characters long.")]
+        [Display(Name = "Reference number")]
+        public string? ReferenceNumber { get; set; }
+
+        [StringLength(300, ErrorMessage = "This text can be at most {1} characters long.")]
+        [Display(Name = "Where the original is kept")]
+        public string? OriginalLocation { get; set; }
+
+        [StringLength(300, ErrorMessage = "This text can be at most {1} characters long.")]
+        [Display(Name = "Received from")]
+        public string? ReceivedFrom { get; set; }
+
+        [StringLength(100, ErrorMessage = "This text can be at most {1} characters long.")]
+        [Display(Name = "Received when")]
+        public string? ReceivedOn { get; set; }
+
+        [StringLength(20000, ErrorMessage = "This text can be at most {1} characters long.")]
+        [Display(Name = "Internal notes")]
+        public string? InternalNotes { get; set; }
+
+        /// <summary>What each photo shows, by the id of the photo.</summary>
+        public Dictionary<int, string?> AltTexts { get; set; } = [];
 
         /// <summary>The item's version when the form was opened, to notice changes made by someone else since.</summary>
         public uint? Version { get; set; }
@@ -119,7 +167,16 @@ public class EditModel(
                 Date = item.DateText,
                 Tags = string.Join(", ", item.Tags.Select(t => t.Name).Order(StringComparer.CurrentCultureIgnoreCase)),
                 Version = item.Version,
+                RightsUri = item.RightsUri ?? (item.Contribution is { } contribution ? RightsOptions.ProposalFor(contribution.Rights) : null),
+                RightsHolder = item.RightsHolder,
+                Credit = item.Credit,
+                ReferenceNumber = item.ReferenceNumber,
+                OriginalLocation = item.OriginalLocation,
+                ReceivedFrom = item.ReceivedFrom,
+                ReceivedOn = item.ReceivedOn,
+                InternalNotes = item.InternalNotes,
             };
+            RightsWereProposed = item.RightsUri is null && item.Contribution is not null;
             await ShowStateAsync(item);
         }
         else
@@ -127,6 +184,7 @@ public class EditModel(
             Input.CollectionId = collectionId;
         }
 
+        await LoadDefaultRightsAsync();
         await LoadCollectionsAsync();
         return Page();
     }
@@ -154,9 +212,25 @@ public class EditModel(
         if (tagNames.Count > MaxTagsPerItem)
             ModelState.AddModelError("Input.Tags", localizer["An item can have at most {0} tags.", MaxTagsPerItem]);
 
+        if (!string.IsNullOrEmpty(Input.RightsUri) && !RightsOptions.IsKnown(Input.RightsUri))
+            ModelState.AddModelError("Input.RightsUri", localizer["Please choose one of the statements."]);
+        if (!string.IsNullOrWhiteSpace(Input.ReferenceNumber))
+        {
+            var number = Input.ReferenceNumber.Trim();
+            var usedBy = await db.ArchiveItems.IgnoreQueryFilters().Where(i => i.ReferenceNumber == number && i.Id != id).Select(i => i.Title).FirstOrDefaultAsync();
+            if (usedBy is not null)
+                ModelState.AddModelError("Input.ReferenceNumber", localizer["This reference number is already used by: {0}", usedBy]);
+        }
+        foreach (var (photo, text) in Input.AltTexts)
+        {
+            if (text is { Length: > MaxAltTextLength })
+                ModelState.AddModelError($"Input.AltTexts[{photo}]", localizer["A photo description can be at most {0} characters long.", MaxAltTextLength]);
+        }
+
         if (!ModelState.IsValid)
         {
             await ShowStateAsync(item);
+            await LoadDefaultRightsAsync();
             await LoadCollectionsAsync();
             return Page();
         }
@@ -186,6 +260,22 @@ public class EditModel(
         item.TrySetDate(Input.Date);
         item.SetTags(await FindOrCreateTagsAsync(tagNames));
         item.UpdatedAt = now;
+        item.RightsUri = Clean(Input.RightsUri);
+        item.RightsHolder = Clean(Input.RightsHolder);
+        item.Credit = Clean(Input.Credit);
+        item.ReferenceNumber = Clean(Input.ReferenceNumber);
+        item.OriginalLocation = Clean(Input.OriginalLocation);
+        item.ReceivedFrom = Clean(Input.ReceivedFrom);
+        item.ReceivedOn = Clean(Input.ReceivedOn);
+        item.InternalNotes = Clean(Input.InternalNotes);
+        if (Input.AltTexts.Count > 0 && id is not null)
+        {
+            foreach (var file in await db.MediaFiles.Where(f => f.ArchiveItemId == id).ToListAsync())
+            {
+                if (Input.AltTexts.TryGetValue(file.Id, out var text))
+                    file.AltText = Clean(text);
+            }
+        }
         audit.Record(isNew ? AuditAction.ItemCreated : AuditAction.ItemChanged, item.Title, item);
 
         switch (command)
@@ -245,6 +335,11 @@ public class EditModel(
         };
     }
 
+    private static string? Clean(string? text) => string.IsNullOrWhiteSpace(text) ? null : text.Trim();
+
+    private async Task LoadDefaultRightsAsync() =>
+        DefaultRightsLabel = (await profile.GetAsync()).DefaultRightsUri is { } uri ? RightsOptions.Label(localizer, uri) : null;
+
     private async Task LoadNeighboursAsync(int? id)
     {
         if (id is { } itemId && AdminItemList.FilterFrom(Back) is { } filter)
@@ -264,6 +359,7 @@ public class EditModel(
         ModelState.Remove("Input.Version");
         Input.Version = current.Version;
         await ShowStateAsync(current);
+        await LoadDefaultRightsAsync();
         await LoadCollectionsAsync();
         return Page();
     }
@@ -331,6 +427,39 @@ public class EditModel(
         await db.SaveChangesAsync(cancellationToken);
 
         TempData["Message"] = localizer["The contribution is marked as withdrawn. It is hidden and cannot be published again."].Value;
+        return BackToItem(id);
+    }
+
+    /// <summary>Corrects what a contributor typed, for example a misspelt name, or when they ask for a change.</summary>
+    public async Task<IActionResult> OnPostContributorDetailsAsync(
+        int id, string? contributorName, string? contributorEmail, bool showName, string? contributorRightsHolder, CancellationToken cancellationToken)
+    {
+        var item = await db.ArchiveItems.Include(i => i.Contribution).FirstOrDefaultAsync(i => i.Id == id, cancellationToken);
+        if (item is null)
+            return NotFound();
+        if (item.Contribution is not { PersonalDetailsRemovedAt: null } contribution)
+            return BadRequest();
+
+        var name = Clean(contributorName);
+        var email = Clean(contributorEmail);
+        var holder = Clean(contributorRightsHolder);
+        if (name is null || name.Length > Contribution.NameMaxLength)
+            TempData["Error"] = localizer["Please enter a name of at most {0} characters.", Contribution.NameMaxLength].Value;
+        else if (email is not null && (email.Length > Contribution.EmailMaxLength || !new EmailAddressAttribute().IsValid(email)))
+            TempData["Error"] = localizer["Please enter a valid email address."].Value;
+        else if (holder is { Length: > Contribution.RightsHolderMaxLength })
+            TempData["Error"] = localizer["The name can be at most {0} characters long.", Contribution.RightsHolderMaxLength].Value;
+        else
+        {
+            contribution.ContributorName = name;
+            contribution.ContributorEmail = email;
+            contribution.ShowName = showName;
+            contribution.RightsHolder = holder;
+            // The log says that something changed, and never what, because it holds no contributor details.
+            audit.Record(AuditAction.ContributorDetailsChanged, item.Title, item);
+            await db.SaveChangesAsync(cancellationToken);
+            TempData["Message"] = localizer["The contributor's details are corrected."].Value;
+        }
         return BackToItem(id);
     }
 

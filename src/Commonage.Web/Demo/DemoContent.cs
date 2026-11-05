@@ -143,9 +143,19 @@ public static class DemoContent
                 await AddPhotoAsync(item, scene);
         }
 
+        // A few catalogue details, as a group would keep them. The photos are drawn for this demo, so anyone may use them.
+        var number = 0;
+        foreach (var item in items.Where(i => i.Status == ItemStatus.Published))
+        {
+            item.ReferenceNumber = $"LHG-{++number:000}";
+            item.OriginalLocation = T($"Box {1 + (number / 4)}", $"Karton {1 + (number / 4)}");
+            item.RightsUri = RightsOptions.CcBy;
+            item.Credit = T("Drawing: demo archive", "Zeichnung: Demo-Archiv");
+        }
+
         db.ArchiveItems.AddRange(items);
         // A made-up group, so the demo shows an archive as a group would set it up.
-        db.ArchiveSettings.Add(new ArchiveSettings { DefaultLanguage = language, PrivacyReviewed = true, ImprintNotNeeded = true });
+        db.ArchiveSettings.Add(new ArchiveSettings { DefaultLanguage = language, PrivacyReviewed = true, ImprintNotNeeded = true, DefaultRightsUri = RightsOptions.NotEvaluated });
         void Text(ArchiveTextKind kind, string text) => db.ArchiveTexts.Add(new ArchiveText { Language = language, Kind = kind, Text = text });
         Text(ArchiveTextKind.Name, T("Lindenau History Group", "Geschichtsverein Lindenau"));
         Text(ArchiveTextKind.Tagline, T("Photos and memories from a town that does not exist.", "Fotos und Erinnerungen aus einem Ort, den es nicht gibt."));

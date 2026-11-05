@@ -19,6 +19,9 @@ public class ContributorsModel(CommonageDbContext db) : PageModel
 
     public IReadOnlyList<Contribution> Results { get; private set; } = [];
 
+    /// <summary>Items that name the person in what curators wrote, which is not always a contribution.</summary>
+    public IReadOnlyList<ArchiveItem> NamedInItems { get; private set; } = [];
+
     public async Task OnGetAsync(CancellationToken cancellationToken)
     {
         var text = Text?.Trim();
@@ -37,6 +40,17 @@ public class ContributorsModel(CommonageDbContext db) : PageModel
                 || EF.Functions.ILike(c.RightsHolder!, pattern)
                 || EF.Functions.ILike(c.ReferenceCode!, pattern))
             .OrderBy(c => c.ContributorName).ThenByDescending(c => c.SubmittedAt)
+            .Take(MaxResults)
+            .ToListAsync(cancellationToken);
+
+        NamedInItems = await db.ArchiveItems
+            .IgnoreQueryFilters()
+            .AsNoTracking()
+            .Where(i => EF.Functions.ILike(i.RightsHolder!, pattern)
+                || EF.Functions.ILike(i.Credit!, pattern)
+                || EF.Functions.ILike(i.ReceivedFrom!, pattern)
+                || EF.Functions.ILike(i.InternalNotes!, pattern))
+            .OrderByDescending(i => i.UpdatedAt)
             .Take(MaxResults)
             .ToListAsync(cancellationToken);
     }

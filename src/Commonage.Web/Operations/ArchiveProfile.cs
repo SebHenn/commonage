@@ -18,6 +18,7 @@ public sealed class ArchiveIdentity(ArchiveSettings settings, IReadOnlyList<Arch
     public string? AccentColor => settings.AccentColor;
     public Guid? LogoId => settings.LogoId;
     public string? TimeZoneId => settings.TimeZone;
+    public string? DefaultRightsUri => settings.DefaultRightsUri;
     public bool AllowSearchEngines => settings.AllowSearchEngines;
     public bool PrivacyReviewed => settings.PrivacyReviewed;
     public bool ImprintNotNeeded => settings.ImprintNotNeeded;

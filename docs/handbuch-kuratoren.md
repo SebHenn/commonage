@@ -12,6 +12,20 @@ Für alle, die sich um den Bestand eines Archivs kümmern. Technische Kenntnisse
 - **Schlagwörter:** die Orte, Personen und Themen, nach denen jemand suchen könnte. Prüfen Sie vor einem neuen Schlagwort, ob
   es schon unter einem ähnlichen Namen existiert.
 
+## Rechte, Nennung und was nur Sie sehen
+
+Öffnen Sie bei einem Eintrag **Rechte und Nennung**:
+
+- **Was dürfen andere damit tun?** Wählen Sie ehrlich. „Noch nicht geprüft“ ist eine gute Antwort. Wählen Sie eine freie Lizenz
+  nur, wenn sie wirklich von der Person stammt, die die Rechte hat. Wer ein Foto einsendet, stimmt der Veröffentlichung auf dieser
+  Website zu, nicht der Weiterverwendung durch andere.
+- **Wer hat die Rechte?** Das sehen nur Kuratoren.
+- **Nennung** ist für Besucher. Schreiben Sie sie nur, wenn die Person öffentlich genannt werden darf.
+
+**Katalogangaben** sind für Sie: Referenznummer, wo das Original liegt, von wem und wann Sie es bekommen haben, und Notizen. Sie
+bleiben aus öffentlichen Seiten und der öffentlichen Suche heraus. Jedes Foto hat außerdem ein Feld dafür, **was es zeigt**, in
+einem Satz, für Menschen, die es nicht sehen können.
+
 ## Viele Einträge bearbeiten
 
 Öffnen Sie die Liste der Einträge und filtern Sie sie: nach Sammlung oder danach, was noch fehlt, zum Beispiel ein Datum.

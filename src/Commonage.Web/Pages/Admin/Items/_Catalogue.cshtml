@@ -1,0 +1,78 @@
+@model Commonage.Web.Pages.Admin.Items.EditModel
+
+<details class="mb-3" open="@Model.CatalogueHasContent" id="rights-details">
+    <summary class="h5">@T["Rights and credit"]</summary>
+    <div class="mt-3">
+        <div class="mb-3">
+            <label asp-for="Input.RightsUri" class="form-label"></label>
+            <select asp-for="Input.RightsUri" class="form-select" aria-describedby="rights-help">
+                <option value="">@(Model.DefaultRightsLabel is { } archiveDefault ? T["The archive's default: {0}", archiveDefault] : T["Not decided yet"])</option>
+                @foreach (var uri in RightsOptions.All)
+                {
+                    <option value="@uri">@RightsOptions.Label(T, uri)</option>
+                }
+            </select>
+            <span asp-validation-for="Input.RightsUri" class="text-danger"></span>
+            <div id="rights-help" class="form-text">
+                @if (Model.RightsWereProposed)
+                {
+                    @T["Suggested from what the contributor answered. They agreed to publication on this website, not to reuse by others, so only a free licence they gave you themselves should go further."]
+                }
+                else
+                {
+                    @T["What others may do with this item. Choose a free licence only if whoever holds the rights really gave it."]
+                }
+            </div>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Input.RightsHolder" class="form-label"></label>
+            <input asp-for="Input.RightsHolder" class="form-control" aria-describedby="holder-help" />
+            <span asp-validation-for="Input.RightsHolder" class="text-danger"></span>
+            <div id="holder-help" class="form-text">@T["Only curators see this."]</div>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Input.Credit" class="form-label"></label>
+            <input asp-for="Input.Credit" class="form-control" aria-describedby="credit-help" />
+            <span asp-validation-for="Input.Credit" class="text-danger"></span>
+            <div id="credit-help" class="form-text">
+                @T["For visitors, for example: Photo: Anna Krause. Leave it empty unless this person may be named publicly."]
+                @if (Model.Contribution?.RightsHolder is { } named)
+                {
+                    <br />@T["The contributor named as photographer or author: {0}", named]
+                }
+            </div>
+        </div>
+    </div>
+</details>
+
+<details class="mb-3" open="@Model.CatalogueHasContent" id="catalogue-details">
+    <summary class="h5">@T["Catalogue details"]</summary>
+    <p class="form-text">@T["Only curators see these. They stay out of public pages and public search."]</p>
+    <div class="row g-3 mb-3">
+        <div class="col-sm-6">
+            <label asp-for="Input.ReferenceNumber" class="form-label"></label>
+            <input asp-for="Input.ReferenceNumber" class="form-control" />
+            <span asp-validation-for="Input.ReferenceNumber" class="text-danger"></span>
+        </div>
+        <div class="col-sm-6">
+            <label asp-for="Input.OriginalLocation" class="form-label"></label>
+            <input asp-for="Input.OriginalLocation" class="form-control" />
+            <span asp-validation-for="Input.OriginalLocation" class="text-danger"></span>
+        </div>
+        <div class="col-sm-6">
+            <label asp-for="Input.ReceivedFrom" class="form-label"></label>
+            <input asp-for="Input.ReceivedFrom" class="form-control" />
+            <span asp-validation-for="Input.ReceivedFrom" class="text-danger"></span>
+        </div>
+        <div class="col-sm-6">
+            <label asp-for="Input.ReceivedOn" class="form-label"></label>
+            <input asp-for="Input.ReceivedOn" class="form-control" />
+            <span asp-validation-for="Input.ReceivedOn" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Input.InternalNotes" class="form-label"></label>
+        <textarea asp-for="Input.InternalNotes" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="Input.InternalNotes" class="text-danger"></span>
+    </div>
+</details>

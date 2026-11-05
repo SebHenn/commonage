@@ -22,6 +22,24 @@
 
 @if (!string.IsNullOrWhiteSpace(Model.Text))
 {
+    @if (Model.NamedInItems.Count > 0)
+    {
+        <h2 class="h5">@T["Named in what curators wrote"]</h2>
+        <p class="form-text">@T["In the rights holder, credit, received from or internal notes of these items. Correct or remove the text on the item."]</p>
+        <ul class="mb-4">
+            @foreach (var item in Model.NamedInItems)
+            {
+                <li>
+                    <a asp-page="/Admin/Items/Edit" asp-route-id="@item.Id">@item.Title</a>
+                    @if (item.DeletedAt is not null)
+                    {
+                        <span class="badge text-bg-dark">@T["In the bin"]</span>
+                    }
+                </li>
+            }
+        </ul>
+    }
+
     @if (Model.Results.Count == 0)
     {
         <p class="text-muted">@T["No contributions match."]</p>

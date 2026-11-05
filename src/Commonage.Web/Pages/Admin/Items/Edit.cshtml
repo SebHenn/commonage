@@ -102,6 +102,31 @@
             </dl>
             @if (contribution.PersonalDetailsRemovedAt is null || Model.CurrentStatus != ItemStatus.Withdrawn)
             {
+                @if (contribution.PersonalDetailsRemovedAt is null)
+                {
+                    <details class="mt-3">
+                        <summary>@T["Correct these details"]</summary>
+                        <form method="post" asp-page-handler="ContributorDetails" asp-route-id="@Model.ItemId" asp-route-back="@Model.Back" class="mt-2">
+                            <div class="mb-2">
+                                <label for="contributor-name" class="form-label">@T["Name"]</label>
+                                <input id="contributor-name" name="contributorName" value="@contribution.ContributorName" class="form-control" autocomplete="off" />
+                            </div>
+                            <div class="mb-2">
+                                <label for="contributor-email" class="form-label">@T["Email address"]</label>
+                                <input id="contributor-email" name="contributorEmail" type="email" value="@contribution.ContributorEmail" class="form-control" autocomplete="off" />
+                            </div>
+                            <div class="mb-2">
+                                <label for="contributor-holder" class="form-label">@T["Name of the photographer or author, if known"]</label>
+                                <input id="contributor-holder" name="contributorRightsHolder" value="@contribution.RightsHolder" class="form-control" autocomplete="off" />
+                            </div>
+                            <div class="form-check mb-2">
+                                <input id="contributor-show" name="showName" type="checkbox" value="true" checked="@contribution.ShowName" class="form-check-input" />
+                                <label for="contributor-show" class="form-check-label">@T["May be named publicly"]</label>
+                            </div>
+                            <button type="submit" class="btn btn-sm btn-outline-primary">@T["Save these details"]</button>
+                        </form>
+                    </details>
+                }
                 <h3 class="h6 mt-4">@T["If the contributor asks"]</h3>
                 <div class="d-flex flex-wrap gap-2">
                     @if (contribution.PersonalDetailsRemovedAt is null)
@@ -142,7 +167,7 @@
     </section>
 }
 
-<form method="post" class="col-lg-8" data-warn-unsaved="@(Model.FormHasUnsavedText ? "dirty" : "")" data-send-once>
+<form method="post" id="item-form" class="col-lg-8" data-warn-unsaved="@(Model.FormHasUnsavedText ? "dirty" : "")" data-send-once>
     <partial name="_ErrorSummary" />
     <input type="hidden" asp-for="Input.Version" />
     <div class="mb-3">
@@ -182,6 +207,8 @@
         <textarea asp-for="Input.Description" class="form-control" rows="8"></textarea>
         <span asp-validation-for="Input.Description" class="text-danger"></span>
     </div>
+
+    <partial name="_Catalogue" model="Model" />
 
     <div class="d-flex flex-wrap gap-2">
         @switch (Model.CurrentStatus)

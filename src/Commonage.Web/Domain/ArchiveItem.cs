@@ -44,6 +44,25 @@ public class ArchiveItem
     /// <summary>Changes with every save. Lets a form notice that someone else changed the item since it was opened.</summary>
     public uint Version { get; private set; }
 
+    /// <summary>What others may do with the item, see <see cref="RightsOptions"/>. Null falls back to the archive's default.</summary>
+    public string? RightsUri { get; set; }
+
+    /// <summary>Who holds the rights. Only curators see this, because a name given for one purpose is not public by itself.</summary>
+    public string? RightsHolder { get; set; }
+
+    /// <summary>The credit for visitors, for example "Photo: Anna Krause". A curator writes it on purpose.</summary>
+    public string? Credit { get; set; }
+
+    // What curators keep for themselves: never on a public page and not in the public search.
+    public string? ReferenceNumber { get; set; }
+    public string? OriginalLocation { get; set; }
+    public string? ReceivedFrom { get; set; }
+
+    /// <summary>When it came to the archive, as written. Often that is all anyone knows: "summer 2019".</summary>
+    public string? ReceivedOn { get; set; }
+
+    public string? InternalNotes { get; set; }
+
     public void MoveToBin(DateTime now) => DeletedAt = now;
 
     public void RestoreFromBin() => DeletedAt = null;

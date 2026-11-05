@@ -21,6 +21,9 @@ public class ArchiveSettings
 
     public bool AllowSearchEngines { get; set; } = true;
 
+    /// <summary>What applies to items without a statement of their own, see <see cref="RightsOptions"/>.</summary>
+    public string? DefaultRightsUri { get; set; }
+
     /// <summary>An admin has read the privacy text and found it right for this archive, even if it stays as it came.</summary>
     public bool PrivacyReviewed { get; set; }
 

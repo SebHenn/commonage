@@ -28,6 +28,10 @@
                             <div class="card-body p-2 small d-flex flex-column">
                                 <div class="text-truncate" title="@file.OriginalFileName">@file.OriginalFileName</div>
                                 <div class="text-muted mb-2">@((file.SizeBytes / 1024.0 / 1024.0).ToString("0.0")) MB</div>
+                                @* Saved with the item: the form attribute makes this field part of the form above or below. *@
+                                <label for="@Html.GenerateIdFromName($"Input.AltTexts[{file.Id}]")" class="form-label mb-1">@T["What does it show?"]</label>
+                                <textarea id="@Html.GenerateIdFromName($"Input.AltTexts[{file.Id}]")" name="Input.AltTexts[@file.Id]" form="item-form" rows="2" maxlength="1000"
+                                          class="form-control form-control-sm mb-2" aria-describedby="alt-help">@(Model.Input.AltTexts.TryGetValue(file.Id, out var typed) ? typed : file.AltText)</textarea>
                                 <div class="d-flex flex-wrap gap-2 mt-auto justify-content-between">
                                     <a href="/admin/media/@file.Id/original" class="btn btn-sm btn-outline-secondary">@T["Original"]</a>
                                     <form method="post" asp-page-handler="DeleteMedia" asp-route-id="@Model.ItemId" asp-route-mediaFileId="@file.Id" asp-route-back="@Model.Back"
@@ -40,6 +44,9 @@
                     </div>
                 }
             </div>
+            <p id="alt-help" class="form-text">@T["For people who cannot see the photo: who and what is in it, in a sentence. Saved together with the item."]</p>
+            @* So nobody has to scroll back to the form's own button. *@
+            <p><button type="submit" form="item-form" class="btn btn-sm btn-outline-primary">@T["Save"]</button></p>
             @if (Model.MediaFiles.Any(f => f.Status == ProcessingStatus.Pending))
             {
                 <p class="text-muted small">@T["Previews are being created. Reload the page in a moment."]</p>

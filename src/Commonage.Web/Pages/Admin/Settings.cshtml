@@ -117,6 +117,18 @@
             <span asp-validation-for="Input.TimeZone" class="text-danger"></span>
             <div id="timezone-help" class="form-text">@T["For the times shown to curators, such as in the activity log."]</div>
         </div>
+        <div class="mb-3">
+            <label asp-for="Input.DefaultRightsUri" class="form-label"></label>
+            <select asp-for="Input.DefaultRightsUri" class="form-select" aria-describedby="rights-default-help">
+                <option value="">@T["Not decided yet"]</option>
+                @foreach (var uri in RightsOptions.All)
+                {
+                    <option value="@uri">@RightsOptions.Label(T, uri)</option>
+                }
+            </select>
+            <span asp-validation-for="Input.DefaultRightsUri" class="text-danger"></span>
+            <div id="rights-default-help" class="form-text">@T["If you do not know yet, choosing that it is not checked is honest. A free licence is only yours to give for what you hold the rights to."]</div>
+        </div>
         <div class="form-check mb-3">
             <input asp-for="Input.AllowSearchEngines" class="form-check-input" aria-describedby="search-engines-help" />
             <label asp-for="Input.AllowSearchEngines" class="form-check-label"></label>
