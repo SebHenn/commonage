@@ -68,6 +68,15 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options)
             item.Property(i => i.Title).HasMaxLength(300);
             item.Property(i => i.Description).HasMaxLength(20000);
             item.Property(i => i.DateText).HasMaxLength(DateRange.MaxTextLength);
+            item.Property(i => i.RightsUri).HasMaxLength(RightsOptions.MaxUriLength);
+            item.Property(i => i.RightsHolder).HasMaxLength(300);
+            item.Property(i => i.Credit).HasMaxLength(300);
+            item.Property(i => i.ReferenceNumber).HasMaxLength(100);
+            item.Property(i => i.OriginalLocation).HasMaxLength(300);
+            item.Property(i => i.ReceivedFrom).HasMaxLength(300);
+            item.Property(i => i.ReceivedOn).HasMaxLength(100);
+            item.Property(i => i.InternalNotes).HasMaxLength(20000);
+            item.HasIndex(i => i.ReferenceNumber).IsUnique();
             item.HasIndex(i => i.Status);
             item.HasIndex(i => i.DateFrom);
             item.HasIndex(i => i.DateTo);
@@ -127,6 +136,7 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options)
             settings.Property(s => s.DefaultLanguage).HasMaxLength(20);
             settings.Property(s => s.AccentColor).HasMaxLength(7);
             settings.Property(s => s.TimeZone).HasMaxLength(100);
+            settings.Property(s => s.DefaultRightsUri).HasMaxLength(RightsOptions.MaxUriLength);
         });
 
         builder.Entity<ArchiveText>(text =>
@@ -156,6 +166,7 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options)
             file.Property(f => f.ContentType).HasMaxLength(100);
             file.Property(f => f.Sha256).HasMaxLength(64).IsFixedLength();
             file.Property(f => f.ProcessingError).HasMaxLength(1000);
+            file.Property(f => f.AltText).HasMaxLength(1000);
             file.HasIndex(f => f.StorageId).IsUnique();
             file.HasIndex(f => f.Status);
             file.HasOne(f => f.ArchiveItem)

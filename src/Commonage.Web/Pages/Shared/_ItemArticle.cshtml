@@ -21,7 +21,7 @@
             {
                 @* The first picture is what the page is about, so it does not wait. *@
                 <figure>
-                    <img src="@mediaAddress/@file.Id/preview" alt="@Model.Title" width="@file.PreviewWidth" height="@file.PreviewHeight"
+                    <img src="@mediaAddress/@file.Id/preview" alt="@(file.AltText ?? Model.Title)" width="@file.PreviewWidth" height="@file.PreviewHeight"
                          class="media-preview rounded" loading="@(first ? "eager" : "lazy")" fetchpriority="@(first ? "high" : "auto")" />
                 </figure>
                 first = false;

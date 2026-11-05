@@ -36,6 +36,7 @@ public enum AuditAction
     PhotoPurged,
     SettingsChanged,
     RestoreTested,
+    ContributorDetailsChanged,
 }
 
 /// <summary>

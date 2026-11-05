@@ -46,6 +46,15 @@ The list on "Manage archive" shows what is left to set up, and stays until every
 
 Curators have their own guide: [curator-handbook.md](curator-handbook.md) ([deutsch](handbuch-kuratoren.md)).
 
+## Rights and catalogue details
+
+On each item, curators can say what others may do with it, as a standard statement with a plain label. "Settings" has a
+default for items without one of their own. A contributor's answer only suggests a statement, and never a free licence: they
+agreed to publication on this website, not to reuse by others. Visitors do not see these yet; that comes in a later version.
+
+"Catalogue details" (reference number, where the original is kept, received from and when, notes) are for curators only and
+stay out of public pages and public search. A reference number typed into the search on "Manage archive" finds its item.
+
 ## Picture sizes
 
 Each photo has a preview and smaller sizes for lists, made when it is uploaded. When a new version of Commonage adds a size,
@@ -105,7 +114,10 @@ the material can always move to another system, or be handed to a public archive
 | `files/<item id>/<file id>-<name>` | The original files, exactly as uploaded. |
 | `README.txt` | A short description of the above. |
 
-`archive.json` has `"format": "commonage-export"` and `"version": 2`. Version 2 added `settings` with the archive's name, pages and colours, and the logo under `branding/`. While exporting, every file is checked against
+`archive.json` has `"format": "commonage-export"` and `"version": 3`. Version 3 added each item's rights, credit and catalogue
+details and each photo's description; in `items.csv`, `rights` and `rights_holder` are now the item's own, and the contributor's
+answers moved to `contributor_rights` and `contributor_rights_holder`. An export of published items leaves out what only
+curators see. Without personal data, it also leaves out rights holders, credits, "received from" and internal notes. Version 2 added `settings` with the archive's name, pages and colours, and the logo under `branding/`. While exporting, every file is checked against
 its checksum. A file entry with `"problem": "missing"` was not found in storage, `"checksumMismatch"` means it has
 changed since the upload; both need looking into.
 

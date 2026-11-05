@@ -23,7 +23,7 @@ public record ExportOptions(bool PublishedOnly, bool IncludePersonalData);
 public class ArchiveExporter(CommonageDbContext db, IFileStorage storage, TimeProvider clock, ILogger<ArchiveExporter> logger)
 {
     public const string Format = "commonage-export";
-    public const int Version = 2;
+    public const int Version = 3;
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -87,7 +87,7 @@ public class ArchiveExporter(CommonageDbContext db, IFileStorage storage, TimePr
             collections.Select(c => new ExportCollection(c.Id, c.Title, c.Description, c.CreatedAt)).ToList(),
             exportedItems,
             new ExportSettings(
-                settings.DefaultLanguage, settings.AccentColor, settings.TimeZone, settings.AllowSearchEngines, settings.PrivacyReviewed,
+                settings.DefaultLanguage, settings.AccentColor, settings.TimeZone, settings.DefaultRightsUri, settings.AllowSearchEngines, settings.PrivacyReviewed,
                 settings.ImprintNotNeeded, settings.RestoreTestedAt, logoPath,
                 texts.Select(t => new ExportText(t.Language, t.Kind, t.Text)).ToList()));
 
@@ -142,7 +142,7 @@ public class ArchiveExporter(CommonageDbContext db, IFileStorage storage, TimePr
     }
 
     private static ExportFile Describe(MediaFile file, string? path, string? problem) =>
-        new(file.Id, path, file.OriginalFileName, file.ContentType, file.SizeBytes, file.Sha256, file.UploadedAt, problem);
+        new(file.Id, path, file.OriginalFileName, file.ContentType, file.SizeBytes, file.Sha256, file.UploadedAt, file.AltText, problem);
 
     private static ExportItem Describe(ArchiveItem item, List<ExportFile> files, ExportOptions options) => new(
         item.Id,
@@ -155,6 +155,15 @@ public class ArchiveExporter(CommonageDbContext db, IFileStorage storage, TimePr
         item.CreatedAt,
         item.UpdatedAt,
         item.PublishedAt,
+        item.RightsUri,
+        options.IncludePersonalData ? item.RightsHolder : null,
+        options.IncludePersonalData ? item.Credit : null,
+        // A copy of what is public leaves out what only curators see.
+        options.PublishedOnly ? null : item.ReferenceNumber,
+        options.PublishedOnly ? null : item.OriginalLocation,
+        options.PublishedOnly || !options.IncludePersonalData ? null : item.ReceivedFrom,
+        options.PublishedOnly ? null : item.ReceivedOn,
+        options.PublishedOnly || !options.IncludePersonalData ? null : item.InternalNotes,
         item.Contribution is not { } contribution ? null : new ExportContribution(
             options.IncludePersonalData ? contribution.ContributorName : null,
             options.IncludePersonalData ? contribution.ContributorEmail : null,
@@ -230,6 +239,7 @@ internal record ExportSettings(
     string DefaultLanguage,
     string? AccentColor,
     string? TimeZone,
+    string? DefaultRightsUri,
     bool AllowSearchEngines,
     bool PrivacyReviewed,
     bool ImprintNotNeeded,
@@ -252,6 +262,14 @@ internal record ExportItem(
     DateTime CreatedAt,
     DateTime UpdatedAt,
     DateTime? PublishedAt,
+    string? RightsUri,
+    string? RightsHolder,
+    string? Credit,
+    string? ReferenceNumber,
+    string? OriginalLocation,
+    string? ReceivedFrom,
+    string? ReceivedOn,
+    string? InternalNotes,
     ExportContribution? Contribution,
     IReadOnlyList<ExportFile> Files);
 
@@ -279,6 +297,7 @@ internal record ExportFile(
     long SizeBytes,
     string Sha256,
     DateTime UploadedAt,
+    string? AltText,
     string? Problem);
 
 internal static class ItemsCsv
@@ -286,7 +305,8 @@ internal static class ItemsCsv
     private static readonly string[] Header =
     [
         "id", "collection", "title", "status", "date", "date_from", "date_to", "tags", "description",
-        "rights", "rights_holder", "contributor_name", "contributor_email", "files",
+        "rights", "rights_holder", "credit", "reference_number", "contributor_rights", "contributor_rights_holder",
+        "contributor_name", "contributor_email", "files",
     ];
 
     public static async Task WriteAsync(Stream stream, ExportDocument document, CancellationToken cancellationToken)
@@ -309,6 +329,10 @@ internal static class ItemsCsv
                 item.Date?.To?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
                 string.Join("; ", item.Tags),
                 item.Description,
+                item.RightsUri,
+                item.RightsHolder,
+                item.Credit,
+                item.ReferenceNumber,
                 item.Contribution?.Rights.ToString(),
                 item.Contribution?.RightsHolder,
                 item.Contribution?.ContributorName,

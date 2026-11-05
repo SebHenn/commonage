@@ -13,6 +13,8 @@ public enum ItemNeed
     Tags,
     Photos,
     PreviewFailed,
+    Rights,
+    AltText,
 }
 
 public enum AdminItemSort
@@ -45,7 +47,12 @@ public static class AdminItemList
     public static async Task<IQueryable<ArchiveItem>> QueryAsync(this CommonageDbContext db, AdminItemFilter filter, CancellationToken cancellationToken)
     {
         // Curators see every item, drafts included.
-        var items = db.ArchiveItems.Filter(new ItemFilter(await db.ToSearchQueryAsync(filter.Text, cancellationToken), filter.Tag, filter.CollectionId));
+        // A reference number is not in the search index, on purpose, so it is looked up on its own. Whoever types one wants that item.
+        var isReference = filter.Text is { Length: > 0 } text && await db.ArchiveItems.AnyAsync(i => i.ReferenceNumber == text.Trim(), cancellationToken);
+        var query = isReference ? null : await db.ToSearchQueryAsync(filter.Text, cancellationToken);
+        var items = db.ArchiveItems.Filter(new ItemFilter(query, filter.Tag, filter.CollectionId));
+        if (isReference)
+            items = items.Where(i => i.ReferenceNumber == filter.Text!.Trim());
         if (filter.Status is { } status)
             items = items.Where(i => i.Status == status);
 
@@ -56,6 +63,10 @@ public static class AdminItemList
             ItemNeed.Tags => items.Where(i => i.TagNames == null),
             ItemNeed.Photos => items.Where(i => !i.MediaFiles.Any()),
             ItemNeed.PreviewFailed => items.Where(i => i.MediaFiles.Any(f => f.Status == ProcessingStatus.Failed)),
+            ItemNeed.AltText => items.Where(i => i.MediaFiles.Any(f => f.AltText == null)),
+            // With a default for the whole archive, nothing is left undecided.
+            ItemNeed.Rights when !await db.ArchiveSettings.AnyAsync(s => s.DefaultRightsUri != null, cancellationToken) => items.Where(i => i.RightsUri == null),
+            ItemNeed.Rights => items.Where(i => false),
             _ => items,
         };
 

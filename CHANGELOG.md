@@ -5,6 +5,16 @@ version may change things that need attention when updating, and these notes say
 
 ## Unreleased
 
+### For curators
+
+- Each item can record what others may do with it, as a standard statement with a plain label, who holds the rights, and a
+  credit. Settings has a default. A contributor's answer only suggests a statement, and never a free licence.
+- Catalogue details for curators only: reference number, where the original is kept, received from and when, internal notes.
+- Each photo can say what it shows, for people who cannot see it. Visitors' pages use this as the picture's description.
+- Filters for items without a rights statement or photo descriptions. A reference number typed into the search finds its item.
+- Contributor details can be corrected, for example a misspelt name.
+- "Contributors" also finds people named in what curators wrote.
+
 ### For visitors
 
 - A new look: the start page opens with the group's name and welcome text, recently added photos and collections with
@@ -22,6 +32,8 @@ version may change things that need attention when updating, and these notes say
 
 ### Project
 
+- The export format is now version 3. In `items.csv`, the contributor's answers moved to `contributor_rights` and
+  `contributor_rights_holder`. See docs/operations.md.
 - Interface languages are one list, in `SupportedLanguages.cs`. Pages switch to right-to-left by language, and browser tests
   try that, and much longer text.
 

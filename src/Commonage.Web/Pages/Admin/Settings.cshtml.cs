@@ -89,6 +89,9 @@ public class SettingsModel(
         [Display(Name = "Time zone")]
         public string? TimeZone { get; set; }
 
+        [Display(Name = "What may others do with your items, unless an item says otherwise?")]
+        public string? DefaultRightsUri { get; set; }
+
         [Display(Name = "Let search engines list this archive")]
         public bool AllowSearchEngines { get; set; } = true;
     }
@@ -115,6 +118,7 @@ public class SettingsModel(
             DefaultLanguage = settings.DefaultLanguage,
             TimeZone = settings.TimeZone,
             AllowSearchEngines = settings.AllowSearchEngines,
+            DefaultRightsUri = settings.DefaultRightsUri,
         };
         ShowState(settings);
     }
@@ -132,6 +136,9 @@ public class SettingsModel(
             ModelState.AddModelError("Input.DefaultLanguage", localizer["Please choose one of the languages."]);
         if (!string.IsNullOrEmpty(Input.TimeZone) && !TimeZoneInfo.TryFindSystemTimeZoneById(Input.TimeZone, out _))
             ModelState.AddModelError("Input.TimeZone", localizer["Please choose one of the time zones."]);
+
+        if (!string.IsNullOrEmpty(Input.DefaultRightsUri) && !RightsOptions.IsKnown(Input.DefaultRightsUri))
+            ModelState.AddModelError("Input.DefaultRightsUri", localizer["Please choose one of the statements."]);
 
         string? accent = null;
         if (!Input.UseStandardColor && !string.Equals(Input.AccentColor, StandardColor, StringComparison.OrdinalIgnoreCase))
@@ -166,6 +173,7 @@ public class SettingsModel(
         settings.AccentColor = accent;
         settings.TimeZone = string.IsNullOrEmpty(Input.TimeZone) ? null : Input.TimeZone;
         settings.AllowSearchEngines = Input.AllowSearchEngines;
+        settings.DefaultRightsUri = string.IsNullOrEmpty(Input.DefaultRightsUri) ? null : Input.DefaultRightsUri;
         settings.PrivacyReviewed = Input.PrivacyReviewed;
         settings.ImprintNotNeeded = Input.ImprintNotNeeded;
 

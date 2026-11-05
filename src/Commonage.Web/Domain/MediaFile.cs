@@ -39,6 +39,9 @@ public class MediaFile
 
     public DateTime UploadedAt { get; set; }
 
+    /// <summary>What the photo shows, for people who cannot see it. Without it, the item's title stands in.</summary>
+    public string? AltText { get; set; }
+
     /// <summary>When the photo was moved to the bin on its own. Photos in the bin are hidden from everything but the bin page.</summary>
     public DateTime? DeletedAt { get; set; }
 
