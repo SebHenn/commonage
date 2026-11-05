@@ -1,5 +1,7 @@
+@inject IConfiguration Configuration
 @{
     Layout = "_Layout";
+    var handbook = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "de" ? "handbuch-kuratoren.md" : "curator-handbook.md";
     var page = ViewContext.RouteData.Values["page"]?.ToString() ?? "";
 
     // The section of the management pages this page belongs to, so its link is marked as the current one.
@@ -18,7 +20,9 @@
         <a asp-page="/Admin/Users/Index" class="nav-link" aria-current="@Current("/Admin/Users")">@T["Accounts"]</a>
         <a asp-page="/Admin/Activity" class="nav-link" aria-current="@Current("/Admin/Activity")">@T["Activity log"]</a>
         <a asp-page="/Admin/Export" class="nav-link" aria-current="@Current("/Admin/Export")">@T["Export"]</a>
+        <a asp-page="/Admin/Settings" class="nav-link" aria-current="@Current("/Admin/Settings")">@T["Settings"]</a>
     }
+    <a href="@Commonage.Web.SourceCode.UrlFrom(Configuration)/blob/main/docs/@handbook" class="nav-link" rel="noopener">@T["Handbook"]</a>
 </nav>
 
 @RenderBody()

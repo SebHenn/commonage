@@ -7,6 +7,10 @@
 <div class="col-lg-8">
     <h1>@T["Thank you"]</h1>
     <p>@T["We have received what you sent in. A curator will look at it, and it will appear in the archive once it is approved."]</p>
+    @if (Model.Reference is { } reference)
+    {
+        <p>@T["Your reference: {0}. Please note it down: you can quote it if you want to ask about what you sent, or have it taken down. No email will follow.", reference]</p>
+    }
     <p class="d-flex flex-wrap gap-3">
         <a asp-page="Index" asp-route-token="@Model.Token">@T["Send in something else"]</a>
         <a asp-page="/Index">@T["Browse the archive"]</a>

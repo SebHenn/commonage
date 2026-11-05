@@ -1,0 +1,42 @@
+@model Commonage.Web.Pages.Admin.GettingStarted
+@* Stays until everything is done, so an unset contact page or a backup nobody has tested cannot be forgotten quietly. *@
+@if (Model.Steps.Any(step => !step.Done))
+{
+    <section class="card mb-4" aria-labelledby="getting-started-heading">
+        <div class="card-body">
+            <h2 id="getting-started-heading" class="h5">@T["Getting started"]</h2>
+            <ul class="list-unstyled mb-0">
+                @foreach (var step in Model.Steps)
+                {
+                    <li class="mb-1">
+                        @if (step.Done)
+                        {
+                            <span aria-hidden="true">✓</span>
+                            <span class="visually-hidden">@T["Done:"]</span>
+                            <span class="text-muted">@step.Text</span>
+                        }
+                        else
+                        {
+                            <span aria-hidden="true">○</span>
+                            <span class="visually-hidden">@T["To do:"]</span>
+                            @if (step.Page is not null)
+                            {
+                                <a asp-page="@step.Page">@step.Text</a>
+                            }
+                            else
+                            {
+                                @step.Text
+                            }
+                        }
+                    </li>
+                }
+            </ul>
+            @if (Model.RestoreTested is false)
+            {
+                <form method="post" asp-page="/Admin/Settings" asp-page-handler="RestoreTested" class="mt-3">
+                    <button type="submit" class="btn btn-sm btn-outline-secondary">@T["We have tested a restore"]</button>
+                </form>
+            }
+        </div>
+    </section>
+}

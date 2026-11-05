@@ -1,0 +1,130 @@
+@page
+@model Commonage.Web.Pages.Admin.SettingsModel
+@{
+    ViewData["Title"] = T["Archive settings"];
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form method="post" enctype="multipart/form-data" class="col-lg-8" data-warn-unsaved="@(ModelState.IsValid ? "" : "dirty")" data-send-once>
+    <partial name="_ErrorSummary" />
+
+    <fieldset class="mb-4">
+        <legend class="h4">@T["Your archive"]</legend>
+        <div class="mb-3">
+            <label asp-for="Input.Name" class="form-label"></label>
+            <input asp-for="Input.Name" class="form-control" />
+            <span asp-validation-for="Input.Name" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Input.Tagline" class="form-label"></label>
+            <input asp-for="Input.Tagline" class="form-control" aria-describedby="tagline-help" />
+            <span asp-validation-for="Input.Tagline" class="text-danger"></span>
+            <div id="tagline-help" class="form-text">@T["A few words about what this archive is, for example: Photos and memories from Lindenau."]</div>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Input.Intro" class="form-label"></label>
+            <textarea asp-for="Input.Intro" class="form-control" rows="4"></textarea>
+            <span asp-validation-for="Input.Intro" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label for="Logo" class="form-label">@T["Logo"]</label>
+            @if (Model.CurrentLogoId is { } logoId)
+            {
+                <div class="mb-2"><img src="/branding/@logoId/logo" alt="" class="settings-logo" /></div>
+            }
+            <input id="Logo" type="file" name="Logo" accept="@Commonage.Web.Media.ImageFormats.AcceptAttribute" class="form-control" aria-describedby="logo-help"
+                   data-choose-text="@T["Choose a logo"]" data-none-text="@T["No file chosen"]" />
+            <span data-valmsg-for="Logo" data-valmsg-replace="true" class="text-danger">@(ViewData.ModelState["Logo"]?.Errors.FirstOrDefault()?.ErrorMessage)</span>
+            <div id="logo-help" class="form-text">@T["JPEG, PNG, TIFF or WebP, at most {0} MB. It is also used as the browser tab's icon.", Commonage.Web.Operations.LogoImages.MaxBytes / 1024 / 1024]</div>
+            @if (Model.CurrentLogoId is not null)
+            {
+                <div class="form-check mt-2">
+                    <input asp-for="Input.RemoveLogo" class="form-check-input" />
+                    <label asp-for="Input.RemoveLogo" class="form-check-label"></label>
+                </div>
+            }
+        </div>
+        <div class="mb-3">
+            <label asp-for="Input.AccentColor" class="form-label"></label>
+            <input asp-for="Input.AccentColor" type="color" class="form-control form-control-color" />
+            <span asp-validation-for="Input.AccentColor" class="text-danger"></span>
+            <div class="form-check mt-2">
+                <input asp-for="Input.UseStandardColor" class="form-check-input" />
+                <label asp-for="Input.UseStandardColor" class="form-check-label"></label>
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset class="mb-4">
+        <legend class="h4">@T["Pages about your archive"]</legend>
+        <p class="form-text">@T["Plain text. Web and email addresses become links. A page you leave empty is not shown."]</p>
+        <div class="mb-3">
+            <label asp-for="Input.About" class="form-label"></label>
+            <textarea asp-for="Input.About" class="form-control" rows="5"></textarea>
+            <span asp-validation-for="Input.About" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Input.Contact" class="form-label"></label>
+            <textarea asp-for="Input.Contact" class="form-control" rows="4" aria-describedby="contact-help"></textarea>
+            <span asp-validation-for="Input.Contact" class="text-danger"></span>
+            <div id="contact-help" class="form-text">@T["Contributors are promised they can ask for removal. Say how: an email address, a phone number or a meeting place."]</div>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Input.Privacy" class="form-label"></label>
+            <textarea asp-for="Input.Privacy" class="form-control" rows="16" aria-describedby="privacy-help"></textarea>
+            <span asp-validation-for="Input.Privacy" class="text-danger"></span>
+            <div id="privacy-help" class="form-text">@T["This describes what Commonage itself stores. It is a template and not legal advice: adapt it to what your group does."]</div>
+            <div class="form-check mt-2">
+                <input asp-for="Input.PrivacyReviewed" class="form-check-input" />
+                <label asp-for="Input.PrivacyReviewed" class="form-check-label"></label>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Input.Imprint" class="form-label"></label>
+            <textarea asp-for="Input.Imprint" class="form-control" rows="5" aria-describedby="imprint-help"></textarea>
+            <span asp-validation-for="Input.Imprint" class="text-danger"></span>
+            <div id="imprint-help" class="form-text">@T["Whether you need one depends on your country. In Germany, for example, most websites do."]</div>
+            <div class="form-check mt-2">
+                <input asp-for="Input.ImprintNotNeeded" class="form-check-input" />
+                <label asp-for="Input.ImprintNotNeeded" class="form-check-label"></label>
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset class="mb-4">
+        <legend class="h4">@T["Language, time and visibility"]</legend>
+        <div class="mb-3">
+            <label asp-for="Input.DefaultLanguage" class="form-label"></label>
+            <select asp-for="Input.DefaultLanguage" class="form-select" aria-describedby="language-help">
+                <option value="en" lang="en">English</option>
+                <option value="de" lang="de">Deutsch</option>
+            </select>
+            <span asp-validation-for="Input.DefaultLanguage" class="text-danger"></span>
+            <div id="language-help" class="form-text">@T["For visitors whose browser asks for no language this archive offers."]</div>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Input.TimeZone" class="form-label"></label>
+            <select asp-for="Input.TimeZone" class="form-select" aria-describedby="timezone-help">
+                <option value="">@T["The server's clock"]</option>
+                @foreach (var zone in Model.TimeZones)
+                {
+                    <option value="@zone">@zone</option>
+                }
+            </select>
+            <span asp-validation-for="Input.TimeZone" class="text-danger"></span>
+            <div id="timezone-help" class="form-text">@T["For the times shown to curators, such as in the activity log."]</div>
+        </div>
+        <div class="form-check mb-3">
+            <input asp-for="Input.AllowSearchEngines" class="form-check-input" aria-describedby="search-engines-help" />
+            <label asp-for="Input.AllowSearchEngines" class="form-check-label"></label>
+            <div id="search-engines-help" class="form-text">@T["Without this, search engines are asked to leave the archive out. Anyone with a link can still open it."]</div>
+        </div>
+    </fieldset>
+
+    <button type="submit" class="btn btn-primary">@T["Save"]</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

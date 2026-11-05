@@ -218,9 +218,9 @@ public class ArchiveHealthTests(CommonageAppFactory app) : IDisposable
         var adminPage = await admin.GetStringAsync("/Admin");
         var curatorPage = await curator.GetStringAsync("/Admin");
 
-        Assert.Contains("No backup is recorded", adminPage);
+        Assert.Contains("Set up nightly backups", adminPage);
         Assert.Contains("The disk is nearly full", adminPage);
-        Assert.DoesNotContain("No backup is recorded", curatorPage);
+        Assert.DoesNotContain("Set up nightly backups", curatorPage);
         Assert.DoesNotContain("The disk is nearly full", curatorPage);
     }
 
@@ -235,7 +235,7 @@ public class ArchiveHealthTests(CommonageAppFactory app) : IDisposable
         var page = await admin.GetStringAsync("/Admin");
 
         Assert.Contains("Last backup:", page);
-        Assert.DoesNotContain("No backup is recorded", page);
+        Assert.DoesNotContain("Days since the last backup", page);
     }
 
     [Fact]

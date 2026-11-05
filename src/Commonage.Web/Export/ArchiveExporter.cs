@@ -8,6 +8,7 @@ using System.Text.Json.Serialization;
 using Commonage.Web.Data;
 using Commonage.Web.Domain;
 using Commonage.Web.Media;
+using Commonage.Web.Operations;
 using Microsoft.EntityFrameworkCore;
 
 namespace Commonage.Web.Export;
@@ -22,7 +23,7 @@ public record ExportOptions(bool PublishedOnly, bool IncludePersonalData);
 public class ArchiveExporter(CommonageDbContext db, IFileStorage storage, TimeProvider clock, ILogger<ArchiveExporter> logger)
 {
     public const string Format = "commonage-export";
-    public const int Version = 1;
+    public const int Version = 2;
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -64,10 +65,31 @@ public class ArchiveExporter(CommonageDbContext db, IFileStorage storage, TimePr
             exportedItems.Add(Describe(item, files, options));
         }
 
+        var settings = await db.ArchiveSettings.AsNoTracking().FirstOrDefaultAsync(cancellationToken) ?? new ArchiveSettings();
+        var texts = await db.ArchiveTexts.AsNoTracking().OrderBy(t => t.Language).ThenBy(t => t.Kind).ToListAsync(cancellationToken);
+        string? logoPath = null;
+        if (settings.LogoId is { } logoId)
+        {
+            try
+            {
+                await using var logo = storage.OpenRead(LogoImages.KeyFor(logoId, "logo"));
+                logoPath = "branding/logo.png";
+                await WriteEntryAsync(zip, logoPath, CompressionLevel.NoCompression, stream => logo.CopyToAsync(stream, cancellationToken), cancellationToken);
+            }
+            catch (FileNotFoundException)
+            {
+                logger.LogWarning("The archive's logo was not found.");
+            }
+        }
+
         var document = new ExportDocument(
             Format, Version, clock.GetUtcNow().UtcDateTime, options.PublishedOnly, options.IncludePersonalData,
             collections.Select(c => new ExportCollection(c.Id, c.Title, c.Description, c.CreatedAt)).ToList(),
-            exportedItems);
+            exportedItems,
+            new ExportSettings(
+                settings.DefaultLanguage, settings.AccentColor, settings.TimeZone, settings.AllowSearchEngines, settings.PrivacyReviewed,
+                settings.ImprintNotNeeded, settings.RestoreTestedAt, logoPath,
+                texts.Select(t => new ExportText(t.Language, t.Kind, t.Text)).ToList()));
 
         await WriteEntryAsync(zip, "archive.json", CompressionLevel.Optimal,
             stream => JsonSerializer.SerializeAsync(stream, document, JsonOptions, cancellationToken), cancellationToken);
@@ -140,6 +162,7 @@ public class ArchiveExporter(CommonageDbContext db, IFileStorage storage, TimePr
             contribution.Rights,
             options.IncludePersonalData ? contribution.RightsHolder : null,
             contribution.ConsentText,
+            contribution.ReferenceCode,
             contribution.SubmittedAt,
             contribution.ReviewedAt,
             contribution.PersonalDetailsRemovedAt,
@@ -179,6 +202,8 @@ public class ArchiveExporter(CommonageDbContext db, IFileStorage storage, TimePr
                        them as formulas; archive.json has the exact text.
         files/         The original files exactly as they were uploaded, in one folder per item:
                        files/<item id>/<file id>-<original file name>
+        branding/      The archive's logo, if it has one. Its name and pages are under "settings" in
+                       archive.json.
 
         "includesPersonalData" in archive.json says whether the names of contributors, photographers and
         authors and contributors' email addresses
@@ -198,7 +223,21 @@ internal record ExportDocument(
     bool PublishedOnly,
     bool IncludesPersonalData,
     IReadOnlyList<ExportCollection> Collections,
-    IReadOnlyList<ExportItem> Items);
+    IReadOnlyList<ExportItem> Items,
+    ExportSettings Settings);
+
+internal record ExportSettings(
+    string DefaultLanguage,
+    string? AccentColor,
+    string? TimeZone,
+    bool AllowSearchEngines,
+    bool PrivacyReviewed,
+    bool ImprintNotNeeded,
+    DateTime? RestoreTestedAt,
+    string? Logo,
+    IReadOnlyList<ExportText> Texts);
+
+internal record ExportText(string Language, ArchiveTextKind Kind, string Text);
 
 internal record ExportCollection(int Id, string Title, string? Description, DateTime CreatedAt);
 
@@ -226,6 +265,7 @@ internal record ExportContribution(
     RightsStatement Rights,
     string? RightsHolder,
     string ConsentText,
+    string? ReferenceCode,
     DateTime SubmittedAt,
     DateTime? ReviewedAt,
     DateTime? PersonalDetailsRemovedAt,

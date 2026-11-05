@@ -38,7 +38,7 @@ The database and the app itself are never exposed; only Caddy, the HTTPS front, 
 ```sh
 git clone https://github.com/SebHenn/commonage.git
 cd commonage
-git checkout v0.2.0        # a released version, not the development branch
+git checkout v0.3.0        # a released version, not the development branch
 ```
 
 This gives you the Compose files and the backup scripts. The app itself comes as a ready-made Docker image,
@@ -62,10 +62,10 @@ COMMONAGE_ADMIN_PASSWORD=<the second random value, or a long passphrase>
 
 COMMONAGE_DOMAIN=archive.example.org
 COMPOSE_FILE=compose.yaml:compose.production.yaml
-COMMONAGE_VERSION=0.2
+COMMONAGE_VERSION=0.3
 ```
 
-`COMMONAGE_VERSION=0.2` follows the bug-fix releases of 0.2 (0.2.1, 0.2.2, ...) whenever you update; a new minor
+`COMMONAGE_VERSION=0.3` follows the bug-fix releases of 0.3 (0.3.1, 0.3.2, ...) whenever you update; a new minor
 version such as 0.2 only comes when you change this line.
 
 The `COMPOSE_FILE` line adds `compose.production.yaml`, so every `docker compose` command, and the backup scripts,

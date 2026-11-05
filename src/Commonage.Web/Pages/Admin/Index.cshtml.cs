@@ -6,10 +6,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 
 namespace Commonage.Web.Pages.Admin;
 
-public class IndexModel(CommonageDbContext db, ArchiveHealth health) : PageModel
+public record GettingStartedStep(string Text, bool Done, string? Page);
+
+public record GettingStarted(IReadOnlyList<GettingStartedStep> Steps, bool RestoreTested);
+
+public class IndexModel(CommonageDbContext db, ArchiveHealth health, ArchiveProfile profile, IStringLocalizer<SharedResource> localizer) : PageModel
 {
     private const int PageSize = 50;
 
@@ -20,6 +25,8 @@ public class IndexModel(CommonageDbContext db, ArchiveHealth health) : PageModel
     public int WaitingCount { get; private set; }
 
     public ArchiveHealth Health => health;
+
+    public GettingStarted GettingStarted { get; private set; } = new([], false);
 
     public SelectList CollectionOptions { get; private set; } = null!;
 
@@ -49,6 +56,23 @@ public class IndexModel(CommonageDbContext db, ArchiveHealth health) : PageModel
 
     public AdminItemFilter Filter => new(Text, Status, CollectionId, Tag, Needs, Sort);
 
+    private async Task<GettingStarted> LoadGettingStartedAsync(CancellationToken cancellationToken)
+    {
+        var identity = await profile.GetAsync();
+        const string settings = "/Admin/Settings";
+        return new GettingStarted(
+        [
+            new(localizer["Give the archive its name"], identity.NameIsSet, settings),
+            new(localizer["Say how people can reach you"], identity.Text(ArchiveTextKind.Contact) is not null, settings),
+            new(localizer["Read the privacy text and adapt it"], identity.PrivacyReviewed, settings),
+            new(localizer["Write an imprint, or note that you need none"], identity.Text(ArchiveTextKind.Imprint) is not null || identity.ImprintNotNeeded, settings),
+            new(localizer["Create the first collection"], HasCollections, "/Admin/Collections/Edit"),
+            new(localizer["Create the first contribution link"], await db.ContributionLinks.AnyAsync(cancellationToken), "/Admin/Contributions/Edit"),
+            new(localizer["Set up nightly backups (docs/deployment.md)"], health.LastBackupAt is not null, null),
+            new(localizer["Test restoring a backup, on another machine (docs/deployment.md)"], identity.RestoreTestedAt is not null, null),
+        ], identity.RestoreTestedAt is not null);
+    }
+
     public bool HasFilters => Text is not null || Status is not null || CollectionId is not null || Tag is not null || Needs is not null;
 
     public async Task OnGetAsync(CancellationToken cancellationToken)
@@ -57,6 +81,7 @@ public class IndexModel(CommonageDbContext db, ArchiveHealth health) : PageModel
         HasCollections = collections.Count > 0;
         CollectionOptions = new SelectList(collections, nameof(Collection.Id), nameof(Collection.Title), CollectionId);
         WaitingCount = await db.ArchiveItems.CountAsync(i => i.Status == ItemStatus.Submitted, cancellationToken);
+        GettingStarted = await LoadGettingStartedAsync(cancellationToken);
 
         var items = await db.QueryAsync(Filter, cancellationToken);
         Items = await items

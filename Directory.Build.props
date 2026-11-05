@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
     <!-- The released version. Raise it together with CHANGELOG.md. -->
-    <Version>0.2.0</Version>
+    <Version>0.3.0</Version>
     <!-- Warnings fail the build on CI only, so local experiments stay quick. -->
     <TreatWarningsAsErrors Condition="'$(CI)' == 'true'">true</TreatWarningsAsErrors>
     <!-- packages.lock.json pins every package, also indirect ones, by content hash. CI and the Docker build restore

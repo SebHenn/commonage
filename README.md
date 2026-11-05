@@ -9,10 +9,11 @@ PDFs and sound recordings are planned.
 - **Curators** review what comes in, describe it with uncertain dates ("circa 1950", "1950s") and tags, and publish
   it. Originals stay private; visitors see previews without location data.
 - **Visitors** browse collections and search the published archive, in English or German.
+- **The archive carries the group's own name**, logo and colour, with its own About, Contact and Privacy pages.
 - **The group stays in control**: it runs the archive on its own server, can export everything in an open format at
   any time, handles contributors' requests to remove their data, and sees who changed what.
 
-> **Status:** v0.2, an early version for real community archives. See [CHANGELOG.md](CHANGELOG.md) and
+> **Status:** v0.3, an early version for real community archives. See [CHANGELOG.md](CHANGELOG.md) and
 > [docs/roadmap.md](docs/roadmap.md).
 
 ## Try it
@@ -34,6 +35,8 @@ and password from `.env`. The health check is at http://localhost:8080/health.
 
 - [Putting an archive online](docs/deployment.md): a server, a domain and HTTPS.
 - [Running an archive](docs/operations.md): accounts, activity log, personal data, export, backup and restore.
+- [Handbook for curators](docs/curator-handbook.md) ([deutsch](docs/handbuch-kuratoren.md)): describing, reviewing and
+  handling removal requests.
 - [Security](docs/security.md) and [accessibility](docs/accessibility.md): what is in place and what is still open.
   Report vulnerabilities as described in [SECURITY.md](SECURITY.md).
 - [Development](docs/development.md): working on the code.

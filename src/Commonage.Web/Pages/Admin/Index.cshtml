@@ -6,6 +6,7 @@
 
 @if (User.IsInRole(Commonage.Web.Identity.Roles.Admin))
 {
+    <partial name="_GettingStarted" model="Model.GettingStarted" />
     <partial name="_ArchiveHealthNotices" model="Model.Health" />
 }
 

@@ -17,6 +17,8 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options)
     public DbSet<ContributionLink> ContributionLinks => Set<ContributionLink>();
     public DbSet<Contribution> Contributions => Set<Contribution>();
     public DbSet<AuditEntry> AuditEntries => Set<AuditEntry>();
+    public DbSet<ArchiveSettings> ArchiveSettings => Set<ArchiveSettings>();
+    public DbSet<ArchiveText> ArchiveTexts => Set<ArchiveText>();
 
     // Keys that encrypt login cookies. Stored in the database so logins survive container rebuilds.
     public DbSet<DataProtectionKey> DataProtectionKeys => Set<DataProtectionKey>();
@@ -107,6 +109,8 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options)
             contribution.Property(c => c.ContributorEmail).HasMaxLength(Contribution.EmailMaxLength);
             contribution.Property(c => c.RightsHolder).HasMaxLength(Contribution.RightsHolderMaxLength);
             contribution.Property(c => c.ConsentText).HasMaxLength(4000);
+            contribution.Property(c => c.ReferenceCode).HasMaxLength(Contribution.ReferenceCodeLength);
+            contribution.HasIndex(c => c.ReferenceCode).IsUnique();
             contribution.HasIndex(c => c.ArchiveItemId).IsUnique();
             contribution.HasOne(c => c.ArchiveItem)
                 .WithOne(i => i.Contribution)
@@ -115,6 +119,22 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options)
             contribution.HasOne(c => c.ContributionLink)
                 .WithMany(l => l.Contributions)
                 .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        builder.Entity<ArchiveSettings>(settings =>
+        {
+            settings.Property(s => s.Id).ValueGeneratedNever();
+            settings.Property(s => s.DefaultLanguage).HasMaxLength(20);
+            settings.Property(s => s.AccentColor).HasMaxLength(7);
+            settings.Property(s => s.TimeZone).HasMaxLength(100);
+        });
+
+        builder.Entity<ArchiveText>(text =>
+        {
+            text.HasKey(t => new { t.Language, t.Kind });
+            text.Property(t => t.Language).HasMaxLength(20);
+            text.Property(t => t.Kind).HasConversion<string>().HasMaxLength(30);
+            text.Property(t => t.Text).HasMaxLength(ArchiveText.MaxLength);
         });
 
         builder.Entity<AuditEntry>(entry =>

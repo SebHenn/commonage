@@ -39,6 +39,8 @@ public static class AuditText
         AuditAction.PasswordChanged => localizer["Changed their password"],
         AuditAction.ArchiveExported => localizer["Exported the archive"],
         AuditAction.ArchiveExportedWithPersonalData => localizer["Exported the archive with contributors' personal data"],
+        AuditAction.SettingsChanged => localizer["Changed the archive settings"],
+        AuditAction.RestoreTested => localizer["Noted that a restore was tested"],
         _ => action.ToString(),
     };
 

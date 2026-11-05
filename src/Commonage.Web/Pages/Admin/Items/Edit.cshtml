@@ -92,6 +92,11 @@
                         <br /><a asp-page="/Admin/Contributions/Edit" asp-route-id="@link.Id">@link.Title</a>
                     }
                 </dd>
+                @if (contribution.ReferenceCode is { } referenceCode)
+                {
+                    <dt class="col-sm-4">@T["Reference"]</dt>
+                    <dd class="col-sm-8">@referenceCode</dd>
+                }
                 <dt class="col-sm-4">@T["Consent"]</dt>
                 <dd class="col-sm-8 mb-0">@contribution.ConsentText</dd>
             </dl>
