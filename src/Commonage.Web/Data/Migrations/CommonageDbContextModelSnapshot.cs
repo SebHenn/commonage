@@ -360,6 +360,9 @@ namespace Commonage.Web.Data.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("DerivativeVersion")
+                        .HasColumnType("integer");
+
                     b.Property<string>("OriginalFileName")
                         .IsRequired()
                         .HasMaxLength(255)

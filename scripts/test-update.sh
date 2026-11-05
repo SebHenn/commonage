@@ -66,11 +66,11 @@ git checkout --quiet "$head"
 git tag v9.0.0
 git commit --quiet --no-verify --allow-empty -m "The broken test release"
 git tag v9.0.1
-# The previous release, with this update script added, because older releases do not have it yet.
+# The previous release, with this update script. Older releases do not have it, and a newer one may have the same.
 git checkout --quiet "$previous"
 git show "$head:scripts/update.sh" > scripts/update.sh
 git add scripts/update.sh
-git commit --quiet --no-verify -m "Add the update script for the test"
+git commit --quiet --no-verify --allow-empty -m "Add the update script for the test"
 git tag v8.0.0
 cat > .env <<EOF
 POSTGRES_PASSWORD=update-test-$(date +%s)

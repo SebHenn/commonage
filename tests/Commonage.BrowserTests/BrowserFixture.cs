@@ -1,4 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Playwright;
 using Npgsql;
@@ -63,6 +66,10 @@ public sealed class BrowserFixture : WebApplicationFactory<Program>, IAsyncLifet
         builder.UseSetting("Contributions:MaxSubmissionsPerHour", "1000");
         builder.UseSetting("Login:MaxAttemptsPerHour", "100000");
         builder.UseSetting("Uploads:MinimumFreeMegabytes", "1");
+        // Right to left, and a made-up language whose text is much longer than English.
+        builder.UseSetting("Languages:ForTesting", $"ar,{LongTextLanguage.Code}");
+        builder.ConfigureTestServices(services => services.AddSingleton<IStringLocalizerFactory>(provider =>
+            new LongTextLanguage(ActivatorUtilities.CreateInstance<ResourceManagerStringLocalizerFactory>(provider))));
     }
 
     /// <summary>A new browser session of its own, as if on another device.</summary>

@@ -1,6 +1,10 @@
 ﻿@inject IConfiguration Configuration
 @inject Commonage.Web.Operations.ArchiveProfile Profile
+@inject SupportedLanguages Languages
 @{
+    var culture = System.Globalization.CultureInfo.CurrentUICulture;
+    var rightToLeft = culture.TextInfo.IsRightToLeft;
+    var pageTitle = ViewData["Title"] as string ?? ViewData["Title"]?.ToString();
     var identity = await Profile.GetAsync();
     var isPrivatePage = new[] { "/Admin", "/Account", "/Contribute" }.Any(p => (ViewContext.RouteData.Values["page"]?.ToString() ?? "").StartsWith(p, StringComparison.OrdinalIgnoreCase));
     var currentPage = ViewContext.RouteData.Values["page"]?.ToString() ?? "";
@@ -8,11 +12,11 @@
     string? Current(params string[] pages) => pages.Any(p => currentPage.StartsWith(p, StringComparison.OrdinalIgnoreCase)) ? "page" : null;
 }
 <!DOCTYPE html>
-<html lang="@System.Globalization.CultureInfo.CurrentUICulture.Name">
+<html lang="@culture.Name" dir="@(rightToLeft ? "rtl" : "ltr")">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - @identity.Name</title>
+    <title>@(pageTitle == identity.Name ? identity.Name : $"{pageTitle} - {identity.Name}")</title>
     @if (isPrivatePage || !identity.AllowSearchEngines)
     {
         <meta name="robots" content="noindex" />
@@ -22,9 +26,8 @@
         <link rel="icon" type="image/png" href="/branding/@iconId/favicon" />
         <link rel="apple-touch-icon" href="/branding/@iconId/icon" />
     }
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="@(rightToLeft ? "/lib/bootstrap/dist/css/bootstrap.rtl.min.css" : "/lib/bootstrap/dist/css/bootstrap.min.css")" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Commonage.Web.styles.css" asp-append-version="true" />
     @if (identity.AccentColor is not null)
     {
         <link rel="stylesheet" href="@Commonage.Web.Operations.BrandingEndpoints.StylesheetPath?v=@identity.BrandingVersion" />
@@ -34,7 +37,7 @@
 <body class="d-flex flex-column min-vh-100">
     <a href="#main" class="visually-hidden-focusable position-absolute top-0 start-0 z-3 m-2 p-2 bg-white border rounded">@T["Skip to content"]</a>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom site-navbar">
             <div class="container">
                 <a class="navbar-brand text-wrap" asp-area="" asp-page="/Index">
                     @if (identity.LogoId is { } logoId)
@@ -46,15 +49,28 @@
                 @* What visitors need is always visible, also on a phone. Only what signed-in people need folds away. *@
                 <ul class="navbar-nav flex-row gap-3 me-auto">
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-page="/Index" aria-current="@Current("/Index", "/Collections", "/Items")">@T["Collections"]</a>
+                        <a class="nav-link text-dark" asp-area="" asp-page="/Collections/Index" aria-current="@Current("/Collections", "/Items")">@T["Collections"]</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link text-dark" asp-area="" asp-page="/Search" aria-current="@Current("/Search")">@T["Search"]</a>
                     </li>
                 </ul>
+                @* In the header, because a visitor who does not read the page's language must find it first. *@
+                <details class="language-picker">
+                    <summary class="nav-link text-dark">
+                        <span class="visually-hidden">@T["Language"]: </span><span lang="@culture.Name">@SupportedLanguages.NameOf(culture.Name)</span>
+                    </summary>
+                    <form method="post" asp-page="/SetLanguage" asp-route-returnUrl="@(Context.Request.Path + Context.Request.QueryString)" class="language-menu">
+                        @foreach (var language in Languages.Codes)
+                        {
+                            <button type="submit" name="culture" value="@language" class="btn btn-link btn-sm language-button" lang="@language"
+                                    aria-current="@(language == culture.Name ? "true" : null)">@SupportedLanguages.NameOf(language)</button>
+                        }
+                    </form>
+                </details>
                 @if (User.Identity?.IsAuthenticated == true)
                 {
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#account-menu" aria-controls="account-menu"
+                    <button class="navbar-toggler ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#account-menu" aria-controls="account-menu"
                             aria-expanded="false" aria-label="@T["Toggle navigation"]">
                         <span class="navbar-toggler-icon"></span>
                     </button>
@@ -75,13 +91,11 @@
         </nav>
         @if (Commonage.Web.Demo.DemoContent.LanguageOf(Configuration) is not null)
         {
-            <div class="container">
-                <p class="alert alert-warning py-2 small" role="note">@T["This is a demo archive. Everything in it, people and pictures included, is made up."]</p>
-            </div>
+            <p class="demo-notice" role="note">@T["This is a demo archive. Everything in it, people and pictures included, is made up."]</p>
         }
     </header>
-    <div class="container flex-grow-1">
-        <main id="main" tabindex="-1" class="pb-3">
+    <div class="container flex-grow-1 pt-3">
+        <main id="main" tabindex="-1" class="pb-3" data-address="@($"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}")">
             @if (TempData["Message"] is string message)
             {
                 <div class="alert alert-success" role="status">@message</div>
@@ -115,11 +129,6 @@
             }
             <span class="small">@T["Made with {0}", Commonage.Web.Operations.ArchiveIdentity.SoftwareName]</span>
             <a href="@Commonage.Web.SourceCode.UrlFrom(Configuration)" rel="noopener" class="small">@T["Source code"]</a>
-            <form method="post" asp-page="/SetLanguage" asp-route-returnUrl="@(Context.Request.Path + Context.Request.QueryString)" class="d-flex gap-1">
-                <button type="submit" name="culture" value="en" class="btn btn-link btn-sm language-button" lang="en">English</button>
-                <span aria-hidden="true">·</span>
-                <button type="submit" name="culture" value="de" class="btn btn-link btn-sm language-button" lang="de">Deutsch</button>
-            </form>
             @if (User.Identity?.IsAuthenticated != true)
             {
                 <a asp-page="/Account/Login" class="ms-auto">@T["Curator login"]</a>

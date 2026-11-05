@@ -45,4 +45,11 @@ public class MediaFile
     public string OriginalKey => $"originals/{StorageId:N}";
     public string PreviewKey => $"previews/{StorageId:N}.jpg";
     public string ThumbnailKey => $"thumbnails/{StorageId:N}.jpg";
+    public string CardKey => $"cards/{StorageId:N}.jpg";
+
+    /// <summary>Which picture sizes exist. Raising it makes the archive add the new ones in the background.</summary>
+    public const int CurrentDerivativeVersion = 2;
+
+    /// <summary>Files from before the larger card size have version 1 until the archive has made it.</summary>
+    public int DerivativeVersion { get; set; } = 1;
 }

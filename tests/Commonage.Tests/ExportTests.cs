@@ -69,7 +69,7 @@ public class ExportTests(CommonageAppFactory app)
         + "CanBePublished: follows from status. DeletedAt: the bin is not exported. Version: only for open forms.")]
     [InlineData(typeof(MediaFile), "file", "id originalFileName contentType sizeBytes sha256 uploadedAt",
         "ArchiveItemId, ArchiveItem: the file is listed under its item. StorageId, OriginalKey, PreviewKey, ThumbnailKey: storage details. "
-        + "Status, ProcessingError, PreviewWidth, PreviewHeight: previews are made anew. DeletedAt: the bin is not exported.")]
+        + "Status, ProcessingError, PreviewWidth, PreviewHeight, CardKey, DerivativeVersion, CurrentDerivativeVersion: previews are made anew. DeletedAt: the bin is not exported.")]
     [InlineData(typeof(ArchiveSettings), "settings", "defaultLanguage accentColor timeZone allowSearchEngines privacyReviewed imprintNotNeeded restoreTestedAt logo texts",
         "Id, TheOnlyId: there is only one. LogoId: as logo.")]
     [InlineData(typeof(Contribution), "contribution", "contributorName contributorEmail showName rights rightsHolder consentText referenceCode submittedAt reviewedAt personalDetailsRemovedAt contributionLink",

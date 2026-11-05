@@ -2,6 +2,7 @@
 @model SearchModel
 @{
     ViewData["Title"] = T["Search"];
+    ViewData["ShowCollection"] = true;
 }
 
 <h1>@T["Search the archive"]</h1>
@@ -22,12 +23,12 @@
             @* On small screens the filters fold away so the results come first. *@
             <button class="btn btn-outline-primary w-100 d-lg-none" type="button" data-bs-toggle="collapse"
                     data-bs-target="#search-filters" aria-expanded="@(Model.HasFilters ? "true" : "false")" aria-controls="search-filters">
-                @T["Filters"]
+                @(Model.HasFilters ? T["Filters active: {0}", Model.ActiveFilterCount] : T["Filters"])
             </button>
             <div id="search-filters" class="collapse d-lg-block mt-3 mt-lg-0 @(Model.HasFilters ? "show" : "")">
                 <div class="mb-3">
                     <label for="filter-collection" class="form-label">@T["Collection"]</label>
-                    <select id="filter-collection" name="collection" asp-items="Model.CollectionOptions" class="form-select">
+                    <select id="filter-collection" name="collection" asp-items="Model.CollectionOptions" class="form-select" data-autosubmit>
                         <option value="">@T["All collections"]</option>
                     </select>
                 </div>
@@ -46,7 +47,7 @@
                 </fieldset>
                 <div class="mb-3">
                     <label for="filter-sort" class="form-label">@T["Sort by"]</label>
-                    <select id="filter-sort" name="sort" class="form-select">
+                    <select id="filter-sort" name="sort" class="form-select" data-autosubmit>
                         @if (Model.Query is not null)
                         {
                             <option value="@ItemSort.Relevance" selected="@(Model.EffectiveSort == ItemSort.Relevance)">@T["Best match"]</option>
@@ -81,16 +82,33 @@
             <h2 class="visually-hidden">@T["Results"]</h2>
             <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
                 <p class="mb-0 me-auto" role="status">@T["Items found: {0}", Model.Results.TotalCount]</p>
-                @if (Model.Tag is not null)
+                @{
+                    var chips = new List<(string Text, string Key)>();
+                    if (Model.Tag is not null) { chips.Add((T["Tag: {0}", Model.Tag], "tag")); }
+                    if (Model.CollectionTitle is not null) { chips.Add((T["Collection: {0}", Model.CollectionTitle], "collection")); }
+                    if (Model.From is not null) { chips.Add((T["From year: {0}", Model.From], "from")); }
+                    if (Model.To is not null) { chips.Add((T["To year: {0}", Model.To], "to")); }
+                }
+                @foreach (var (text, key) in chips)
                 {
-                    <a href="@Request.WithQueryValue("tag", null)" class="badge rounded-pill text-bg-secondary tag-link"
-                       title="@T["Remove this filter"]">@T["Tag: {0}", Model.Tag] <span aria-hidden="true">×</span><span class="visually-hidden">@T["Remove this filter"]</span></a>
+                    <a href="@Request.WithQueryValue(key, null)" class="badge rounded-pill text-bg-secondary tag-link"
+                       title="@T["Remove this filter"]">@text <span aria-hidden="true">×</span><span class="visually-hidden">@T["Remove this filter"]</span></a>
                 }
             </div>
 
             @if (Model.Results.TotalCount == 0)
             {
                 <p class="text-muted">@T["Nothing matches your search. Try fewer words or remove a filter."]</p>
+                @if (Model.PopularTags.Count > 0)
+                {
+                    <p class="mb-1">@T["Or start from one of these:"]</p>
+                    <ul class="list-unstyled d-flex flex-wrap gap-2">
+                        @foreach (var tag in Model.PopularTags)
+                        {
+                            <li><a asp-page="/Search" asp-route-tag="@tag" class="badge rounded-pill text-bg-light border tag-link">@tag</a></li>
+                        }
+                    </ul>
+                }
             }
             else
             {

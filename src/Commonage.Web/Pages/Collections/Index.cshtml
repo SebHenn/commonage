@@ -1,0 +1,16 @@
+@page "/collections"
+@model Commonage.Web.Pages.Collections.IndexModel
+@{
+    ViewData["Title"] = T["Collections"];
+}
+
+<h1>@T["Collections"]</h1>
+
+@if (Model.Collections.Count == 0)
+{
+    <p class="text-muted">@T["The archive has no collections yet."]</p>
+}
+else
+{
+    <partial name="_CollectionCards" model="Model.Collections" />
+}

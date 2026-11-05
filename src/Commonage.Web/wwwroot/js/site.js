@@ -117,6 +117,24 @@ for (const input of document.querySelectorAll('input[type=file][data-choose-text
     });
 }
 
+// The language menu closes like any other menu: by clicking elsewhere or pressing Escape.
+document.addEventListener('click', event => {
+    for (const menu of document.querySelectorAll('details.language-picker[open]')) {
+        if (!menu.contains(event.target))
+            menu.open = false;
+    }
+});
+document.addEventListener('keydown', event => {
+    if (event.key === 'Escape')
+        document.querySelectorAll('details.language-picker[open]').forEach(menu => { menu.open = false; });
+});
+
+// A choice in a list takes effect at once. Without JavaScript, the form's button does the same.
+document.addEventListener('change', event => {
+    if (event.target.hasAttribute('data-autosubmit'))
+        event.target.form.requestSubmit();
+});
+
 // Forms marked with data-warn-unsaved make the browser ask before the page is left with changes that nobody saved,
 // whether by a link, the language switch or another form on the page. Sending the form itself is not leaving.
 // data-warn-unsaved="dirty" means the page came back from the server with text that is still not saved.

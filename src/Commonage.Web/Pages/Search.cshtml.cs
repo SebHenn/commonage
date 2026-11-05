@@ -45,7 +45,15 @@ public class SearchModel(CommonageDbContext db) : PageModel
     /// <summary>The full-text query made from <see cref="Text"/>; null when there is nothing to search for.</summary>
     public string? Query { get; private set; }
 
-    public bool HasFilters => Tag is not null || Collection is not null || From is not null || To is not null;
+    public bool HasFilters => ActiveFilterCount > 0;
+
+    public int ActiveFilterCount =>
+        (Tag is null ? 0 : 1) + (Collection is null ? 0 : 1) + (From is null ? 0 : 1) + (To is null ? 0 : 1);
+
+    public string? CollectionTitle { get; private set; }
+
+    /// <summary>When nothing was found: tags that do lead somewhere.</summary>
+    public IReadOnlyList<string> PopularTags { get; private set; } = [];
 
     public async Task OnGetAsync(CancellationToken cancellationToken)
     {
@@ -80,5 +88,18 @@ public class SearchModel(CommonageDbContext db) : PageModel
 
         var collections = await db.Collections.OrderBy(c => c.Title).ToListAsync(cancellationToken);
         CollectionOptions = new SelectList(collections, nameof(Domain.Collection.Id), nameof(Domain.Collection.Title), Collection);
+        CollectionTitle = collections.FirstOrDefault(c => c.Id == Collection)?.Title;
+
+        if (Results.TotalCount == 0)
+        {
+            PopularTags = await db.PublishedItems
+                .SelectMany(i => i.Tags)
+                .GroupBy(t => t.Name)
+                .OrderByDescending(g => g.Count())
+                .ThenBy(g => g.Key)
+                .Select(g => g.Key)
+                .Take(MaxTagSuggestions / 2)
+                .ToListAsync(cancellationToken);
+        }
     }
 }

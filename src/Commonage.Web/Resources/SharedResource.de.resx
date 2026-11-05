@@ -133,11 +133,13 @@
   <data name="Exported the archive" xml:space="preserve"><value>Archiv exportiert</value></data>
   <data name="Exported the archive with contributors' personal data" xml:space="preserve"><value>Archiv mit personenbezogenen Daten der Einsendenden exportiert</value></data>
   <data name="Filters" xml:space="preserve"><value>Filter</value></data>
+  <data name="Filters active: {0}" xml:space="preserve"><value>Aktive Filter: {0}</value></data>
   <data name="Find everything a person has sent in or is named as the photographer or author of, for example when they ask what the archive holds about them, or ask for it to be deleted." xml:space="preserve"><value>Finden Sie alles, was eine Person eingesendet hat oder wobei sie als Fotograf oder Autor genannt ist, zum Beispiel wenn sie fragt, was das Archiv über sie gespeichert hat, oder um Löschung bittet.</value></data>
   <data name="For the account {0}. Use at least {1} characters. A few words in a row are easy to remember and hard to guess." xml:space="preserve"><value>Für das Konto {0}. Verwenden Sie mindestens {1} Zeichen. Ein paar Wörter hintereinander sind leicht zu merken und schwer zu erraten.</value></data>
   <data name="For the times shown to curators, such as in the activity log." xml:space="preserve"><value>Für die Zeiten, die Kuratoren sehen, zum Beispiel im Aktivitätsprotokoll.</value></data>
   <data name="For visitors whose browser asks for no language this archive offers." xml:space="preserve"><value>Für Besucher, deren Browser keine Sprache anfragt, die dieses Archiv anbietet.</value></data>
   <data name="Found when visitors filter by: {0}" xml:space="preserve"><value>Wird beim Filtern nach Zeitraum gefunden für: {0}</value></data>
+  <data name="From year: {0}" xml:space="preserve"><value>Ab Jahr: {0}</value></data>
   <data name="From year" xml:space="preserve"><value>Von Jahr</value></data>
   <data name="From: {0}" xml:space="preserve"><value>Aus: {0}</value></data>
   <data name="Getting started" xml:space="preserve"><value>Erste Schritte</value></data>
@@ -162,6 +164,7 @@
   <data name="Items: {0}" xml:space="preserve"><value>Einträge: {0}</value></data>
   <data name="JPEG, PNG, TIFF or WebP, at most {0} MB. It is also used as the browser tab's icon." xml:space="preserve"><value>JPEG, PNG, TIFF oder WebP, höchstens {0} MB. Es wird auch als Symbol im Browser-Tab verwendet.</value></data>
   <data name="JPEG, PNG, TIFF or WebP. The original file is kept unchanged and is only visible to curators." xml:space="preserve"><value>JPEG, PNG, TIFF oder WebP. Die Originaldatei bleibt unverändert erhalten und ist nur für Kuratoren sichtbar.</value></data>
+  <data name="Language" xml:space="preserve"><value>Sprache</value></data>
   <data name="Language of the archive" xml:space="preserve"><value>Sprache des Archivs</value></data>
   <data name="Language, time and visibility" xml:space="preserve"><value>Sprache, Zeit und Sichtbarkeit</value></data>
   <data name="Last backup: {0}" xml:space="preserve"><value>Letzte Sicherung: {0}</value></data>
@@ -218,6 +221,7 @@
   <data name="Only used to ask you about what you send in." xml:space="preserve"><value>Wird nur für Rückfragen zu Ihrem Beitrag verwendet.</value></data>
   <data name="Open" xml:space="preserve"><value>Offen</value></data>
   <data name="Open: the link accepts contributions" xml:space="preserve"><value>Offen: Über den Link können Beiträge eingesendet werden</value></data>
+  <data name="Or start from one of these:" xml:space="preserve"><value>Oder beginnen Sie hier:</value></data>
   <data name="Original" xml:space="preserve"><value>Original</value></data>
   <data name="Our archive needs no imprint." xml:space="preserve"><value>Unser Archiv braucht kein Impressum.</value></data>
   <data name="Page not found" xml:space="preserve"><value>Seite nicht gefunden</value></data>
@@ -393,6 +397,7 @@
   <data name="Title" xml:space="preserve"><value>Titel</value></data>
   <data name="To do:" xml:space="preserve"><value>Noch zu tun:</value></data>
   <data name="To year" xml:space="preserve"><value>Bis Jahr</value></data>
+  <data name="To year: {0}" xml:space="preserve"><value>Bis Jahr: {0}</value></data>
   <data name="Toggle navigation" xml:space="preserve"><value>Navigation ein- oder ausblenden</value></data>
   <data name="Too many attempts" xml:space="preserve"><value>Zu viele Versuche</value></data>
   <data name="Too many attempts came from your network in the last hour. Please try again later." xml:space="preserve"><value>In der letzten Stunde kamen zu viele Versuche aus Ihrem Netzwerk. Bitte versuchen Sie es später noch einmal.</value></data>

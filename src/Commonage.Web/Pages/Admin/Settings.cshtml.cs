@@ -20,14 +20,13 @@ public class SettingsModel(
     LogoImages logos,
     AuditLog audit,
     TimeProvider clock,
+    SupportedLanguages languages,
     IStringLocalizer<SharedResource> localizer) : PageModel
 {
     private const long MaxRequestBytes = LogoImages.MaxBytes + (1024 * 1024);
 
     // The archive's standard blue, shown in the colour picker while no colour is chosen.
     private const string StandardColor = "#0d6efd";
-
-    public static readonly IReadOnlyList<string> Languages = ["en", "de"];
 
     [BindProperty]
     public InputModel Input { get; set; } = new();
@@ -37,6 +36,7 @@ public class SettingsModel(
 
     public Guid? CurrentLogoId { get; private set; }
     public IReadOnlyList<string> TimeZones { get; private set; } = [];
+    public IReadOnlyList<string> Languages => languages.Codes;
 
     public class InputModel
     {
@@ -128,7 +128,7 @@ public class SettingsModel(
             db.ArchiveSettings.Add(settings);
         }
 
-        if (!Languages.Contains(Input.DefaultLanguage))
+        if (!languages.Offers(Input.DefaultLanguage))
             ModelState.AddModelError("Input.DefaultLanguage", localizer["Please choose one of the languages."]);
         if (!string.IsNullOrEmpty(Input.TimeZone) && !TimeZoneInfo.TryFindSystemTimeZoneById(Input.TimeZone, out _))
             ModelState.AddModelError("Input.TimeZone", localizer["Please choose one of the time zones."]);

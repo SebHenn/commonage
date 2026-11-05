@@ -97,8 +97,10 @@
         <div class="mb-3">
             <label asp-for="Input.DefaultLanguage" class="form-label"></label>
             <select asp-for="Input.DefaultLanguage" class="form-select" aria-describedby="language-help">
-                <option value="en" lang="en">English</option>
-                <option value="de" lang="de">Deutsch</option>
+                @foreach (var language in Model.Languages)
+                {
+                    <option value="@language" lang="@language">@SupportedLanguages.NameOf(language)</option>
+                }
             </select>
             <span asp-validation-for="Input.DefaultLanguage" class="text-danger"></span>
             <div id="language-help" class="form-text">@T["For visitors whose browser asks for no language this archive offers."]</div>

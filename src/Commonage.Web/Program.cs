@@ -77,6 +77,7 @@ builder.Services.AddSingleton<MediaProcessingQueue>();
 builder.Services.AddHostedService<MediaProcessor>();
 builder.Services.AddScoped<ArchiveBin>();
 builder.Services.AddMemoryCache();
+builder.Services.AddSingleton<SupportedLanguages>();
 builder.Services.AddSingleton<ArchiveProfile>();
 builder.Services.AddSingleton<LogoImages>();
 builder.Services.AddHostedService<ArchiveBinPurger>();
@@ -138,12 +139,12 @@ app.UseHttpsRedirection();
 
 app.UseSecurityHeaders();
 
-string[] supportedCultures = ["en", "de"];
+var languages = app.Services.GetRequiredService<SupportedLanguages>();
 var localization = new RequestLocalizationOptions
 {
     DefaultRequestCulture = new RequestCulture("en"),
-    SupportedCultures = supportedCultures.Select(c => new CultureInfo(c)).ToList(),
-    SupportedUICultures = supportedCultures.Select(c => new CultureInfo(c)).ToList(),
+    SupportedCultures = languages.Codes.Select(c => new CultureInfo(c)).ToList(),
+    SupportedUICultures = languages.Codes.Select(c => new CultureInfo(c)).ToList(),
 };
 // After the visitor's own choice and their browser's languages comes the language the group chose for its archive.
 localization.RequestCultureProviders.Add(new CustomRequestCultureProvider(async context =>

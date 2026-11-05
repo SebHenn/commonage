@@ -38,6 +38,7 @@ Automated checks cannot judge these, so check them by hand on the pages that cha
 
 - **Photos have no description of their own.** The item title stands in for every photo of an item. Curators
   should be able to describe each photo (alt text), and contributors could suggest one.
-- **No right-to-left layout** yet (see "Languages" in the roadmap).
+- **Right-to-left layout is tested without a real translation**, with English text in an Arabic setting. It needs a real
+  right-to-left language and its readers to be sure.
 - **Not yet tested with real assistive technology** (NVDA, VoiceOver, TalkBack). This belongs in the five-task test
   or a separate session with a screen reader user.

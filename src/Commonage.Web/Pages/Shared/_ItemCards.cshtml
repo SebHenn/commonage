@@ -1,23 +1,31 @@
 @model IEnumerable<ItemSummary>
+@{
+    var showCollection = ViewData["ShowCollection"] is true;
+}
 
 <ul class="list-unstyled row g-3">
     @foreach (var item in Model)
     {
-        <li class="col-6 col-md-4 col-lg-3 item-card">
-            <a asp-page="/Items/Details" asp-route-id="@item.Id" class="d-block">
+        <li class="col-6 col-md-4 col-lg-3">
+            <a asp-page="/Items/Details" asp-route-id="@item.Id" class="item-card">
                 @if (item.ThumbnailMediaFileId is { } mediaFileId)
                 {
-                    <img src="/media/@mediaFileId/thumbnail" alt="" class="media-thumbnail rounded mb-1" loading="lazy" />
+                    <img src="/media/@mediaFileId/thumbnail" srcset="/media/@mediaFileId/thumbnail 400w, /media/@mediaFileId/card 800w"
+                         sizes="(min-width: 992px) 25vw, (min-width: 768px) 33vw, 50vw" alt="" class="media-thumbnail" loading="lazy" />
                 }
                 else
                 {
-                    <span class="media-thumbnail text-tile rounded mb-1" aria-hidden="true"><span>@T["Text"]</span></span>
+                    <span class="media-thumbnail text-tile" aria-hidden="true"><span>@T["Text"]</span></span>
                 }
-                @item.Title
+                <span class="item-card-title">@item.Title</span>
             </a>
             @if (item.DateText is not null)
             {
                 <small class="d-block text-muted">@item.DateText</small>
+            }
+            @if (showCollection)
+            {
+                <small class="d-block text-muted">@item.CollectionTitle</small>
             }
         </li>
     }

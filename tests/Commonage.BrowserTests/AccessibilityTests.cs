@@ -9,7 +9,7 @@ namespace Commonage.BrowserTests;
 public class AccessibilityTests(BrowserFixture app)
 {
     public static TheoryData<string, int> PublicPages() => Widths(
-        "/", "/collections/1", "/items/1", "/search", "/search?q=flood", "/search?q=zzzznothing", "/items/99999",
+        "/", "/collections", "/collections/1", "/items/1", "/items/6", "/search", "/search?q=flood", "/search?q=zzzznothing", "/items/99999",
         "/Account/Login", "CONTRIBUTE", "/contribute/no-such-link", "/about", "/contact", "/privacy");
 
     public static TheoryData<string, int> CuratorPages() => Widths(
@@ -42,6 +42,41 @@ public class AccessibilityTests(BrowserFixture app)
         var page = await app.LogInAsync(width);
         await CheckAsync(page, path);
     }
+
+    [Theory]
+    [MemberData(nameof(MainPages))]
+    public async Task A_page_works_from_right_to_left(string path)
+    {
+        var page = await app.NewPageAsync(390);
+        await page.Context.AddCookiesAsync([new Cookie { Name = ".AspNetCore.Culture", Value = "c=ar|uic=ar", Url = app.BaseUrl }]);
+
+        await CheckAsync(page, path == "CONTRIBUTE" ? app.ContributionPath : path);
+
+        Assert.Equal("rtl", await page.GetAttributeAsync("html", "dir"));
+        // The site name starts on the right, as the reading does.
+        var brand = await page.Locator(".navbar-brand").BoundingBoxAsync();
+        Assert.True(brand!.X + brand.Width > 390 / 2);
+    }
+
+    [Theory]
+    [MemberData(nameof(MainPages))]
+    public async Task A_page_holds_up_with_much_longer_text(string path)
+    {
+        var page = await app.NewPageAsync(320, 640);
+        await page.Context.AddCookiesAsync([new Cookie { Name = ".AspNetCore.Culture", Value = $"c={LongTextLanguage.Code}|uic={LongTextLanguage.Code}", Url = app.BaseUrl }]);
+
+        await page.GotoAsync(path == "CONTRIBUTE" ? app.ContributionPath : path);
+
+        var overflow = await page.EvaluateAsync<int>("document.documentElement.scrollWidth - document.documentElement.clientWidth");
+        var tooWide = await page.EvaluateAsync<string[]>("""
+            [...document.querySelectorAll('body *')]
+                .filter(e => e.getBoundingClientRect().right > document.documentElement.clientWidth + 1 && !e.closest('.contact-field'))
+                .slice(0, 5).map(e => e.tagName + '.' + e.className + ': ' + e.innerText?.slice(0, 40))
+            """);
+        Assert.True(overflow <= 0, $"{path} scrolls sideways by {overflow} px: {string.Join(" | ", tooWide)}");
+    }
+
+    public static TheoryData<string> MainPages() => new() { "/", "/collections", "/collections/1", "/items/1", "/search?q=flood", "CONTRIBUTE", "/privacy" };
 
     private static async Task CheckAsync(IPage page, string path)
     {

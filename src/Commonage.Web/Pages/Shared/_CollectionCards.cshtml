@@ -1,0 +1,26 @@
+@model IEnumerable<CollectionCard>
+
+<ul class="list-unstyled row g-4">
+    @foreach (var collection in Model)
+    {
+        <li class="col-12 col-sm-6 col-lg-4">
+            <a asp-page="/Collections/Details" asp-route-id="@collection.Id" class="collection-card">
+                @if (collection.CoverMediaFileId is { } cover)
+                {
+                    <img src="/media/@cover/thumbnail" srcset="/media/@cover/thumbnail 400w, /media/@cover/card 800w"
+                         sizes="(min-width: 992px) 33vw, (min-width: 576px) 50vw, 100vw" alt="" class="media-thumbnail" loading="lazy" />
+                }
+                else
+                {
+                    <span class="media-thumbnail text-tile" aria-hidden="true"><span>@T["Text"]</span></span>
+                }
+                <span class="collection-card-title">@collection.Title</span>
+            </a>
+            @if (!string.IsNullOrWhiteSpace(collection.Description))
+            {
+                <p class="mb-1">@collection.Description</p>
+            }
+            <small class="text-muted">@T["Items: {0}", collection.PublishedItemCount]</small>
+        </li>
+    }
+</ul>

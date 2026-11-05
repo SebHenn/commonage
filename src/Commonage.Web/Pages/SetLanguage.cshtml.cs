@@ -4,15 +4,13 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Commonage.Web.Pages;
 
-public class SetLanguageModel : PageModel
+public class SetLanguageModel(SupportedLanguages languages) : PageModel
 {
-    private static readonly string[] SupportedCultures = ["en", "de"];
-
     public IActionResult OnGet() => RedirectToPage("/Index");
 
     public IActionResult OnPost(string culture, string? returnUrl)
     {
-        if (SupportedCultures.Contains(culture))
+        if (languages.Offers(culture))
         {
             Response.Cookies.Append(
                 CookieRequestCultureProvider.DefaultCookieName,

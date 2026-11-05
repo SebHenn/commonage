@@ -46,6 +46,13 @@ The list on "Manage archive" shows what is left to set up, and stays until every
 
 Curators have their own guide: [curator-handbook.md](curator-handbook.md) ([deutsch](handbuch-kuratoren.md)).
 
+## Picture sizes
+
+Each photo has a preview and smaller sizes for lists, made when it is uploaded. When a new version of Commonage adds a size,
+the archive makes it for older photos in the background, whenever no new upload is waiting. Nothing goes offline meanwhile,
+and it continues after a restart. On a small server with many photos this can take hours, and the larger size adds about
+0.1 to 0.3 MB per photo to the disk.
+
 ## The bin
 
 Deleting an item or a photo moves it to the bin ("Manage archive" → "Bin"), so a mistake can be undone. It disappears

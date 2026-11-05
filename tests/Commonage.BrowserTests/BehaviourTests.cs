@@ -174,7 +174,7 @@ public class BehaviourTests(BrowserFixture app)
 
         await page.FillAsync("main input[type=search]", "flood");
         await page.ClickAsync("main form[role=search] button[type=submit]");
-        await page.ClickAsync("main a:text('Flood in Mill Street')");
+        await page.ClickAsync("main a:has-text('Flood in Mill Street')");
 
         Assert.Contains("Flood in Mill Street", await page.InnerTextAsync("h1"));
         Assert.True(await page.Locator("main img").CountAsync() > 0);

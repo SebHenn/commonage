@@ -1,5 +1,5 @@
 using Commonage.Web.Data;
-using Commonage.Web.Domain;
+using Commonage.Web.Search;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,9 +11,11 @@ public class IndexModel(CommonageDbContext db, Commonage.Web.Operations.ArchiveP
 
     private const int MaxTags = 30;
 
-    public record CollectionSummary(int Id, string Title, string? Description, int PublishedItemCount);
+    private const int RecentCount = 8;
 
-    public IReadOnlyList<CollectionSummary> Collections { get; private set; } = [];
+    public IReadOnlyList<CollectionCard> Collections { get; private set; } = [];
+
+    public IReadOnlyList<ItemSummary> Recent { get; private set; } = [];
 
     /// <summary>The most used tags of published items, in alphabetical order.</summary>
     public IReadOnlyList<string> Tags { get; private set; } = [];
@@ -21,10 +23,12 @@ public class IndexModel(CommonageDbContext db, Commonage.Web.Operations.ArchiveP
     public async Task OnGetAsync()
     {
         Identity = await profile.GetAsync();
-        Collections = await db.Collections
-            .OrderBy(c => c.Title)
-            .Select(c => new CollectionSummary(
-                c.Id, c.Title, c.Description, c.Items.Count(i => i.Status == ItemStatus.Published)))
+        Collections = await db.LoadCollectionCardsAsync(HttpContext.RequestAborted);
+        Recent = await db.PublishedItems
+            .OrderByDescending(i => i.PublishedAt)
+            .ThenByDescending(i => i.Id)
+            .Take(RecentCount)
+            .Select(ItemSummary.FromItem)
             .ToListAsync();
 
         var popularTags = await db.PublishedItems
