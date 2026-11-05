@@ -1,0 +1,87 @@
+@page
+@model Commonage.Web.Pages.Admin.Items.AddManyModel
+@{
+    ViewData["Title"] = T["Add many photos"];
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="@Commonage.Web.Search.AdminItemList.Page">@T["Items"]</a></li>
+    </ol>
+</nav>
+
+<h1>@ViewData["Title"]</h1>
+<p class="col-lg-8">@T["Each photo becomes a draft of its own, with what you enter here. You give them their titles afterwards, and only then can they be published. For one item with several photos, use New item."]</p>
+
+@if (!Model.CanUpload)
+{
+    <p class="alert alert-warning" role="status">@T["The disk is nearly full, so no photos can be added at the moment. Tell the person who runs the server."]</p>
+}
+else if (!Model.CollectionOptions.Any())
+{
+    <p>@T["Items belong to a collection."] <a asp-page="/Admin/Collections/Edit">@T["Create your first collection"]</a></p>
+}
+else
+{
+    <form method="post" enctype="multipart/form-data" class="col-lg-8" data-upload-queue data-done-url="@Commonage.Web.Pages.Admin.Items.AddManyModel.DraftsUrl" data-done-text="@T["Go to the drafts without a title"]">
+        <partial name="_ErrorSummary" />
+        <div class="mb-3">
+            <label asp-for="Input.CollectionId" class="form-label"></label>
+            <select asp-for="Input.CollectionId" asp-items="Model.CollectionOptions" class="form-select">
+                <option value="">@T["Choose a collection"]</option>
+            </select>
+            <span asp-validation-for="Input.CollectionId" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Input.Date" class="form-label"></label>
+            <input asp-for="Input.Date" class="form-control" aria-describedby="date-help date-result" data-date-result="date-result" />
+            <span asp-validation-for="Input.Date" class="text-danger"></span>
+            <div id="date-help" class="form-text">
+                @T["Write the date as precisely as it is known, for example: 1953, 12.03.1953, March 1953, circa 1950, 1950s, 1950–1955, before 1945."]
+            </div>
+            <div id="date-result" class="form-text" role="status"></div>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Input.Tags" class="form-label"></label>
+            <input asp-for="Input.Tags" class="form-control" aria-describedby="tags-help" />
+            <span asp-validation-for="Input.Tags" class="text-danger"></span>
+            <div id="tags-help" class="form-text">@T["Places, people or topics, separated by commas."]</div>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Input.RightsUri" class="form-label"></label>
+            <select asp-for="Input.RightsUri" class="form-select" aria-describedby="rights-help">
+                <option value="">@(Model.DefaultRightsLabel is { } archiveDefault ? T["The archive's default: {0}", archiveDefault] : T["Not decided yet"])</option>
+                @foreach (var uri in RightsOptions.All)
+                {
+                    <option value="@uri">@RightsOptions.Label(T, uri)</option>
+                }
+            </select>
+            <span asp-validation-for="Input.RightsUri" class="text-danger"></span>
+            <div id="rights-help" class="form-text">@T["What others may do with this item. Choose a free licence only if whoever holds the rights really gave it."]</div>
+        </div>
+        <div class="mb-3">
+            <label for="photo-upload" class="form-label">@T["Photos"]</label>
+            @* With no asp-for, so the browser's own check does not come in the way of the message below. *@
+            <input id="photo-upload" type="file" name="files" accept="@Commonage.Web.Media.ImageFormats.AcceptAttribute" multiple class="form-control" aria-describedby="many-help"
+                   data-val="true" data-val-required="@T["Please choose at least one photo."]"
+                   data-choose-text="@T["Choose photos"]" data-none-text="@T["No photos chosen"]" data-count-text="@T["Photos chosen: {0}"]" />
+            <span data-valmsg-for="files" data-valmsg-replace="true" class="text-danger d-block"></span>
+            <div id="many-help" class="form-text">
+                @T["JPEG, PNG, TIFF or WebP. The original file is kept unchanged and is only visible to curators."]
+                <noscript>@T["Without JavaScript, all photos are sent together, and together they can be at most {0} GB. There is no progress to see, and the page waits until they have arrived.", Commonage.Web.Pages.Admin.Items.AddManyModel.MaxRequestBytes / 1024 / 1024 / 1024]</noscript>
+            </div>
+        </div>
+        <div class="form-check mb-3">
+            <input id="add-identical" type="checkbox" name="addIdentical" value="true" class="form-check-input" />
+            <label for="add-identical" class="form-check-label">@T["Also add files the archive already has"]</label>
+        </div>
+        <button type="submit" class="btn btn-primary">@T["Add these photos"]</button>
+    </form>
+}
+
+<partial name="_UploadTexts" />
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/uploads.js" asp-append-version="true"></script>
+}

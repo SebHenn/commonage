@@ -82,6 +82,9 @@ public static partial class Browser
     private static string? Attribute(string tag, string name) =>
         Regex.Match(tag, $@"\s{name}=""([^""]*)""") is { Success: true } match ? match.Groups[1].Value : null;
 
+    /// <summary>The antiforgery token of a page already fetched.</summary>
+    public static string Token(string page) => AntiforgeryToken().Match(page).Groups[1].Value;
+
     private static async Task<string> GetAntiforgeryTokenAsync(HttpClient client, string url)
     {
         var page = await client.GetStringAsync(url);

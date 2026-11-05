@@ -15,6 +15,7 @@ public enum ItemNeed
     PreviewFailed,
     Rights,
     AltText,
+    Title,
 }
 
 public enum AdminItemSort
@@ -37,7 +38,9 @@ public record AdminItemFilter(
 }
 
 /// <summary>One line of the curators' item list.</summary>
-public record AdminItemRow(int Id, string Title, string CollectionTitle, ItemStatus Status, DateTime UpdatedAt, int? ThumbnailMediaFileId, int PhotoCount);
+public record AdminItemRow(
+    int Id, string Title, string CollectionTitle, ItemStatus Status, DateTime UpdatedAt, int? ThumbnailMediaFileId, int PhotoCount,
+    string? FirstFileName = null, bool HasIdenticalFile = false);
 
 /// <summary>The curators' item list. The edit page uses it too, to go on to the next item of the same list.</summary>
 public static class AdminItemList
@@ -64,6 +67,7 @@ public static class AdminItemList
             ItemNeed.Photos => items.Where(i => !i.MediaFiles.Any()),
             ItemNeed.PreviewFailed => items.Where(i => i.MediaFiles.Any(f => f.Status == ProcessingStatus.Failed)),
             ItemNeed.AltText => items.Where(i => i.MediaFiles.Any(f => f.AltText == null)),
+            ItemNeed.Title => items.Where(i => i.Title == ""),
             // With a default for the whole archive, nothing is left undecided.
             ItemNeed.Rights when !await db.ArchiveSettings.AnyAsync(s => s.DefaultRightsUri != null, cancellationToken) => items.Where(i => i.RightsUri == null),
             ItemNeed.Rights => items.Where(i => false),

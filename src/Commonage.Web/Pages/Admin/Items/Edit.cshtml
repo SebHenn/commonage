@@ -1,7 +1,7 @@
 @page "{id:int?}"
 @model Commonage.Web.Pages.Admin.Items.EditModel
 @{
-    ViewData["Title"] = Model.ItemId is null ? T["New item"] : T["Edit: {0}", Model.SavedTitle ?? ""];
+    ViewData["Title"] = Model.ItemId is null ? T["New item"] : T["Edit: {0}", ArchiveItem.ShownTitle(T, Model.SavedTitle ?? "")];
 }
 
 <nav aria-label="breadcrumb">
@@ -34,8 +34,13 @@
     }
 </div>
 
-@* In a review, the material comes first: it is what the decision is about. *@
-@if (Model.CurrentStatus == ItemStatus.Submitted)
+@if (Model.IsUntitled)
+{
+    <p class="alert alert-info col-lg-8">@T["This draft has no title yet, and cannot be published without one. Give it a title that says what the photo shows."]</p>
+}
+
+@* In a review, the material comes first: it is what the decision is about. It is also what a title is written from. *@
+@if (Model.CurrentStatus == ItemStatus.Submitted || Model.IsUntitled)
 {
     <partial name="_Photos" model="Model" />
 }
@@ -167,9 +172,21 @@
     </section>
 }
 
-<form method="post" id="item-form" class="col-lg-8" data-warn-unsaved="@(Model.FormHasUnsavedText ? "dirty" : "")" data-send-once>
+<form method="post" id="item-form" class="col-lg-8" enctype="@(Model.ItemId is null ? "multipart/form-data" : null)" data-warn-unsaved="@(Model.FormHasUnsavedText ? "dirty" : "")" data-send-once>
     <partial name="_ErrorSummary" />
     <input type="hidden" asp-for="Input.Version" />
+    @if (Model.ItemId is null && Model.CanUpload)
+    {
+        @* With no asp-for: the browser would then require a photo, and an item does not need one. *@
+        <div class="mb-3">
+            <label for="files" class="form-label">@T["Photos"]</label>
+            <input id="files" type="file" name="files" accept="@Commonage.Web.Media.ImageFormats.AcceptAttribute" multiple class="form-control" aria-describedby="files-help"
+                   data-choose-text="@T["Choose photos"]" data-none-text="@T["No photos chosen"]" data-count-text="@T["Photos chosen: {0}"]"
+                   data-max-total-bytes="@Commonage.Web.Pages.Admin.Items.EditModel.MaxUploadRequestBytes" data-too-much-text="@T["These photos are too much to send with the form. Save the item first, then add them: they are sent one at a time there."]" />
+            <span data-valmsg-for="files" data-valmsg-replace="true" class="text-danger d-block"></span>
+            <div id="files-help" class="form-text">@T["JPEG, PNG, TIFF or WebP. The original file is kept unchanged and is only visible to curators."] <a asp-page="/Admin/Items/AddMany" asp-route-collectionId="@Model.Input.CollectionId">@T["Each photo its own item? Add many photos at once."]</a></div>
+        </div>
+    }
     <div class="mb-3">
         <label asp-for="Input.Title" class="form-label"></label>
         <input asp-for="Input.Title" class="form-control" />
@@ -234,8 +251,13 @@
                 <button type="submit" class="btn btn-outline-primary">@T["Save"]</button>
                 break;
             default:
-                <button type="submit" class="btn btn-outline-primary">@T["Save as draft"]</button>
-                @if (Model.NextId is not null)
+                @* On a new item, saving is the usual thing to do: most are not ready for visitors the moment they are typed in. *@
+                @if (Model.NamingOneAfterAnother)
+                {
+                    <button type="submit" name="then" value="next" class="btn btn-primary">@T["Save and next"]</button>
+                }
+                <button type="submit" class="btn @(Model.ItemId is null ? "btn-primary" : "btn-outline-primary")">@T["Save as draft"]</button>
+                @if (Model.NextId is not null && !Model.NamingOneAfterAnother)
                 {
                     <button type="submit" name="then" value="next" class="btn btn-outline-primary">@T["Save and next"]</button>
                 }
@@ -243,13 +265,13 @@
                 {
                     <button type="submit" name="then" value="another" class="btn btn-outline-primary">@T["Save and add another"]</button>
                 }
-                <button type="submit" name="command" value="publish" class="btn btn-primary">@T["Save and publish"]</button>
+                <button type="submit" name="command" value="publish" class="btn @(Model.ItemId is null || Model.NamingOneAfterAnother ? "btn-outline-primary" : "btn-primary")">@T["Save and publish"]</button>
                 break;
         }
     </div>
 </form>
 
-@if (Model.CurrentStatus != ItemStatus.Submitted)
+@if (Model.ItemId is not null && Model.CurrentStatus != ItemStatus.Submitted && !Model.IsUntitled)
 {
     <partial name="_Photos" model="Model" />
 }
@@ -279,6 +301,9 @@
     </form>
 }
 
+<partial name="_UploadTexts" />
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/uploads.js" asp-append-version="true"></script>
 }

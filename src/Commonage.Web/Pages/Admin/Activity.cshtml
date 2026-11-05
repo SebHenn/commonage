@@ -34,11 +34,11 @@ else
                                 <text>: </text>
                                 @if (entry.ArchiveItemId is { } itemId)
                                 {
-                                    <a asp-page="/Admin/Items/Edit" asp-route-id="@itemId">@entry.Subject</a>
+                                    <a asp-page="/Admin/Items/Edit" asp-route-id="@itemId">@ArchiveItem.ShownTitle(T, entry.Subject)</a>
                                 }
                                 else
                                 {
-                                    @entry.Subject
+                                    @ArchiveItem.ShownTitle(T, entry.Subject)
                                 }
                             }
                         </td>

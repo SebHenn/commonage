@@ -1,0 +1,47 @@
+@model Commonage.Web.Pages.Admin.Items.PhotoCard
+@{
+    var file = Model.File;
+    var altId = Html.GenerateIdFromName($"Input.AltTexts[{file.Id}]");
+}
+
+<div class="col-6 col-md-4 col-lg-3">
+    <div class="card h-100">
+        @if (file.Status == ProcessingStatus.Ready)
+        {
+            <img src="/admin/media/@file.Id/thumbnail" class="card-img-top media-thumbnail" alt="@file.OriginalFileName" loading="lazy" />
+        }
+        else if (file.Status == ProcessingStatus.Pending)
+        {
+            @* uploads.js replaces this with the picture when it is there. *@
+            <div class="card-img-top media-thumbnail d-flex align-items-center justify-content-center bg-light text-muted small p-2 text-center"
+                 data-preview-pending="@file.Id" data-preview-class="card-img-top media-thumbnail" data-preview-alt="@file.OriginalFileName" data-preview-failed="@T["No preview could be created."]">
+                @T["Creating preview…"]
+            </div>
+        }
+        else
+        {
+            <div class="card-img-top media-thumbnail d-flex align-items-center justify-content-center bg-light text-muted small p-2 text-center">
+                @T["No preview could be created."]
+            </div>
+        }
+        <div class="card-body p-2 small d-flex flex-column">
+            <div class="text-truncate" title="@file.OriginalFileName">@file.OriginalFileName</div>
+            <div class="text-muted mb-2">@((file.SizeBytes / 1024.0 / 1024.0).ToString("0.0")) MB</div>
+            @if (Model.SameAs is { } same)
+            {
+                <div class="mb-2"><span class="badge text-bg-warning text-wrap">@T["The archive already has this file"]</span> <a asp-page="/Admin/Items/Edit" asp-route-id="@same.ItemId">@ArchiveItem.ShownTitle(T, same.ItemTitle)</a></div>
+            }
+            @* Saved with the item: the form attribute makes this field part of the form above or below. *@
+            <label for="@altId" class="form-label mb-1">@T["What does it show?"]</label>
+            <textarea id="@altId" name="Input.AltTexts[@file.Id]" form="item-form" rows="2" maxlength="1000"
+                      class="form-control form-control-sm mb-2" aria-describedby="alt-help">@(Model.TypedAltText ?? file.AltText)</textarea>
+            <div class="d-flex flex-wrap gap-2 mt-auto justify-content-between">
+                <a href="/admin/media/@file.Id/original" class="btn btn-sm btn-outline-secondary">@T["Original"]</a>
+                <form method="post" asp-page="/Admin/Items/Edit" asp-page-handler="DeleteMedia" asp-route-id="@Model.ItemId" asp-route-mediaFileId="@file.Id" asp-route-back="@Model.Back"
+                      data-confirm="@T["Move this photo to the bin? You can restore it there for {0} days.", Commonage.Web.Data.ArchiveBin.RetentionDays]">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">@T["Move to bin"]</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

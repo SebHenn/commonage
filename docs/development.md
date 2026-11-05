@@ -1,5 +1,33 @@
 # Development
 
+## How it fits together
+
+One ASP.NET Core application with Razor Pages, one PostgreSQL database, and a folder of files. There are no other services, no
+queue server and no build step for the front end: pages work without JavaScript, and a little of it makes them better.
+
+| Folder in `src/Commonage.Web` | What is in it |
+| --- | --- |
+| `Pages` | Every screen. `Pages/Admin` is for curators and needs a login, `Pages/Admin/Users` for admins. Everything else is public. |
+| `Domain` | What an archive is made of: items, photos, collections, contributions, dates, rights. No database or web code. |
+| `Data` | The database through EF Core, its migrations, and the bin. Query filters keep what is in the bin out of every query. |
+| `Search` | Public search and the curators' item list. |
+| `Media` | Uploads, the background work on previews, and the only way to a stored file (`MediaEndpoints`). |
+| `Contributions` | Contribution links and what protects them from spam. |
+| `Identity`, `Security` | Accounts and roles, and security headers. |
+| `Audit` | The activity log. An entry is saved together with the change it describes. |
+| `Export` | The archive as open files. A test makes every new field a decision: exported, or left out for a reason. |
+| `Operations` | Free disk space, the age of backups, and the archive's name and settings. |
+| `Resources` | Translations. English is the key, and every other language has a file here. |
+
+What is special about it, and easy to break by accident:
+
+- **Only published items are public.** Public pages go through `db.PublishedItems`, and `/media` serves nothing else.
+- **Originals are private.** Visitors only ever see generated pictures, which carry no EXIF. So GPS positions stay private.
+- **A contributor's personal details stay with curators.** They are never on a public page unless a curator chose so, and never in
+  the activity log.
+- **Nothing is deleted at once.** Items and photos go to the bin for 30 days first.
+- **Text is written for any language.** No sentences built from parts, nothing stored in one language that a person sees later.
+
 ## Prerequisites
 
 - .NET 10 SDK
@@ -50,6 +78,17 @@ Originals and their previews are stored under `Storage:RootPath`. It defaults to
 Previews are generated in the background with [NetVips](https://github.com/kleisauke/net-vips)
 (libvips). They are rotated upright and contain no EXIF, so GPS coordinates stay in the private
 original.
+
+`wwwroot/js/uploads.js` sends curators' photos one per request, so a batch is not limited by the size
+of a request and one lost connection does not lose it. A request that accepts `application/json` gets a
+short answer for the queue (`UploadReply`); the same form without JavaScript sends all files at once, up
+to 1 GB, and gets a page. Sending a file again is safe, because a file with the same SHA-256 is reported
+instead of stored unless `addIdentical` is set. `/admin/media/status` tells the page which previews are
+done. Contributors never hear about identical files: that would say what the archive holds.
+
+A draft from "Add many photos" has an empty title. Nothing stored says "Untitled", because that would be
+in one language and could pass for a real title. `ArchiveItem.ShownTitle` shows it in any language, and
+`CanBePublished` is false until there is one.
 
 ## Search and dates
 

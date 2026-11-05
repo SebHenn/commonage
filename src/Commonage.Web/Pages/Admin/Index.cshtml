@@ -14,6 +14,7 @@
     <h1 class="me-auto mb-0">@T["Items"]</h1>
     @if (Model.HasCollections)
     {
+        <a asp-page="/Admin/Items/AddMany" class="btn btn-outline-primary">@T["Add many photos"]</a>
         <a asp-page="/Admin/Items/Edit" class="btn btn-primary">@T["New item"]</a>
     }
 </div>
@@ -61,6 +62,7 @@ else
             <label for="admin-needs" class="form-label small mb-1">@T["Still needs"]</label>
             <select id="admin-needs" name="needs" class="form-select">
                 <option value="">@T["Anything"]</option>
+                <option value="@ItemNeed.Title" selected="@(Model.Needs == ItemNeed.Title)">@T["A title"]</option>
                 <option value="@ItemNeed.Description" selected="@(Model.Needs == ItemNeed.Description)">@T["A description"]</option>
                 <option value="@ItemNeed.Date" selected="@(Model.Needs == ItemNeed.Date)">@T["A date"]</option>
                 <option value="@ItemNeed.Tags" selected="@(Model.Needs == ItemNeed.Tags)">@T["Tags"]</option>
@@ -93,10 +95,30 @@ else
     }
     else
     {
+        @* The table is not inside this form, because each row's checkbox joins it by name, and the search form stays what it is. *@
+        <form method="post" id="bulk-form" asp-page="/Admin/Items/Bulk" class="bulk-bar d-flex flex-wrap gap-2 align-items-end mb-3">
+            <input type="hidden" name="back" value="@Model.ListUrl" />
+            <div>
+                <label for="bulk-action" class="form-label small mb-1">@T["Change many at once"]</label>
+                <select id="bulk-action" name="action" class="form-select">
+                    <option value="@Commonage.Web.Pages.Admin.Items.BulkAction.Publish">@T["Publish"]</option>
+                    <option value="@Commonage.Web.Pages.Admin.Items.BulkAction.AddTags">@T["Add tags"]</option>
+                    <option value="@Commonage.Web.Pages.Admin.Items.BulkAction.SetDate">@T["Set the date"]</option>
+                    <option value="@Commonage.Web.Pages.Admin.Items.BulkAction.MoveToCollection">@T["Move to a collection"]</option>
+                    <option value="@Commonage.Web.Pages.Admin.Items.BulkAction.SetRights">@T["Set the rights statement"]</option>
+                </select>
+            </div>
+            <button type="submit" name="scope" value="selected" class="btn btn-outline-primary">@T["For the ticked items"]</button>
+            <button type="submit" name="scope" value="all" class="btn btn-outline-primary">@T["For all in this list: {0}", Model.Items.TotalCount]</button>
+        </form>
         <div class="table-responsive">
             <table class="table align-middle">
                 <thead>
                     <tr>
+                        <th scope="col">
+                            <span class="visually-hidden">@T["Choose"]</span>
+                            <input type="checkbox" class="form-check-input" data-tick-all="selected" aria-label="@T["Tick all on this page"]" hidden />
+                        </th>
                         <th scope="col"><span class="visually-hidden">@T["Photos"]</span></th>
                         <th scope="col">@T["Title"]</th>
                         <th scope="col" class="d-none d-md-table-cell">@T["Collection"]</th>
@@ -108,6 +130,9 @@ else
                     @foreach (var item in Model.Items.Items)
                     {
                         <tr>
+                            <td>
+                                <input type="checkbox" class="form-check-input" name="selected" value="@item.Id" form="bulk-form" aria-label="@T["Choose: {0}", ArchiveItem.ShownTitle(T, item.Title)]" />
+                            </td>
                             <td class="admin-list-picture">
                                 @if (item.ThumbnailMediaFileId is { } thumbnail)
                                 {
@@ -115,7 +140,15 @@ else
                                 }
                             </td>
                             <td>
-                                <a asp-page="/Admin/Items/Edit" asp-route-id="@item.Id" asp-route-back="@Model.ListUrl">@item.Title</a>
+                                <a asp-page="/Admin/Items/Edit" asp-route-id="@item.Id" asp-route-back="@Model.ListUrl">@ArchiveItem.ShownTitle(T, item.Title)</a>
+                                @if (item.FirstFileName is not null)
+                                {
+                                    <span class="d-block small text-muted text-break">@item.FirstFileName</span>
+                                }
+                                @if (item.HasIdenticalFile)
+                                {
+                                    <span class="badge text-bg-warning d-table mt-1">@T["The archive already has this file"]</span>
+                                }
                                 @if (item.PhotoCount > 1)
                                 {
                                     <span class="d-block small text-muted">@T["Photos: {0}", item.PhotoCount]</span>

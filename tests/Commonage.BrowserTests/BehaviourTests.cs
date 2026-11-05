@@ -84,7 +84,7 @@ public class BehaviourTests(BrowserFixture app)
     }
 
     [Fact]
-    public async Task Uploading_a_photo_with_unsaved_text_asks_first()
+    public async Task Uploading_a_photo_with_unsaved_text_leaves_the_text_alone_and_does_not_ask()
     {
         var page = await app.LogInAsync();
         await CreateItemAsync(page, "Upload warning test");
@@ -93,9 +93,10 @@ public class BehaviourTests(BrowserFixture app)
         await page.FillAsync(Description, "Typed but not saved");
         await page.SetInputFilesAsync("#photo-upload", Path.Combine("Fixtures", "photo.jpg"));
         await page.ClickAsync(Button("Upload"));
-        await WaitForAsync(() => dialogs.Count == 1);
+        // Added, or already in the archive from another test: either way the page stays.
+        await page.Locator(".upload-queue li[data-state=added], .upload-queue li[data-state=identical]").WaitForAsync();
 
-        Assert.Equal(["beforeunload"], dialogs);
+        Assert.Empty(dialogs);
         Assert.Equal("Typed but not saved", await page.InputValueAsync(Description));
     }
 

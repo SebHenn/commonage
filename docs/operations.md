@@ -114,6 +114,8 @@ the material can always move to another system, or be handed to a public archive
 | `files/<item id>/<file id>-<name>` | The original files, exactly as uploaded. |
 | `README.txt` | A short description of the above. |
 
+An item's title can be empty in a full export: a draft from "Add many photos" that nobody has named yet.
+
 `archive.json` has `"format": "commonage-export"` and `"version": 3`. Version 3 added each item's rights, credit and catalogue
 details and each photo's description; in `items.csv`, `rights` and `rights_holder` are now the item's own, and the contributor's
 answers moved to `contributor_rights` and `contributor_rights_holder`. An export of published items leaves out what only

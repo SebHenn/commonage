@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using Commonage.Web.Data;
 using Commonage.Web.Domain;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 
@@ -33,6 +34,12 @@ public enum UploadError
     UnsupportedFormat,
 }
 
+/// <summary>What a look at an uploaded file found. Its fingerprint is only there when the file is acceptable.</summary>
+public record ExaminedUpload(UploadError Error, string? ContentType = null, string? Sha256 = null);
+
+/// <summary>An item that already holds a file with the same content.</summary>
+public record IdenticalFile(int ItemId, string ItemTitle);
+
 public static class UploadErrorMessages
 {
     public static string Describe(IStringLocalizer localizer, UploadError error, string fileName) => error switch
@@ -59,32 +66,53 @@ public class MediaUploadService(
 
     public async Task<UploadError> AddAsync(ArchiveItem item, IFormFile upload, CancellationToken cancellationToken = default)
     {
+        var examined = await ExamineAsync(upload, cancellationToken);
+        if (examined.Error == UploadError.None)
+            await StoreAsync(item, upload, examined, cancellationToken);
+        return examined.Error;
+    }
+
+    /// <summary>Checks a file and takes its fingerprint, to see whether the archive already has it before anything is stored.</summary>
+    public async Task<ExaminedUpload> ExamineAsync(IFormFile upload, CancellationToken cancellationToken = default)
+    {
         await using var content = upload.OpenReadStream();
         var (error, contentType) = await DetectAsync(upload, content, cancellationToken);
         if (error != UploadError.None)
-            return error;
+            return new ExaminedUpload(error);
 
         content.Position = 0;
-        var sha256 = Convert.ToHexStringLower(await SHA256.HashDataAsync(content, cancellationToken));
-        content.Position = 0;
+        return new ExaminedUpload(UploadError.None, contentType, Convert.ToHexStringLower(await SHA256.HashDataAsync(content, cancellationToken)));
+    }
 
+    /// <summary>An item with the same file, if there is one. What is in the bin does not count: someone chose to throw that away.</summary>
+    public async Task<IdenticalFile?> FindIdenticalAsync(ExaminedUpload examined, CancellationToken cancellationToken = default) =>
+        await db.MediaFiles
+            .Where(f => f.Sha256 == examined.Sha256)
+            .OrderBy(f => f.Id)
+            .Select(f => new IdenticalFile(f.ArchiveItemId, f.ArchiveItem.Title))
+            .FirstOrDefaultAsync(cancellationToken);
+
+    /// <summary>Stores a file that passed <see cref="ExamineAsync"/>. Also saves whatever else is waiting in the context, such as a new item.</summary>
+    public async Task<MediaFile> StoreAsync(ArchiveItem item, IFormFile upload, ExaminedUpload examined, CancellationToken cancellationToken = default)
+    {
         var file = new MediaFile
         {
             ArchiveItem = item,
             OriginalFileName = CleanFileName(upload.FileName),
-            ContentType = contentType!,
+            ContentType = examined.ContentType!,
             SizeBytes = upload.Length,
-            Sha256 = sha256,
+            Sha256 = examined.Sha256!,
             StorageId = Guid.NewGuid(),
             Status = ProcessingStatus.Pending,
             UploadedAt = DateTime.UtcNow,
         };
-        await storage.SaveAsync(file.OriginalKey, content, cancellationToken);
+        await using (var content = upload.OpenReadStream())
+            await storage.SaveAsync(file.OriginalKey, content, cancellationToken);
         db.MediaFiles.Add(file);
         await db.SaveChangesAsync(cancellationToken);
 
         queue.Enqueue(file.Id);
-        return UploadError.None;
+        return file;
     }
 
     public async Task DeleteAsync(MediaFile file, CancellationToken cancellationToken = default)

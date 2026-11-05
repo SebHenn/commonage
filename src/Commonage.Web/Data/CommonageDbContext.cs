@@ -169,6 +169,7 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options)
             file.Property(f => f.AltText).HasMaxLength(1000);
             file.HasIndex(f => f.StorageId).IsUnique();
             file.HasIndex(f => f.Status);
+            file.HasIndex(f => f.Sha256);
             file.HasOne(f => f.ArchiveItem)
                 .WithMany(i => i.MediaFiles)
                 .OnDelete(DeleteBehavior.Cascade);

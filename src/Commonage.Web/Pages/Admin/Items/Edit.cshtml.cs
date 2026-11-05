@@ -13,6 +13,9 @@ using Microsoft.Extensions.Localization;
 
 namespace Commonage.Web.Pages.Admin.Items;
 
+/// <summary>What a photo's card shows on the item page.</summary>
+public record PhotoCard(MediaFile File, int ItemId, string? Back, string? TypedAltText, IdenticalFile? SameAs);
+
 // Upload requests may carry several large scans. Each file is still checked against Uploads:MaxFileSizeMegabytes.
 // Authorization runs before the body is read, so anonymous requests are rejected without accepting a large upload.
 [AcceptsUploads]
@@ -26,8 +29,8 @@ public class EditModel(
     ArchiveProfile profile,
     IStringLocalizer<SharedResource> localizer) : PageModel
 {
-    private const long MaxUploadRequestBytes = 1024L * 1024 * 1024;
-    private const int MaxTagsPerItem = 30;
+    /// <summary>The limit for what is sent in one request: a new item's photos, and everything without JavaScript.</summary>
+    public const long MaxUploadRequestBytes = 1024L * 1024 * 1024;
     private const int HistoryLength = 20;
     private const int MaxAltTextLength = 1000;
 
@@ -41,6 +44,9 @@ public class EditModel(
     public DateRange? CurrentDateRange { get; private set; }
     public SelectList CollectionOptions { get; private set; } = null!;
     public IReadOnlyList<MediaFile> MediaFiles { get; private set; } = [];
+
+    /// <summary>Which of the photos the archive holds more than once, by the id of the photo.</summary>
+    public IReadOnlyDictionary<int, IdenticalFile> IdenticalFiles { get; private set; } = new Dictionary<int, IdenticalFile>();
 
     /// <summary>Who sent the item in, for items that came through a contribution link.</summary>
     public Contribution? Contribution { get; private set; }
@@ -75,6 +81,12 @@ public class EditModel(
 
     /// <summary>The statement in the form is only a suggestion, from what a contributor answered.</summary>
     public bool RightsWereProposed { get; private set; }
+
+    /// <summary>A draft from "Add many photos" that nobody has named yet.</summary>
+    public bool IsUntitled => SavedTitle?.Length == 0;
+
+    /// <summary>Going through drafts to name them: type a title, press Enter, on to the next. Enter presses a form's first button.</summary>
+    public bool NamingOneAfterAnother => IsUntitled && NextId is not null;
 
     /// <summary>Filled-in sections stay open, so nothing there goes unnoticed, and empty ones out of the way.</summary>
     public bool CatalogueHasContent => !string.IsNullOrEmpty(Input.RightsUri) || !string.IsNullOrEmpty(Input.RightsHolder)
@@ -191,7 +203,8 @@ public class EditModel(
 
     /// <param name="command">"publish", "unpublish", "accept" or "reject" changes the status; anything else only saves.</param>
     /// <param name="then">"next" goes on to the next item of the list, "another" to a new item.</param>
-    public async Task<IActionResult> OnPostAsync(int? id, string? command, string? then)
+    /// <param name="files">Photos chosen on the form for a new item.</param>
+    public async Task<IActionResult> OnPostAsync(int? id, string? command, string? then, List<IFormFile> files)
     {
         ArchiveItem? item = null;
         if (id is not null)
@@ -203,23 +216,21 @@ public class EditModel(
 
         if (Input.CollectionId is not null && !await db.Collections.AnyAsync(c => c.Id == Input.CollectionId))
             ModelState.AddModelError("Input.CollectionId", localizer["Please choose a collection."]);
-        if (!string.IsNullOrWhiteSpace(Input.Date) && !DateRange.TryParse(Input.Date, out _))
-            ModelState.AddModelError("Input.Date", localizer["This date could not be understood. Please include a year, for example: 1953, 12.03.1953, circa 1950, 1950s, 1950–1955."]);
+        if (ItemFields.DateError(localizer, Input.Date) is { } dateError)
+            ModelState.AddModelError("Input.Date", dateError);
 
         var tagNames = Tag.ParseList(Input.Tags);
-        if (tagNames.Any(name => name.Length > Tag.MaxLength))
-            ModelState.AddModelError("Input.Tags", localizer["A tag can be at most {0} characters long.", Tag.MaxLength]);
-        if (tagNames.Count > MaxTagsPerItem)
-            ModelState.AddModelError("Input.Tags", localizer["An item can have at most {0} tags.", MaxTagsPerItem]);
+        foreach (var tagError in ItemFields.TagErrors(localizer, tagNames))
+            ModelState.AddModelError("Input.Tags", tagError);
 
-        if (!string.IsNullOrEmpty(Input.RightsUri) && !RightsOptions.IsKnown(Input.RightsUri))
-            ModelState.AddModelError("Input.RightsUri", localizer["Please choose one of the statements."]);
+        if (ItemFields.RightsError(localizer, Input.RightsUri) is { } rightsError)
+            ModelState.AddModelError("Input.RightsUri", rightsError);
         if (!string.IsNullOrWhiteSpace(Input.ReferenceNumber))
         {
             var number = Input.ReferenceNumber.Trim();
             var usedBy = await db.ArchiveItems.IgnoreQueryFilters().Where(i => i.ReferenceNumber == number && i.Id != id).Select(i => i.Title).FirstOrDefaultAsync();
             if (usedBy is not null)
-                ModelState.AddModelError("Input.ReferenceNumber", localizer["This reference number is already used by: {0}", usedBy]);
+                ModelState.AddModelError("Input.ReferenceNumber", localizer["This reference number is already used by: {0}", ArchiveItem.ShownTitle(localizer, usedBy)]);
         }
         foreach (var (photo, text) in Input.AltTexts)
         {
@@ -227,15 +238,32 @@ public class EditModel(
                 ModelState.AddModelError($"Input.AltTexts[{photo}]", localizer["A photo description can be at most {0} characters long.", MaxAltTextLength]);
         }
 
+        // Checked before anything is saved, so a new item is not left behind without the photos it was made for.
+        var newPhotos = new List<(IFormFile File, ExaminedUpload Examined)>();
+        if (item is null)
+        {
+            foreach (var file in files)
+            {
+                var examined = await uploads.ExamineAsync(file);
+                if (examined.Error == UploadError.None)
+                    newPhotos.Add((file, examined));
+                else
+                    ModelState.AddModelError("files", UploadErrorMessages.Describe(localizer, examined.Error, file.FileName));
+            }
+        }
+
         if (!ModelState.IsValid)
         {
+            // A browser cannot fill in chosen files again when a form comes back, so it has to be said.
+            if (item is null && files.Count > 0)
+                ModelState.AddModelError("files", localizer["Please choose the photos again."]);
             await ShowStateAsync(item);
             await LoadDefaultRightsAsync();
             await LoadCollectionsAsync();
             return Page();
         }
 
-        if (command == "publish" && item is { CanBePublished: false })
+        if (command == "publish" && item?.Status == ItemStatus.Withdrawn)
             return BadRequest();
 
         // If someone else saved the item since this form was opened, saving fails instead of overwriting their work.
@@ -258,7 +286,7 @@ public class EditModel(
         item.Description = string.IsNullOrWhiteSpace(Input.Description) ? null : Input.Description.Trim();
         item.CollectionId = Input.CollectionId!.Value;
         item.TrySetDate(Input.Date);
-        item.SetTags(await FindOrCreateTagsAsync(tagNames));
+        item.SetTags(await db.FindOrCreateTagsAsync(tagNames));
         item.UpdatedAt = now;
         item.RightsUri = Clean(Input.RightsUri);
         item.RightsHolder = Clean(Input.RightsHolder);
@@ -315,6 +343,21 @@ public class EditModel(
             return await ShowChangesByOthersAsync(item.Id);
         }
 
+        if (newPhotos.Count > 0)
+        {
+            audit.Record(AuditAction.PhotosAdded, item.Title, item);
+            var identical = new List<string>();
+            foreach (var (file, examined) in newPhotos)
+            {
+                if (await uploads.FindIdenticalAsync(examined) is { } same)
+                    identical.Add(localizer["{0}: the archive already has this file: {1}", file.FileName, ArchiveItem.ShownTitle(localizer, same.ItemTitle)]);
+                await uploads.StoreAsync(item, file, examined);
+            }
+            TempData["Message"] = $"{TempData["Message"]} {localizer["Photos uploaded: {0}. Previews are being created.", newPhotos.Count].Value}";
+            if (identical.Count > 0)
+                TempData["Error"] = ItemFields.ListOf(identical);
+        }
+
         // After a decision on a contribution, the next one is what most curators want to see.
         if (wasWaiting && item.Status != ItemStatus.Submitted)
         {
@@ -335,7 +378,7 @@ public class EditModel(
         };
     }
 
-    private static string? Clean(string? text) => string.IsNullOrWhiteSpace(text) ? null : text.Trim();
+    private static string? Clean(string? text) => ItemFields.Clean(text);
 
     private async Task LoadDefaultRightsAsync() =>
         DefaultRightsLabel = (await profile.GetAsync()).DefaultRightsUri is { } uri ? RightsOptions.Label(localizer, uri) : null;
@@ -366,34 +409,70 @@ public class EditModel(
 
     private IActionResult BackToItem(int id) => RedirectToPage(new { id, back = Back });
 
-    public async Task<IActionResult> OnPostUploadAsync(int id, List<IFormFile> files, CancellationToken cancellationToken)
+    /// <param name="files">One file from uploads.js, which answers it with a line in its queue, or all of them from the form without JavaScript.</param>
+    /// <param name="addIdentical">Also add a file the archive already has. Without JavaScript that is what happens, with a warning.</param>
+    public async Task<IActionResult> OnPostUploadAsync(int id, List<IFormFile> files, bool addIdentical, CancellationToken cancellationToken)
     {
         var item = await db.ArchiveItems.FindAsync([id], cancellationToken);
         if (item is null)
             return NotFound();
 
+        if (Request.Headers.Accept.ToString().Contains("application/json", StringComparison.OrdinalIgnoreCase))
+        {
+            if (files.Count != 1)
+                return BadRequest();
+            var examined = await uploads.ExamineAsync(files[0], cancellationToken);
+            if (examined.Error != UploadError.None)
+                return new JsonResult(UploadReply.Refused(UploadErrorMessages.Describe(localizer, examined.Error, files[0].FileName)));
+            if (!addIdentical && await uploads.FindIdenticalAsync(examined, cancellationToken) is { } same)
+                return new JsonResult(UploadReply.Identical(localizer, same, Url.Page("/Admin/Items/Edit", new { id = same.ItemId })!));
+
+            await audit.RecordPhotosAddedAsync(item, cancellationToken);
+            var stored = await uploads.StoreAsync(item, files[0], examined, cancellationToken);
+            return new JsonResult(UploadReply.Added(id, null, stored.Id, Url.Page("/Admin/Items/Edit", "PhotoCard", new { id, mediaFileId = stored.Id, back = Back })));
+        }
+
         var errors = new List<string>();
+        var identical = new List<string>();
         var uploaded = 0;
         foreach (var file in files)
         {
-            var error = await uploads.AddAsync(item, file, cancellationToken);
-            if (error == UploadError.None)
-                uploaded++;
-            else
-                errors.Add(UploadErrorMessages.Describe(localizer, error, file.FileName));
+            var examined = await uploads.ExamineAsync(file, cancellationToken);
+            if (examined.Error != UploadError.None)
+            {
+                errors.Add(UploadErrorMessages.Describe(localizer, examined.Error, file.FileName));
+                continue;
+            }
+            if (await uploads.FindIdenticalAsync(examined, cancellationToken) is { } same)
+                identical.Add(localizer["{0}: the archive already has this file: {1}", file.FileName, ArchiveItem.ShownTitle(localizer, same.ItemTitle)]);
+            await uploads.StoreAsync(item, file, examined, cancellationToken);
+            uploaded++;
         }
 
         if (files.Count == 0)
             errors.Add(localizer["Please choose at least one photo."]);
         if (uploaded > 0)
         {
-            audit.Record(AuditAction.PhotosAdded, item.Title, item);
+            await audit.RecordPhotosAddedAsync(item, cancellationToken);
             await db.SaveChangesAsync(cancellationToken);
             TempData["Message"] = localizer["Photos uploaded: {0}. Previews are being created.", uploaded].Value;
         }
+        if (identical.Count > 0)
+            errors.Add(ItemFields.ListOf(identical));
         if (errors.Count > 0)
             TempData["Error"] = string.Join(" ", errors);
         return BackToItem(id);
+    }
+
+    /// <summary>The card of one photo, for a page that just sent it and should not have to reload to show it.</summary>
+    public async Task<IActionResult> OnGetPhotoCardAsync(int id, int mediaFileId, CancellationToken cancellationToken)
+    {
+        var file = await db.MediaFiles.FirstOrDefaultAsync(f => f.Id == mediaFileId && f.ArchiveItemId == id, cancellationToken);
+        if (file is null)
+            return NotFound();
+
+        var identical = await FindIdenticalFilesAsync([file]);
+        return Partial("_PhotoCard", new PhotoCard(file, id, Back, null, identical.GetValueOrDefault(file.Id)));
     }
 
     /// <summary>Moves the item to the bin, where it can be restored or deleted for good, see <see cref="ArchiveBin"/>.</summary>
@@ -503,6 +582,7 @@ public class EditModel(
         if (item is not null)
         {
             MediaFiles = await db.MediaFiles.Where(f => f.ArchiveItemId == item.Id).OrderBy(f => f.Id).ToListAsync();
+            IdenticalFiles = await FindIdenticalFilesAsync(MediaFiles);
             History = await db.AuditEntries
                 .Where(e => e.ArchiveItemId == item.Id)
                 .OrderByDescending(e => e.At).ThenByDescending(e => e.Id)
@@ -513,21 +593,28 @@ public class EditModel(
         }
     }
 
+    private async Task<Dictionary<int, IdenticalFile>> FindIdenticalFilesAsync(IReadOnlyList<MediaFile> photos)
+    {
+        var fingerprints = photos.Select(f => f.Sha256).Distinct().ToList();
+        var candidates = await db.MediaFiles
+            .Where(f => fingerprints.Contains(f.Sha256))
+            .OrderBy(f => f.Id)
+            .Select(f => new { f.Id, f.Sha256, f.ArchiveItemId, f.ArchiveItem.Title })
+            .ToListAsync();
+        var found = new Dictionary<int, IdenticalFile>();
+        foreach (var photo in photos)
+        {
+            if (candidates.FirstOrDefault(c => c.Sha256 == photo.Sha256 && c.Id != photo.Id) is { } other)
+                found[photo.Id] = new IdenticalFile(other.ArchiveItemId, other.Title);
+        }
+        return found;
+    }
+
     private Task<ArchiveItem?> FindItemAsync(int id) =>
         db.ArchiveItems
             .Include(i => i.Tags)
             .Include(i => i.Contribution).ThenInclude(c => c!.ContributionLink)
             .FirstOrDefaultAsync(i => i.Id == id);
-
-    /// <summary>Reuses existing tags regardless of case, so "mill street" joins the existing tag "Mill Street".</summary>
-    private async Task<List<Tag>> FindOrCreateTagsAsync(IReadOnlyList<string> names)
-    {
-        var normalizedNames = names.Select(Tag.Normalize).ToList();
-        var existing = await db.Tags.Where(t => normalizedNames.Contains(t.NormalizedName)).ToDictionaryAsync(t => t.NormalizedName);
-        return names
-            .Select(name => existing.GetValueOrDefault(Tag.Normalize(name)) ?? new Tag { Name = name, NormalizedName = Tag.Normalize(name) })
-            .ToList();
-    }
 
     private async Task LoadCollectionsAsync()
     {

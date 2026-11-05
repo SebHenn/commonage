@@ -14,6 +14,14 @@ version may change things that need attention when updating, and these notes say
 - Filters for items without a rights statement or photo descriptions. A reference number typed into the search finds its item.
 - Contributor details can be corrected, for example a misspelt name.
 - "Contributors" also finds people named in what curators wrote.
+- **Add many photos:** one draft per photo, with a shared collection, date, tags and rights statement. Photos go one at a time, with
+  progress. A broken connection stops the queue and it goes on from there, and sending the same files again is safe.
+- A draft from there has no title yet, can be found with a filter, and cannot be published until it has one.
+- Change many items at once, ticked or all that a filter found: publish, add tags, set the date, move to a collection, set the
+  rights statement. A page first says how many and what would happen.
+- The archive notices identical files: on upload, on each photo, and with a note on contributions. Contributors are not told.
+- A new item can take its photos on the same form, and "Save as draft" is the main button there.
+- Photos added to an item appear without a reload, and typed text stays where it is. Previews come in by themselves.
 
 ### For visitors
 
@@ -32,6 +40,7 @@ version may change things that need attention when updating, and these notes say
 
 ### Project
 
+- An item in the export can have an empty title: a draft nobody has named yet. Exports of published items never contain one.
 - The export format is now version 3. In `items.csv`, the contributor's answers moved to `contributor_rights` and
   `contributor_rights_holder`. See docs/operations.md.
 - Interface languages are one list, in `SupportedLanguages.cs`. Pages switch to right-to-left by language, and browser tests

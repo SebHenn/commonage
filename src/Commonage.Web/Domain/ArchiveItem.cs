@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Localization;
+
 namespace Commonage.Web.Domain;
 
 /// <summary>
@@ -67,13 +69,22 @@ public class ArchiveItem
 
     public void RestoreFromBin() => DeletedAt = null;
 
-    /// <summary>Withdrawn contributions cannot be published again; the contributor would have to send them in anew.</summary>
-    public bool CanBePublished => Status != ItemStatus.Withdrawn;
+    /// <summary>
+    /// A draft made from a photo that nobody has named yet. Its title is empty rather than a stored word like "Untitled",
+    /// which would be in one language only and could be taken for a real title. <see cref="ShownTitle"/> says it in any language.
+    /// </summary>
+    public bool IsUntitled => Title.Length == 0;
+
+    /// <summary>What to show curators as the title of an item, also for a title kept in the activity log.</summary>
+    public static string ShownTitle(IStringLocalizer localizer, string title) => title.Length == 0 ? localizer["Untitled"] : title;
+
+    /// <summary>Withdrawn contributions cannot be published again; the contributor would have to send them in anew. And nothing goes public without a real title.</summary>
+    public bool CanBePublished => Status != ItemStatus.Withdrawn && !IsUntitled;
 
     public void Publish(DateTime now)
     {
         if (!CanBePublished)
-            throw new InvalidOperationException("A withdrawn contribution cannot be published.");
+            throw new InvalidOperationException("Withdrawn contributions and items without a title cannot be published.");
         MarkReviewed(now);
         Status = ItemStatus.Published;
         PublishedAt ??= now;
