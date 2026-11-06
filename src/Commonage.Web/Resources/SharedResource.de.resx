@@ -4,6 +4,7 @@
   <resheader name="version"><value>2.0</value></resheader>
   <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="A caption can be at most {0} characters long." xml:space="preserve"><value>Eine Bildunterschrift darf höchstens {0} Zeichen lang sein.</value></data>
   <data name="A closed link shows “not found”. You can open it again at any time." xml:space="preserve"><value>Ein geschlossener Link zeigt „nicht gefunden“. Sie können ihn jederzeit wieder öffnen.</value></data>
   <data name="A curator looks at everything sent in before it appears in the archive." xml:space="preserve"><value>Alles, was Sie einsenden, wird vom Archiv geprüft, bevor es dort erscheint.</value></data>
   <data name="A date" xml:space="preserve"><value>Ein Datum</value></data>
@@ -17,6 +18,7 @@
   <data name="A rights statement" xml:space="preserve"><value>Eine Rechteangabe</value></data>
   <data name="A tag can be at most {0} characters long." xml:space="preserve"><value>Ein Schlagwort darf höchstens {0} Zeichen lang sein.</value></data>
   <data name="A title" xml:space="preserve"><value>Einen Titel</value></data>
+  <data name="A transcription" xml:space="preserve"><value>Eine Abschrift</value></data>
   <data name="A working preview" xml:space="preserve"><value>Eine funktionierende Vorschau</value></data>
   <data name="About this archive" xml:space="preserve"><value>Über dieses Archiv</value></data>
   <data name="About you" xml:space="preserve"><value>Zu Ihnen</value></data>
@@ -59,6 +61,7 @@
   <data name="Browse the archive" xml:space="preserve"><value>Im Archiv stöbern</value></data>
   <data name="Can also manage accounts, export the archive and read the activity log." xml:space="preserve"><value>Kann außerdem Konten verwalten, das Archiv exportieren und das Aktivitätsprotokoll lesen.</value></data>
   <data name="Cancel" xml:space="preserve"><value>Abbrechen</value></data>
+  <data name="Caption" xml:space="preserve"><value>Bildunterschrift</value></data>
   <data name="Catalogue details" xml:space="preserve"><value>Katalogangaben</value></data>
   <data name="Change many at once" xml:space="preserve"><value>Viele auf einmal ändern</value></data>
   <data name="Change password" xml:space="preserve"><value>Passwort ändern</value></data>
@@ -69,6 +72,7 @@
   <data name="Changed the collection" xml:space="preserve"><value>Sammlung geändert</value></data>
   <data name="Changed the contribution link" xml:space="preserve"><value>Beitragslink geändert</value></data>
   <data name="Changed the item" xml:space="preserve"><value>Eintrag geändert</value></data>
+  <data name="Changed the order or direction of photos" xml:space="preserve"><value>Reihenfolge oder Ausrichtung von Fotos geändert</value></data>
   <data name="Changed their password" xml:space="preserve"><value>Eigenes Passwort geändert</value></data>
   <data name="Check the contribution, complete the details below, then publish it, accept it as a draft or reject it." xml:space="preserve"><value>Prüfen Sie den Beitrag, ergänzen Sie die Angaben unten und veröffentlichen Sie ihn dann, übernehmen Sie ihn als Entwurf oder lehnen Sie ihn ab.</value></data>
   <data name="Choose" xml:space="preserve"><value>Auswählen</value></data>
@@ -101,6 +105,7 @@
   <data name="Contributors are promised they can ask for removal. Say how: an email address, a phone number or a meeting place." xml:space="preserve"><value>Einsendenden wird zugesagt, dass sie um Entfernung bitten können. Sagen Sie, wie: eine E-Mail-Adresse, eine Telefonnummer oder ein Treffpunkt.</value></data>
   <data name="Correct these details" xml:space="preserve"><value>Diese Angaben korrigieren</value></data>
   <data name="Corrected the contributor's details" xml:space="preserve"><value>Hat die Angaben der einsendenden Person korrigiert</value></data>
+  <data name="Cover" xml:space="preserve"><value>Titelbild</value></data>
   <data name="Create a new setup link" xml:space="preserve"><value>Neuen Einrichtungslink erstellen</value></data>
   <data name="Create account" xml:space="preserve"><value>Konto erstellen</value></data>
   <data name="Create the first collection" xml:space="preserve"><value>Die erste Sammlung anlegen</value></data>
@@ -145,6 +150,8 @@
   <data name="Drafts created: {0}. Previews are being created." xml:space="preserve"><value>Entwürfe angelegt: {0}. Die Vorschaubilder werden erstellt.</value></data>
   <data name="Each photo becomes a draft of its own, with what you enter here. You give them their titles afterwards, and only then can they be published. For one item with several photos, use New item." xml:space="preserve"><value>Jedes Foto wird ein eigener Entwurf, mit dem, was Sie hier eintragen. Die Titel vergeben Sie danach, und erst dann können die Entwürfe veröffentlicht werden. Für einen Eintrag mit mehreren Fotos nehmen Sie „Neuer Eintrag“.</value></data>
   <data name="Each photo its own item? Add many photos at once." xml:space="preserve"><value>Jedes Foto ein eigener Eintrag? Viele Fotos auf einmal hinzufügen.</value></data>
+  <data name="Earlier" xml:space="preserve"><value>Nach vorne</value></data>
+  <data name="Earlier: {0}" xml:space="preserve"><value>Nach vorne: {0}</value></data>
   <data name="Edit collection" xml:space="preserve"><value>Sammlung bearbeiten</value></data>
   <data name="Edit contribution link" xml:space="preserve"><value>Beitragslink bearbeiten</value></data>
   <data name="Edit item" xml:space="preserve"><value>Eintrag bearbeiten</value></data>
@@ -153,6 +160,8 @@
   <data name="Email address" xml:space="preserve"><value>E-Mail-Adresse</value></data>
   <data name="Enable account" xml:space="preserve"><value>Konto aktivieren</value></data>
   <data name="Enabled the account" xml:space="preserve"><value>Konto aktiviert</value></data>
+  <data name="Everyone reads the caption under the photo, for example: Page 2, or The bakery from across the road. Words in it are not searched, so what matters for finding the item belongs in the description." xml:space="preserve"><value>Die Bildunterschrift steht für alle lesbar unter dem Foto, zum Beispiel: Seite 2, oder: Die Bäckerei von der anderen Straßenseite. Die Suche findet ihre Wörter nicht. Was wichtig ist, um den Eintrag zu finden, gehört deshalb in die Beschreibung.</value></data>
+  <data name="Everything from this time" xml:space="preserve"><value>Alles aus dieser Zeit</value></data>
   <data name="Export" xml:space="preserve"><value>Export</value></data>
   <data name="Export the archive" xml:space="preserve"><value>Archiv exportieren</value></data>
   <data name="Exported the archive" xml:space="preserve"><value>Archiv exportiert</value></data>
@@ -162,6 +171,7 @@
   <data name="Find everything a person has sent in or is named as the photographer or author of, for example when they ask what the archive holds about them, or ask for it to be deleted." xml:space="preserve"><value>Finden Sie alles, was eine Person eingesendet hat oder wobei sie als Fotograf oder Autor genannt ist, zum Beispiel wenn sie fragt, was das Archiv über sie gespeichert hat, oder um Löschung bittet.</value></data>
   <data name="Finished. Added: {0}. Already in the archive: {1}. Refused: {2}." xml:space="preserve"><value>Fertig. Hinzugefügt: {0}. Schon im Archiv: {1}. Abgelehnt: {2}.</value></data>
   <data name="Finished: {0} of {1}" xml:space="preserve"><value>Fertig: {0} von {1}</value></data>
+  <data name="For a letter or other writing, write out what it says here. Handwriting cannot be searched or read aloud, and this can." xml:space="preserve"><value>Bei einem Brief oder anderem Geschriebenen schreiben Sie hier ab, was dort steht. Handschrift lässt sich nicht durchsuchen oder vorlesen, dieser Text schon.</value></data>
   <data name="For all in this list: {0}" xml:space="preserve"><value>Für alle in dieser Liste: {0}</value></data>
   <data name="For people who cannot see the photo: who and what is in it, in a sentence. Saved together with the item." xml:space="preserve"><value>Für Menschen, die das Foto nicht sehen können: wer und was darauf ist, in einem Satz. Wird zusammen mit dem Eintrag gespeichert.</value></data>
   <data name="For the account {0}. Use at least {1} characters. A few words in a row are easy to remember and hard to guess." xml:space="preserve"><value>Für das Konto {0}. Verwenden Sie mindestens {1} Zeichen. Ein paar Wörter hintereinander sind leicht zu merken und schwer zu erraten.</value></data>
@@ -173,6 +183,7 @@
   <data name="Free for non-commercial use with credit (CC BY-NC)" xml:space="preserve"><value>Frei für nicht kommerzielle Nutzung mit Nennung (CC BY-NC)</value></data>
   <data name="Free to use with credit (CC BY)" xml:space="preserve"><value>Frei nutzbar mit Nennung (CC BY)</value></data>
   <data name="Free to use with credit, and shared alike (CC BY-SA)" xml:space="preserve"><value>Frei nutzbar mit Nennung und unter gleichen Bedingungen (CC BY-SA)</value></data>
+  <data name="From the same time" xml:space="preserve"><value>Aus derselben Zeit</value></data>
   <data name="From year" xml:space="preserve"><value>Von Jahr</value></data>
   <data name="From year: {0}" xml:space="preserve"><value>Ab Jahr: {0}</value></data>
   <data name="From: {0}" xml:space="preserve"><value>Aus: {0}</value></data>
@@ -214,11 +225,14 @@
   <data name="Language, time and visibility" xml:space="preserve"><value>Sprache, Zeit und Sichtbarkeit</value></data>
   <data name="Last backup: {0}" xml:space="preserve"><value>Letzte Sicherung: {0}</value></data>
   <data name="Last changed" xml:space="preserve"><value>Zuletzt geändert</value></data>
+  <data name="Later" xml:space="preserve"><value>Nach hinten</value></data>
+  <data name="Later: {0}" xml:space="preserve"><value>Nach hinten: {0}</value></data>
   <data name="Leave this field empty" xml:space="preserve"><value>Dieses Feld leer lassen</value></data>
   <data name="Left out, because the archive already has them: {0}" xml:space="preserve"><value>Ausgelassen, weil das Archiv sie schon hat: {0}</value></data>
   <data name="Left out, because they are not drafts: {0}. A contribution needs a decision of its own, on its own page." xml:space="preserve"><value>Ausgelassen, weil sie keine Entwürfe sind: {0}. Über einen Beitrag wird einzeln entschieden, auf seiner eigenen Seite.</value></data>
   <data name="Left out, because they have no title yet: {0}." xml:space="preserve"><value>Ausgelassen, weil sie noch keinen Titel haben: {0}.</value></data>
   <data name="Let search engines list this archive" xml:space="preserve"><value>Suchmaschinen dürfen dieses Archiv aufführen</value></data>
+  <data name="Let visitors open photos at a large size" xml:space="preserve"><value>Besucher können Fotos in großer Größe öffnen</value></data>
   <data name="Log in" xml:space="preserve"><value>Anmelden</value></data>
   <data name="Log out" xml:space="preserve"><value>Abmelden</value></data>
   <data name="Logo" xml:space="preserve"><value>Logo</value></data>
@@ -230,6 +244,7 @@
   <data name="Marked the contribution as withdrawn" xml:space="preserve"><value>Beitrag als zurückgezogen markiert</value></data>
   <data name="May be named on public pages" xml:space="preserve"><value>Darf auf öffentlichen Seiten genannt werden</value></data>
   <data name="may be named publicly" xml:space="preserve"><value>darf öffentlich genannt werden</value></data>
+  <data name="More from {0}" xml:space="preserve"><value>Mehr aus {0}</value></data>
   <data name="Move many to a collection" xml:space="preserve"><value>Viele in eine Sammlung verschieben</value></data>
   <data name="Move this item to the bin? It disappears from the archive at once. You can restore it there for {0} days." xml:space="preserve"><value>Diesen Eintrag in den Papierkorb legen? Er verschwindet sofort aus dem Archiv. Sie können ihn dort {0} Tage lang wiederherstellen.</value></data>
   <data name="Move this photo to the bin? You can restore it there for {0} days." xml:space="preserve"><value>Dieses Foto in den Papierkorb legen? Sie können es dort {0} Tage lang wiederherstellen.</value></data>
@@ -255,6 +270,7 @@
   <data name="Newest first" xml:space="preserve"><value>Neueste zuerst</value></data>
   <data name="Next" xml:space="preserve"><value>Weiter</value></data>
   <data name="Next item" xml:space="preserve"><value>Nächster Eintrag</value></data>
+  <data name="Next: {0}" xml:space="preserve"><value>Nächster: {0}</value></data>
   <data name="No access" xml:space="preserve"><value>Kein Zugriff</value></data>
   <data name="No contributions match." xml:space="preserve"><value>Keine Beiträge gefunden.</value></data>
   <data name="No file chosen" xml:space="preserve"><value>Keine Datei ausgewählt</value></data>
@@ -277,9 +293,11 @@
   <data name="Only published items" xml:space="preserve"><value>Nur veröffentlichte Einträge</value></data>
   <data name="Only the archive's curators see your name and email address, unless you choose to have your name shown. Your email address is only used to ask about what you send in." xml:space="preserve"><value>Nur die Kuratoren des Archivs sehen Ihren Namen und Ihre E-Mail-Adresse, es sei denn, Sie möchten, dass Ihr Name genannt wird. Ihre E-Mail-Adresse wird nur für Rückfragen zu Ihrer Einsendung verwendet.</value></data>
   <data name="Open" xml:space="preserve"><value>Offen</value></data>
+  <data name="Open at full size" xml:space="preserve"><value>In voller Größe öffnen</value></data>
   <data name="Open: the link accepts contributions" xml:space="preserve"><value>Offen: Über den Link können Beiträge eingesendet werden</value></data>
   <data name="Or start from one of these:" xml:space="preserve"><value>Oder beginnen Sie hier:</value></data>
   <data name="Original" xml:space="preserve"><value>Original</value></data>
+  <data name="Other items in {0}" xml:space="preserve"><value>Weitere Einträge in {0}</value></data>
   <data name="Our archive needs no imprint." xml:space="preserve"><value>Unser Archiv braucht kein Impressum.</value></data>
   <data name="Page not found" xml:space="preserve"><value>Seite nicht gefunden</value></data>
   <data name="Page {0} of {1}" xml:space="preserve"><value>Seite {0} von {1}</value></data>
@@ -288,11 +306,13 @@
   <data name="Password" xml:space="preserve"><value>Passwort</value></data>
   <data name="Period" xml:space="preserve"><value>Zeitraum</value></data>
   <data name="Photo descriptions" xml:space="preserve"><value>Fotobeschreibungen</value></data>
+  <data name="Photo {0} of {1}" xml:space="preserve"><value>Foto {0} von {1}</value></data>
   <data name="Photographer or author: {0}" xml:space="preserve"><value>Fotografiert oder geschrieben von: {0}</value></data>
   <data name="Photos" xml:space="preserve"><value>Fotos</value></data>
   <data name="Photos (optional)" xml:space="preserve"><value>Fotos (optional)</value></data>
   <data name="Photos are published without location data or other embedded details. The original files stay private." xml:space="preserve"><value>Fotos werden ohne Standortdaten und andere eingebettete Angaben veröffentlicht. Die Originaldateien bleiben privat.</value></data>
   <data name="Photos chosen: {0}" xml:space="preserve"><value>Ausgewählte Fotos: {0}</value></data>
+  <data name="Photos of this item" xml:space="preserve"><value>Fotos dieses Eintrags</value></data>
   <data name="Photos on their way" xml:space="preserve"><value>Fotos auf dem Weg</value></data>
   <data name="Photos uploaded: {0}. Previews are being created." xml:space="preserve"><value>Hochgeladene Fotos: {0}. Vorschauen werden erstellt.</value></data>
   <data name="Photos: {0}" xml:space="preserve"><value>Fotos: {0}</value></data>
@@ -333,6 +353,7 @@
   <data name="Previews still to be created: {0}" xml:space="preserve"><value>Noch zu erstellende Vorschaubilder: {0}</value></data>
   <data name="Previous" xml:space="preserve"><value>Zurück</value></data>
   <data name="Previous item" xml:space="preserve"><value>Vorheriger Eintrag</value></data>
+  <data name="Previous: {0}" xml:space="preserve"><value>Vorheriger: {0}</value></data>
   <data name="Privacy" xml:space="preserve"><value>Datenschutz</value></data>
   <data name="Public domain: free to use" xml:space="preserve"><value>Gemeinfrei: frei nutzbar</value></data>
   <data name="Publish" xml:space="preserve"><value>Veröffentlichen</value></data>
@@ -405,6 +426,7 @@
   <data name="Source code" xml:space="preserve"><value>Quellcode</value></data>
   <data name="Status" xml:space="preserve"><value>Status</value></data>
   <data name="Still needs" xml:space="preserve"><value>Fehlt noch</value></data>
+  <data name="Still needs a transcription" xml:space="preserve"><value>Muss noch abgeschrieben werden</value></data>
   <data name="Stop sending" xml:space="preserve"><value>Senden abbrechen</value></data>
   <data name="Submitted" xml:space="preserve"><value>Eingesendet</value></data>
   <data name="Suggested from what the contributor answered. They agreed to publication on this website, not to reuse by others, so only a free licence they gave you themselves should go further." xml:space="preserve"><value>Vorschlag aus der Antwort der einsendenden Person. Sie hat der Veröffentlichung auf dieser Website zugestimmt, nicht der Weiterverwendung durch andere. Darüber hinaus sollte nur eine freie Lizenz gehen, die sie Ihnen selbst gegeben hat.</value></data>
@@ -512,6 +534,9 @@
   <data name="Too many attempts" xml:space="preserve"><value>Zu viele Versuche</value></data>
   <data name="Too many attempts came from your network in the last hour. Please try again later." xml:space="preserve"><value>In der letzten Stunde kamen zu viele Versuche aus Ihrem Netzwerk. Bitte versuchen Sie es später noch einmal.</value></data>
   <data name="Too many failed attempts. Please try again in a few minutes." xml:space="preserve"><value>Zu viele Fehlversuche. Bitte versuchen Sie es in einigen Minuten erneut.</value></data>
+  <data name="Turn right" xml:space="preserve"><value>Nach rechts drehen</value></data>
+  <data name="Turn right: {0}" xml:space="preserve"><value>Nach rechts drehen: {0}</value></data>
+  <data name="Turning the photo…" xml:space="preserve"><value>Foto wird gedreht …</value></data>
   <data name="Understood as: {0}" xml:space="preserve"><value>Verstanden als: {0}</value></data>
   <data name="Unknown" xml:space="preserve"><value>Unbekannt</value></data>
   <data name="Unpublish" xml:space="preserve"><value>Veröffentlichung zurückziehen</value></data>
@@ -519,9 +544,12 @@
   <data name="Untitled" xml:space="preserve"><value>Ohne Titel</value></data>
   <data name="Up to {0} photos: JPEG, PNG, TIFF or WebP." xml:space="preserve"><value>Bis zu {0} Fotos: JPEG, PNG, TIFF oder WebP.</value></data>
   <data name="Upload" xml:space="preserve"><value>Hochladen</value></data>
+  <data name="Use as cover" xml:space="preserve"><value>Als Titelbild</value></data>
+  <data name="Use as cover: {0}" xml:space="preserve"><value>Als Titelbild: {0}</value></data>
   <data name="Use the standard colour" xml:space="preserve"><value>Die Standardfarbe verwenden</value></data>
   <data name="Version {0}" xml:space="preserve"><value>Version {0}</value></data>
   <data name="View public page" xml:space="preserve"><value>Öffentliche Seite ansehen</value></data>
+  <data name="Visitors can open a photo at about 3000 pixels, to read a letter or look at a face. Without this they only get a smaller one, about 1600 pixels, and the archive saves the disk space. The original stays private either way, and larger versions have no location data or other embedded details either." xml:space="preserve"><value>Besucher können ein Foto mit etwa 3000 Pixeln öffnen, um einen Brief zu lesen oder ein Gesicht anzusehen. Ohne diese Einstellung erhalten sie nur eine kleinere Fassung mit etwa 1600 Pixeln, und das Archiv spart Speicherplatz. Das Original bleibt in jedem Fall privat, und auch größere Fassungen enthalten keine Standortdaten oder andere eingebettete Angaben.</value></data>
   <data name="Waiting" xml:space="preserve"><value>Wartet</value></data>
   <data name="Waiting for review: {0}" xml:space="preserve"><value>Warten auf Prüfung: {0}</value></data>
   <data name="Waiting for setup" xml:space="preserve"><value>Wartet auf Einrichtung</value></data>
@@ -569,5 +597,6 @@
   <data name="{0} is not a supported photo format. Please use JPEG, PNG, TIFF or WebP." xml:space="preserve"><value>{0} ist kein unterstütztes Fotoformat. Bitte verwenden Sie JPEG, PNG, TIFF oder WebP.</value></data>
   <data name="{0} is too large." xml:space="preserve"><value>{0} ist zu groß.</value></data>
   <data name="{0} was left out, because together the photos would be too large to send at once. You can send it afterwards." xml:space="preserve"><value>{0} wurde weggelassen, weil die Fotos zusammen zu groß wären, um sie auf einmal zu senden. Sie können es danach senden.</value></data>
+  <data name="{0}, photo {1} of {2}" xml:space="preserve"><value>{0}, Foto {1} von {2}</value></data>
   <data name="{0}: the archive already has this file: {1}" xml:space="preserve"><value>{0}: Das Archiv hat diese Datei schon: {1}</value></data>
 </root>

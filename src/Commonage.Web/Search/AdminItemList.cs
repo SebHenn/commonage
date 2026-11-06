@@ -16,6 +16,7 @@ public enum ItemNeed
     Rights,
     AltText,
     Title,
+    Transcription,
 }
 
 public enum AdminItemSort
@@ -68,6 +69,7 @@ public static class AdminItemList
             ItemNeed.PreviewFailed => items.Where(i => i.MediaFiles.Any(f => f.Status == ProcessingStatus.Failed)),
             ItemNeed.AltText => items.Where(i => i.MediaFiles.Any(f => f.AltText == null)),
             ItemNeed.Title => items.Where(i => i.Title == ""),
+            ItemNeed.Transcription => items.Where(i => i.NeedsTranscription),
             // With a default for the whole archive, nothing is left undecided.
             ItemNeed.Rights when !await db.ArchiveSettings.AnyAsync(s => s.DefaultRightsUri != null, cancellationToken) => items.Where(i => i.RightsUri == null),
             ItemNeed.Rights => items.Where(i => false),

@@ -14,7 +14,7 @@ using Microsoft.Extensions.Localization;
 namespace Commonage.Web.Pages.Admin.Items;
 
 /// <summary>What a photo's card shows on the item page.</summary>
-public record PhotoCard(MediaFile File, int ItemId, string? Back, string? TypedAltText, IdenticalFile? SameAs);
+public record PhotoCard(MediaFile File, int ItemId, string? Back, string? TypedAltText, string? TypedCaption, IdenticalFile? SameAs, int Number, int Total);
 
 // Upload requests may carry several large scans. Each file is still checked against Uploads:MaxFileSizeMegabytes.
 // Authorization runs before the body is read, so anonymous requests are rejected without accepting a large upload.
@@ -24,6 +24,7 @@ public record PhotoCard(MediaFile File, int ItemId, string? Back, string? TypedA
 public class EditModel(
     CommonageDbContext db,
     MediaUploadService uploads,
+    MediaProcessingQueue previews,
     AuditLog audit,
     ArchiveHealth health,
     ArchiveProfile profile,
@@ -153,6 +154,12 @@ public class EditModel(
         /// <summary>What each photo shows, by the id of the photo.</summary>
         public Dictionary<int, string?> AltTexts { get; set; } = [];
 
+        /// <summary>What visitors read under each photo, by the id of the photo.</summary>
+        public Dictionary<int, string?> Captions { get; set; } = [];
+
+        [Display(Name = "Still needs a transcription")]
+        public bool NeedsTranscription { get; set; }
+
         /// <summary>The item's version when the form was opened, to notice changes made by someone else since.</summary>
         public uint? Version { get; set; }
     }
@@ -187,6 +194,7 @@ public class EditModel(
                 ReceivedFrom = item.ReceivedFrom,
                 ReceivedOn = item.ReceivedOn,
                 InternalNotes = item.InternalNotes,
+                NeedsTranscription = item.NeedsTranscription,
             };
             RightsWereProposed = item.RightsUri is null && item.Contribution is not null;
             await ShowStateAsync(item);
@@ -236,6 +244,11 @@ public class EditModel(
         {
             if (text is { Length: > MaxAltTextLength })
                 ModelState.AddModelError($"Input.AltTexts[{photo}]", localizer["A photo description can be at most {0} characters long.", MaxAltTextLength]);
+        }
+        foreach (var (photo, text) in Input.Captions)
+        {
+            if (text is { Length: > MediaFile.MaxCaptionLength })
+                ModelState.AddModelError($"Input.Captions[{photo}]", localizer["A caption can be at most {0} characters long.", MediaFile.MaxCaptionLength]);
         }
 
         // Checked before anything is saved, so a new item is not left behind without the photos it was made for.
@@ -296,12 +309,15 @@ public class EditModel(
         item.ReceivedFrom = Clean(Input.ReceivedFrom);
         item.ReceivedOn = Clean(Input.ReceivedOn);
         item.InternalNotes = Clean(Input.InternalNotes);
-        if (Input.AltTexts.Count > 0 && id is not null)
+        item.NeedsTranscription = Input.NeedsTranscription;
+        if ((Input.AltTexts.Count > 0 || Input.Captions.Count > 0) && id is not null)
         {
             foreach (var file in await db.MediaFiles.Where(f => f.ArchiveItemId == id).ToListAsync())
             {
                 if (Input.AltTexts.TryGetValue(file.Id, out var text))
                     file.AltText = Clean(text);
+                if (Input.Captions.TryGetValue(file.Id, out var caption))
+                    file.Caption = Clean(caption);
             }
         }
         audit.Record(isNew ? AuditAction.ItemCreated : AuditAction.ItemChanged, item.Title, item);
@@ -472,8 +488,63 @@ public class EditModel(
             return NotFound();
 
         var identical = await FindIdenticalFilesAsync([file]);
-        return Partial("_PhotoCard", new PhotoCard(file, id, Back, null, identical.GetValueOrDefault(file.Id)));
+        // The page numbers its cards again when it has added this one.
+        var total = await db.MediaFiles.CountAsync(f => f.ArchiveItemId == id, cancellationToken);
+        return Partial("_PhotoCard", new PhotoCard(file, id, Back, null, null, identical.GetValueOrDefault(file.Id), total, total));
     }
+
+    /// <summary>Puts a photo elsewhere among the item's photos. The first one is the cover. The item's own version stays as it is, so an open form can still be saved.</summary>
+    /// <param name="direction">"earlier", "later" or "first".</param>
+    public async Task<IActionResult> OnPostMovePhotoAsync(int id, int mediaFileId, string? direction, CancellationToken cancellationToken)
+    {
+        var item = await db.ArchiveItems.FindAsync([id], cancellationToken);
+        if (item is null)
+            return NotFound();
+
+        var photos = await db.MediaFiles.Where(f => f.ArchiveItemId == id).OrderBy(f => f.Position).ThenBy(f => f.Id).ToListAsync(cancellationToken);
+        var from = photos.FindIndex(f => f.Id == mediaFileId);
+        if (from < 0)
+            return NotFound();
+
+        var to = direction switch
+        {
+            "earlier" => Math.Max(from - 1, 0),
+            "later" => Math.Min(from + 1, photos.Count - 1),
+            "first" => 0,
+            _ => from,
+        };
+        var photo = photos[from];
+        photos.RemoveAt(from);
+        photos.Insert(to, photo);
+        for (var position = 0; position < photos.Count; position++)
+            photos[position].Position = position;
+
+        await audit.RecordPhotosArrangedAsync(item, cancellationToken);
+        await db.SaveChangesAsync(cancellationToken);
+        return PhotoChanged(id, mediaFileId);
+    }
+
+    /// <summary>Turns a photo a quarter to the right. Only its previews change, in the background. The original stays exactly as it came.</summary>
+    public async Task<IActionResult> OnPostTurnPhotoAsync(int id, int mediaFileId, CancellationToken cancellationToken)
+    {
+        var file = await db.MediaFiles.Include(f => f.ArchiveItem).FirstOrDefaultAsync(f => f.Id == mediaFileId && f.ArchiveItemId == id, cancellationToken);
+        if (file is null)
+            return NotFound();
+        if (file.Status != ProcessingStatus.Ready)
+            return BadRequest();
+
+        file.Rotation = (file.Rotation + 90) % 360;
+        await audit.RecordPhotosArrangedAsync(file.ArchiveItem, cancellationToken);
+        await db.SaveChangesAsync(cancellationToken);
+        previews.Enqueue(file.Id);
+        return PhotoChanged(id, mediaFileId);
+    }
+
+    /// <summary>With JavaScript the page changes by itself and keeps what was typed. Without, it comes back at the same photo.</summary>
+    private IActionResult PhotoChanged(int id, int mediaFileId) =>
+        Request.Headers.Accept.ToString().Contains("application/json", StringComparison.OrdinalIgnoreCase)
+            ? new JsonResult(new { ok = true })
+            : RedirectToPage(null, null, new { id, back = Back }, $"photo-{mediaFileId}");
 
     /// <summary>Moves the item to the bin, where it can be restored or deleted for good, see <see cref="ArchiveBin"/>.</summary>
     public async Task<IActionResult> OnPostDeleteAsync(int id, CancellationToken cancellationToken)
@@ -581,7 +652,7 @@ public class EditModel(
         Contribution = item?.Contribution;
         if (item is not null)
         {
-            MediaFiles = await db.MediaFiles.Where(f => f.ArchiveItemId == item.Id).OrderBy(f => f.Id).ToListAsync();
+            MediaFiles = await db.MediaFiles.Where(f => f.ArchiveItemId == item.Id).OrderBy(f => f.Position).ThenBy(f => f.Id).ToListAsync();
             IdenticalFiles = await FindIdenticalFilesAsync(MediaFiles);
             History = await db.AuditEntries
                 .Where(e => e.ArchiveItemId == item.Id)

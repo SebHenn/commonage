@@ -1,6 +1,7 @@
 using Commonage.Web.Data;
 using Commonage.Web.Domain;
 using Commonage.Web.Identity;
+using Commonage.Web.Operations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.Net.Http.Headers;
@@ -14,7 +15,7 @@ namespace Commonage.Web.Media;
 public static class MediaEndpoints
 {
     private const int MaxStatusQuestions = 200;
-    private const string VariantPattern = "{variant:regex(^(preview|thumbnail|card)$)}";
+    private const string VariantPattern = "{variant:regex(^(preview|thumbnail|card|large)$)}";
 
     public static void MapMediaEndpoints(this WebApplication app)
     {
@@ -32,25 +33,27 @@ public static class MediaEndpoints
         var wanted = (ids ?? "").Split(',').Take(MaxStatusQuestions).Select(id => int.TryParse(id, out var number) ? number : 0).Where(id => id > 0).ToList();
         var files = await db.MediaFiles
             .Where(f => wanted.Contains(f.Id))
-            .Select(f => new { f.Id, f.Status })
+            .Select(f => new { f.Id, f.Status, Turning = f.Rotation != f.RenderedRotation })
             .ToListAsync();
-        var waiting = await db.MediaFiles.CountAsync(f => f.Status == ProcessingStatus.Pending);
+        var waiting = await db.MediaFiles.CountAsync(f => f.Status == ProcessingStatus.Pending || (f.Status == ProcessingStatus.Ready && f.Rotation != f.RenderedRotation));
         return Results.Json(new
         {
-            ready = files.Where(f => f.Status == ProcessingStatus.Ready).Select(f => f.Id),
+            ready = files.Where(f => f.Status == ProcessingStatus.Ready && !f.Turning).Select(f => f.Id),
             failed = files.Where(f => f.Status == ProcessingStatus.Failed).Select(f => f.Id),
-            waiting = files.Where(f => f.Status == ProcessingStatus.Pending).Select(f => f.Id),
+            waiting = files.Where(f => f.Status == ProcessingStatus.Pending || (f.Status == ProcessingStatus.Ready && f.Turning)).Select(f => f.Id),
             message = waiting == 0 ? "" : localizer["Previews still to be created: {0}", waiting].Value,
         });
     }
 
     private static async Task<IResult> ServePublicDerivativeAsync(
-        int id, string variant, CommonageDbContext db, IFileStorage storage, HttpContext context)
+        int id, string variant, CommonageDbContext db, IFileStorage storage, ArchiveProfile profile, HttpContext context)
     {
         var file = await db.PublishedItems
             .SelectMany(i => i.MediaFiles)
             .FirstOrDefaultAsync(f => f.Id == id && f.Status == ProcessingStatus.Ready);
         if (file is null)
+            return Results.NotFound();
+        if (variant == "large" && !(file.HasLarge && (await profile.GetAsync()).LargePhotos))
             return Results.NotFound();
 
         // Short lifetime so an unpublished item disappears from browser caches soon. After that, browsers ask again and
@@ -58,7 +61,7 @@ public static class MediaEndpoints
         context.Response.Headers.CacheControl = "public, max-age=600";
         return Results.Stream(storage.OpenRead(KeyFor(file, variant)), "image/jpeg",
             lastModified: file.UploadedAt,
-            entityTag: new EntityTagHeaderValue($"\"{file.StorageId:N}-{variant}-{file.DerivativeVersion}\""));
+            entityTag: new EntityTagHeaderValue($"\"{file.StorageId:N}-{variant}-{file.DerivativeVersion}-{file.RenderedRotation}\""));
     }
 
     private static async Task<IResult> ServeDerivativeAsync(
@@ -88,6 +91,8 @@ public static class MediaEndpoints
         "thumbnail" => file.ThumbnailKey,
         // Until the archive has made the larger size for an older file, the smaller one has to do.
         "card" => file.DerivativeVersion >= 2 ? file.CardKey : file.ThumbnailKey,
+        // A curator looking at what visitors will see, of a file that has no larger size.
+        "large" => file.HasLarge ? file.LargeKey : file.PreviewKey,
         _ => file.PreviewKey,
     };
 }

@@ -15,6 +15,13 @@ public static class SecurityHeaders
     /// <summary>The contribution form also shows the photos someone has chosen, which only exist on their device so far.</summary>
     public const string ContributionFormPolicy = UpToImages + " blob:" + AfterImages;
 
+    /// <summary>
+    /// A picture opened on its own, to look at it large. It needs no script at all, but the browser's own view of a picture
+    /// styles itself inline, to centre the picture and to zoom. What is served is always an image, because of nosniff.
+    /// </summary>
+    public const string PicturePolicy =
+        "default-src 'none'; img-src 'self'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'";
+
     private const string UpToImages = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:";
 
     private const string AfterImages =
@@ -26,8 +33,9 @@ public static class SecurityHeaders
             var headers = context.Response.Headers;
             // Browsers must not guess content types, so an uploaded file can never be interpreted as a script or page.
             headers.XContentTypeOptions = "nosniff";
-            headers.ContentSecurityPolicy = context.Request.Path.StartsWithSegments("/contribute")
-                ? ContributionFormPolicy
+            var path = context.Request.Path;
+            headers.ContentSecurityPolicy = path.StartsWithSegments("/contribute") ? ContributionFormPolicy
+                : path.StartsWithSegments("/media") || path.StartsWithSegments("/admin/media") ? PicturePolicy
                 : ContentSecurityPolicy;
             headers.XFrameOptions = "DENY";
             // Addresses can carry setup links; other sites never see them.

@@ -1,30 +1,84 @@
 @model ArchiveItem
+@inject Commonage.Web.Operations.ArchiveProfile Profile
 @* An item as visitors see it. Curators see the same in a preview, with the pictures from their own address, because the
    public one only serves published items. *@
 @{
     var mediaAddress = ViewData["MediaAddress"] as string ?? "/media";
-    var first = true;
+    var title = ArchiveItem.ShownTitle(T, Model.Title);
+    var count = Model.MediaFiles.Count;
+    var number = 0;
+    var largePhotos = (await Profile.GetAsync()).LargePhotos;
 }
 
 <article class="item-layout @(Model.MediaFiles.Count > 0 ? "item-layout-with-media" : "")">
     <div class="item-head">
-        <h1>@ArchiveItem.ShownTitle(T, Model.Title)</h1>
+        <h1>@title</h1>
         @if (Model.DateText is not null)
         {
-            <p class="text-muted mb-0">@Model.DateText</p>
+            @* Everything from that time, so that a date leads somewhere. *@
+            @if (Model.DateFrom is not null || Model.DateTo is not null)
+            {
+                <p class="mb-0"><a asp-page="/Search" asp-route-from="@Model.DateFrom?.Year" asp-route-to="@Model.DateTo?.Year" class="item-date" title="@T["Everything from this time"]">@Model.DateText</a></p>
+            }
+            else
+            {
+                <p class="text-muted mb-0">@Model.DateText</p>
+            }
         }
     </div>
     @if (Model.MediaFiles.Count > 0)
     {
         <div class="item-media">
+            @if (count > 1)
+            {
+                <nav class="photo-strip d-print-none" aria-label="@T["Photos of this item"]">
+                    <ol>
+                        @{ var inStrip = 0; }
+                        @foreach (var file in Model.MediaFiles)
+                        {
+                            inStrip++;
+                            <li>
+                                <a href="#photo-@inStrip" aria-label="@T["Photo {0} of {1}", inStrip, count]">
+                                    <img src="@mediaAddress/@file.Id/thumbnail" alt="" loading="lazy" />
+                                    <span aria-hidden="true">@inStrip</span>
+                                </a>
+                            </li>
+                        }
+                    </ol>
+                </nav>
+            }
             @foreach (var file in Model.MediaFiles)
             {
+                number++;
+                var alt = file.AltText ?? (count > 1 ? T["{0}, photo {1} of {2}", title, number, count].Value : title);
+                var picture = number == 1 ? "eager" : "lazy";
                 @* The first picture is what the page is about, so it does not wait. *@
-                <figure>
-                    <img src="@mediaAddress/@file.Id/preview" alt="@(file.AltText ?? ArchiveItem.ShownTitle(T, Model.Title))" width="@file.PreviewWidth" height="@file.PreviewHeight"
-                         class="media-preview rounded" loading="@(first ? "eager" : "lazy")" fetchpriority="@(first ? "high" : "auto")" />
+                <figure id="photo-@number">
+                    @if (largePhotos && file.HasLarge)
+                    {
+                        @* The browser's own view of a picture can already zoom, on every device, without any script. *@
+                        <a href="@mediaAddress/@file.Id/large" class="photo-link">
+                            <img src="@mediaAddress/@file.Id/preview" alt="@alt" width="@file.PreviewWidth" height="@file.PreviewHeight"
+                                 class="media-preview rounded" loading="@picture" fetchpriority="@(number == 1 ? "high" : "auto")" />
+                            <span class="d-print-none">@T["Open at full size"]</span>
+                        </a>
+                    }
+                    else
+                    {
+                        <img src="@mediaAddress/@file.Id/preview" alt="@alt" width="@file.PreviewWidth" height="@file.PreviewHeight"
+                             class="media-preview rounded" loading="@picture" fetchpriority="@(number == 1 ? "high" : "auto")" />
+                    }
+                    @if (count > 1 || file.Caption is not null)
+                    {
+                        <figcaption>
+                            @if (count > 1)
+                            {
+                                <span class="photo-number">@T["Photo {0} of {1}", number, count]</span>
+                            }
+                            @file.Caption
+                        </figcaption>
+                    }
                 </figure>
-                first = false;
             }
         </div>
     }

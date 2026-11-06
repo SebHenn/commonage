@@ -127,6 +127,20 @@ redirects or shows the page again.
   again keeps its draft until the browser's storage is cleared.
 - **Pictures from the device** need `img-src blob:`. `SecurityHeaders` allows that on `/contribute` only.
 
+## Photos of an item
+
+`MediaFile.Position` orders an item's photos, and the first is its cover. Anything that picks or lists photos must order by
+`Position` and then `Id`, because a photo back from the bin can share a position. Moving and turning a photo must not save the
+item itself: its `Version` changing would make a form that is open say that someone else changed it.
+
+`MediaProcessor` makes the sizes in the background. `Rotation` is what curators asked for and `RenderedRotation` what the stored
+files show, and files go on being served until the new ones replace them. The address stays the same, so the `ETag` includes
+`RenderedRotation`. A turn that fails is given up, so that no page waits for it. `DerivativeVersion` and `HasLarge` say which sizes
+exist. Raising `CurrentDerivativeVersion` makes older files catch up when nothing else is waiting, one pass per start of the app.
+
+A large picture is opened as the picture itself, because the browser's own view already fits and zooms it on every device. That
+view styles itself inline, so `/media` and `/admin/media` have their own `PicturePolicy`, with no script at all.
+
 ## Accounts, activity log, export and backups
 
 How these work for the people running an archive is in [operations.md](operations.md). In the code:

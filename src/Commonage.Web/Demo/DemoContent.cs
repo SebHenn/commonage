@@ -36,6 +36,8 @@ public static class DemoContent
         var now = DateTime.UtcNow;
         var tags = new Dictionary<string, Tag>();
         var scenes = new List<(ArchiveItem Item, string? Scene)>();
+        ArchiveItem letter;
+        var letterPages = DemoLetter.Pages(de);
 
         var millStreet = Collection(T("Mill Street", "Mühlenstraße"),
             T("Houses, shops and people of Mill Street in Lindenau, from the 1930s to today.",
@@ -71,10 +73,10 @@ public static class DemoContent
                 T("The first team in the season they won the district cup. Names of the players are welcome.",
                   "Die erste Mannschaft in der Saison, in der sie den Kreispokal gewann. Namen der Spieler sind willkommen."),
                 [T("football", "Fußball"), T("team photos", "Mannschaftsfotos")], "team"),
-            Published(club, T("Letter about the new pitch", "Brief wegen des neuen Sportplatzes"), T("before 1965", "vor 1965"),
-                T("Dear members, the town council has agreed that the club may use the meadow by the brook as its new pitch. We need helpers on Saturdays to level the ground. Bring a spade.",
-                  "Liebe Mitglieder, der Gemeinderat hat zugestimmt, dass der Verein die Wiese am Bach als neuen Sportplatz nutzen darf. Wir brauchen samstags Helfer, um den Boden zu ebnen. Bitte Spaten mitbringen."),
-                [T("football", "Fußball"), T("letters", "Briefe")], scene: null),
+            (letter = Published(club, T("Letter about the new pitch", "Brief wegen des neuen Sportplatzes"), T("before 1965", "vor 1965"),
+                // The words of the letter, as a curator would write them out, because nobody can search for handwriting.
+                string.Join("\n\n", letterPages.SelectMany(page => page)),
+                [T("football", "Fußball"), T("letters", "Briefe")], scene: null)),
             Published(school, T("First day at school", "Erster Schultag"), T("September 1968", "September 1968"),
                 T("The new first-years in front of the school on the hill, each with a school cone.",
                   "Die neuen Erstklässler vor der Schule am Berg, jedes Kind mit einer Schultüte."),
@@ -135,13 +137,23 @@ public static class DemoContent
         };
         waiting.TrySetDate(T("1970s", "1970er Jahre"));
         items.Add(waiting);
-        await AddPhotoAsync(waiting, "grandmother-shop");
+        // Last, so that the items before it keep their numbers. A story without a picture, as many are.
+        items.Add(Published(club, T("What the old goalkeeper told us", "Was der alte Torwart uns erzählte"), T("1950s", "1950er Jahre"),
+                T("Karl kept goal for eleven seasons. He says the pitch sloped so much that you could only see the far goal from the top of the hill. No photo of him has been found yet.",
+                  "Karl stand elf Spielzeiten im Tor. Er sagt, der Platz sei so schief gewesen, dass man das andere Tor nur von oben sehen konnte. Ein Foto von ihm ist noch nicht gefunden."),
+                [T("football", "Fußball"), T("memories", "Erinnerungen")], scene: null));
+        await AddPhotoAsync(waiting, "grandmother-shop", DemoImages.Render("grandmother-shop"));
 
         foreach (var (item, scene) in scenes)
         {
             if (scene is not null)
-                await AddPhotoAsync(item, scene);
+                await AddPhotoAsync(item, scene, DemoImages.Render(scene));
         }
+
+        await AddPhotoAsync(letter, "letter-page-1", DemoLetter.Render(letterPages[0], seed: 1),
+            T("First page", "Erste Seite"), T("A handwritten letter in blue ink, first page, folded once across the middle.", "Ein handgeschriebener Brief in blauer Tinte, erste Seite, einmal in der Mitte gefaltet."));
+        await AddPhotoAsync(letter, "letter-page-2", DemoLetter.Render(letterPages[1], seed: 2),
+            T("Second page, with the chairman's signature", "Zweite Seite, mit der Unterschrift des Vorsitzenden"), T("The second page of the handwritten letter, ending with the chairman's name.", "Die zweite Seite des handgeschriebenen Briefs, am Ende der Name des Vorsitzenden."));
 
         // A few catalogue details, as a group would keep them. The photos are drawn for this demo, so anyone may use them.
         var number = 0;
@@ -195,13 +207,15 @@ public static class DemoContent
             return item;
         }
 
-        async Task AddPhotoAsync(ArchiveItem item, string scene)
+        async Task AddPhotoAsync(ArchiveItem item, string name, byte[] jpeg, string? caption = null, string? altText = null)
         {
-            var jpeg = DemoImages.Render(scene);
             var file = new MediaFile
             {
                 ArchiveItem = item,
-                OriginalFileName = scene + ".jpg",
+                OriginalFileName = name + ".jpg",
+                Position = item.MediaFiles.Count,
+                Caption = caption,
+                AltText = altText,
                 ContentType = "image/jpeg",
                 SizeBytes = jpeg.Length,
                 Sha256 = Convert.ToHexStringLower(SHA256.HashData(jpeg)),

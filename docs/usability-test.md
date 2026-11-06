@@ -82,6 +82,9 @@ What to note for task A, besides the usual:
 - Whether the chosen photos appear, and how quickly with ten large ones. Whether the page struggles with that.
 - Turn on flight mode while it is sending, and off again. What happens, and what does the person do next?
 
+For task B, note whether the person finds "Open at full size", and whether they manage to zoom in and read the letter on the phone, and
+in which browser. Nobody has tried that on a real phone yet.
+
 ## Results
 
 **M14, November 2026, walk-through by the developer, not by real users:** tasks A to C acted out in the running demo archive, at
@@ -91,9 +94,14 @@ phone width in Chrome, with the network slowed to 600 kbit/s. No real phone, no 
   two and a quarter minutes, with the bar moving steadily, one request, and all three photos arrived. It also found four things
   the tests had not, all fixed: the mistake about the date was shown twice on the field, Stop sending was partly off the screen,
   the demo's introduction repeated the sentence about curators, and photos were too large once there were several.
-- Task B cannot really be done yet: the demo's letter is typed text, with no scan to read. That is for M15.
+- Task B could not really be done at this point: the demo's letter was typed text, with no scan to read. M15 added one.
 - Task C mostly works, and shows a gap. A search for "Mill Street 1950s" finds two items, but with the year filter there are three:
   the tram, 1930–1955, was in service in the 1950s, but the search only looks for the word. That is for M19.
+
+**M15, November 2026, walk-through by the developer, not by real users:** task B on the demo's new letter, in Chrome at phone and
+desktop width. The first page's link opens it at 2118 × 3000 pixels, and a click zooms into it. On the phone, the page has no sideways
+scrolling down to 320 px. Pinching to zoom on a real phone has not been tried. It also found that the browser's picture view could not
+centre or zoom under the site's security policy, and that previous and next were on the wrong sides, both fixed.
 
 **v0.1, November 2026:** run with a real community group on the demo archive. All five tasks were completed
 successfully, so the success criteria are met and v0.1.0 can be released.

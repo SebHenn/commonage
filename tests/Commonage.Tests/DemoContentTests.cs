@@ -32,11 +32,11 @@ public class DemoContentTests(CommonageAppFactory app)
         Assert.Contains(title, search);
         Assert.Contains(notice, search);
         Assert.Equal(3, await db.Collections.CountAsync());
-        Assert.Equal(8, await db.ArchiveItems.CountAsync(i => i.Status == ItemStatus.Published));
+        Assert.Equal(9, await db.ArchiveItems.CountAsync(i => i.Status == ItemStatus.Published));
         Assert.Equal(1, await db.ArchiveItems.CountAsync(i => i.Status == ItemStatus.Draft));
         Assert.Equal(1, await db.ArchiveItems.CountAsync(i => i.Status == ItemStatus.Submitted));
         Assert.True(await db.ContributionLinks.AnyAsync(l => l.IsActive));
-        Assert.Equal(8, await db.MediaFiles.CountAsync());
+        Assert.Equal(10, await db.MediaFiles.CountAsync());
         Assert.True(await db.ArchiveItems.Where(i => i.Status == ItemStatus.Published).AllAsync(i => i.DateText != null));
     }
 
@@ -59,6 +59,24 @@ public class DemoContentTests(CommonageAppFactory app)
         var db = demoScope.ServiceProvider.GetRequiredService<CommonageDbContext>();
         Assert.Equal(["Our own collection"], await db.Collections.Select(c => c.Title).ToListAsync());
         Assert.False(await db.ArchiveItems.AnyAsync());
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void The_demo_letter_is_all_written_out_on_pages_large_enough_to_need_zooming(bool german)
+    {
+        foreach (var words in DemoLetter.Pages(german))
+        {
+            foreach (var paragraph in words)
+                Assert.True(DemoLetter.CanWrite(paragraph), $"Something in \"{paragraph}\" would be missing from the page.");
+
+            using var page = Image.NewFromBuffer(DemoLetter.Render(words, seed: 1));
+            Assert.Equal((DemoLetter.Width, DemoLetter.Height), (page.Width, page.Height));
+            Assert.True(Math.Max(page.Width, page.Height) > 1600, "It has to be larger than a preview, or there is no large size to try.");
+            Assert.Equal("jpegload_buffer", page.Get("vips-loader"));
+            Assert.DoesNotContain("exif-data", page.GetFields());
+        }
     }
 
     [Fact]

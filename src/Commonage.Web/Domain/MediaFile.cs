@@ -42,6 +42,25 @@ public class MediaFile
     /// <summary>What the photo shows, for people who cannot see it. Without it, the item's title stands in.</summary>
     public string? AltText { get; set; }
 
+    public const int MaxCaptionLength = 1000;
+
+    /// <summary>What visitors read under the photo, unlike <see cref="AltText"/>, which replaces it for those who cannot see it.</summary>
+    public string? Caption { get; set; }
+
+    /// <summary>Where it comes among the item's photos, lowest first. The first one is the item's cover.</summary>
+    public int Position { get; set; }
+
+    /// <summary>How far curators turned it, in degrees clockwise: 0, 90, 180 or 270. The original itself is never changed.</summary>
+    public int Rotation { get; set; }
+
+    /// <summary>How far the stored previews are turned. They follow <see cref="Rotation"/> in the background and go on being served meanwhile.</summary>
+    public int RenderedRotation { get; set; }
+
+    public bool IsBeingTurned => Rotation != RenderedRotation;
+
+    /// <summary>Whether a size larger than the preview exists. Not for a file that is no larger than the preview, or while an archive does not use it.</summary>
+    public bool HasLarge { get; set; }
+
     /// <summary>When the photo was moved to the bin on its own. Photos in the bin are hidden from everything but the bin page.</summary>
     public DateTime? DeletedAt { get; set; }
 
@@ -49,10 +68,11 @@ public class MediaFile
     public string PreviewKey => $"previews/{StorageId:N}.jpg";
     public string ThumbnailKey => $"thumbnails/{StorageId:N}.jpg";
     public string CardKey => $"cards/{StorageId:N}.jpg";
+    public string LargeKey => $"large/{StorageId:N}.jpg";
 
     /// <summary>Which picture sizes exist. Raising it makes the archive add the new ones in the background.</summary>
-    public const int CurrentDerivativeVersion = 2;
+    public const int CurrentDerivativeVersion = 3;
 
-    /// <summary>Files from before the larger card size have version 1 until the archive has made it.</summary>
+    /// <summary>Files from before the larger card size have version 1 until the archive has made it, and version 2 until it has thought about the large size.</summary>
     public int DerivativeVersion { get; set; } = 1;
 }

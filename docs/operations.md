@@ -114,7 +114,10 @@ the material can always move to another system, or be handed to a public archive
 | `files/<item id>/<file id>-<name>` | The original files, exactly as uploaded. |
 | `README.txt` | A short description of the above. |
 
-An item's title can be empty in a full export: a draft from "Add many photos" that nobody has named yet.
+An item's title can be empty in a full export: a draft from "Add many photos" that nobody has named yet. Each file says its
+`position` among the item's photos and its `rotation`, how far curators turned it in degrees clockwise. The file itself is the
+original, which is never turned, so whoever uses the export has to apply that. Files are listed in order. `needsTranscription` is
+in a full export only.
 
 `archive.json` has `"format": "commonage-export"` and `"version": 3`. Version 3 added each item's rights, credit and catalogue
 details and each photo's description; in `items.csv`, `rights` and `rights_holder` are now the item's own, and the contributor's

@@ -65,6 +65,12 @@ public class ArchiveItem
 
     public string? InternalNotes { get; set; }
 
+    /// <summary>
+    /// Somebody still has to write out what the scan says. Handwriting cannot be searched or read aloud, so the words of a letter
+    /// belong in <see cref="Description"/>. Only curators see this.
+    /// </summary>
+    public bool NeedsTranscription { get; set; }
+
     public void MoveToBin(DateTime now) => DeletedAt = now;
 
     public void RestoreFromBin() => DeletedAt = null;

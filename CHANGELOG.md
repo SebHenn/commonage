@@ -22,9 +22,19 @@ version may change things that need attention when updating, and these notes say
 - The archive notices identical files: on upload, on each photo, and with a note on contributions. Contributors are not told.
 - A new item can take its photos on the same form, and "Save as draft" is the main button there.
 - Photos added to an item appear without a reload, and typed text stays where it is. Previews come in by themselves.
+- Photos can be put in order, the first being the item's cover, and turned a quarter at a time, without reloading the page and
+  without losing what was typed. The original stays exactly as it came.
+- Each photo can have a caption, which everyone reads under it.
+- An item can be marked as still needing a transcription, with a filter to find those. The description is the place for the words
+  of a letter: handwriting cannot be searched or read aloud.
 
 ### For visitors
 
+- Photos can be opened large, about 3000 pixels, to read a letter or look at a face. It is the browser's own view of a picture,
+  which can zoom on every device, with nothing to load or learn.
+- An item with several photos has a row of numbered thumbnails, and says "Photo 2 of 4" with each caption.
+- An item leads on: the previous and next in its collection, more from the collection, and what comes from the same time. Its
+  date leads to everything from that time.
 - A new look: the start page opens with the group's name and welcome text, recently added photos and collections with
   pictures. System fonts, comfortable text, and cards that work the same everywhere.
 - Photos are sharp on phones with fine screens and are no longer cut to fit. An item's text sits beside its photo on wide
@@ -51,6 +61,9 @@ version may change things that need attention when updating, and these notes say
 ### For people who run an archive
 
 - Older photos get the new picture size in the background, with nothing going offline. See docs/operations.md.
+- **The large photos are off in an archive that has saved its settings before, because they show more than it has chosen to
+  show so far.** An admin can switch them on under "Settings" and the archive then makes them in the background. In a new archive,
+  or one that has never saved its settings, they are on. They take extra disk space for each photo larger than 1600 pixels.
 - **If you wrote your own privacy page:** add that the contribution form keeps the title, date and description in the person's
   own browser for three days or until they are sent. The standard text now says so.
 
@@ -59,6 +72,7 @@ version may change things that need attention when updating, and these notes say
 - An item in the export can have an empty title: a draft nobody has named yet. Exports of published items never contain one.
 - The export format is now version 3. In `items.csv`, the contributor's answers moved to `contributor_rights` and
   `contributor_rights_holder`. See docs/operations.md.
+- The demo archive has a handwritten letter of two pages to try reading, and a story without a picture.
 - Interface languages are one list, in `SupportedLanguages.cs`. Pages switch to right-to-left by language, and browser tests
   try that, and much longer text.
 

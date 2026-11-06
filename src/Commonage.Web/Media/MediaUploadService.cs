@@ -97,9 +97,12 @@ public class MediaUploadService(
     /// <summary>Stores a file that passed <see cref="ExamineAsync"/>. Also saves whatever else is waiting in the context, such as a new item.</summary>
     public async Task<MediaFile> StoreAsync(ArchiveItem item, IFormFile upload, ExaminedUpload examined, CancellationToken cancellationToken = default)
     {
+        // After everything else, also what is in the bin, because it may come back to its place.
+        var last = await db.MediaFiles.IgnoreQueryFilters().Where(f => f.ArchiveItemId == item.Id).MaxAsync(f => (int?)f.Position, cancellationToken);
         var file = new MediaFile
         {
             ArchiveItem = item,
+            Position = (last ?? -1) + 1,
             OriginalFileName = CleanFileName(upload.FileName),
             ContentType = examined.ContentType!,
             SizeBytes = upload.Length,
@@ -121,7 +124,7 @@ public class MediaUploadService(
     {
         db.MediaFiles.Remove(file);
         await db.SaveChangesAsync(cancellationToken);
-        foreach (var key in new[] { file.OriginalKey, file.PreviewKey, file.ThumbnailKey, file.CardKey })
+        foreach (var key in new[] { file.OriginalKey, file.PreviewKey, file.ThumbnailKey, file.CardKey, file.LargeKey })
             storage.Delete(key);
     }
 

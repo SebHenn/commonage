@@ -12,3 +12,38 @@
 </nav>
 
 <partial name="_ItemArticle" model="Model.Item" />
+
+@{
+    var around = Model.Surroundings;
+}
+@if (around.Previous is not null || around.Next is not null)
+{
+    <nav class="item-neighbours d-print-none" aria-label="@T["Other items in {0}", Model.Item.Collection.Title]">
+        @if (around.Previous is { } previous)
+        {
+            <a asp-page="/Items/Details" asp-route-id="@previous.Id" rel="prev">@T["Previous: {0}", previous.Title]</a>
+        }
+        @if (around.Next is { } next)
+        {
+            <a asp-page="/Items/Details" asp-route-id="@next.Id" rel="next" class="item-next">@T["Next: {0}", next.Title]</a>
+        }
+    </nav>
+}
+@if (around.SameCollection.Count > 0)
+{
+    <section class="mt-5 d-print-none" aria-labelledby="more-from">
+        <h2 id="more-from" class="h4">
+            <a asp-page="/Collections/Details" asp-route-id="@Model.Item.CollectionId">@T["More from {0}", Model.Item.Collection.Title]</a>
+        </h2>
+        <partial name="_ItemCards" model="around.SameCollection" />
+    </section>
+}
+@if (around.SameTime.Count > 0)
+{
+    <section class="mt-4 d-print-none" aria-labelledby="same-time">
+        <h2 id="same-time" class="h4">
+            <a asp-page="/Search" asp-route-from="@Model.Item.DateFrom?.Year" asp-route-to="@Model.Item.DateTo?.Year">@T["From the same time"]</a>
+        </h2>
+        <partial name="_ItemCards" model="around.SameTime" view-data='new ViewDataDictionary(ViewData) { ["ShowCollection"] = true }' />
+    </section>
+}

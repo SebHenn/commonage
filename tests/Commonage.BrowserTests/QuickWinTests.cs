@@ -172,7 +172,7 @@ public class QuickWinTests(BrowserFixture app)
     public async Task Text_items_get_a_tile_that_does_not_look_like_a_broken_picture()
     {
         var page = await app.NewPageAsync();
-        await page.GotoAsync("/search?q=letter");
+        await page.GotoAsync("/search?q=goalkeeper");
 
         Assert.Equal("Text", await page.InnerTextAsync(".text-tile"));
     }

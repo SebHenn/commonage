@@ -36,8 +36,10 @@ Automated checks cannot judge these, so check them by hand on the pages that cha
 
 ## Known gaps
 
-- **Photos have no description of their own.** The item title stands in for every photo of an item. Curators
-  should be able to describe each photo (alt text), and contributors could suggest one.
+- **Contributors cannot describe their photos yet.** Curators describe each photo. Until they have, the item's title and the
+  photo's number stand in.
+- **A photo opened large is only a picture.** It has no description there, because it is the file itself. The page it came from
+  has the description, the caption and any transcript.
 - **Right-to-left layout is tested without a real translation**, with English text in an Arabic setting. It needs a real
   right-to-left language and its readers to be sure.
 - **Not yet tested with real assistive technology** (NVDA, VoiceOver, TalkBack). This belongs in the five-task test

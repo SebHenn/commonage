@@ -3,13 +3,17 @@
 <section class="mt-5" aria-labelledby="photos-heading">
     <h2 id="photos-heading" class="h4">@T["Photos"]</h2>
     <div id="photo-cards" class="row g-3 mb-3">
+        @{ var number = 0; }
         @foreach (var file in Model.MediaFiles)
         {
-            <partial name="_PhotoCard" model="new Commonage.Web.Pages.Admin.Items.PhotoCard(file, Model.ItemId!.Value, Model.Back, Model.Input.AltTexts.GetValueOrDefault(file.Id), Model.IdenticalFiles.GetValueOrDefault(file.Id))" />
+            number++;
+            <partial name="_PhotoCard" model="new Commonage.Web.Pages.Admin.Items.PhotoCard(file, Model.ItemId!.Value, Model.Back, Model.Input.AltTexts.GetValueOrDefault(file.Id), Model.Input.Captions.GetValueOrDefault(file.Id), Model.IdenticalFiles.GetValueOrDefault(file.Id), number, Model.MediaFiles.Count)" />
         }
     </div>
+    <p id="photo-moved" class="visually-hidden" role="status"></p>
     <div data-photos-present hidden="@(Model.MediaFiles.Count == 0)">
         <p id="alt-help" class="form-text">@T["For people who cannot see the photo: who and what is in it, in a sentence. Saved together with the item."]</p>
+        <p id="caption-help" class="form-text">@T["Everyone reads the caption under the photo, for example: Page 2, or The bakery from across the road. Words in it are not searched, so what matters for finding the item belongs in the description."]</p>
         @* So nobody has to scroll back to the form's own button. *@
         <p>
             @* Above the form on an untitled draft, which makes it the button Enter presses there. *@

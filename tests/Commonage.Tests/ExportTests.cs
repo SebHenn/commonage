@@ -39,6 +39,40 @@ public class ExportTests(CommonageAppFactory app)
     }
 
     [Fact]
+    public async Task The_export_says_in_which_order_photos_go_and_how_they_are_turned()
+    {
+        var item = await app.CreateContributionAsync(ItemStatus.Published);
+        using var admin = app.CreateClient();
+        await Browser.LogInAsCuratorAsync(admin);
+        await Browser.UploadAsync(admin, $"/Admin/Items/Edit/{item.Id}", "Upload", "first.jpg", TestData.Photo);
+        await Browser.UploadAsync(admin, $"/Admin/Items/Edit/{item.Id}", "Upload", "second.jpg", TestData.Photo);
+        await app.WithDbAsync(async db =>
+        {
+            var files = await db.MediaFiles.Where(f => f.ArchiveItemId == item.Id).OrderBy(f => f.Id).ToListAsync();
+            files[0].Position = 1;
+            files[1].Position = 0;
+            files[1].Rotation = 270;
+            files[1].Caption = "The back of it";
+            (await db.ArchiveItems.SingleAsync(i => i.Id == item.Id)).NeedsTranscription = true;
+            return await db.SaveChangesAsync();
+        });
+
+        using var zip = await ExportAsync(admin, publishedOnly: false, includePersonalData: true);
+        using var publicZip = await ExportAsync(admin, publishedOnly: true, includePersonalData: false);
+
+        var exported = FindItem(zip, item.Id);
+        var first = exported.GetProperty("files")[0];
+        Assert.Equal("second.jpg", first.GetProperty("originalFileName").GetString());
+        Assert.Equal(0, first.GetProperty("position").GetInt32());
+        Assert.Equal(270, first.GetProperty("rotation").GetInt32());
+        Assert.Equal("The back of it", first.GetProperty("caption").GetString());
+        Assert.Equal("first.jpg", exported.GetProperty("files")[1].GetProperty("originalFileName").GetString());
+        Assert.True(exported.GetProperty("needsTranscription").GetBoolean());
+        // What curators still have to do is nobody else's business.
+        Assert.Equal(JsonValueKind.Null, FindItem(publicZip, item.Id).GetProperty("needsTranscription").ValueKind);
+    }
+
+    [Fact]
     public async Task Without_personal_data_no_name_or_email_is_in_the_export()
     {
         var item = await app.CreateContributionAsync(ItemStatus.Submitted, name: "Hidden Person", email: "hidden-person@example.org");
@@ -64,13 +98,13 @@ public class ExportTests(CommonageAppFactory app)
     /// and nobody would notice until then. Names are as they appear in archive.json.
     /// </summary>
     [Theory]
-    [InlineData(typeof(ArchiveItem), "item", "id collectionId title description status createdAt updatedAt publishedAt contribution files tags rightsUri rightsHolder credit referenceNumber originalLocation receivedFrom receivedOn internalNotes",
+    [InlineData(typeof(ArchiveItem), "item", "id collectionId title description status createdAt updatedAt publishedAt contribution files tags rightsUri rightsHolder credit referenceNumber originalLocation receivedFrom receivedOn internalNotes needsTranscription",
         "Collection: by collectionId. MediaFiles: as files. DateText, DateFrom, DateTo: as date. TagNames: repeats tags. "
         + "CanBePublished: follows from status. IsUntitled: follows from the empty title. DeletedAt: the bin is not exported. Version: only for open forms.")]
-    [InlineData(typeof(MediaFile), "file", "id originalFileName contentType sizeBytes sha256 uploadedAt altText",
+    [InlineData(typeof(MediaFile), "file", "id originalFileName contentType sizeBytes sha256 uploadedAt altText caption position rotation",
         "ArchiveItemId, ArchiveItem: the file is listed under its item. StorageId, OriginalKey, PreviewKey, ThumbnailKey: storage details. "
-        + "Status, ProcessingError, PreviewWidth, PreviewHeight, CardKey, DerivativeVersion, CurrentDerivativeVersion: previews are made anew. DeletedAt: the bin is not exported.")]
-    [InlineData(typeof(ArchiveSettings), "settings", "defaultLanguage accentColor timeZone defaultRightsUri allowSearchEngines privacyReviewed imprintNotNeeded restoreTestedAt logo texts",
+        + "Status, ProcessingError, PreviewWidth, PreviewHeight, CardKey, LargeKey, HasLarge, RenderedRotation, IsBeingTurned, DerivativeVersion, CurrentDerivativeVersion, MaxCaptionLength: previews are made anew. DeletedAt: the bin is not exported.")]
+    [InlineData(typeof(ArchiveSettings), "settings", "defaultLanguage accentColor timeZone defaultRightsUri allowSearchEngines largePhotos privacyReviewed imprintNotNeeded restoreTestedAt logo texts",
         "Id, TheOnlyId: there is only one. LogoId: as logo.")]
     [InlineData(typeof(Contribution), "contribution", "contributorName contributorEmail showName rights rightsHolder consentText referenceCode submittedAt reviewedAt personalDetailsRemovedAt contributionLink",
         "Id, ArchiveItemId, ArchiveItem: listed under its item. ContributionLinkId: the link is named. SendingFingerprint: only there to recognise a form sent twice.")]
