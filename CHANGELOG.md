@@ -33,6 +33,7 @@ version may change things that need attention when updating, and these notes say
   offers a way on.
 - The language menu is at the top of every page.
 - Pages print cleanly, with their address.
+- A very long tag no longer pushes a page sideways on a phone.
 
 ### For people who run an archive
 

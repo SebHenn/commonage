@@ -273,6 +273,9 @@ main:focus {
   text-decoration: none;
   padding: .4em .8em;
   white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: start;
+  max-inline-size: 100%;
   text-align: start;
 }
 
