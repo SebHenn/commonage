@@ -79,7 +79,7 @@ public class AccessibilityTests(BrowserFixture app)
     public static TheoryData<string> MainPages() => new() { "/", "/collections", "/collections/1", "/items/1", "/search?q=flood", "CONTRIBUTE", "/privacy" };
 
     /// <summary>For states a page only reaches by using it, as well as for each page as it loads.</summary>
-    public static async Task AssertNoViolationsAsync(IPage page, string what)
+    internal static async Task AssertNoViolationsAsync(IPage page, string what)
     {
         var results = await page.RunAxe(new AxeRunOptions
         {
