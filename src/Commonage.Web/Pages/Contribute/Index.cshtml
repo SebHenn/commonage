@@ -20,47 +20,47 @@
     }
     else
     {
-    <p class="text-muted">@T["A curator looks at everything sent in before it appears in the archive."]</p>
-
-    <form method="post" enctype="multipart/form-data" data-warn-unsaved="@(ModelState.IsValid ? "" : "dirty")" data-send-once>
+    <form method="post" enctype="multipart/form-data" class="contribute-form" data-warn-unsaved="@(ModelState.IsValid ? "" : "dirty")" data-send-once data-contribution>
         <partial name="_ErrorSummary" />
         <input type="hidden" asp-for="FormStarted" />
+        <input type="hidden" asp-for="SendingKey" />
         <div class="contact-field" aria-hidden="true">
             <label asp-for="Website">@T["Leave this field empty"]</label>
             <input asp-for="Website" tabindex="-1" autocomplete="off" />
         </div>
 
-        <fieldset class="mb-4">
-            <legend class="h4">@T["About the material"]</legend>
-            <div class="mb-3">
-                <label asp-for="Input.Title" class="form-label"></label>
-                <input asp-for="Input.Title" class="form-control" aria-describedby="title-help" />
-                <span asp-validation-for="Input.Title" class="text-danger"></span>
-                <div id="title-help" class="form-text">@T["A few words, for example: Flood in Mill Street"]</div>
-            </div>
-            <div class="mb-3">
-                @* Written out, because asp-for would make the optional photos required in the browser. *@
-                <label for="Files" class="form-label">@T["Photos (optional)"]</label>
-                <input id="Files" type="file" name="Files" accept="@Commonage.Web.Media.ImageFormats.AcceptAttribute" multiple
-                       class="form-control" aria-describedby="photos-help"
-                       data-choose-text="@T["Choose photos"]" data-none-text="@T["No photos chosen"]" />
-                <span asp-validation-for="Files" class="text-danger"></span>
-                <div id="photos-help" class="form-text">@T["Up to {0} photos: JPEG, PNG, TIFF or WebP.", Commonage.Web.Pages.Contribute.IndexModel.MaxFiles]</div>
-            </div>
-            <div class="mb-3">
-                <label asp-for="Input.Date" class="form-label"></label>
-                <input asp-for="Input.Date" class="form-control" aria-describedby="date-help date-result" data-date-result="date-result" />
-                <span asp-validation-for="Input.Date" class="text-danger"></span>
-                <div id="date-help" class="form-text">@T["As precisely as you know it, for example: 1953, March 1953, circa 1950, 1950s."]</div>
-                <div id="date-result" class="form-text" role="status"></div>
-            </div>
-            <div class="mb-3">
-                <label asp-for="Input.Description" class="form-label"></label>
-                <textarea asp-for="Input.Description" class="form-control" rows="6" aria-describedby="description-help"></textarea>
-                <span asp-validation-for="Input.Description" class="text-danger"></span>
-                <div id="description-help" class="form-text">@T["Who or what can be seen, where and when, and how it came to you."]</div>
-            </div>
-        </fieldset>
+        @* People arrive with a photo in mind, so it comes first. *@
+        <div class="mb-3">
+            @* Written out, because asp-for would make the optional photos required in the browser. *@
+            <label for="Files" class="form-label">@T["Photos (optional)"]</label>
+            <input id="Files" type="file" name="Files" accept="@Commonage.Web.Media.ImageFormats.AcceptAttribute" multiple
+                   class="form-control" aria-describedby="photos-help"
+                   data-choose-text="@T["Choose photos"]" data-none-text="@T["No photos chosen"]" data-count-text="@T["Photos chosen: {0}"]"
+                   data-max-files="@Commonage.Web.Pages.Contribute.IndexModel.MaxFiles"
+                   data-max-file-bytes="@Model.MaxFileBytes"
+                   data-max-request-bytes="@Commonage.Web.Pages.Contribute.IndexModel.MaxRequestBytes" />
+            <span asp-validation-for="Files" class="text-danger"></span>
+            <div id="photos-help" class="form-text">@T["Up to {0} photos: JPEG, PNG, TIFF or WebP.", Commonage.Web.Pages.Contribute.IndexModel.MaxFiles]</div>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Input.Title" class="form-label"></label>
+            <input asp-for="Input.Title" class="form-control" aria-describedby="title-help" />
+            <span asp-validation-for="Input.Title" class="text-danger"></span>
+            <div id="title-help" class="form-text">@T["A few words, for example: Flood in Mill Street"]</div>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Input.Date" class="form-label"></label>
+            <input asp-for="Input.Date" class="form-control" aria-describedby="date-help date-result" data-date-result="date-result" />
+            <span asp-validation-for="Input.Date" class="text-danger"></span>
+            <div id="date-help" class="form-text">@T["As precisely as you know it, for example: 1953, March 1953, circa 1950, 1950s."]</div>
+            <div id="date-result" class="form-text" role="status"></div>
+        </div>
+        <div class="mb-4">
+            <label asp-for="Input.Description" class="form-label"></label>
+            <textarea asp-for="Input.Description" class="form-control" rows="3" aria-describedby="description-help"></textarea>
+            <span asp-validation-for="Input.Description" class="text-danger"></span>
+            <div id="description-help" class="form-text">@T["Who or what can be seen, where and when, and how it came to you."]</div>
+        </div>
 
         <fieldset class="mb-4" id="Input_Rights" tabindex="-1">
             <legend class="h4">@T["Who made it?"]</legend>
@@ -77,7 +77,8 @@
                 </div>
             }
             <span asp-validation-for="Input.Rights" class="text-danger"></span>
-            <div class="mt-3">
+            @* With JavaScript, only there when it applies. Without, always there. *@
+            <div class="mt-3" data-rights-holder>
                 <label asp-for="Input.RightsHolder" class="form-label"></label>
                 <input asp-for="Input.RightsHolder" class="form-control" />
                 <span asp-validation-for="Input.RightsHolder" class="text-danger"></span>
@@ -95,13 +96,12 @@
                 <label asp-for="Input.Email" class="form-label"></label>
                 <input asp-for="Input.Email" class="form-control" autocomplete="email" aria-describedby="email-help" />
                 <span asp-validation-for="Input.Email" class="text-danger"></span>
-                <div id="email-help" class="form-text">@T["Only used to ask you about what you send in."]</div>
+                <div id="email-help" class="form-text">@T["Only the archive's curators see your name and email address, unless you choose to have your name shown. Your email address is only used to ask about what you send in."]</div>
             </div>
-            <div class="form-check mb-3">
+            <div class="form-check">
                 <input asp-for="Input.ShowName" class="form-check-input" />
                 <label asp-for="Input.ShowName" class="form-check-label"></label>
             </div>
-            <p class="form-text">@T["Only the archive's curators see your name and email address, unless you choose to have your name shown."]</p>
         </fieldset>
 
         <div class="form-check mb-4">
@@ -114,11 +114,41 @@
             }
         </div>
 
-        <button type="submit" class="btn btn-primary">@T["Send"]</button>
+        <p class="form-text">@T["A curator looks at everything sent in before it appears in the archive."]</p>
+        <div class="d-grid d-sm-block">
+            <button type="submit" class="btn btn-primary btn-lg">@T["Send"]</button>
+        </div>
     </form>
+
+    @* What contribute.js says, in the language of the page. *@
+    <div id="contribute-texts" hidden
+         data-add-more="@T["Add more photos"]"
+         data-remove="@T["Remove"]"
+         data-remove-named="@T["Remove {0}"]"
+         data-empty="@T["{0} is empty."]"
+         data-too-large="@T["{0} is too large."]"
+         data-unsupported="@T["{0} is not a supported photo format. Please use JPEG, PNG, TIFF or WebP."]"
+         data-heic="@T["{0} is in the HEIC format, which this archive cannot read yet. Please save it as a JPEG and choose it again."]"
+         data-too-many="@T["You can send at most {0} photos at once.", Commonage.Web.Pages.Contribute.IndexModel.MaxFiles]"
+         data-does-not-fit="@T["{0} was left out, because together the photos would be too large to send at once. You can send it afterwards."]"
+         data-sending-label="@T["What you are sending"]"
+         data-progress="@T["Sending: {0} of {1}"]"
+         data-keep-open="@T["Please keep this page open until it is done."]"
+         data-saving="@T["Almost done: the archive is saving what you sent."]"
+         data-stop="@T["Stop sending"]"
+         data-stopped="@T["Sending stopped. Nothing is lost on this page: press Send when you want to try again."]"
+         data-connection="@T["The connection to the archive was lost. Nothing is lost on this page: press Send to try again. It will not arrive twice."]"
+         data-rejected="@T["The archive did not accept this. Please reload the page and try again. Photos have to be chosen again."]"
+         data-too-much="@T["Together these photos are too large to send at once. Please send some of them afterwards."]"
+         data-full="@T["This archive cannot take in anything new at the moment, because its storage is full. Please try again later."]"
+         data-check="@T["Please check the following:"]"
+         data-draft-kept="@T["The title, date and description are kept on this device for three days, in case you have to stop. Your name and email address are not."]"
+         data-draft-restored="@T["This text was started on this device earlier. If it is not yours, clear it."]"
+         data-draft-clear="@T["Clear this draft"]"></div>
     }
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/contribute.js" asp-append-version="true"></script>
 }

@@ -52,6 +52,7 @@ public static class PrivacyText
         localizer["This archive stores what people send in through its contribution links: what they wrote, their files, the name they gave, their email address if they gave one, and what they agreed to. Only the archive's curators see names and email addresses, unless someone chose to be named."],
         localizer["Photos are published without location data or other embedded details. The original files stay private."],
         localizer["This site only sets the cookies it needs: one for the chosen language, one to protect forms, and one to keep curators logged in. There are no analytics and no third-party services. Visitors' addresses are held in memory for a short time, to limit abuse of forms and logins."],
+        localizer["On the contribution form, the title, date and description you type stay in your own browser for three days or until you send them, so that nothing is lost if you have to stop. They reach the archive only when you send the form, and you can clear them at any time."],
         localizer["Anyone can ask for their details, or what they sent in, to be changed or removed. The contact page says how to reach the archive. Backups keep older copies until they are replaced."],
     ];
 }

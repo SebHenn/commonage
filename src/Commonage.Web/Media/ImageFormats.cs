@@ -22,4 +22,15 @@ public static class ImageFormats
             return "image/webp";
         return null;
     }
+
+    /// <summary>
+    /// HEIC, the format of many phone photos. It is not accepted, because the bundled image library cannot be relied on to
+    /// read it, but it is common enough that the person sending it deserves more than "not a supported format".
+    /// </summary>
+    public static bool IsHeic(ReadOnlySpan<byte> header) =>
+        header.Length >= 12
+        && header[4..8].SequenceEqual("ftyp"u8)
+        && (header[8..12].SequenceEqual("heic"u8) || header[8..12].SequenceEqual("heix"u8)
+            || header[8..12].SequenceEqual("hevc"u8) || header[8..12].SequenceEqual("hevx"u8)
+            || header[8..12].SequenceEqual("mif1"u8) || header[8..12].SequenceEqual("msf1"u8));
 }

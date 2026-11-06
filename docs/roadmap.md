@@ -169,7 +169,7 @@ real pace over M7 and M8 before promising dates. Each milestone is a minor relea
 | **M11 Look and feel** ✅ | 4 | The demo archive opens with the group's name, recent photos and collection image cards, sharp on a phone and with portraits uncropped. Search shows active filters as removable chips. Pages work in right-to-left and in a long-text test language. |
 | **M12 Catalogue fields** ✅ | 3 | A curator records rights, credit, reference number, where the original is kept and alt text on an item, and can filter for what is missing. |
 | **M13 Shoebox** ✅ | 4 | A curator turns 300 scans into drafts with shared values, sees progress and can retry failures, is warned about identical files, and publishes a chosen set in one action. An item without a real title cannot be published. |
-| **M14 Phone-first sending** | 4 | Over slow mobile data, a contributor sees their chosen photos, watches a progress bar and cannot send twice. The new tasks are walked through in the running app and given to the tester, and a week of fixes is done. |
+| **M14 Phone-first sending** ✅ | 4 | Over slow mobile data, a contributor sees their chosen photos, watches a progress bar and cannot send twice. The new tasks are walked through in the running app and given to the tester, and a week of fixes is done. |
 | **M15 Readable items** | 4 | A visitor reads a scanned letter at full size, sees "Photo 2 of 4" with its caption, and moves on to the next item or to items from the same time. Curators reorder, rotate and describe each photo. |
 | **M16 Rights and sharing** | 3 | Every item page says whether it may be reused, in plain language. "Cite this item" gives a line to copy. A link pasted into a messenger shows the picture and the archive's name. |
 | **M17 Language reach** | 5 | A translator without Git has tried Weblate on a few pages. Missing translations fail a test. Counts read correctly under Polish plural rules. Item text carries the right `lang`. Dates that are accepted today are still accepted. |
@@ -179,7 +179,9 @@ real pace over M7 and M8 before promising dates. Each milestone is a minor relea
 | **M21 Import and scale** | 4 | A group imports a spreadsheet and a ZIP of scans after a dry run that lists every problem. A 50,000-item archive on a small ARM server stays fast and exports without running out of memory. |
 
 The review after M14 also decides what comes next. PDF documents, audio or an earlier import may well replace M15
-onwards, depending on what the groups say.
+onwards, depending on what the groups say. **Review, November 2026:** no group or tester has asked for any of those so far, and
+the walk-through's tasks point at M15 (a letter cannot be read as a scan) and M19 (a decade is searched as a word), so the order
+stays. The tasks are in [usability-test.md](usability-test.md), for the tester, and it changes if their reports call for it.
 
 ### What each milestone holds
 
@@ -328,6 +330,7 @@ Comes before bulk entry so a shoebox evening does not create backfill work.
 - Text drafts in `localStorage`: title, date and description only, never name, email or rights holder, with an expiry
   and a "Clear this draft" control, because events share devices.
 - Try HEIC on a real iPhone. The browser may already convert it, and the bundled libvips probably has no HEVC decoder.
+  *Not tried yet, because it takes a real iPhone: it is on the tester's list. Until then, HEIC is refused in plain words.*
 - A walk-through of new tasks, also given to the tester: send three photos over mobile data with a wrong date, read a
   letter, find everything from the 1950s in one street. It would help to have someone over 70 and a screen reader user
   try it, but nothing waits for that. A week of fixes follows, then decide what comes after this milestone.
@@ -342,6 +345,7 @@ Comes before bulk entry so a shoebox evening does not create backfill work.
   search.
 - Description as the documented place for a transcript, with a "needs transcription" flag, since zoom helps only
   sighted visitors and handwriting cannot be searched.
+- A scanned letter in the demo archive. Its letter is typed text today, so "read a letter" cannot be tried there.
 
 **M16 Rights and sharing**
 
@@ -380,6 +384,8 @@ Until then, write counts in label form (`Photos: {0}`), which needs no plural gr
 **M19 Discovery**
 
 - Decade timeline with predefined CSS classes for bar widths, because the policy forbids inline styles.
+- A decade or year typed into the search counts as a date. In the M14 walk-through, "Mill Street 1950s" found two items while the
+  year filter found three, since the tram of 1930–1955 does not contain the word.
 - Tag page with rename, merge and delete unused. `Tag.Kind` (topic, place, person) with `/places` and `/people`. Naming
   living people stays a curator's decision.
 - Collections: order, date span, cover, default sort, delete when empty.

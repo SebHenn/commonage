@@ -21,6 +21,13 @@ public class Contribution
     public const int EmailMaxLength = 254;
     public const int RightsHolderMaxLength = 300;
     public const int ReferenceCodeLength = 9;
+    public const int SendingFingerprintLength = 64;
+
+    /// <summary>
+    /// Recognises the same form sent again, for example after the connection dropped before the answer came, so it does not
+    /// arrive twice. A hash that holds nothing about the contributor. See <see cref="Contributions.SendingFingerprints"/>.
+    /// </summary>
+    public string? SendingFingerprint { get; set; }
 
     /// <summary>
     /// What a contributor can quote when they ask about what they sent, since they have no account. Random, so it reveals

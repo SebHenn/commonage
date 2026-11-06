@@ -101,8 +101,8 @@ public static class DemoContent
         var link = new ContributionLink
         {
             Title = T("Share your photos of Mill Street", "Teilen Sie Ihre Fotos der Mühlenstraße"),
-            Introduction = T("Do you have photos or stories from Mill Street? Send them in. We look at everything before it appears in the archive.",
-                "Haben Sie Fotos oder Geschichten aus der Mühlenstraße? Senden Sie sie ein. Wir sehen uns alles an, bevor es im Archiv erscheint."),
+            Introduction = T("Do you have photos or stories from Mill Street? Send them in.",
+                "Haben Sie Fotos oder Geschichten aus der Mühlenstraße? Senden Sie sie ein."),
             Collection = millStreet,
             Token = ContributionLink.NewToken(),
             IsActive = true,

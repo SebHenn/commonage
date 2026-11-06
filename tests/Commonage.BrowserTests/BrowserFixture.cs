@@ -27,6 +27,24 @@ public sealed class BrowserFixture : WebApplicationFactory<Program>, IAsyncLifet
     /// <summary>The address of the demo archive's contribution link.</summary>
     public string ContributionPath { get; private set; } = "";
 
+    /// <summary>How many contributions with this title have arrived, and how many photos they have together.</summary>
+    public async Task<(long Contributions, long Photos)> CountContributionsAsync(string title)
+    {
+        await using var connection = new NpgsqlConnection(_db.GetConnectionString());
+        await connection.OpenAsync();
+        await using var query = new NpgsqlCommand("""
+            select count(distinct i."Id"), count(f."Id")
+            from "Contributions" c
+            join "ArchiveItems" i on i."Id" = c."ArchiveItemId"
+            left join "MediaFiles" f on f."ArchiveItemId" = i."Id"
+            where i."Title" = @title
+            """, connection);
+        query.Parameters.AddWithValue("title", title);
+        await using var reader = await query.ExecuteReaderAsync();
+        await reader.ReadAsync();
+        return (reader.GetInt64(0), reader.GetInt64(1));
+    }
+
     public async Task InitializeAsync()
     {
         await _db.StartAsync();

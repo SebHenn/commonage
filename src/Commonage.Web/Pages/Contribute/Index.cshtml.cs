@@ -15,7 +15,8 @@ namespace Commonage.Web.Pages.Contribute;
 
 /// <summary>
 /// The form behind a contribution link. Anyone with the link can use it, so everything sent in stays private
-/// as <see cref="ItemStatus.Submitted"/> until a curator publishes it.
+/// as <see cref="ItemStatus.Submitted"/> until a curator publishes it. With JavaScript, contribute.js sends it and asks
+/// for an answer in JSON, so that the chosen photos stay chosen when something needs correcting.
 /// </summary>
 [AcceptsUploads]
 [RequestSizeLimit(MaxRequestBytes)]
@@ -28,6 +29,7 @@ public class IndexModel(
     ArchiveHealth health,
     ArchiveProfile profile,
     IOptions<ContributionOptions> options,
+    IOptions<UploadOptions> uploadOptions,
     IStringLocalizer<SharedResource> localizer,
     ILogger<IndexModel> logger) : PageModel
 {
@@ -35,10 +37,17 @@ public class IndexModel(
 
     // Lower than for curators, because anyone can send this form. Each file is also checked against
     // Uploads:MaxFileSizeMegabytes.
-    private const long MaxRequestBytes = 500L * 1024 * 1024;
+    public const long MaxRequestBytes = 500L * 1024 * 1024;
+
+    /// <summary>What contribute.js checks before anything is sent. The same limit is checked here again.</summary>
+    public long MaxFileBytes => uploadOptions.Value.MaxFileSizeBytes;
 
     [BindProperty]
     public InputModel Input { get; set; } = new();
+
+    /// <summary>Stays the same for as long as this form is open, see <see cref="SendingFingerprints"/>.</summary>
+    [BindProperty]
+    public string? SendingKey { get; set; }
 
     [BindProperty]
     public List<IFormFile> Files { get; set; } = [];
@@ -66,11 +75,11 @@ public class IndexModel(
         public string Title { get; set; } = "";
 
         [StringLength(DateRange.MaxTextLength, ErrorMessage = "The date can be at most {1} characters long.")]
-        [Display(Name = "When was it?")]
+        [Display(Name = "When was it? (optional)")]
         public string? Date { get; set; }
 
         [StringLength(20000, ErrorMessage = "The description can be at most {1} characters long.")]
-        [Display(Name = "What do you know about it?")]
+        [Display(Name = "What do you know about it? (optional)")]
         public string? Description { get; set; }
 
         [Required(ErrorMessage = "Please enter your name.")]
@@ -104,6 +113,7 @@ public class IndexModel(
         Link = link;
         Identity = await profile.GetAsync();
         FormStarted = formTimer.Start();
+        SendingKey = Guid.NewGuid().ToString("N");
         return Page();
     }
 
@@ -116,8 +126,7 @@ public class IndexModel(
         if (!string.IsNullOrEmpty(Website) || !formTimer.WasFilledInByAPerson(FormStarted))
         {
             logger.LogInformation("Discarded an automated-looking contribution to link {LinkId}.", link.Id);
-            TempData["Reference"] = Contribution.NewReferenceCode();
-            return RedirectToPage("Thanks", new { token });
+            return Sent(token, Contribution.NewReferenceCode());
         }
 
         if (!Input.Consent)
@@ -136,8 +145,19 @@ public class IndexModel(
         if (linkIsFull)
             ModelState.AddModelError("Files", localizer["A lot has been sent through this link today. Please try again tomorrow, or send this without photos."]);
 
+        var sentByScript = Request.Headers.Accept.ToString().Contains("application/json", StringComparison.OrdinalIgnoreCase);
         if (!ModelState.IsValid)
         {
+            if (sentByScript)
+            {
+                return BadRequest(new
+                {
+                    errors = ModelState
+                        .Where(field => field.Value is { Errors.Count: > 0 })
+                        .ToDictionary(field => field.Key, field => field.Value!.Errors.Select(error => error.ErrorMessage)),
+                });
+            }
+
             // Browsers do not keep chosen files when a form is shown again.
             if (Files.Count > 0 && !linkIsFull)
                 ModelState.AddModelError("Files", localizer["Please choose your photos again."]);
@@ -145,6 +165,10 @@ public class IndexModel(
             Identity = await profile.GetAsync();
             return Page();
         }
+
+        var fingerprint = SendingFingerprints.Of(SendingKey, link.Id, [Input.Title, Input.Date, Input.Description, Input.Rights.ToString(), Input.RightsHolder], Files);
+        if (await AlreadySentAsync(fingerprint) is { } reference)
+            return Sent(token, reference);
 
         var now = DateTime.UtcNow;
         var item = new ArchiveItem
@@ -165,20 +189,64 @@ public class IndexModel(
                 RightsHolder = string.IsNullOrWhiteSpace(Input.RightsHolder) ? null : Input.RightsHolder.Trim(),
                 ConsentText = ConsentStatement,
                 ReferenceCode = Contribution.NewReferenceCode(),
+                SendingFingerprint = fingerprint,
                 SubmittedAt = now,
             },
         };
         item.TrySetDate(Input.Date);
         db.ArchiveItems.Add(item);
         audit.Record(AuditAction.ContributionReceived, item.Title, item);
-        await db.SaveChangesAsync(cancellationToken);
 
-        foreach (var file in Files)
-            await uploads.AddAsync(item, file, cancellationToken);
+        // Everything has arrived by now. Whether the sender is still connected no longer matters: stopping halfway would
+        // leave a contribution without all its photos, and sending again would be taken for the same one.
+        try
+        {
+            await db.SaveChangesAsync(CancellationToken.None);
+        }
+        catch (DbUpdateException) when (fingerprint is not null)
+        {
+            // Sent twice at the same moment, and the other one got there first.
+            db.ChangeTracker.Clear();
+            if (await AlreadySentAsync(fingerprint) is { } sameMoment)
+                return Sent(token, sameMoment);
+            throw;
+        }
 
-        TempData["Reference"] = item.Contribution.ReferenceCode;
-        return RedirectToPage("Thanks", new { token });
+        try
+        {
+            foreach (var file in Files)
+                await uploads.AddAsync(item, file, CancellationToken.None);
+        }
+        catch
+        {
+            // Not all photos are stored, and the person is about to see an error. Sending again has to really send them.
+            await db.Contributions
+                .IgnoreQueryFilters()
+                .Where(c => c.ArchiveItemId == item.Id)
+                .ExecuteUpdateAsync(set => set.SetProperty(c => c.SendingFingerprint, (string?)null), CancellationToken.None);
+            throw;
+        }
+
+        return Sent(token, item.Contribution.ReferenceCode);
     }
+
+    private IActionResult Sent(string token, string reference)
+    {
+        TempData["Reference"] = reference;
+        return Request.Headers.Accept.ToString().Contains("application/json", StringComparison.OrdinalIgnoreCase)
+            ? new JsonResult(new { thanksUrl = Url.Page("Thanks", new { token }) })
+            : RedirectToPage("Thanks", new { token });
+    }
+
+    /// <summary>The reference of the same form sent earlier, also when that contribution is in the bin by now.</summary>
+    private async Task<string?> AlreadySentAsync(string? fingerprint) =>
+        fingerprint is null
+            ? null
+            : await db.Contributions
+                .IgnoreQueryFilters()
+                .Where(c => c.SendingFingerprint == fingerprint)
+                .Select(c => c.ReferenceCode)
+                .FirstOrDefaultAsync(CancellationToken.None);
 
     /// <summary>Shown next to the consent checkbox and stored with the contribution, in the contributor's language.</summary>
     public string ConsentStatement => localizer[

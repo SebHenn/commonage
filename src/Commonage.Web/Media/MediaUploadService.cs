@@ -32,6 +32,7 @@ public enum UploadError
     Empty,
     TooLarge,
     UnsupportedFormat,
+    Heic,
 }
 
 /// <summary>What a look at an uploaded file found. Its fingerprint is only there when the file is acceptable.</summary>
@@ -46,6 +47,7 @@ public static class UploadErrorMessages
     {
         UploadError.Empty => localizer["{0} is empty.", fileName],
         UploadError.TooLarge => localizer["{0} is too large.", fileName],
+        UploadError.Heic => localizer["{0} is in the HEIC format, which this archive cannot read yet. Please save it as a JPEG and choose it again.", fileName],
         _ => localizer["{0} is not a supported photo format. Please use JPEG, PNG, TIFF or WebP.", fileName],
     };
 }
@@ -133,7 +135,9 @@ public class MediaUploadService(
         var header = new byte[ImageFormats.HeaderLength];
         var headerLength = await content.ReadAtLeastAsync(header, header.Length, throwOnEndOfStream: false, cancellationToken);
         var contentType = ImageFormats.DetectContentType(header.AsSpan(0, headerLength));
-        return contentType is null ? (UploadError.UnsupportedFormat, null) : (UploadError.None, contentType);
+        if (contentType is not null)
+            return (UploadError.None, contentType);
+        return (ImageFormats.IsHeic(header.AsSpan(0, headerLength)) ? UploadError.Heic : UploadError.UnsupportedFormat, null);
     }
 
     private static string CleanFileName(string fileName)

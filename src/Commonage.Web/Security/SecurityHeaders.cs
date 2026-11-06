@@ -10,9 +10,15 @@ public static class SecurityHeaders
     /// inline script or style on purpose (see the data-confirm attribute in site.js), so this policy breaks nothing.
     /// "data:" images are Bootstrap's built-in icons, such as the arrow of a select box.
     /// </summary>
-    public const string ContentSecurityPolicy =
-        "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; " +
-        "connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'";
+    public const string ContentSecurityPolicy = UpToImages + AfterImages;
+
+    /// <summary>The contribution form also shows the photos someone has chosen, which only exist on their device so far.</summary>
+    public const string ContributionFormPolicy = UpToImages + " blob:" + AfterImages;
+
+    private const string UpToImages = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:";
+
+    private const string AfterImages =
+        "; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'";
 
     public static IApplicationBuilder UseSecurityHeaders(this IApplicationBuilder app) =>
         app.Use(async (context, next) =>
@@ -20,7 +26,9 @@ public static class SecurityHeaders
             var headers = context.Response.Headers;
             // Browsers must not guess content types, so an uploaded file can never be interpreted as a script or page.
             headers.XContentTypeOptions = "nosniff";
-            headers.ContentSecurityPolicy = ContentSecurityPolicy;
+            headers.ContentSecurityPolicy = context.Request.Path.StartsWithSegments("/contribute")
+                ? ContributionFormPolicy
+                : ContentSecurityPolicy;
             headers.XFrameOptions = "DENY";
             // Addresses can carry setup links; other sites never see them.
             headers["Referrer-Policy"] = "same-origin";

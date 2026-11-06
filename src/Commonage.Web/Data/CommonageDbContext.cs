@@ -120,6 +120,8 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options)
             contribution.Property(c => c.ConsentText).HasMaxLength(4000);
             contribution.Property(c => c.ReferenceCode).HasMaxLength(Contribution.ReferenceCodeLength);
             contribution.HasIndex(c => c.ReferenceCode).IsUnique();
+            contribution.Property(c => c.SendingFingerprint).HasMaxLength(Contribution.SendingFingerprintLength);
+            contribution.HasIndex(c => c.SendingFingerprint).IsUnique();
             contribution.HasIndex(c => c.ArchiveItemId).IsUnique();
             contribution.HasOne(c => c.ArchiveItem)
                 .WithOne(i => i.Contribution)
