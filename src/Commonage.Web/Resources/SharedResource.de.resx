@@ -227,7 +227,7 @@
   <data name="Mark this contribution as withdrawn? It is hidden at once and cannot be published again." xml:space="preserve"><value>Diesen Beitrag als zurückgezogen markieren? Er wird sofort verborgen und kann nicht wieder veröffentlicht werden.</value></data>
   <data name="Marked the contribution as withdrawn" xml:space="preserve"><value>Beitrag als zurückgezogen markiert</value></data>
   <data name="may be named publicly" xml:space="preserve"><value>darf öffentlich genannt werden</value></data>
-  <data name="May be named publicly" xml:space="preserve"><value>Darf öffentlich genannt werden</value></data>
+  <data name="May be named on public pages" xml:space="preserve"><value>Darf auf öffentlichen Seiten genannt werden</value></data>
   <data name="Move many to a collection" xml:space="preserve"><value>Viele in eine Sammlung verschieben</value></data>
   <data name="Move this item to the bin? It disappears from the archive at once. You can restore it there for {0} days." xml:space="preserve"><value>Diesen Eintrag in den Papierkorb legen? Er verschwindet sofort aus dem Archiv. Sie können ihn dort {0} Tage lang wiederherstellen.</value></data>
   <data name="Move this photo to the bin? You can restore it there for {0} days." xml:space="preserve"><value>Dieses Foto in den Papierkorb legen? Sie können es dort {0} Tage lang wiederherstellen.</value></data>

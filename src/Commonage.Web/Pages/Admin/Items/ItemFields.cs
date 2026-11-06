@@ -13,7 +13,7 @@ public static class ItemFields
 
     public static string? DateError(IStringLocalizer localizer, string? date) =>
         !string.IsNullOrWhiteSpace(date) && !DateRange.TryParse(date, out _)
-            ? localizer["This date could not be understood. Please include a year, for example: 1953, 12.03.1953, circa 1950, 1950s, 1950–1955."]
+            ? localizer["This date could not be understood. Please include a year, for example: 1953, 12.03.1953, circa 1950, 1950s, 1950–1955."].Value
             : null;
 
     public static IEnumerable<string> TagErrors(IStringLocalizer localizer, IReadOnlyList<string> names)
@@ -25,7 +25,7 @@ public static class ItemFields
     }
 
     public static string? RightsError(IStringLocalizer localizer, string? rightsUri) =>
-        !string.IsNullOrEmpty(rightsUri) && !RightsOptions.IsKnown(rightsUri) ? localizer["Please choose one of the statements."] : null;
+        !string.IsNullOrEmpty(rightsUri) && !RightsOptions.IsKnown(rightsUri) ? localizer["Please choose one of the statements."].Value : null;
 
     public static string? Clean(string? text) => string.IsNullOrWhiteSpace(text) ? null : text.Trim();
 

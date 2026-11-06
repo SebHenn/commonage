@@ -134,7 +134,7 @@ public class AddManyModel(
         return added > 0 ? LocalRedirect(DraftsUrl) : RedirectToPage(new { collectionId = Input.CollectionId });
     }
 
-    private string? ItemUrl(int id) => Url.Page("/Admin/Items/Edit", new { id, back = DraftsUrl });
+    private string ItemUrl(int id) => Url.Page("/Admin/Items/Edit", new { id, back = DraftsUrl })!;
 
     private async Task<(ArchiveItem Item, MediaFile File)> AddDraftAsync(IFormFile upload, ExaminedUpload examined, List<Tag> tags, CancellationToken cancellationToken)
     {
