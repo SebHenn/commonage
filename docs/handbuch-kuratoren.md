@@ -32,6 +32,37 @@ einem Satz, für Menschen, die es nicht sehen können.
 Öffnen Sie den ersten Eintrag und gehen Sie mit **Speichern und weiter** durch die Liste. Mit **Vorschau** sehen Sie einen
 Entwurf so, wie ihn Besucher sehen würden.
 
+Um viele auf einmal zu ändern, kreuzen Sie sie an oder nehmen Sie alles, was der Filter gefunden hat. Wählen Sie, was geschehen
+soll: veröffentlichen, Schlagwörter hinzufügen, das Datum setzen, in eine Sammlung verschieben oder den Rechtehinweis setzen.
+Die nächste Seite sagt, um wie viele Einträge es geht und was mit ihnen geschähe, und es ändert sich nichts, bevor Sie
+bestätigen. Jeder geänderte Eintrag bekommt eine Zeile in seinem Verlauf.
+
+Beim Veröffentlichen von vielen werden nur Entwürfe mit Titel genommen. Über Beiträge wird einzeln entschieden. Rückgängig
+machen lässt sich eine Änderung an vielen nicht, also probieren Sie sie im Zweifel erst an wenigen aus.
+
+## Eine Kiste voller Fotos
+
+**Viele Fotos hinzufügen** in der Liste der Einträge macht aus jedem Foto einen Entwurf. Tragen Sie zuerst ein, was sie gemeinsam
+haben: die Sammlung und, wenn bekannt, Datum, Schlagwörter und Rechtehinweis. Dann wählen Sie die Fotos aus, so viele Sie möchten.
+
+Sie werden einzeln gesendet, und Sie sehen, wie weit es ist. Sie können in einem anderen Tab weiterarbeiten, aber lassen Sie
+diesen offen, bis es fertig ist: Die Seite fragt nach, bevor sie geschlossen wird.
+
+- **Wenn die Verbindung abbricht,** sind die angekommenen Fotos sicher, und **Weiter** macht dort weiter.
+- **Wenn die Seite geschlossen wurde,** wählen Sie dieselben Fotos noch einmal aus. Was das Archiv schon hat, wird ausgelassen, und
+  die Liste sagt das.
+- **Dateien, die das Archiv schon hat,** werden nicht hinzugefügt, und Sie bekommen einen Link dorthin. **Trotzdem hinzufügen**
+  nimmt eine auf, wenn Sie wirklich eine zweite Kopie möchten.
+
+Die Entwürfe haben noch keinen Titel und können ohne Titel nicht veröffentlicht werden. **Zu den Entwürfen ohne Titel** führt zur
+Liste, mit dem Foto neben jedem Eintrag. Öffnen Sie den ersten, tippen Sie einen Titel und drücken Sie die Eingabetaste: Das speichert ihn und öffnet den
+nächsten.
+
+Für einen Eintrag mit mehreren Fotos, etwa ein Album oder einen Brief mit mehreren Seiten, nehmen Sie stattdessen **Neuer Eintrag**.
+Dort können Sie die Fotos direkt im Formular auswählen.
+
+Ohne JavaScript gehen alle Fotos in einer einzigen Anfrage, zusammen höchstens 1 GB, und einen Fortschritt sehen Sie nicht.
+
 ## Beiträge prüfen
 
 „Beiträge, die auf Prüfung warten“ auf der Verwaltungsseite listet auf, was eingegangen ist, das Älteste zuerst. Bei jedem
@@ -40,6 +71,10 @@ Beitrag:
 - **Speichern und veröffentlichen:** er ist in Ordnung, so wie er ist oder nachdem Sie die Beschreibung korrigiert haben.
 - **Als Entwurf übernehmen:** Sie möchten ihn behalten, aber er braucht noch Arbeit.
 - **Ablehnen:** Spam, oder er passt nicht ins Archiv. Er bleibt verborgen, bis jemand ihn löscht.
+
+Ein gelber Hinweis „Das Archiv hat diese Datei schon“ bedeutet, dass eine Datei darin mit einer vorhandenen identisch ist, mit einem
+Link zu diesem Eintrag. Es kann eine zweite Kopie sein oder die Kopie einer anderen Person vom selben Foto. Einsendende erfahren
+davon nichts.
 
 Schauen Sie vor dem Veröffentlichen, wer das Foto gemacht hat. Wenn die einsendende Person das nicht weiß oder wenn Menschen
 zu sehen sind, die vielleicht nicht gezeigt werden möchten, überlegen Sie, ob es öffentlich sein sollte. Fragen Sie im

@@ -30,7 +30,7 @@
             @foreach (var item in Model.NamedInItems)
             {
                 <li>
-                    <a asp-page="/Admin/Items/Edit" asp-route-id="@item.Id">@item.Title</a>
+                    <a asp-page="/Admin/Items/Edit" asp-route-id="@item.Id">@ArchiveItem.ShownTitle(T, item.Title)</a>
                     @if (item.DeletedAt is not null)
                     {
                         <span class="badge text-bg-dark">@T["In the bin"]</span>
@@ -71,7 +71,7 @@
                                     <br /><span class="text-muted small">@T["Photographer or author: {0}", contribution.RightsHolder]</span>
                                 }
                             </td>
-                            <td><a asp-page="/Admin/Items/Edit" asp-route-id="@contribution.ArchiveItemId">@contribution.ArchiveItem.Title</a></td>
+                            <td><a asp-page="/Admin/Items/Edit" asp-route-id="@contribution.ArchiveItemId">@ArchiveItem.ShownTitle(T, contribution.ArchiveItem.Title)</a></td>
                             <td>
                                 @if (contribution.ArchiveItem.DeletedAt is null)
                                 {

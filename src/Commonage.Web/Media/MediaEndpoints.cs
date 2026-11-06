@@ -2,6 +2,7 @@ using Commonage.Web.Data;
 using Commonage.Web.Domain;
 using Commonage.Web.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 using Microsoft.Net.Http.Headers;
 
 namespace Commonage.Web.Media;
@@ -12,6 +13,7 @@ namespace Commonage.Web.Media;
 /// </summary>
 public static class MediaEndpoints
 {
+    private const int MaxStatusQuestions = 200;
     private const string VariantPattern = "{variant:regex(^(preview|thumbnail|card)$)}";
 
     public static void MapMediaEndpoints(this WebApplication app)
@@ -21,6 +23,25 @@ public static class MediaEndpoints
         var curator = app.MapGroup("/admin/media").RequireAuthorization(Policies.ManageArchive);
         curator.MapGet($"/{{id:int}}/{VariantPattern}", ServeDerivativeAsync);
         curator.MapGet("/{id:int}/original", ServeOriginalAsync);
+        curator.MapGet("/status", PreviewStatusAsync);
+    }
+
+    /// <summary>Which previews are done, so a page can show them without a reload, and how many the archive still has to make.</summary>
+    private static async Task<IResult> PreviewStatusAsync(string? ids, CommonageDbContext db, IStringLocalizer<SharedResource> localizer)
+    {
+        var wanted = (ids ?? "").Split(',').Take(MaxStatusQuestions).Select(id => int.TryParse(id, out var number) ? number : 0).Where(id => id > 0).ToList();
+        var files = await db.MediaFiles
+            .Where(f => wanted.Contains(f.Id))
+            .Select(f => new { f.Id, f.Status })
+            .ToListAsync();
+        var waiting = await db.MediaFiles.CountAsync(f => f.Status == ProcessingStatus.Pending);
+        return Results.Json(new
+        {
+            ready = files.Where(f => f.Status == ProcessingStatus.Ready).Select(f => f.Id),
+            failed = files.Where(f => f.Status == ProcessingStatus.Failed).Select(f => f.Id),
+            waiting = files.Where(f => f.Status == ProcessingStatus.Pending).Select(f => f.Id),
+            message = waiting == 0 ? "" : localizer["Previews still to be created: {0}", waiting].Value,
+        });
     }
 
     private static async Task<IResult> ServePublicDerivativeAsync(

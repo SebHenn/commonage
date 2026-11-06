@@ -31,7 +31,7 @@
                             <img src="/admin/media/@photo.Id/thumbnail" class="card-img-top media-thumbnail" alt="" loading="lazy" />
                         }
                         <div class="card-body">
-                            <h3 class="h6">@item.Title</h3>
+                            <h3 class="h6">@ArchiveItem.ShownTitle(T, item.Title)</h3>
                             <p class="small text-muted mb-2">
                                 @item.Collection.Title · <partial name="_StatusBadge" model="item.Status" /><br />
                                 @T["Moved to the bin on {0}", Dates.Day(item.DeletedAt!.Value)]<br />
@@ -74,7 +74,7 @@
                         <div class="card-body">
                             <h3 class="h6 text-break">@file.OriginalFileName</h3>
                             <p class="small text-muted mb-2">
-                                @T["From: {0}", file.ArchiveItem.Title]<br />
+                                @T["From: {0}", ArchiveItem.ShownTitle(T, file.ArchiveItem.Title)]<br />
                                 @T["Moved to the bin on {0}", Dates.Day(file.DeletedAt!.Value)]<br />
                                 @T["Deleted for good on {0}", Dates.Day(ArchiveBin.GoneForGoodOn(file.DeletedAt.Value))]
                             </p>

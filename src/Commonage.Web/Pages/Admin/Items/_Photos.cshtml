@@ -2,72 +2,48 @@
 
 <section class="mt-5" aria-labelledby="photos-heading">
     <h2 id="photos-heading" class="h4">@T["Photos"]</h2>
-    @if (Model.ItemId is null)
+    <div id="photo-cards" class="row g-3 mb-3">
+        @foreach (var file in Model.MediaFiles)
+        {
+            <partial name="_PhotoCard" model="new Commonage.Web.Pages.Admin.Items.PhotoCard(file, Model.ItemId!.Value, Model.Back, Model.Input.AltTexts.GetValueOrDefault(file.Id), Model.IdenticalFiles.GetValueOrDefault(file.Id))" />
+        }
+    </div>
+    <div data-photos-present hidden="@(Model.MediaFiles.Count == 0)">
+        <p id="alt-help" class="form-text">@T["For people who cannot see the photo: who and what is in it, in a sentence. Saved together with the item."]</p>
+        @* So nobody has to scroll back to the form's own button. *@
+        <p>
+            @* Above the form on an untitled draft, which makes it the button Enter presses there. *@
+            @if (Model.NamingOneAfterAnother)
+            {
+                <button type="submit" form="item-form" name="then" value="next" class="btn btn-sm btn-outline-primary">@T["Save and next"]</button>
+            }
+            else
+            {
+                <button type="submit" form="item-form" class="btn btn-sm btn-outline-primary">@T["Save"]</button>
+            }
+        </p>
+    </div>
+    <p class="text-muted small" data-preview-status>
+        @if (Model.MediaFiles.Any(f => f.Status == ProcessingStatus.Pending))
+        {
+            @T["Previews are being created. Reload the page in a moment."]
+        }
+    </p>
+
+    @if (Model.CanUpload)
     {
-        <p class="text-muted">@T["Save the item first, then add photos."]</p>
+        <form method="post" asp-page-handler="Upload" asp-route-id="@Model.ItemId" asp-route-back="@Model.Back" enctype="multipart/form-data" class="d-flex flex-wrap gap-2 align-items-center" data-upload-queue>
+            <label for="photo-upload" class="visually-hidden">@T["Choose photos"]</label>
+            <input id="photo-upload" type="file" name="files" accept="@Commonage.Web.Media.ImageFormats.AcceptAttribute" multiple class="form-control w-auto"
+                   data-val="true" data-val-required="@T["Please choose at least one photo."]"
+                   data-choose-text="@T["Choose photos"]" data-none-text="@T["No photos chosen"]" data-count-text="@T["Photos chosen: {0}"]" />
+            <button type="submit" class="btn btn-outline-primary">@T["Upload"]</button>
+            <span data-valmsg-for="files" data-valmsg-replace="true" class="text-danger w-100"></span>
+        </form>
+        <p class="form-text">@T["JPEG, PNG, TIFF or WebP. The original file is kept unchanged and is only visible to curators."]</p>
     }
     else
     {
-        @if (Model.MediaFiles.Count > 0)
-        {
-            <div class="row g-3 mb-3">
-                @foreach (var file in Model.MediaFiles)
-                {
-                    <div class="col-6 col-md-4 col-lg-3">
-                        <div class="card h-100">
-                            @if (file.Status == ProcessingStatus.Ready)
-                            {
-                                <img src="/admin/media/@file.Id/thumbnail" class="card-img-top media-thumbnail" alt="@file.OriginalFileName" loading="lazy" />
-                            }
-                            else
-                            {
-                                <div class="card-img-top media-thumbnail d-flex align-items-center justify-content-center bg-light text-muted small p-2 text-center">
-                                    @(file.Status == ProcessingStatus.Pending ? T["Creating preview…"] : T["No preview could be created."])
-                                </div>
-                            }
-                            <div class="card-body p-2 small d-flex flex-column">
-                                <div class="text-truncate" title="@file.OriginalFileName">@file.OriginalFileName</div>
-                                <div class="text-muted mb-2">@((file.SizeBytes / 1024.0 / 1024.0).ToString("0.0")) MB</div>
-                                @* Saved with the item: the form attribute makes this field part of the form above or below. *@
-                                <label for="@Html.GenerateIdFromName($"Input.AltTexts[{file.Id}]")" class="form-label mb-1">@T["What does it show?"]</label>
-                                <textarea id="@Html.GenerateIdFromName($"Input.AltTexts[{file.Id}]")" name="Input.AltTexts[@file.Id]" form="item-form" rows="2" maxlength="1000"
-                                          class="form-control form-control-sm mb-2" aria-describedby="alt-help">@(Model.Input.AltTexts.TryGetValue(file.Id, out var typed) ? typed : file.AltText)</textarea>
-                                <div class="d-flex flex-wrap gap-2 mt-auto justify-content-between">
-                                    <a href="/admin/media/@file.Id/original" class="btn btn-sm btn-outline-secondary">@T["Original"]</a>
-                                    <form method="post" asp-page-handler="DeleteMedia" asp-route-id="@Model.ItemId" asp-route-mediaFileId="@file.Id" asp-route-back="@Model.Back"
-                                          data-confirm="@T["Move this photo to the bin? You can restore it there for {0} days.", Commonage.Web.Data.ArchiveBin.RetentionDays]">
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">@T["Move to bin"]</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                }
-            </div>
-            <p id="alt-help" class="form-text">@T["For people who cannot see the photo: who and what is in it, in a sentence. Saved together with the item."]</p>
-            @* So nobody has to scroll back to the form's own button. *@
-            <p><button type="submit" form="item-form" class="btn btn-sm btn-outline-primary">@T["Save"]</button></p>
-            @if (Model.MediaFiles.Any(f => f.Status == ProcessingStatus.Pending))
-            {
-                <p class="text-muted small">@T["Previews are being created. Reload the page in a moment."]</p>
-            }
-        }
-
-        @if (Model.CanUpload)
-        {
-            <form method="post" asp-page-handler="Upload" asp-route-id="@Model.ItemId" asp-route-back="@Model.Back" enctype="multipart/form-data" class="d-flex flex-wrap gap-2 align-items-center">
-                <label for="photo-upload" class="visually-hidden">@T["Choose photos"]</label>
-                <input id="photo-upload" type="file" name="files" accept="@Commonage.Web.Media.ImageFormats.AcceptAttribute" multiple class="form-control w-auto"
-                       data-val="true" data-val-required="@T["Please choose at least one photo."]"
-                       data-choose-text="@T["Choose photos"]" data-none-text="@T["No photos chosen"]" />
-                <button type="submit" class="btn btn-outline-primary">@T["Upload"]</button>
-                <span data-valmsg-for="files" data-valmsg-replace="true" class="text-danger w-100"></span>
-            </form>
-            <p class="form-text">@T["JPEG, PNG, TIFF or WebP. The original file is kept unchanged and is only visible to curators."]</p>
-        }
-        else
-        {
-            <p class="alert alert-warning" role="status">@T["The disk is nearly full, so no photos can be added at the moment. Tell the person who runs the server."]</p>
-        }
+        <p class="alert alert-warning" role="status">@T["The disk is nearly full, so no photos can be added at the moment. Tell the person who runs the server."]</p>
     }
 </section>

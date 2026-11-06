@@ -1,0 +1,123 @@
+@page
+@model Commonage.Web.Pages.Admin.Items.BulkModel
+@using Commonage.Web.Pages.Admin.Items
+@{
+    ViewData["Title"] = Model.Action switch
+    {
+        BulkAction.Publish => T["Publish many at once"],
+        BulkAction.AddTags => T["Add tags to many at once"],
+        BulkAction.SetDate => T["Set the date of many at once"],
+        BulkAction.MoveToCollection => T["Move many to a collection"],
+        _ => T["Set the rights statement of many at once"],
+    };
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="@Model.BackUrl">@T["Items"]</a></li>
+    </ol>
+</nav>
+
+<h1>@ViewData["Title"]</h1>
+
+<form method="post" asp-page-handler="Apply" class="col-lg-8" data-send-once>
+    <partial name="_ErrorSummary" />
+    <input type="hidden" asp-for="Ids" />
+    <input type="hidden" asp-for="Action" />
+    <input type="hidden" asp-for="Back" />
+
+    <p class="fw-bold">@T["Items chosen: {0}", Model.Count]</p>
+    <ul>
+        @foreach (var item in Model.Examples)
+        {
+            <li>
+                @ArchiveItem.ShownTitle(T, item.Title)
+                @if (item.Title.Length == 0 && item.FileName is not null)
+                {
+                    <span class="text-muted text-break">@item.FileName</span>
+                }
+            </li>
+        }
+        @if (Model.Count > Model.Examples.Count)
+        {
+            <li>…</li>
+        }
+    </ul>
+
+    @if (Model.Action == BulkAction.Publish)
+    {
+        <p>@T["These become public at once: {0}.", Model.WillChange]</p>
+        @if (Model.WithoutTitle > 0)
+        {
+            <p class="alert alert-warning">@T["Left out, because they have no title yet: {0}.", Model.WithoutTitle]</p>
+        }
+        @if (Model.NotDrafts > 0)
+        {
+            <p class="alert alert-info">@T["Left out, because they are not drafts: {0}. A contribution needs a decision of its own, on its own page.", Model.NotDrafts]</p>
+        }
+    }
+    @if (Model.Action == BulkAction.AddTags)
+    {
+        <div class="mb-3">
+            <label asp-for="Tags" class="form-label">@T["Tags to add"]</label>
+            <input asp-for="Tags" class="form-control" aria-describedby="bulk-tags-help" />
+            <span asp-validation-for="Tags" class="text-danger"></span>
+            <div id="bulk-tags-help" class="form-text">@T["Places, people or topics, separated by commas."] @T["Tags the items already have stay."]</div>
+        </div>
+    }
+    @if (Model.Action == BulkAction.SetDate)
+    {
+        <div class="mb-3">
+            <label asp-for="Date" class="form-label">@T["Date"]</label>
+            <input asp-for="Date" class="form-control" aria-describedby="bulk-date-help bulk-date-result" data-date-result="bulk-date-result" />
+            <span asp-validation-for="Date" class="text-danger"></span>
+            <div id="bulk-date-help" class="form-text">
+                @T["Write the date as precisely as it is known, for example: 1953, 12.03.1953, March 1953, circa 1950, 1950s, 1950–1955, before 1945."]
+            </div>
+            <div id="bulk-date-result" class="form-text" role="status"></div>
+        </div>
+    }
+    @if (Model.Action == BulkAction.MoveToCollection)
+    {
+        <div class="mb-3">
+            <label asp-for="CollectionId" class="form-label">@T["Collection"]</label>
+            <select asp-for="CollectionId" asp-items="Model.CollectionOptions" class="form-select">
+                <option value="">@T["Choose a collection"]</option>
+            </select>
+            <span asp-validation-for="CollectionId" class="text-danger"></span>
+        </div>
+    }
+    @if (Model.Action == BulkAction.SetRights)
+    {
+        <div class="mb-3">
+            <label asp-for="RightsUri" class="form-label">@T["What may others do with it?"]</label>
+            <select asp-for="RightsUri" class="form-select" aria-describedby="bulk-rights-help">
+                <option value="">@(Model.DefaultRightsLabel is { } archiveDefault ? T["The archive's default: {0}", archiveDefault] : T["Not decided yet"])</option>
+                @foreach (var uri in RightsOptions.All)
+                {
+                    <option value="@uri">@RightsOptions.Label(T, uri)</option>
+                }
+            </select>
+            <span asp-validation-for="RightsUri" class="text-danger"></span>
+            <div id="bulk-rights-help" class="form-text">@T["What others may do with this item. Choose a free licence only if whoever holds the rights really gave it."]</div>
+        </div>
+    }
+    @if (Model.WouldBeReplaced > 0)
+    {
+        <p class="alert alert-warning">@T["Items that already have one, which is then replaced: {0}.", Model.WouldBeReplaced]</p>
+    }
+
+    <div class="d-flex flex-wrap gap-2 align-items-center">
+        @if (Model.WillChange > 0)
+        {
+            <button type="submit" class="btn btn-primary">
+                @(Model.Action == BulkAction.Publish ? T["Publish: {0}", Model.WillChange] : T["Change: {0}", Model.WillChange])
+            </button>
+        }
+        <a href="@Model.BackUrl">@T["Cancel"]</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

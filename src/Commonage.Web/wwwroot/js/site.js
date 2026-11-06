@@ -113,7 +113,21 @@ for (const input of document.querySelectorAll('input[type=file][data-choose-text
     input.classList.add('visually-hidden');
     input.tabIndex = -1;
     input.addEventListener('change', () => {
-        chosen.textContent = [...input.files].map(file => file.name).join(', ') || input.dataset.noneText;
+        const names = [...input.files].map(file => file.name);
+        chosen.textContent = names.length > 5 && input.dataset.countText
+            ? input.dataset.countText.replace('{0}', names.length)
+            : names.join(', ') || input.dataset.noneText;
+    });
+}
+
+// A box to tick all boxes of a list. It only exists with JavaScript, because only JavaScript can make it work.
+for (const all of document.querySelectorAll('input[data-tick-all]')) {
+    const boxes = () => [...document.getElementsByName(all.dataset.tickAll)];
+    all.hidden = false;
+    all.addEventListener('change', () => boxes().forEach(box => { box.checked = all.checked; }));
+    document.addEventListener('change', event => {
+        if (event.target.name === all.dataset.tickAll)
+            all.checked = boxes().every(box => box.checked);
     });
 }
 

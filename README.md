@@ -39,7 +39,11 @@ and password from `.env`. The health check is at http://localhost:8080/health.
   handling removal requests.
 - [Security](docs/security.md) and [accessibility](docs/accessibility.md): what is in place and what is still open.
   Report vulnerabilities as described in [SECURITY.md](SECURITY.md).
-- [Development](docs/development.md): working on the code.
+- [Development](docs/development.md): working on the code, and how it fits together.
+- [Handing the project over](docs/handover.md): what a new maintainer needs to know.
+
+If this project ever stops, archives keep working: a running archive calls no service of this project, and exports, backups and the
+published images stay usable. See [what that means in practice](docs/handover.md#if-the-project-stops).
 
 ## License
 

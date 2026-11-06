@@ -26,7 +26,7 @@ public class MediaFile
 
     public long SizeBytes { get; set; }
 
-    /// <summary>SHA-256 of the original, hex-encoded. Lets backups and exports verify the file is intact.</summary>
+    /// <summary>SHA-256 of the original, hex-encoded. Lets backups and exports verify the file is intact, and curators notice a file the archive already has.</summary>
     public required string Sha256 { get; set; }
 
     /// <summary>Random name under which the original and its previews are stored.</summary>

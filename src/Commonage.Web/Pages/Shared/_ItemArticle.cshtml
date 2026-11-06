@@ -8,7 +8,7 @@
 
 <article class="item-layout @(Model.MediaFiles.Count > 0 ? "item-layout-with-media" : "")">
     <div class="item-head">
-        <h1>@Model.Title</h1>
+        <h1>@ArchiveItem.ShownTitle(T, Model.Title)</h1>
         @if (Model.DateText is not null)
         {
             <p class="text-muted mb-0">@Model.DateText</p>
@@ -21,7 +21,7 @@
             {
                 @* The first picture is what the page is about, so it does not wait. *@
                 <figure>
-                    <img src="@mediaAddress/@file.Id/preview" alt="@(file.AltText ?? Model.Title)" width="@file.PreviewWidth" height="@file.PreviewHeight"
+                    <img src="@mediaAddress/@file.Id/preview" alt="@(file.AltText ?? ArchiveItem.ShownTitle(T, Model.Title))" width="@file.PreviewWidth" height="@file.PreviewHeight"
                          class="media-preview rounded" loading="@(first ? "eager" : "lazy")" fetchpriority="@(first ? "high" : "auto")" />
                 </figure>
                 first = false;

@@ -92,7 +92,10 @@ public class IndexModel(CommonageDbContext db, ArchiveHealth health, ArchiveProf
                 i.Status,
                 i.UpdatedAt,
                 i.MediaFiles.Where(f => f.Status == ProcessingStatus.Ready).OrderBy(f => f.Id).Select(f => (int?)f.Id).FirstOrDefault(),
-                i.MediaFiles.Count))
+                i.MediaFiles.Count,
+                i.Title == "" ? i.MediaFiles.OrderBy(f => f.Id).Select(f => f.OriginalFileName).FirstOrDefault() : null,
+                // Worth a look before a decision on a contribution. Contributors are never told.
+                i.Status == ItemStatus.Submitted && i.MediaFiles.Any(f => db.MediaFiles.Any(other => other.Sha256 == f.Sha256 && other.ArchiveItemId != i.Id))))
             .ToPagedListAsync(PageNumber, PageSize, cancellationToken);
     }
 }

@@ -145,4 +145,30 @@ public class DesignTests(BrowserFixture app)
         await page.ClickAsync(".breadcrumb a");
         Assert.EndsWith("/collections", page.Url);
     }
+
+    [Fact]
+    public async Task The_longest_tag_someone_can_type_does_not_push_a_phone_page_sideways()
+    {
+        var tag = new string('x', 35) + Guid.NewGuid().ToString("N")[..15];
+        var curator = await app.LogInAsync();
+        await curator.GotoAsync("/Admin/Items/Edit");
+        await curator.FillAsync("[name='Input.Title']", "An item with a very long tag");
+        await curator.SelectOptionAsync("[name='Input.CollectionId']", new SelectOptionValue { Index = 1 });
+        await curator.FillAsync("[name='Input.Tags']", tag);
+        await curator.ClickAsync("#item-form button:text-is('Save and publish')");
+        await curator.WaitForSelectorAsync(".alert-success");
+        var id = curator.Url.Split('?')[0].Split('/').Last();
+
+        var phone = await app.NewPageAsync(320, 640);
+        foreach (var path in new[] { "/", $"/items/{id}", "/search", $"/search?tag={tag}" })
+        {
+            await phone.GotoAsync(path);
+            var overflow = await phone.EvaluateAsync<int>("document.documentElement.scrollWidth - document.documentElement.clientWidth");
+            Assert.True(overflow <= 0, $"{path} scrolls sideways by {overflow} px.");
+        }
+
+        // The tag must actually have been on the page for this to say anything.
+        await phone.GotoAsync($"/items/{id}");
+        Assert.Contains(tag, await phone.InnerTextAsync("main"));
+    }
 }

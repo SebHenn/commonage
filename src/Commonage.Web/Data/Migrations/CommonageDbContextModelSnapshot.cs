@@ -443,6 +443,8 @@ namespace Commonage.Web.Data.Migrations
 
                     b.HasIndex("ArchiveItemId");
 
+                    b.HasIndex("Sha256");
+
                     b.HasIndex("Status");
 
                     b.HasIndex("StorageId")

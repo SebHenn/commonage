@@ -1,7 +1,7 @@
 @page "{id:int}"
 @model Commonage.Web.Pages.Admin.Items.PreviewModel
 @{
-    ViewData["Title"] = T["Preview: {0}", Model.Item.Title];
+    ViewData["Title"] = T["Preview: {0}", ArchiveItem.ShownTitle(T, Model.Item.Title)];
     ViewData["MediaAddress"] = "/admin/media";
 }
 

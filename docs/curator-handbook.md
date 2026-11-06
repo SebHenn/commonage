@@ -30,6 +30,34 @@ cannot see it.
 Open the item list and filter it: by collection, or by what is "still needed", such as a date. Open the first item and use
 **Save and next** to go through the list. Use **Preview** to see a draft as visitors will.
 
+To change many at once, tick them, or take everything the filter found. Choose what to do: publish, add tags, set the date,
+move to a collection or set the rights statement. The next page says how many items it is about and what would happen to
+them, and nothing changes until you confirm. Each item that changes gets a line in its history.
+
+Publishing many at once only takes drafts with a title. Contributions wait for a decision of their own. There is no undo for
+many at once, so try a change on a few items first if you are unsure.
+
+## A box full of photos
+
+**Add many photos** on the item list makes one draft from each photo. Enter what they share first: the collection, and if
+you know them, the date, tags and rights statement. Then choose the photos, as many as you like.
+
+They are sent one at a time, and you can see how far it has got. You may go on working in another tab, but keep this one open
+until it is finished: the page asks before you close it.
+
+- **If the connection breaks,** the photos that arrived are safe, and **Continue** goes on from there.
+- **If the page was closed,** choose the same photos again. What the archive already has is left out, and the list says so.
+- **Files the archive already has** are not added, and you get a link to where they are. **Add anyway** adds one if it really
+  is a second copy you want.
+
+The drafts have no title yet, and without one they cannot be published. **Go to the drafts without a title** leads to the list
+of them, with the photo beside each one. Open the first, type a title and press Enter: that saves it and opens the next one.
+
+For one item with several photos, such as an album or a letter of several pages, use **New item** instead. You can choose the
+photos right on that form.
+
+Without JavaScript, all the photos go in one request, at most 1 GB in all, and there is no progress to see.
+
 ## Reviewing what people send in
 
 "Contributions waiting for review" on the management page lists what came in, oldest first. On each one:
@@ -37,6 +65,9 @@ Open the item list and filter it: by collection, or by what is "still needed", s
 - **Save and publish:** it is good as it is, or after you corrected the description.
 - **Accept as draft:** you want to keep it, but it needs more work.
 - **Reject:** spam, or not for this archive. It stays hidden until someone deletes it.
+
+A yellow note, "The archive already has this file", means a file in it is identical to one you have, with a link to that item.
+It may be a second copy, or someone else's copy of the same photo. Contributors are not told.
 
 Before publishing, look at who made it. If the contributor does not know, or the photo shows people who may not want to be
 seen, ask yourself whether it should be public. When in doubt, ask them, or keep it as a draft.
