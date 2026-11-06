@@ -45,7 +45,8 @@ public class QuickWinTests(BrowserFixture app)
         await page.ClickAsync("main form button[type=submit]");
         await page.WaitForSelectorAsync("[data-valmsg-for='Input.Consent']:has-text('Please agree')");
 
-        Assert.Equal(1, await page.EvaluateAsync<int>("document.querySelector('#Files').files.length"));
+        await page.WaitForSelectorAsync(".chosen-photos li");
+        Assert.Equal(1, await page.Locator(".chosen-photos li").CountAsync());
 
         await page.CheckAsync("[name='Input.Consent']");
         await page.ClickAsync("main form button[type=submit]");
@@ -55,11 +56,13 @@ public class QuickWinTests(BrowserFixture app)
     [Fact]
     public async Task A_mistake_only_the_server_finds_leads_to_a_summary_that_has_the_focus()
     {
-        var page = await app.NewPageAsync(390, 844);
-        await FillContributionAsync(page, "With an unreadable date");
+        var page = await app.LogInAsync(390, 844);
+        await page.GotoAsync("/Admin/Items/Edit");
+        await page.FillAsync("[name='Input.Title']", "With an unreadable date");
+        await page.SelectOptionAsync("[name='Input.CollectionId']", new SelectOptionValue { Index = 1 });
         await page.FillAsync(Date, "the winter when I was small");
 
-        await page.ClickAsync("main form button[type=submit]");
+        await page.ClickAsync("#item-form button[type=submit]:text-is('Save as draft')");
         await page.WaitForSelectorAsync("[data-focus-on-load]");
 
         Assert.True(await page.EvaluateAsync<bool>("document.activeElement.hasAttribute('data-focus-on-load')"));
@@ -105,7 +108,8 @@ public class QuickWinTests(BrowserFixture app)
 
         await page.SetInputFilesAsync("#Files", Path.Combine("Fixtures", "photo.jpg"));
 
-        Assert.Equal("photo.jpg", await chosen.InnerTextAsync());
+        await page.WaitForSelectorAsync("#Files-chosen:text-is('Ausgewählte Fotos: 1')");
+        Assert.True(await page.Locator("button:text-is('Weitere Fotos hinzufügen')").IsVisibleAsync());
     }
 
     [Fact]

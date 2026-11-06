@@ -113,6 +113,20 @@ record. Spam protection is in `Contributions/SpamProtection.cs` and configured i
 section (`MinimumFillSeconds`, `MaxSubmissionsPerHour`). The tests switch both off in `CommonageAppFactory`
 and test them separately in `ContributionTests`.
 
+With JavaScript, `wwwroot/js/contribute.js` takes over sending, and the page's handler answers it in JSON: a link to the
+thanks page, or the mistakes per field. That is why chosen photos survive a mistake. Without JavaScript the same handler
+redirects or shows the page again.
+
+- **Sent once.** A form carries a random `SendingKey`. `Contributions/SendingFingerprints.cs` hashes it with what was sent,
+  leaving out name and email address, into `Contribution.SendingFingerprint`, which has a unique index. The same form sent
+  again gets the first one's reference. Going back and changing something makes a new contribution. If storing a photo fails,
+  the fingerprint is cleared again, so that sending again really sends. Once a request has arrived it is finished regardless
+  of the connection, because half a contribution would then be recognised as the whole.
+- **Drafts** live in `localStorage` under `commonage-contribution-draft:` plus the path, and only hold title, date and
+  description. Expired ones, of any link, are removed when any contribution form opens, so a device that never opens one
+  again keeps its draft until the browser's storage is cleared.
+- **Pictures from the device** need `img-src blob:`. `SecurityHeaders` allows that on `/contribute` only.
+
 ## Accounts, activity log, export and backups
 
 How these work for the people running an archive is in [operations.md](operations.md). In the code:
@@ -158,6 +172,8 @@ and fields by themselves (`Forms/FieldErrors.cs`, `site.js`). Other behaviour is
 - `data-date-result`: on a date field, says how the date is understood while it is typed.
 - `data-choose-text` and `data-none-text`: a file picker in the page's language. Without JavaScript, the browser's own
   control stays.
+
+`contribute.js` only runs on the contribution form, and `uploads.js` only on curators' upload forms.
 - `data-required-message`: a required checkbox, which ASP.NET's validation leaves out.
 
 Without JavaScript, `css/nojs.css` shows what would otherwise stay folded away.

@@ -320,6 +320,10 @@ namespace Commonage.Web.Data.Migrations
                         .HasMaxLength(300)
                         .HasColumnType("character varying(300)");
 
+                    b.Property<string>("SendingFingerprint")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
                     b.Property<bool>("ShowName")
                         .HasColumnType("boolean");
 
@@ -334,6 +338,9 @@ namespace Commonage.Web.Data.Migrations
                     b.HasIndex("ContributionLinkId");
 
                     b.HasIndex("ReferenceCode")
+                        .IsUnique();
+
+                    b.HasIndex("SendingFingerprint")
                         .IsUnique();
 
                     b.ToTable("Contributions");

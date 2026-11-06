@@ -73,7 +73,7 @@ public class ExportTests(CommonageAppFactory app)
     [InlineData(typeof(ArchiveSettings), "settings", "defaultLanguage accentColor timeZone defaultRightsUri allowSearchEngines privacyReviewed imprintNotNeeded restoreTestedAt logo texts",
         "Id, TheOnlyId: there is only one. LogoId: as logo.")]
     [InlineData(typeof(Contribution), "contribution", "contributorName contributorEmail showName rights rightsHolder consentText referenceCode submittedAt reviewedAt personalDetailsRemovedAt contributionLink",
-        "Id, ArchiveItemId, ArchiveItem: listed under its item. ContributionLinkId: the link is named.")]
+        "Id, ArchiveItemId, ArchiveItem: listed under its item. ContributionLinkId: the link is named. SendingFingerprint: only there to recognise a form sent twice.")]
     [InlineData(typeof(Collection), "collection", "id title description createdAt", "Items: each item names its collection.")]
     public async Task Every_field_is_exported_or_left_out_on_purpose(Type type, string part, string exported, string leftOut)
     {

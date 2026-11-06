@@ -80,6 +80,9 @@ Schauen Sie vor dem Veröffentlichen, wer das Foto gemacht hat. Wenn die einsend
 zu sehen sind, die vielleicht nicht gezeigt werden möchten, überlegen Sie, ob es öffentlich sein sollte. Fragen Sie im
 Zweifel nach, oder lassen Sie es als Entwurf.
 
+Wenn jemand sagt, ein Handyfoto sei wegen seines Formats abgelehnt worden, ist es wahrscheinlich HEIC, das das Archiv noch nicht
+lesen kann. Es muss zuerst als JPEG gespeichert werden. Das Formular sagt das auch.
+
 ## Wenn jemand um Entfernung bittet
 
 Nehmen Sie jede solche Bitte ernst und antworten Sie schnell. Es ist egal, ob die Person das Foto eingesendet hat oder nur

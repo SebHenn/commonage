@@ -58,7 +58,42 @@ someone watches and takes notes. The aim is to find what confuses people, not to
 Write the findings into an issue per problem (without names), with how many people hit it. Fix what stopped people
 before v0.1 is announced; plan the rest. Record the date, the group and the results summary below.
 
+## Three more tasks, since M14
+
+For the tester, or anyone who tries the archive between milestones. Same rules as above, on a real phone over mobile data,
+not on Wi-Fi. It would help if one person is over 70 and one uses a screen reader, but nothing waits for that.
+
+> **A. Send in photos (as a contributor, on a phone, over mobile data).**
+> *(Contribution link.)* Send in three photos from your phone of anything at all. Say it was "the summer after the flood",
+> and go on from whatever the form tells you.
+
+> **B. Read a letter (as a visitor).**
+> Your neighbour says the football club once wrote to its members about a new pitch. Find that letter and read it.
+
+> **C. Look around one street (as a visitor).**
+> Find everything from the 1950s in Mill Street.
+
+What to note for task A, besides the usual:
+
+- Which phone and browser, and how long the sending took.
+- **On an iPhone: does it send photos in its usual format?** iPhones store HEIC. The browser may convert them to JPEG by itself,
+  which nobody has been able to try yet. If the form refuses them, that is the first thing to report. On Android, the same
+  if the phone is set to HEIC.
+- Whether the chosen photos appear, and how quickly with ten large ones. Whether the page struggles with that.
+- Turn on flight mode while it is sending, and off again. What happens, and what does the person do next?
+
 ## Results
+
+**M14, November 2026, walk-through by the developer, not by real users:** tasks A to C acted out in the running demo archive, at
+phone width in Chrome, with the network slowed to 600 kbit/s. No real phone, no screen reader, nobody else.
+
+- Task A works. The wrong date was caught before anything was sent, and the three photos stayed chosen. 9.5 MB took about
+  two and a quarter minutes, with the bar moving steadily, one request, and all three photos arrived. It also found four things
+  the tests had not, all fixed: the mistake about the date was shown twice on the field, Stop sending was partly off the screen,
+  the demo's introduction repeated the sentence about curators, and photos were too large once there were several.
+- Task B cannot really be done yet: the demo's letter is typed text, with no scan to read. That is for M15.
+- Task C mostly works, and shows a gap. A search for "Mill Street 1950s" finds two items, but with the year filter there are three:
+  the tram, 1930–1955, was in service in the 1950s, but the search only looks for the word. That is for M19.
 
 **v0.1, November 2026:** run with a real community group on the demo archive. All five tasks were completed
 successfully, so the success criteria are met and v0.1.0 can be released.

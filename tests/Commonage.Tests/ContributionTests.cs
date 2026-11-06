@@ -1,9 +1,11 @@
 using System.Net;
+using System.Text.Json;
 using Commonage.Web.Data;
 using Commonage.Web.Domain;
 using Commonage.Web.Media;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -156,6 +158,158 @@ public class ContributionTests(CommonageAppFactory app)
 
         Assert.Equal([HttpStatusCode.Redirect, HttpStatusCode.Redirect, HttpStatusCode.TooManyRequests], statuses);
         Assert.Equal(2, await CountContributionsAsync(token));
+    }
+
+    [Fact]
+    public async Task The_same_form_sent_again_arrives_once_and_gets_the_same_reference()
+    {
+        var token = await CreateLinkAsync();
+        using var visitor = app.CreateClient();
+        var fields = ValidFields("Sent over a bad connection");
+        fields["SendingKey"] = Guid.NewGuid().ToString("N");
+
+        var first = await Browser.SendFormWithFilesAsync(visitor, $"/contribute/{token}", fields, ("flood.jpg", Photo));
+        var again = await Browser.SendFormWithFilesAsync(visitor, $"/contribute/{token}", fields, ("flood.jpg", Photo));
+
+        Assert.Equal(1, await CountContributionsAsync(token));
+        Assert.Equal(1, await WithDbAsync(db => db.MediaFiles.CountAsync(f => f.ArchiveItem.Contribution!.ContributionLink!.Token == token)));
+        var reference = await WithDbAsync(db => db.Contributions.Where(c => c.ContributionLink!.Token == token).Select(c => c.ReferenceCode).SingleAsync());
+        Assert.Contains(reference!, await first.Content.ReadAsStringAsync());
+        Assert.Contains(reference!, await again.Content.ReadAsStringAsync());
+    }
+
+    [Fact]
+    public async Task Sent_twice_at_the_same_moment_it_still_arrives_once()
+    {
+        var token = await CreateLinkAsync();
+        var key = Guid.NewGuid().ToString("N");
+        var visitors = Enumerable.Range(0, 4).Select(_ => app.CreateClient()).ToList();
+
+        var replies = await Task.WhenAll(visitors.Select(visitor =>
+        {
+            var fields = ValidFields("Tapped twice");
+            fields["SendingKey"] = key;
+            return Browser.SendFormWithFilesAsync(visitor, $"/contribute/{token}", fields);
+        }));
+
+        Assert.All(replies, reply => Assert.Contains("Thank you", reply.Content.ReadAsStringAsync().Result));
+        Assert.Equal(1, await CountContributionsAsync(token));
+        visitors.ForEach(visitor => visitor.Dispose());
+    }
+
+    [Fact]
+    public async Task Going_back_and_changing_something_counts_as_a_new_contribution()
+    {
+        var token = await CreateLinkAsync();
+        using var visitor = app.CreateClient();
+        var key = Guid.NewGuid().ToString("N");
+        var fields = ValidFields("The first one");
+        fields["SendingKey"] = key;
+        var otherPhoto = ValidFields("The first one");
+        otherPhoto["SendingKey"] = key;
+        var otherTitle = ValidFields("Another one");
+        otherTitle["SendingKey"] = key;
+
+        await Browser.SendFormWithFilesAsync(visitor, $"/contribute/{token}", fields, ("first.jpg", Photo));
+        await Browser.SendFormWithFilesAsync(visitor, $"/contribute/{token}", otherPhoto, ("second.jpg", Photo));
+        await Browser.SendFormWithFilesAsync(visitor, $"/contribute/{token}", otherTitle, ("first.jpg", Photo));
+
+        Assert.Equal(3, await CountContributionsAsync(token));
+    }
+
+    [Fact]
+    public async Task A_form_that_failed_while_storing_photos_really_sends_them_the_next_time()
+    {
+        var token = await CreateLinkAsync();
+        var storage = new StorageThatFailsOnce(app.Services.GetRequiredService<IFileStorage>());
+        await using var server = app.WithWebHostBuilder(b => b.ConfigureTestServices(services => services.AddSingleton<IFileStorage>(storage)));
+        using var visitor = server.CreateClient();
+        var fields = ValidFields("The disk had a bad moment");
+        fields["SendingKey"] = Guid.NewGuid().ToString("N");
+
+        var failed = await Browser.SendFormWithFilesAsync(visitor, $"/contribute/{token}", fields, ("flood.jpg", Photo));
+        var again = await Browser.SendFormWithFilesAsync(visitor, $"/contribute/{token}", fields, ("flood.jpg", Photo));
+
+        Assert.Equal(HttpStatusCode.InternalServerError, failed.StatusCode);
+        Assert.Contains("Thank you", await again.Content.ReadAsStringAsync());
+        Assert.Equal(1, await WithDbAsync(db => db.MediaFiles.CountAsync(f => f.ArchiveItem.Contribution!.ContributionLink!.Token == token)));
+    }
+
+    private sealed class StorageThatFailsOnce(IFileStorage real) : IFileStorage
+    {
+        private int _calls;
+
+        public Task SaveAsync(string key, Stream content, CancellationToken cancellationToken = default) =>
+            Interlocked.Increment(ref _calls) == 1 ? throw new IOException("A bad moment.") : real.SaveAsync(key, content, cancellationToken);
+
+        public Stream OpenRead(string key) => real.OpenRead(key);
+
+        public void Delete(string key) => real.Delete(key);
+    }
+
+    [Fact]
+    public async Task A_script_gets_its_answer_as_data_and_the_reference_still_reaches_the_thanks_page()
+    {
+        var token = await CreateLinkAsync();
+        using var visitor = app.CreateClient();
+        visitor.DefaultRequestHeaders.Accept.ParseAdd("application/json");
+
+        var sent = await Browser.SendFormWithFilesAsync(visitor, $"/contribute/{token}", ValidFields("Sent by the script"), ("flood.jpg", Photo));
+
+        Assert.Equal(HttpStatusCode.OK, sent.StatusCode);
+        using var answer = JsonDocument.Parse(await sent.Content.ReadAsStringAsync());
+        var thanks = await visitor.GetStringAsync(answer.RootElement.GetProperty("thanksUrl").GetString());
+        var reference = await WithDbAsync(db => db.Contributions.Where(c => c.ContributionLink!.Token == token).Select(c => c.ReferenceCode).SingleAsync());
+        Assert.Contains(reference!, thanks);
+    }
+
+    [Fact]
+    public async Task A_script_is_told_what_is_wrong_per_field_and_not_to_choose_the_photos_again()
+    {
+        var token = await CreateLinkAsync();
+        using var visitor = app.CreateClient();
+        visitor.DefaultRequestHeaders.Accept.ParseAdd("application/json");
+        var fields = ValidFields("With a date nobody can read");
+        fields["Input.Date"] = "the winter when I was small";
+
+        var sent = await Browser.SendFormWithFilesAsync(visitor, $"/contribute/{token}", fields, ("flood.jpg", Photo));
+
+        Assert.Equal(HttpStatusCode.BadRequest, sent.StatusCode);
+        using var answer = JsonDocument.Parse(await sent.Content.ReadAsStringAsync());
+        var errors = answer.RootElement.GetProperty("errors");
+        Assert.Contains("could not be understood", errors.GetProperty("Input.Date")[0].GetString());
+        Assert.False(errors.TryGetProperty("Files", out _));
+        Assert.Equal(0, await CountContributionsAsync(token));
+    }
+
+    [Fact]
+    public async Task A_heic_photo_is_refused_in_words_that_help()
+    {
+        var token = await CreateLinkAsync();
+        using var visitor = app.CreateClient();
+        byte[] heic = [0, 0, 0, 24, .. "ftypheic"u8, 0, 0, 0, 0];
+
+        var sent = await Browser.SendFormWithFilesAsync(visitor, $"/contribute/{token}", ValidFields("From a phone"), ("IMG_0001.HEIC", heic));
+
+        var page = await sent.Content.ReadAsStringAsync();
+        Assert.Contains("IMG_0001.HEIC is in the HEIC format", page);
+        Assert.DoesNotContain("IMG_0001.HEIC is not a supported photo format", page);
+        Assert.Equal(0, await CountContributionsAsync(token));
+    }
+
+    [Fact]
+    public async Task Only_the_contribution_form_may_show_pictures_from_the_device()
+    {
+        var token = await CreateLinkAsync();
+        using var visitor = app.CreateClient();
+
+        var form = await visitor.GetAsync($"/contribute/{token}");
+        var home = await visitor.GetAsync("/");
+        var login = await visitor.GetAsync("/Account/Login");
+
+        Assert.Contains("img-src 'self' data: blob:;", string.Join(" ", form.Headers.GetValues("Content-Security-Policy")));
+        Assert.DoesNotContain("blob:", string.Join(" ", home.Headers.GetValues("Content-Security-Policy")));
+        Assert.DoesNotContain("blob:", string.Join(" ", login.Headers.GetValues("Content-Security-Policy")));
     }
 
     private static Dictionary<string, string> ValidFields(string title) => new()

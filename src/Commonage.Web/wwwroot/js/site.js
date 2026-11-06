@@ -65,7 +65,7 @@ for (const input of document.querySelectorAll('input[data-date-result]')) {
     const result = document.getElementById(input.dataset.dateResult);
     let timer;
     let latest = 0;
-    input.addEventListener('input', () => {
+    const check = () => {
         clearTimeout(timer);
         timer = setTimeout(async () => {
             const asked = ++latest;
@@ -86,7 +86,10 @@ for (const input of document.querySelectorAll('input[data-date-result]')) {
                 // Only a convenience: the form still checks the date when it is sent.
             }
         }, 400);
-    });
+    };
+    input.addEventListener('input', check);
+    // A date filled in by a script, which is not someone typing and so nothing to warn about when leaving.
+    input.addEventListener('date-filled', check);
 }
 
 // The browser's own file control speaks the browser's language, not the page's. This one speaks the page's.
@@ -169,6 +172,7 @@ document.addEventListener('submit', event => {
         sendingUnsavedForm = true;
 });
 window.addEventListener('beforeunload', event => {
-    if (unsavedForms.size > 0 && !sendingUnsavedForm)
+    // A form sent by a script takes the attribute away when it is done.
+    if ([...unsavedForms].some(form => form.hasAttribute('data-warn-unsaved')) && !sendingUnsavedForm)
         event.preventDefault();
 });

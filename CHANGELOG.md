@@ -34,10 +34,25 @@ version may change things that need attention when updating, and these notes say
 - The language menu is at the top of every page.
 - Pages print cleanly, with their address.
 - A very long tag no longer pushes a page sideways on a phone.
+- Links in a list of mistakes are easier to read: their contrast was too low.
+
+### For contributors
+
+- The form is shorter on a phone and starts with the photos. Send takes the whole width.
+- Chosen photos can be seen, added to in several goes and removed. What cannot be sent is said right away, including HEIC
+  photos, which the archive cannot read yet.
+- A date that cannot be understood is found before the photos are sent, and chosen photos stay chosen when something needs
+  correcting.
+- Sending shows how far it has got and can be stopped. A connection that goes quiet is noticed. Sending again after a lost
+  connection does not make two contributions, also when the first one arrived.
+- The title, date and description stay on the device for three days until they are sent, with a button to clear them. Name,
+  email address and the photographer's name are never kept. Without JavaScript the form works as before.
 
 ### For people who run an archive
 
 - Older photos get the new picture size in the background, with nothing going offline. See docs/operations.md.
+- **If you wrote your own privacy page:** add that the contribution form keeps the title, date and description in the person's
+  own browser for three days or until they are sent. The standard text now says so.
 
 ### Project
 

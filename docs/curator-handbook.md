@@ -72,6 +72,9 @@ It may be a second copy, or someone else's copy of the same photo. Contributors 
 Before publishing, look at who made it. If the contributor does not know, or the photo shows people who may not want to be
 seen, ask yourself whether it should be public. When in doubt, ask them, or keep it as a draft.
 
+If someone says a phone photo was refused because of its format, it is probably HEIC, which the archive cannot read yet. They
+need to save it as a JPEG first. The form tells them so.
+
 ## When someone asks for something to be removed
 
 Take every such request seriously, and answer it quickly. It does not matter whether the person sent the photo in or is
