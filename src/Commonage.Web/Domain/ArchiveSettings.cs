@@ -21,6 +21,9 @@ public class ArchiveSettings
 
     public bool AllowSearchEngines { get; set; } = true;
 
+    /// <summary>Visitors can open photos at about 3000 pixels, to read a letter or look closer. Archives from before this existed start without.</summary>
+    public bool LargePhotos { get; set; } = true;
+
     /// <summary>What applies to items without a statement of their own, see <see cref="RightsOptions"/>.</summary>
     public string? DefaultRightsUri { get; set; }
 

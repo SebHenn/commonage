@@ -12,7 +12,7 @@ public record ItemSummary(int Id, string Title, string? DateText, int? Thumbnail
         i.Id,
         i.Title,
         i.DateText,
-        i.MediaFiles.Where(f => f.Status == ProcessingStatus.Ready).OrderBy(f => f.Id).Select(f => (int?)f.Id).FirstOrDefault(),
+        i.MediaFiles.Where(f => f.Status == ProcessingStatus.Ready).OrderBy(f => f.Position).ThenBy(f => f.Id).Select(f => (int?)f.Id).FirstOrDefault(),
         i.Collection.Title);
 }
 
@@ -33,7 +33,7 @@ public static class CollectionCards
                 c.Items.Where(i => i.Status == ItemStatus.Published)
                     .SelectMany(i => i.MediaFiles)
                     .Where(f => f.Status == ProcessingStatus.Ready)
-                    .OrderBy(f => f.Id)
+                    .OrderBy(f => f.ArchiveItemId).ThenBy(f => f.Position).ThenBy(f => f.Id)
                     .Select(f => (int?)f.Id)
                     .FirstOrDefault()))
             .ToListAsync(cancellationToken);

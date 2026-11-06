@@ -60,7 +60,7 @@ public class ArchiveExporter(CommonageDbContext db, IFileStorage storage, TimePr
         foreach (var item in items)
         {
             var files = new List<ExportFile>();
-            foreach (var file in item.MediaFiles.OrderBy(f => f.Id))
+            foreach (var file in item.MediaFiles.OrderBy(f => f.Position).ThenBy(f => f.Id))
                 files.Add(await WriteFileAsync(zip, item, file, cancellationToken));
             exportedItems.Add(Describe(item, files, options));
         }
@@ -87,7 +87,7 @@ public class ArchiveExporter(CommonageDbContext db, IFileStorage storage, TimePr
             collections.Select(c => new ExportCollection(c.Id, c.Title, c.Description, c.CreatedAt)).ToList(),
             exportedItems,
             new ExportSettings(
-                settings.DefaultLanguage, settings.AccentColor, settings.TimeZone, settings.DefaultRightsUri, settings.AllowSearchEngines, settings.PrivacyReviewed,
+                settings.DefaultLanguage, settings.AccentColor, settings.TimeZone, settings.DefaultRightsUri, settings.AllowSearchEngines, settings.LargePhotos, settings.PrivacyReviewed,
                 settings.ImprintNotNeeded, settings.RestoreTestedAt, logoPath,
                 texts.Select(t => new ExportText(t.Language, t.Kind, t.Text)).ToList()));
 
@@ -142,7 +142,7 @@ public class ArchiveExporter(CommonageDbContext db, IFileStorage storage, TimePr
     }
 
     private static ExportFile Describe(MediaFile file, string? path, string? problem) =>
-        new(file.Id, path, file.OriginalFileName, file.ContentType, file.SizeBytes, file.Sha256, file.UploadedAt, file.AltText, problem);
+        new(file.Id, path, file.OriginalFileName, file.ContentType, file.SizeBytes, file.Sha256, file.UploadedAt, file.AltText, file.Caption, file.Position, file.Rotation, problem);
 
     private static ExportItem Describe(ArchiveItem item, List<ExportFile> files, ExportOptions options) => new(
         item.Id,
@@ -164,6 +164,7 @@ public class ArchiveExporter(CommonageDbContext db, IFileStorage storage, TimePr
         options.PublishedOnly || !options.IncludePersonalData ? null : item.ReceivedFrom,
         options.PublishedOnly ? null : item.ReceivedOn,
         options.PublishedOnly || !options.IncludePersonalData ? null : item.InternalNotes,
+        options.PublishedOnly ? null : item.NeedsTranscription,
         item.Contribution is not { } contribution ? null : new ExportContribution(
             options.IncludePersonalData ? contribution.ContributorName : null,
             options.IncludePersonalData ? contribution.ContributorEmail : null,
@@ -211,6 +212,8 @@ public class ArchiveExporter(CommonageDbContext db, IFileStorage storage, TimePr
                        them as formulas; archive.json has the exact text.
         files/         The original files exactly as they were uploaded, in one folder per item:
                        files/<item id>/<file id>-<original file name>
+                       Curators may have turned a photo: archive.json gives its "rotation" in degrees
+                       clockwise, and its "position" among the photos of the item.
         branding/      The archive's logo, if it has one. Its name and pages are under "settings" in
                        archive.json.
 
@@ -241,6 +244,7 @@ internal record ExportSettings(
     string? TimeZone,
     string? DefaultRightsUri,
     bool AllowSearchEngines,
+    bool LargePhotos,
     bool PrivacyReviewed,
     bool ImprintNotNeeded,
     DateTime? RestoreTestedAt,
@@ -270,6 +274,7 @@ internal record ExportItem(
     string? ReceivedFrom,
     string? ReceivedOn,
     string? InternalNotes,
+    bool? NeedsTranscription,
     ExportContribution? Contribution,
     IReadOnlyList<ExportFile> Files);
 
@@ -298,6 +303,9 @@ internal record ExportFile(
     string Sha256,
     DateTime UploadedAt,
     string? AltText,
+    string? Caption,
+    int Position,
+    int Rotation,
     string? Problem);
 
 internal static class ItemsCsv

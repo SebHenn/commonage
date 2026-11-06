@@ -255,8 +255,10 @@
             if (reply.cardUrl) {
                 try {
                     const card = await fetch(reply.cardUrl);
-                    if (card.ok)
+                    if (card.ok) {
                         document.getElementById('photo-cards')?.insertAdjacentHTML('beforeend', await card.text());
+                        numberPhotos();
+                    }
                     document.querySelector('[data-photos-present]')?.removeAttribute('hidden');
                 } catch {
                     // The photo arrived. Its card shows up with the next page load.
@@ -310,9 +312,11 @@
                 const id = Number(placeholder.dataset.previewPending);
                 if (answer.ready.includes(id)) {
                     const picture = new Image();
-                    picture.src = `/admin/media/${id}/thumbnail`;
+                    // A new address, because a photo that was turned has the same one as before.
+                    picture.src = `/admin/media/${id}/thumbnail?shown=${Date.now()}`;
                     picture.alt = placeholder.dataset.previewAlt ?? '';
                     picture.className = placeholder.dataset.previewClass;
+                    placeholder.closest('[data-photo-card]')?.querySelector('[data-photo-turn]')?.removeAttribute('hidden');
                     placeholder.replaceWith(picture);
                 } else if (answer.failed.includes(id)) {
                     placeholder.textContent = placeholder.dataset.previewFailed ?? '';
@@ -332,6 +336,81 @@
     }
 
     watchPreviews();
+
+    // Moving and turning photos without leaving the page, so that captions being typed stay and the place on the page too.
+    // Without JavaScript, these are ordinary forms. If anything goes wrong here, they are sent as that too.
+    const photoCards = document.getElementById('photo-cards');
+
+    function numberPhotos() {
+        const cards = [...document.querySelectorAll('[data-photo-card]')];
+        cards.forEach((card, index) => {
+            card.querySelector('[data-photo-number]').textContent = say(texts.photoNumber, index + 1, cards.length);
+            card.querySelector('[data-photo-cover]').hidden = index !== 0;
+            card.querySelector('button[value=earlier]').disabled = index === 0;
+            card.querySelector('button[value=later]').disabled = index === cards.length - 1;
+            card.querySelector('button[value=first]').hidden = index === 0;
+        });
+    }
+
+    photoCards?.addEventListener('submit', async event => {
+        const form = event.target;
+        const moving = form.hasAttribute('data-photo-move');
+        if (!moving && !form.hasAttribute('data-photo-turn'))
+            return;
+        event.preventDefault();
+        const button = event.submitter;
+        const body = new FormData(form);
+        if (button?.name)
+            body.set(button.name, button.value);
+
+        try {
+            const answer = await fetch(form.action, { method: 'POST', body, headers: { Accept: 'application/json' } });
+            if (!answer.ok)
+                throw new Error(answer.statusText);
+        } catch {
+            if (button?.name)
+                form.append(Object.assign(document.createElement('input'), { type: 'hidden', name: button.name, value: button.value }));
+            form.submit();
+            return;
+        }
+
+        const card = form.closest('[data-photo-card]');
+        if (moving)
+            moved(card, button);
+        else
+            turned(card);
+    });
+
+    function moved(card, button) {
+        if (button.value === 'earlier')
+            card.previousElementSibling?.before(card);
+        else if (button.value === 'later')
+            card.nextElementSibling?.after(card);
+        else
+            photoCards.prepend(card);
+        numberPhotos();
+        // Moving something takes the focus away, and the button pressed may have just stopped being useful.
+        const other = [button, card.querySelector('button[value=earlier]'), card.querySelector('button[value=later]')]
+            .find(candidate => !candidate.disabled && !candidate.hidden);
+        other?.focus();
+        const status = document.getElementById('photo-moved');
+        if (status)
+            status.textContent = card.querySelector('[data-photo-number]').textContent;
+    }
+
+    function turned(card) {
+        const picture = card.querySelector('img');
+        if (!picture)
+            return;
+        const waiting = document.createElement('div');
+        waiting.className = 'card-img-top media-thumbnail d-flex align-items-center justify-content-center bg-light text-muted small p-2 text-center';
+        waiting.dataset.previewPending = card.id.replace('photo-', '');
+        waiting.dataset.previewClass = picture.className;
+        waiting.dataset.previewAlt = picture.alt;
+        waiting.textContent = texts.turning;
+        picture.replaceWith(waiting);
+        watchPreviews();
+    }
 
     // A new item's photos go with its form, in one request. If that cannot work, it is better said before anything is sent.
     for (const input of document.querySelectorAll('input[type=file][data-max-total-bytes]')) {

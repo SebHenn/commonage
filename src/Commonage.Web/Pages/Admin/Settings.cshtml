@@ -134,6 +134,11 @@
             <label asp-for="Input.AllowSearchEngines" class="form-check-label"></label>
             <div id="search-engines-help" class="form-text">@T["Without this, search engines are asked to leave the archive out. Anyone with a link can still open it."]</div>
         </div>
+        <div class="form-check mb-3">
+            <input asp-for="Input.LargePhotos" class="form-check-input" aria-describedby="large-photos-help" />
+            <label asp-for="Input.LargePhotos" class="form-check-label"></label>
+            <div id="large-photos-help" class="form-text">@T["Visitors can open a photo at about 3000 pixels, to read a letter or look at a face. Without this they only get a smaller one, about 1600 pixels, and the archive saves the disk space. The original stays private either way, and larger versions have no location data or other embedded details either."]</div>
+        </div>
     </fieldset>
 
     <button type="submit" class="btn btn-primary">@T["Save"]</button>

@@ -77,6 +77,9 @@ namespace Commonage.Web.Data.Migrations
                         .HasMaxLength(20000)
                         .HasColumnType("character varying(20000)");
 
+                    b.Property<bool>("NeedsTranscription")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("OriginalLocation")
                         .HasMaxLength(300)
                         .HasColumnType("character varying(300)");
@@ -171,6 +174,9 @@ namespace Commonage.Web.Data.Migrations
                         .HasColumnType("character varying(200)");
 
                     b.Property<bool>("ImprintNotNeeded")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("LargePhotos")
                         .HasColumnType("boolean");
 
                     b.Property<Guid?>("LogoId")
@@ -402,6 +408,9 @@ namespace Commonage.Web.Data.Migrations
                     b.Property<int>("ArchiveItemId")
                         .HasColumnType("integer");
 
+                    b.Property<string>("Caption")
+                        .HasColumnType("text");
+
                     b.Property<string>("ContentType")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -413,10 +422,16 @@ namespace Commonage.Web.Data.Migrations
                     b.Property<int>("DerivativeVersion")
                         .HasColumnType("integer");
 
+                    b.Property<bool>("HasLarge")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("OriginalFileName")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("integer");
 
                     b.Property<int?>("PreviewHeight")
                         .HasColumnType("integer");
@@ -427,6 +442,12 @@ namespace Commonage.Web.Data.Migrations
                     b.Property<string>("ProcessingError")
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
+
+                    b.Property<int>("RenderedRotation")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Rotation")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Sha256")
                         .IsRequired()

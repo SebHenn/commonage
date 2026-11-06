@@ -12,6 +12,19 @@ For the people who look after what an archive holds. You need no technical knowl
 - **Tags:** the places, people and topics someone might look for. Before adding a new one, check whether it already
   exists under a slightly different name.
 
+## Several photos, and letters
+
+- **Order:** "Earlier" and "Later" move a photo, and it happens at once for visitors too. The first photo is the cover, the one seen
+  in lists. "Use as cover" puts a photo first.
+- **Turn right:** a quarter at a time, as often as needed. It takes a moment. Only what visitors see is turned, and the original
+  stays as it came.
+- **Caption:** what everyone reads under the photo, such as "Page 2". "What does it show?" is for people who cannot see it. The search
+  does not look at either, so what someone might search for belongs in the description.
+- **Letters and other writing:** write out the words in the description. Handwriting cannot be searched or read aloud. If you
+  cannot do that yet, tick "Still needs a transcription", and "Still needs: A transcription" in the list finds them again.
+
+Visitors can open a photo at about 3000 pixels. Whether they can is a setting for the whole archive, under "Settings".
+
 ## Rights, credit and what only you see
 
 Open **Rights and credit** on an item:

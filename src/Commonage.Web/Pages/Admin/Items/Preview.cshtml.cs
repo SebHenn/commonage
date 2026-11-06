@@ -16,7 +16,7 @@ public class PreviewModel(CommonageDbContext db) : PageModel
         var item = await db.ArchiveItems
             .Include(i => i.Contribution)
             .Include(i => i.Tags.OrderBy(t => t.Name))
-            .Include(i => i.MediaFiles.Where(f => f.Status == ProcessingStatus.Ready).OrderBy(f => f.Id))
+            .Include(i => i.MediaFiles.Where(f => f.Status == ProcessingStatus.Ready).OrderBy(f => f.Position).ThenBy(f => f.Id))
             .FirstOrDefaultAsync(i => i.Id == id);
         if (item is null)
             return NotFound();

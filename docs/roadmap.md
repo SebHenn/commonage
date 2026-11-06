@@ -170,7 +170,7 @@ real pace over M7 and M8 before promising dates. Each milestone is a minor relea
 | **M12 Catalogue fields** ✅ | 3 | A curator records rights, credit, reference number, where the original is kept and alt text on an item, and can filter for what is missing. |
 | **M13 Shoebox** ✅ | 4 | A curator turns 300 scans into drafts with shared values, sees progress and can retry failures, is warned about identical files, and publishes a chosen set in one action. An item without a real title cannot be published. |
 | **M14 Phone-first sending** ✅ | 4 | Over slow mobile data, a contributor sees their chosen photos, watches a progress bar and cannot send twice. The new tasks are walked through in the running app and given to the tester, and a week of fixes is done. |
-| **M15 Readable items** | 4 | A visitor reads a scanned letter at full size, sees "Photo 2 of 4" with its caption, and moves on to the next item or to items from the same time. Curators reorder, rotate and describe each photo. |
+| **M15 Readable items** ✅ | 4 | A visitor reads a scanned letter at full size, sees "Photo 2 of 4" with its caption, and moves on to the next item or to items from the same time. Curators reorder, rotate and describe each photo. |
 | **M16 Rights and sharing** | 3 | Every item page says whether it may be reused, in plain language. "Cite this item" gives a line to copy. A link pasted into a messenger shows the picture and the archive's name. |
 | **M17 Language reach** | 5 | A translator without Git has tried Weblate on a few pages. Missing translations fail a test. Counts read correctly under Polish plural rules. Item text carries the right `lang`. Dates that are accepted today are still accepted. |
 | **M18 Accounts and system** | 4 | A curator logs in with an authenticator app. Login keys are encrypted with a key outside the database, and the backup test still passes. An admin sees version, disk use, failed previews (with retry) and backup age on one page. |
@@ -338,7 +338,8 @@ Comes before bulk entry so a shoebox evening does not create backfill work.
 **M15 Readable items**
 
 - `Position`, `Caption` and `Rotation` on photos, Move earlier/later buttons, "use as cover". `AltText` per photo
-  closes the alt-text item. "Move to a new item" and photo descriptions from contributors *(can slip)*.
+  closes the alt-text item. "Move to a new item" and photo descriptions from contributors *(can slip, and did: under "Later",
+  roughly by value)*.
 - A public "large" image of about 3000 px, a per-archive setting, served through the published check, relying on
   browser zoom instead of a lightbox.
 - Numbered thumbnail strip with captions. Previous and next, "More from {0}", "From the same time". Dates link to
@@ -437,6 +438,8 @@ Until then, write counts in label form (`Photos: {0}`), which needs no plural gr
 14. **Short video** without re-encoding. **S3-compatible storage**, always through the permission-checking endpoint.
     **OCR for typed documents** as an opt-in container. **Near-duplicates** through a perceptual hash.
 15. **Reading Commonage's own export**, for merging archives. Moving a server already works through backup and restore.
+16. **"Move to a new item"**, for a contribution that turns out to be two things, **photo descriptions from contributors**, and
+    **captions in the search**, which only looks at an item's own fields so far.
 
 ### Not planned
 
@@ -524,6 +527,6 @@ The earlier list, now placed in the milestones:
 
 - A limit on login attempts per address: M7.
 - Field errors linked to their fields with `aria-describedby`: M9.
-- A description (alt text) for each photo: M12 and M15, with suggestions from contributors if time allows.
+- A description (alt text) for each photo: M12 and M15. Suggestions from contributors are still to come.
 - A session with screen reader users: M14.
 - Two-factor authentication, encrypted Data Protection keys, and how long the activity log is kept: M18.

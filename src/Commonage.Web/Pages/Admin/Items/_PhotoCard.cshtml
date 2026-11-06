@@ -2,11 +2,22 @@
 @{
     var file = Model.File;
     var altId = Html.GenerateIdFromName($"Input.AltTexts[{file.Id}]");
+    var captionId = Html.GenerateIdFromName($"Input.Captions[{file.Id}]");
+    var isFirst = Model.Number == 1;
+    var isLast = Model.Number == Model.Total;
 }
 
-<div class="col-6 col-md-4 col-lg-3">
+<div id="photo-@file.Id" class="col-6 col-md-4 col-lg-3" data-photo-card>
     <div class="card h-100">
-        @if (file.Status == ProcessingStatus.Ready)
+        @if (file is { Status: ProcessingStatus.Ready, IsBeingTurned: true })
+        {
+            @* uploads.js replaces this with the picture when it is there. *@
+            <div class="card-img-top media-thumbnail d-flex align-items-center justify-content-center bg-light text-muted small p-2 text-center"
+                 data-preview-pending="@file.Id" data-preview-class="card-img-top media-thumbnail" data-preview-alt="@file.OriginalFileName" data-preview-failed="@T["No preview could be created."]">
+                @T["Turning the photo…"]
+            </div>
+        }
+        else if (file.Status == ProcessingStatus.Ready)
         {
             <img src="/admin/media/@file.Id/thumbnail" class="card-img-top media-thumbnail" alt="@file.OriginalFileName" loading="lazy" />
         }
@@ -25,16 +36,34 @@
             </div>
         }
         <div class="card-body p-2 small d-flex flex-column">
+            <div class="fw-semibold">
+                <span data-photo-number>@T["Photo {0} of {1}", Model.Number, Model.Total]</span>
+                <span class="badge text-bg-secondary" data-photo-cover hidden="@(!isFirst)">@T["Cover"]</span>
+            </div>
             <div class="text-truncate" title="@file.OriginalFileName">@file.OriginalFileName</div>
             <div class="text-muted mb-2">@((file.SizeBytes / 1024.0 / 1024.0).ToString("0.0")) MB</div>
             @if (Model.SameAs is { } same)
             {
                 <div class="mb-2"><span class="badge text-bg-warning text-wrap">@T["The archive already has this file"]</span> <a asp-page="/Admin/Items/Edit" asp-route-id="@same.ItemId">@ArchiveItem.ShownTitle(T, same.ItemTitle)</a></div>
             }
-            @* Saved with the item: the form attribute makes this field part of the form above or below. *@
+            @* Saved with the item: the form attribute makes these fields part of the form above or below. *@
+            <label for="@captionId" class="form-label mb-1">@T["Caption"]</label>
+            <textarea id="@captionId" name="Input.Captions[@file.Id]" form="item-form" rows="2" maxlength="@MediaFile.MaxCaptionLength"
+                      class="form-control form-control-sm mb-2" aria-describedby="caption-help">@(Model.TypedCaption ?? file.Caption)</textarea>
             <label for="@altId" class="form-label mb-1">@T["What does it show?"]</label>
             <textarea id="@altId" name="Input.AltTexts[@file.Id]" form="item-form" rows="2" maxlength="1000"
                       class="form-control form-control-sm mb-2" aria-describedby="alt-help">@(Model.TypedAltText ?? file.AltText)</textarea>
+            <form method="post" asp-page="/Admin/Items/Edit" asp-page-handler="MovePhoto" asp-route-id="@Model.ItemId" asp-route-mediaFileId="@file.Id" asp-route-back="@Model.Back"
+                  class="d-flex flex-wrap gap-1 mb-2" data-photo-move>
+                <button type="submit" name="direction" value="earlier" class="btn btn-sm btn-outline-secondary" disabled="@isFirst" aria-label="@T["Earlier: {0}", file.OriginalFileName]">@T["Earlier"]</button>
+                <button type="submit" name="direction" value="later" class="btn btn-sm btn-outline-secondary" disabled="@isLast" aria-label="@T["Later: {0}", file.OriginalFileName]">@T["Later"]</button>
+                <button type="submit" name="direction" value="first" class="btn btn-sm btn-outline-secondary" hidden="@isFirst" aria-label="@T["Use as cover: {0}", file.OriginalFileName]">@T["Use as cover"]</button>
+            </form>
+            @* Hidden until there is a preview to turn. uploads.js shows it when one arrives. *@
+            <form method="post" asp-page="/Admin/Items/Edit" asp-page-handler="TurnPhoto" asp-route-id="@Model.ItemId" asp-route-mediaFileId="@file.Id" asp-route-back="@Model.Back"
+                  class="mb-2" data-photo-turn hidden="@(file.Status != ProcessingStatus.Ready)">
+                <button type="submit" class="btn btn-sm btn-outline-secondary" aria-label="@T["Turn right: {0}", file.OriginalFileName]">@T["Turn right"]</button>
+            </form>
             <div class="d-flex flex-wrap gap-2 mt-auto justify-content-between">
                 <a href="/admin/media/@file.Id/original" class="btn btn-sm btn-outline-secondary">@T["Original"]</a>
                 <form method="post" asp-page="/Admin/Items/Edit" asp-page-handler="DeleteMedia" asp-route-id="@Model.ItemId" asp-route-mediaFileId="@file.Id" asp-route-back="@Model.Back"

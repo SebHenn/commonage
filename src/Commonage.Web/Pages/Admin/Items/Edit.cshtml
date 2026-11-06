@@ -221,8 +221,13 @@
     </div>
     <div class="mb-3">
         <label asp-for="Input.Description" class="form-label"></label>
-        <textarea asp-for="Input.Description" class="form-control" rows="8"></textarea>
+        <textarea asp-for="Input.Description" class="form-control" rows="8" aria-describedby="description-help"></textarea>
         <span asp-validation-for="Input.Description" class="text-danger"></span>
+        <div id="description-help" class="form-text">@T["For a letter or other writing, write out what it says here. Handwriting cannot be searched or read aloud, and this can."]</div>
+        <div class="form-check mt-2">
+            <input asp-for="Input.NeedsTranscription" class="form-check-input" />
+            <label asp-for="Input.NeedsTranscription" class="form-check-label"></label>
+        </div>
     </div>
 
     <partial name="_Catalogue" model="Model" />

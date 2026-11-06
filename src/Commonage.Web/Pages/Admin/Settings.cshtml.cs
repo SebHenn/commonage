@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Commonage.Web.Audit;
 using Commonage.Web.Data;
 using Commonage.Web.Domain;
+using Commonage.Web.Media;
 using Commonage.Web.Operations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -17,6 +18,7 @@ namespace Commonage.Web.Pages.Admin;
 public class SettingsModel(
     CommonageDbContext db,
     ArchiveProfile profile,
+    MediaProcessingQueue previews,
     LogoImages logos,
     AuditLog audit,
     TimeProvider clock,
@@ -94,6 +96,9 @@ public class SettingsModel(
 
         [Display(Name = "Let search engines list this archive")]
         public bool AllowSearchEngines { get; set; } = true;
+
+        [Display(Name = "Let visitors open photos at a large size")]
+        public bool LargePhotos { get; set; } = true;
     }
 
     public async Task OnGetAsync(CancellationToken cancellationToken)
@@ -118,6 +123,7 @@ public class SettingsModel(
             DefaultLanguage = settings.DefaultLanguage,
             TimeZone = settings.TimeZone,
             AllowSearchEngines = settings.AllowSearchEngines,
+            LargePhotos = settings.LargePhotos,
             DefaultRightsUri = settings.DefaultRightsUri,
         };
         ShowState(settings);
@@ -173,6 +179,8 @@ public class SettingsModel(
         settings.AccentColor = accent;
         settings.TimeZone = string.IsNullOrEmpty(Input.TimeZone) ? null : Input.TimeZone;
         settings.AllowSearchEngines = Input.AllowSearchEngines;
+        var largePhotosSwitchedOn = Input.LargePhotos && !settings.LargePhotos;
+        settings.LargePhotos = Input.LargePhotos;
         settings.DefaultRightsUri = string.IsNullOrEmpty(Input.DefaultRightsUri) ? null : Input.DefaultRightsUri;
         settings.PrivacyReviewed = Input.PrivacyReviewed;
         settings.ImprintNotNeeded = Input.ImprintNotNeeded;
@@ -197,6 +205,8 @@ public class SettingsModel(
         audit.Record(AuditAction.SettingsChanged, null);
         await db.SaveChangesAsync(cancellationToken);
         profile.Forget();
+        if (largePhotosSwitchedOn)
+            previews.LookThroughOlderFilesAgain();
         if (oldLogo is { } old && old != settings.LogoId)
             logos.Delete(old);
 

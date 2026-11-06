@@ -17,6 +17,7 @@ public static class AuditText
         AuditAction.ItemRestored => localizer["Restored the item from the bin"],
         AuditAction.ItemPurged => localizer["Deleted the item for good after its time in the bin"],
         AuditAction.PhotosAdded => localizer["Added photos"],
+        AuditAction.PhotosArranged => localizer["Changed the order or direction of photos"],
         AuditAction.PhotoDeleted => localizer["Deleted a photo for good"],
         AuditAction.PhotoMovedToBin => localizer["Moved a photo to the bin"],
         AuditAction.PhotoRestored => localizer["Restored a photo from the bin"],

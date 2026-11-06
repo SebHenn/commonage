@@ -12,6 +12,20 @@ Für alle, die sich um den Bestand eines Archivs kümmern. Technische Kenntnisse
 - **Schlagwörter:** die Orte, Personen und Themen, nach denen jemand suchen könnte. Prüfen Sie vor einem neuen Schlagwort, ob
   es schon unter einem ähnlichen Namen existiert.
 
+## Mehrere Fotos und Briefe
+
+- **Reihenfolge:** „Nach vorne“ und „Nach hinten“ verschieben ein Foto, und zwar sofort auch für Besucher. Das erste Foto ist das
+  Titelbild, das man in Listen sieht. „Als Titelbild“ setzt ein Foto an den Anfang.
+- **Nach rechts drehen:** jeweils um eine Vierteldrehung, so oft wie nötig. Das dauert einen Moment. Gedreht wird nur, was Besucher
+  sehen. Das Original bleibt, wie es kam.
+- **Bildunterschrift:** was alle unter dem Foto lesen, zum Beispiel „Seite 2“. „Was zeigt es?“ ist für Menschen, die es nicht sehen
+  können. Die Suche berücksichtigt beides nicht. Was jemand suchen könnte, gehört deshalb in die Beschreibung.
+- **Briefe und anderes Geschriebenes:** Schreiben Sie den Wortlaut in die Beschreibung. Handschrift lässt sich nicht durchsuchen oder
+  vorlesen. Wenn Sie das noch nicht können, setzen Sie den Haken bei „Muss noch abgeschrieben werden“. In der Liste finden Sie solche
+  Einträge unter „Fehlt noch: Eine Abschrift“.
+
+Besucher können ein Foto mit etwa 3000 Pixeln öffnen. Ob das möglich ist, gilt für das ganze Archiv und steht unter „Einstellungen“.
+
 ## Rechte, Nennung und was nur Sie sehen
 
 Öffnen Sie bei einem Eintrag **Rechte und Nennung**:
