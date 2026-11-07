@@ -123,6 +123,14 @@ public partial class TranslationTests
         Assert.Fail($"Resources/SharedResource.resx is out of date. Run the tests with {UpdateVariable}=1 to rewrite it, then commit it.");
     }
 
+    [Fact]
+    public void The_base_file_is_not_built_into_the_application()
+    {
+        // Built in, it would make every untranslated text look translated, and English text would get the reader's plural rules.
+        var resources = typeof(SharedResource).Assembly.GetManifestResourceNames();
+        Assert.DoesNotContain(resources, r => r.EndsWith("SharedResource.resources", StringComparison.Ordinal));
+    }
+
     [Theory]
     [InlineData(1, "1 dzień")]
     [InlineData(2, "2 dni")]

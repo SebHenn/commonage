@@ -461,7 +461,8 @@ public class ArchiveSettingsTests(CommonageAppFactory app)
 
         Assert.Matches(@"<option value=""de"" lang=""de"" selected=""selected"">Deutsch</option>", settings);
         Assert.Matches(@"id=""date-language-en""[^>]*checked=""checked""", settings);
-        Assert.DoesNotMatch(@"id=""date-language-de""[^>]*checked=""checked""", settings);
+        // German is the main language, which is always read, so it is not offered again.
+        Assert.DoesNotContain("id=\"date-language-de\"", settings);
     }
 
     [Fact]
@@ -495,6 +496,9 @@ public class ArchiveSettingsTests(CommonageAppFactory app)
         // German is no longer the material's, and this admin reads English.
         Assert.Equal("Understood as: 1950", await DateCheckAsync(admin, "um 1950"));
         Assert.Equal("Understood as: 1950–1959", await DateCheckAsync(admin, "1950s"));
+        // A settings page opened before this version, sent afterwards, has no such field and must not undo the choice.
+        await SaveAsync(admin, new());
+        Assert.Equal("Understood as: 1953-03-12", await DateCheckAsync(admin, "12 marca 1953"));
         await ReadInAsync(admin, "de");
         Assert.Equal("Verstanden als: 1945–1955", await DateCheckAsync(admin, "um 1950"));
     }
