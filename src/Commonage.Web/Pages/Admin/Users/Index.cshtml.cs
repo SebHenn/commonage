@@ -7,7 +7,7 @@ namespace Commonage.Web.Pages.Admin.Users;
 
 public class IndexModel(UserManager<IdentityUser> users) : PageModel
 {
-    public record Account(string Id, string Name, string? Role, AccountState State);
+    public record Account(string Id, string Name, string? Role, AccountState State, bool TwoFactor);
 
     public IReadOnlyList<Account> Accounts { get; private set; } = [];
 
@@ -19,7 +19,7 @@ public class IndexModel(UserManager<IdentityUser> users) : PageModel
             var roles = await users.GetRolesAsync(user);
             list.Add(new Account(user.Id, user.Email ?? user.UserName ?? user.Id,
                 roles.Contains(Roles.Admin) ? Roles.Admin : roles.FirstOrDefault(),
-                AccountStates.Of(user)));
+                AccountStates.Of(user), user.TwoFactorEnabled));
         }
         Accounts = list;
     }

@@ -36,6 +36,8 @@ public class LoginModel(SignInManager<IdentityUser> signInManager, IStringLocali
         var result = await signInManager.PasswordSignInAsync(Input.Email, Input.Password, isPersistent: false, lockoutOnFailure: true);
         if (result.Succeeded)
             return LocalRedirect(Url.IsLocalUrl(returnUrl) ? returnUrl : "/Admin");
+        if (result.RequiresTwoFactor)
+            return RedirectToPage("LoginTwoFactor", new { returnUrl = Url.IsLocalUrl(returnUrl) ? returnUrl : null });
 
         // Only someone who knows the password learns that the account is disabled.
         var disabled = result.IsLockedOut

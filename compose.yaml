@@ -28,6 +28,8 @@ services:
       Demo__Language: ${COMMONAGE_DEMO:-}
       # Only if you changed the code: where your version's source is published (AGPL section 13).
       Source__Url: ${COMMONAGE_SOURCE_URL:-}
+      # Encrypts the login keys in the database. See docs/deployment.md and docs/operations.md.
+      DataProtection__Key: ${COMMONAGE_LOGIN_KEY:-}
     volumes:
       - media-data:/app/App_Data
     ports:

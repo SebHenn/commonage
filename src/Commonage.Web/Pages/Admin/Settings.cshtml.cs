@@ -106,6 +106,9 @@ public class SettingsModel(
         [Display(Name = "Let search engines list this archive")]
         public bool AllowSearchEngines { get; set; } = true;
 
+        [Display(Name = "Everyone who manages the archive must log in with an authenticator app")]
+        public bool RequireTwoFactor { get; set; }
+
         [Display(Name = "Let visitors open photos at a large size")]
         public bool LargePhotos { get; set; } = true;
     }
@@ -137,6 +140,7 @@ public class SettingsModel(
                 : settings.OtherContentLanguages?.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList() ?? [],
             TimeZone = settings.TimeZone,
             AllowSearchEngines = settings.AllowSearchEngines,
+            RequireTwoFactor = settings.RequireTwoFactor,
             LargePhotos = settings.LargePhotos,
             DefaultRightsUri = settings.DefaultRightsUri,
         };
@@ -204,6 +208,7 @@ public class SettingsModel(
         settings.AccentColor = accent;
         settings.TimeZone = string.IsNullOrEmpty(Input.TimeZone) ? null : Input.TimeZone;
         settings.AllowSearchEngines = Input.AllowSearchEngines;
+        settings.RequireTwoFactor = Input.RequireTwoFactor;
         var largePhotosSwitchedOn = Input.LargePhotos && !settings.LargePhotos;
         settings.LargePhotos = Input.LargePhotos;
         settings.DefaultRightsUri = string.IsNullOrEmpty(Input.DefaultRightsUri) ? null : Input.DefaultRightsUri;

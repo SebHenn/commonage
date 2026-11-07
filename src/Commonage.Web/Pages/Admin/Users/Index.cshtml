@@ -18,6 +18,7 @@
                 <th scope="col">@T["Email address"]</th>
                 <th scope="col">@T["Role"]</th>
                 <th scope="col">@T["Status"]</th>
+                <th scope="col">@T["Authenticator app"]</th>
             </tr>
         </thead>
         <tbody>
@@ -27,6 +28,7 @@
                     <td class="text-break"><a asp-page="Edit" asp-route-id="@account.Id">@account.Name</a></td>
                     <td>@(account.Role is null ? T["No role"] : T[account.Role])</td>
                     <td><partial name="_AccountState" model="account.State" /></td>
+                    <td>@(account.TwoFactor ? T["Yes"] : T["No"])</td>
                 </tr>
             }
         </tbody>

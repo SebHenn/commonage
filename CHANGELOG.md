@@ -89,6 +89,13 @@ version may change things that need attention when updating, and these notes say
   is saved, dates are read in English and German as before, and the material counts as being in the archive's language. Choose
   "Several languages, none of them most" if that is wrong for your archive.
 - The export's README is in the language of the admin who exports, with an English copy beside it.
+- **Logins can ask for a code from an authenticator app** as well as the password, with ten recovery codes. "Settings" can
+  require it of everyone who manages the archive. An admin turns it off for someone who lost their phone, and
+  `reset-two-factor` on the server does it for the last admin. See docs/operations.md.
+- **The login keys in the database are now encrypted with `COMMONAGE_LOGIN_KEY` from `.env`**, so a stolen backup alone cannot
+  be used to log in. `scripts/update.sh` adds the key to `.env`; after updating by hand, add one as docs/deployment.md
+  describes. **Everyone logs in again once, and setup links created before stop working.** Keep a copy of `.env` apart from
+  the backups: a restore needs the same key.
 
 ### Project
 
@@ -102,7 +109,10 @@ version may change things that need attention when updating, and these notes say
 - A test finds every text in the code and fails when a language the interface offers has no translation for it. It also writes the
   English base file Weblate needs.
 - Counts in sentences use ICU MessageFormat, with the plural rules of each language.
-- The export settings include `contentLanguage` and `otherContentLanguages`.
+- The export settings include `contentLanguage` and `otherContentLanguages`, and `requireTwoFactor`.
+- QRCoder (MIT) draws QR codes, as SVG in the page. The authenticator app's secret and the recovery codes are encrypted in the
+  database, and the backup-and-restore test checks that no login key there can be read.
+- The activity log can be scrolled with the keyboard on a phone.
 
 ## 0.3.0 (2026-11-05)
 

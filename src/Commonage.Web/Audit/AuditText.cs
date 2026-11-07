@@ -43,6 +43,11 @@ public static class AuditText
         AuditAction.SettingsChanged => localizer["Changed the archive settings"],
         AuditAction.RestoreTested => localizer["Noted that a restore was tested"],
         AuditAction.ContributorDetailsChanged => localizer["Corrected the contributor's details"],
+        AuditAction.TwoFactorEnabled => localizer["Started logging in with an authenticator app"],
+        AuditAction.TwoFactorDisabled => localizer["Stopped logging in with an authenticator app"],
+        AuditAction.TwoFactorTurnedOff => localizer["Turned off the account's authenticator app"],
+        AuditAction.RecoveryCodesCreated => localizer["Created new recovery codes"],
+        AuditAction.RecoveryCodeUsed => localizer["Logged in with a recovery code"],
         _ => action.ToString(),
     };
 

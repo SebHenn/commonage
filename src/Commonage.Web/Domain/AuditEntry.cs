@@ -38,6 +38,11 @@ public enum AuditAction
     RestoreTested,
     ContributorDetailsChanged,
     PhotosArranged,
+    TwoFactorEnabled,
+    TwoFactorDisabled,
+    TwoFactorTurnedOff,
+    RecoveryCodesCreated,
+    RecoveryCodeUsed,
 }
 
 /// <summary>

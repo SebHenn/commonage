@@ -30,6 +30,9 @@ public class ArchiveSettings
 
     public bool AllowSearchEngines { get; set; } = true;
 
+    /// <summary>Curators and admins must log in with an authenticator app as well as their password.</summary>
+    public bool RequireTwoFactor { get; set; }
+
     /// <summary>Visitors can open photos at about 3000 pixels, to read a letter or look closer. Archives from before this existed start without.</summary>
     public bool LargePhotos { get; set; } = true;
 

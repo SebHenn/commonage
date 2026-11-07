@@ -133,6 +133,17 @@ Für einen Schuhkarton, den Ihnen jemand persönlich gibt: Legen Sie die Einträ
 in der Beschreibung, wer ihn Ihnen wann gegeben hat und was vereinbart wurde. Lassen Sie sich die Erlaubnis möglichst
 schriftlich geben und bewahren Sie sie bei den Unterlagen Ihrer Gruppe auf.
 
+## Ihre Anmeldung
+
+Unter **Passwort ändern** → **Mit einer Authenticator-App anmelden** können Sie Ihrer Anmeldung einen Code von Ihrem Handy
+hinzufügen. Installieren Sie eine Authenticator-App, etwa Aegis, 2FAS, Google Authenticator oder Microsoft Authenticator, scannen Sie
+den Code auf der Seite und tippen Sie die sechs Ziffern ein, die die App zeigt. Von da an fragt die Anmeldung nach Ihrem Passwort
+auch nach diesen Ziffern, sodass sich niemand als Sie anmelden kann, der nur Ihr Passwort herausgefunden hat. Das Archiv kann das von allen verlangen.
+
+Sie bekommen dann zehn **Wiederherstellungscodes**. Schreiben Sie sie auf oder drucken Sie sie aus und bewahren Sie sie nicht beim
+Handy auf: Ohne das Handy können Sie sich mit jedem davon einmal anmelden. Wenn Sie Handy und Codes verlieren, kann ein Admin die
+App für Ihr Konto ausschalten.
+
 ## Wenn etwas schiefgeht
 
 - **Versehentlich gelöscht:** Schauen Sie in den **Papierkorb**. Einträge und Fotos bleiben dort 30 Tage.

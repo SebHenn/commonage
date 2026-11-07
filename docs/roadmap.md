@@ -391,6 +391,11 @@ old date reader in the tests; the export README. The demo was already in both la
   checks in `/health`, with a note for uptime monitors that a degraded answer is still HTTP 200.
 - How long the activity log and Rejected or Withdrawn items are kept; activity log filters.
 
+**First half done (November 2026):** authenticator apps, and the login keys encrypted with `COMMONAGE_LOGIN_KEY`. A setup
+link still only sets a new password, so that someone who forgot it keeps their app. For a lost phone, an admin turns the
+app off, and `reset-two-factor` on the server does it for the last admin or after the key was lost. The system page and
+how long things are kept follow in a second pull request.
+
 **M19 Discovery**
 
 - Decade timeline with predefined CSS classes for bar widths, because the policy forbids inline styles.

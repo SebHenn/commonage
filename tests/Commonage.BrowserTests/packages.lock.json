@@ -700,6 +700,11 @@
           "Npgsql": "10.0.3"
         }
       },
+      "QRCoder": {
+        "type": "Transitive",
+        "resolved": "1.6.0",
+        "contentHash": "XmPA81eo+oRxBuyVdswsSkTGTE1d3thfF11Z1PdD7oB56A6HU4G4AAOdySmGRMb/cljwlFTMWUtosGEnwpS6GA=="
+      },
       "SharpZipLib": {
         "type": "Transitive",
         "resolved": "1.4.2",
@@ -802,7 +807,8 @@
           "Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore": "[10.0.14, )",
           "NetVips": "[3.2.0, )",
           "NetVips.Native": "[8.18.7, )",
-          "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.3, )"
+          "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.3, )",
+          "QRCoder": "[1.6.0, )"
         }
       }
     }

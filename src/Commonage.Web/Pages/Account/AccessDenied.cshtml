@@ -1,7 +1,7 @@
 @page
+@model Commonage.Web.Pages.Account.AccessDeniedModel
 @{
     ViewData["Title"] = T["No access"];
-    HttpContext.Response.StatusCode = StatusCodes.Status403Forbidden;
 }
 
 <h1>@ViewData["Title"]</h1>

@@ -34,6 +34,17 @@ set_version() {
     rm -f .env.updating
 }
 
+# Archives from before 0.4 have no login key. The new version encrypts its login keys with it from the first start.
+add_login_key() {
+    [ -z "$(env_value COMMONAGE_LOGIN_KEY)" ] || return 0
+    key=$(head -c 32 /dev/urandom | base64 | tr -d '\n')
+    grep -v '^COMMONAGE_LOGIN_KEY=' .env > .env.updating || true
+    printf '\n# Encrypts the login keys in the database. Keep a copy of this file apart from the backups. See docs/operations.md.\nCOMMONAGE_LOGIN_KEY=%s\n' "$key" >> .env.updating
+    cat .env.updating > .env
+    rm -f .env.updating
+    echo "Added COMMONAGE_LOGIN_KEY to .env. Everyone logs in again once. Keep a copy of .env somewhere safe, apart from the backups."
+}
+
 pull() {
     [ "${COMMONAGE_UPDATE_SKIP_PULL:-}" = 1 ] || docker compose pull --quiet web
 }
@@ -76,6 +87,9 @@ if [ "${1:-}" = --after-checkout ]; then
         go_back_without_restoring
         die "could not download $new_ref. Nothing was changed."
     fi
+
+    # After the backup, which keeps the archive as it was in case the update has to be undone.
+    add_login_key
 
     echo "Starting $new_ref. The app upgrades the database when it starts, which can take a while."
     if docker compose up -d --remove-orphans web && wait_until_healthy; then

@@ -22,7 +22,7 @@ vulnerability, see [SECURITY.md](../SECURITY.md).
 | Area | Measure |
 |---|---|
 | Access | Public pages and public image addresses read only from published items (`PublishedItems`). Admin pages are protected by policy per folder; admin-only pages (accounts, export, activity log) by a second policy. Originals and previews of unpublished items are served only to curators. Tested in `PublicationTests`, `MediaTests`, `AccountTests`, `ExportTests`. |
-| Accounts | Passwords of at least 12 characters (length over forced symbols, NIST SP 800-63B). Five wrong passwords lock an account for five minutes, and one address can try 100 logins an hour. Accounts are created with one-time setup links, valid seven days. Disabling an account, or a password change, ends its logins within a minute. Admins cannot lock themselves out. |
+| Accounts | Passwords of at least 12 characters (length over forced symbols, NIST SP 800-63B). Five wrong passwords lock an account for five minutes, and one address can try 100 logins an hour. Accounts are created with one-time setup links, valid seven days. Disabling an account, or a password change, ends its logins within a minute. Admins cannot lock themselves out. An authenticator app (TOTP) can be added to each login, and admins can require it of everyone who manages the archive; wrong codes count towards the lockout like wrong passwords. Ten recovery codes, each usable once. Turning the app off or making new codes asks for the password again. Tested in `TwoFactorTests`. |
 | Forms | Every form carries an antiforgery token. Redirects after login and language change only go to addresses on this site. |
 | Uploads | Files are recognised by their content (magic bytes), never by name or browser type, and stored under random names outside the web root. Originals are never changed or served to visitors. Previews are made by libvips, rotated upright and stripped of all metadata. Images over 250 megapixels get no preview (decompression bombs). Size limits per file and per request. |
 | Browser | Strict Content Security Policy (no inline script or style, no framing, no plugins; only the contribution form may show `blob:` images, for the photos someone has chosen on their own device, and a picture opened on its own has no scripts at all but lets the browser's picture view style itself), `nosniff`, `Referrer-Policy: same-origin` (setup links never leak to other sites), `X-Frame-Options`, `Permissions-Policy`, `Cross-Origin-Opener-Policy`. No `Server` header. `SecurityHeaderTests` checks the headers and that no page contains inline script or style, so the policy can stay strict. |
@@ -37,17 +37,34 @@ vulnerability, see [SECURITY.md](../SECURITY.md).
 | Repository | CI scans the whole history for secrets (gitleaks), builds with warnings as errors, and runs all tests and the backup-and-restore test. CodeQL analyses the C# code and the workflows; dependency review refuses pull requests that add vulnerable dependencies; Dependabot proposes updates weekly, and its patch and minor updates merge only after every required check has passed; OpenSSF Scorecard rates the setup. CI also runs axe on every main page in a browser, and an update from the previous release, including a failed one that has to go back. `main` only changes through pull requests with passing checks, and release tags cannot be moved or deleted. |
 | Supply chain | GitHub Actions are pinned to commits, container images to digests and NuGet packages to content hashes (`packages.lock.json`), so a moved tag or changed package cannot change what runs. Workflows have read-only tokens unless a job needs more. Release images are built by the release workflow only after a maintainer approves it, and carry a software bill of materials and a signed build attestation (`gh attestation verify`). |
 
+## Where the secrets are
+
+| Secret | Where it is, and how it is protected |
+|---|---|
+| Passwords | Only as hashes in the database (ASP.NET Core Identity, PBKDF2 with a salt per password). |
+| Login keys | The keys that sign login cookies, setup links and form tokens are in the database (`DataProtectionKeys`), so that logins survive a restore. Each is encrypted with AES-256-GCM with `COMMONAGE_LOGIN_KEY` (`Security/LoginKeys.cs`), which is in `.env` only, not in the database or the backups. Tested in `LoginKeyTests` and in the backup-and-restore test, which also checks that no key in the database can be read. |
+| Authenticator secrets and recovery codes | In the database, encrypted with the login keys (`ProtectedUserStore`), so they need `COMMONAGE_LOGIN_KEY` as well. Recovery codes are shown once and kept nowhere else. |
+| Setup links | Not stored. They are signed with the login keys, work once and for seven days, and a new one makes older ones invalid. |
+| Database password, first admin's password, login key | In `.env` on the server, readable by its owner only (`chmod 600`), and never in the repository. Keep a copy apart from the backups. |
+
+Someone with both the database and `.env`, such as an attacker on the server itself, can do anything the app can. Keeping the
+server updated and its access limited is what protects against that.
+
 ## Known limits and open points
 
-- **No two-factor authentication** yet. Until then, curators should use a password manager and long passwords.
+- **Two-factor login is optional** unless an admin requires it. Without it, a password manager and long passwords are what
+  protects an account.
+- **An admin can turn off anyone else's authenticator app**, because Commonage sends no emails and that is the way back in
+  for someone who lost their phone. Together with a setup link, an admin can take over a curator's account. Admin accounts need
+  the same care as the server.
 - **The login page reveals whether an account exists** when it has been locked after wrong passwords ("too many
   failed attempts").
 - **Deleted material stays for 30 days.** Items and photos in the bin keep their files and personal data until they are
   deleted for good, which curators can do at once when someone asks for removal.
 - **The default privacy text is a template**, describing what Commonage stores. Each group has to adapt it and check its
   own legal duties, including whether it needs an imprint.
-- **Keys that protect login cookies and setup links are stored unencrypted in the database.** Whoever has the
-  database (or a backup) could forge logins. Protect backups accordingly.
+- **Without `COMMONAGE_LOGIN_KEY`, the login keys are stored unencrypted**, and whoever has the database or a backup could
+  forge logins. Admins see a notice then, and `scripts/update.sh` adds the key to `.env`.
 - **Images are decoded by libvips**, a large C library. Keep the Docker image up to date by installing each new
   release ([deployment.md](deployment.md)) to get its security fixes.
 - **The activity log is kept indefinitely** and holds curators' email addresses.

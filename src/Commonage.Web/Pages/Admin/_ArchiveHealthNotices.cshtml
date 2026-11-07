@@ -1,4 +1,6 @@
 @model Commonage.Web.Operations.ArchiveHealth
+@inject Commonage.Web.Security.LoginKeyStatus LoginKeys
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment Environment
 @* What admins need to act on to keep the archive safe. Commonage sends no emails, so this page is where they learn it. *@
 @{
     var freeGigabytes = Model.FreeBytes is { } free ? (free / 1024.0 / 1024.0 / 1024.0).ToString("0.0") : null;
@@ -17,6 +19,12 @@
 else if (Model.IsLowOnSpace)
 {
     <p class="alert alert-warning" role="status">@T["The disk is filling up. Free disk space (GB): {0}. Uploads stop before it is full.", freeGigabytes ?? ""]</p>
+}
+
+@* A development machine has no reason to set one. *@
+@if (!LoginKeys.Encrypted && !Environment.IsDevelopment())
+{
+    <p class="alert alert-warning" role="status">@T["The keys that keep people logged in are stored in the database without encryption, so a copy of the database, such as a backup, could be used to log in. Whoever runs the server should set COMMONAGE_LOGIN_KEY, as docs/deployment.md describes."]</p>
 }
 
 @if (Model.LastBackupAt is { } lastBackup && !Model.BackupIsOverdue)

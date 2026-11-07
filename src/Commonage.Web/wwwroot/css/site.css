@@ -546,3 +546,38 @@ main:focus {
   inline-size: auto;
   max-inline-size: 100%;
 }
+
+/* Setting up an authenticator app. The code stays black on white in every colour scheme, because cameras read that best. */
+.qr-frame {
+    inline-size: min(16rem, 100%);
+}
+
+.qr-code {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+}
+
+.setup-key,
+.recovery-codes code {
+    /* Bootstrap's pink for code is too faint on the green of the box the codes are shown in. */
+    color: inherit;
+    font-size: 1.1rem;
+    letter-spacing: 0.05em;
+    overflow-wrap: anywhere;
+}
+
+.setup-code {
+    max-inline-size: 10rem;
+}
+
+.recovery-codes {
+    columns: 2 10rem;
+}
+
+.recovery-box {
+    border: 2px solid var(--bs-success);
+    border-radius: var(--bs-border-radius);
+    padding: 1rem;
+    margin-block-end: 1.5rem;
+}

@@ -518,6 +518,19 @@ public class ArchiveSettingsTests(CommonageAppFactory app)
     }
 
     [Fact]
+    public async Task Requiring_an_authenticator_app_sends_the_admin_to_set_one_up()
+    {
+        await using var archive = await NewArchiveAsync();
+        using var admin = await AdminAsync(archive);
+
+        var saved = await SaveAsync(admin, new() { ["Input.RequireTwoFactor"] = "true" });
+
+        Assert.Equal("/Account/TwoFactor", saved.RequestMessage!.RequestUri!.AbsolutePath);
+        Assert.Contains("This archive requires an authenticator app", await saved.Content.ReadAsStringAsync());
+        Assert.Equal("/Account/TwoFactor", (await admin.GetAsync("/Admin/Activity")).RequestMessage!.RequestUri!.AbsolutePath);
+    }
+
+    [Fact]
     public async Task A_language_without_translations_reads_English_with_English_counts()
     {
         await using var polish = app.WithWebHostBuilder(b => b.UseSetting("Languages:ForTesting", "pl"));

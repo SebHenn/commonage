@@ -1,0 +1,23 @@
+@page
+@model Commonage.Web.Pages.Account.LoginTwoFactorModel
+@{
+    ViewData["Title"] = T["Curator login"];
+}
+
+<div class="row">
+    <div class="col-md-6 col-lg-4">
+        <h1>@T["Curator login"]</h1>
+        <form method="post" asp-route-returnUrl="@Request.Query["returnUrl"]">
+            <partial name="_ErrorSummary" />
+            <div class="mb-3">
+                <label asp-for="Input.Code" class="form-label"></label>
+                <input asp-for="Input.Code" class="form-control" autocomplete="one-time-code" autocapitalize="characters"
+                       spellcheck="false" aria-describedby="code-help" autofocus />
+                <span asp-validation-for="Input.Code" class="text-danger"></span>
+                <div id="code-help" class="form-text">@T["Six digits. Without your phone, type one of your recovery codes instead. Each one works once."]</div>
+            </div>
+            <button type="submit" class="btn btn-primary">@T["Log in"]</button>
+        </form>
+        <p class="form-text mt-4">@T["Lost your phone and your recovery codes? An admin can turn the app off for your account."]</p>
+    </div>
+</div>

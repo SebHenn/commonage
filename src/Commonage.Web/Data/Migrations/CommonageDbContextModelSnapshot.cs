@@ -193,6 +193,9 @@ namespace Commonage.Web.Data.Migrations
                     b.Property<bool>("PrivacyReviewed")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("RequireTwoFactor")
+                        .HasColumnType("boolean");
+
                     b.Property<DateTime?>("RestoreTestedAt")
                         .HasColumnType("timestamp with time zone");
 

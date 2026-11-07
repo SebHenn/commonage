@@ -50,6 +50,7 @@ This gives you the Compose files and the backup scripts. The app itself comes as
 cp .env.example .env
 chmod 600 .env
 openssl rand -base64 24     # run twice: one database password, one first admin password
+openssl rand -base64 32     # once more: the login key
 nano .env
 ```
 
@@ -59,11 +60,17 @@ Fill in `.env`:
 POSTGRES_PASSWORD=<the first random value>
 COMMONAGE_ADMIN_EMAIL=you@example.org
 COMMONAGE_ADMIN_PASSWORD=<the second random value, or a long passphrase>
+COMMONAGE_LOGIN_KEY=<the third value>
 
 COMMONAGE_DOMAIN=archive.example.org
 COMPOSE_FILE=compose.yaml:compose.production.yaml
 COMMONAGE_VERSION=0.3
 ```
+
+`COMMONAGE_LOGIN_KEY` encrypts the keys in the database that keep people logged in and that protect their authenticator
+apps. Without it, a stolen copy of the database, such as a backup, would be enough to log in as anyone. **Keep a copy of
+`.env` somewhere safe, apart from the backups**, for example in a password manager: a restore needs the same key, or everyone
+has to log in again and set up their authenticator apps again ([operations.md](operations.md#login-keys)).
 
 `COMMONAGE_VERSION=0.3` follows the bug-fix releases of 0.3 (0.3.1, 0.3.2, ...) whenever you update; a new minor
 version such as 0.2 only comes when you change this line.
@@ -86,7 +93,8 @@ gh attestation verify oci://ghcr.io/sebhenn/commonage:0.1 --owner SebHenn
 ```
 
 Within a minute Caddy has a certificate from Let's Encrypt. Open `https://archive.example.org`, log in with
-"Curator login" at the bottom of the page, and change the admin password under "Change password". You can now delete
+"Curator login" at the bottom of the page, and change the admin password under "Change password". Set up an authenticator
+app there too. You can now delete
 the two `COMMONAGE_ADMIN_` lines from `.env`; they are only used while the archive has no accounts.
 
 Then, under "Manage archive":
@@ -106,7 +114,8 @@ night with cron, keep a week of them, and copy them off the server. For example,
 ```
 
 **Test a restore** on another machine before you rely on the backups, and again every few months:
-`scripts/restore.sh` with a copied backup folder, `.env` and the same `COMMONAGE_DOMAIN` (or `localhost` for a test).
+`scripts/restore.sh` with a copied backup folder, `.env` with the same `COMMONAGE_LOGIN_KEY`, and the same
+`COMMONAGE_DOMAIN` (or `localhost` for a test).
 
 ## Updating
 
