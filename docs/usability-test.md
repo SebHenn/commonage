@@ -82,6 +82,9 @@ What to note for task A, besides the usual:
 - Whether the chosen photos appear, and how quickly with ten large ones. Whether the page struggles with that.
 - Turn on flight mode while it is sending, and off again. What happens, and what does the person do next?
 
+Paste a link to an item into a messenger on a real phone, on an archive with a real address. Does the picture appear? A preview can
+only be tried that way, because the messenger's servers have to reach the archive.
+
 For task B, note whether the person finds "Open at full size", and whether they manage to zoom in and read the letter on the phone, and
 in which browser. Nobody has tried that on a real phone yet.
 

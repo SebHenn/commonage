@@ -1,4 +1,5 @@
 using Commonage.Web.Media;
+using Commonage.Web.Search;
 using Microsoft.Extensions.Options;
 using NetVips;
 
@@ -87,9 +88,9 @@ public static class BrandingEndpoints
             return Results.Stream(storage.OpenRead(LogoImages.KeyFor(id, variant)), "image/png");
         });
 
-        app.MapGet("/robots.txt", async (ArchiveProfile profile) =>
+        app.MapGet("/robots.txt", async (ArchiveProfile profile, HttpContext context) =>
             Results.Text((await profile.GetAsync()).AllowSearchEngines
-                ? "User-agent: *\nDisallow: /Admin\nDisallow: /Account\nDisallow: /contribute\n"
+                ? $"User-agent: *\nDisallow: /Admin\nDisallow: /Account\nDisallow: /contribute\n\nSitemap: {context.Request.BaseAddress()}{PublicFeeds.SitemapPath}\n"
                 : "User-agent: *\nDisallow: /\n", "text/plain"));
     }
 }

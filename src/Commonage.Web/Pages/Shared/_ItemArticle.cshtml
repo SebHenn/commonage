@@ -7,7 +7,9 @@
     var title = ArchiveItem.ShownTitle(T, Model.Title);
     var count = Model.MediaFiles.Count;
     var number = 0;
-    var largePhotos = (await Profile.GetAsync()).LargePhotos;
+    var identity = await Profile.GetAsync();
+    var largePhotos = identity.LargePhotos;
+    var rights = Model.RightsUri ?? identity.DefaultRightsUri;
 }
 
 <article class="item-layout @(Model.MediaFiles.Count > 0 ? "item-layout-with-media" : "")">
@@ -100,6 +102,38 @@
                     <li><a asp-page="/Search" asp-route-tag="@tag.Name" class="badge rounded-pill text-bg-light border tag-link">@tag.Name</a></li>
                 }
             </ul>
+        }
+        <section class="item-rights" aria-labelledby="reuse-heading">
+            <h2 id="reuse-heading" class="h6 mb-1">@T["May I reuse this?"]</h2>
+            <p class="mb-1">
+                @RightsOptions.LabelOrAsk(T, rights)
+                @if (rights is not null)
+                {
+                    <a href="@rights" rel="license noopener">@T["What this means"]</a>
+                }
+            </p>
+            @if (Model.Credit is not null)
+            {
+                <p class="mb-1">@Model.Credit</p>
+            }
+            @if (identity.Text(ArchiveTextKind.Contact) is not null)
+            {
+                <p class="mb-0"><a asp-page="/Info" asp-route-slug="contact">@T["How to reach the archive"]</a></p>
+            }
+        </section>
+        @if (ViewData["Citation"] is string citation && ViewData["Canonical"] is string address)
+        {
+            @* Both buttons only work with JavaScript, so it shows them. The line itself is there for everyone. *@
+            <div class="item-share d-print-none">
+                <button type="button" class="btn btn-sm btn-outline-primary" hidden data-share="@address" data-share-title="@title" data-done-text="@T["Link copied"]" aria-describedby="share-status">@T["Share"]</button>
+                <span id="share-status" class="small ms-2" role="status"></span>
+                <details class="mt-2">
+                    <summary>@T["Cite this item"]</summary>
+                    <p id="citation" class="mt-2 mb-2 text-break">@citation</p>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" hidden data-copy-from="citation" data-done-text="@T["Copied"]" aria-describedby="copy-status">@T["Copy"]</button>
+                    <span id="copy-status" class="small ms-2" role="status"></span>
+                </details>
+            </div>
         }
     </div>
 </article>

@@ -11,6 +11,7 @@ using Commonage.Web.Forms;
 using Commonage.Web.Identity;
 using Commonage.Web.Media;
 using Commonage.Web.Operations;
+using Commonage.Web.Search;
 using Commonage.Web.Security;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
@@ -168,6 +169,7 @@ app.UseUploadGuard();
 app.MapHealthChecks("/health");
 app.MapMediaEndpoints();
 app.MapDateCheck();
+app.MapPublicFeeds();
 app.MapBrandingEndpoints();
 app.MapStaticAssets();
 app.MapRazorPages()

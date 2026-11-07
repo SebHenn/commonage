@@ -293,6 +293,9 @@ namespace Commonage.Web.Data.Migrations
                     b.Property<int>("ArchiveItemId")
                         .HasColumnType("integer");
 
+                    b.Property<bool>("ConsentCoversSharing")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("ConsentText")
                         .IsRequired()
                         .HasMaxLength(4000)
@@ -315,6 +318,9 @@ namespace Commonage.Web.Data.Migrations
                     b.Property<string>("ReferenceCode")
                         .HasMaxLength(9)
                         .HasColumnType("character varying(9)");
+
+                    b.Property<int?>("Reuse")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("ReviewedAt")
                         .HasColumnType("timestamp with time zone");

@@ -89,6 +89,15 @@
                         <br />@T["Photographer or author: {0}", contribution.RightsHolder]
                     }
                 </dd>
+                <dt class="col-sm-4">@T["May others reuse it?"]</dt>
+                <dd class="col-sm-8">
+                    @(contribution.Reuse switch
+                    {
+                        ReuseOffer.AnyUseWithCredit => T["Yes, for any purpose, with credit"],
+                        ReuseOffer.NonCommercialWithCredit => T["Yes, for non-commercial purposes, with credit"],
+                        _ => T["Not offered: others should ask first"],
+                    })
+                </dd>
                 <dt class="col-sm-4">@T["Sent in"]</dt>
                 <dd class="col-sm-8">
                     @Dates.Moment(contribution.SubmittedAt)

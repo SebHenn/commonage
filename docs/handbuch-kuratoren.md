@@ -40,6 +40,16 @@ Besucher können ein Foto mit etwa 3000 Pixeln öffnen. Ob das möglich ist, gil
 bleiben aus öffentlichen Seiten und der öffentlichen Suche heraus. Jedes Foto hat außerdem ein Feld dafür, **was es zeigt**, in
 einem Satz, für Menschen, die es nicht sehen können.
 
+Besucher sehen die Angabe in einfachen Worten auf der Seite des Eintrags, dazu die Nennung. Ohne eigene Angabe gilt die Voreinstellung des
+Archivs, und ohne diese bittet die Seite, nachzufragen.
+
+Wenn eine einsendende Person die Weiterverwendung angeboten hat, ist die Angabe schon entsprechend ausgefüllt, und die Prüfung zeigt, was sie
+gesagt hat. Die Entscheidung bleibt bei Ihnen. Fragen Sie sich vor dem Veröffentlichen, ob sie das erlauben durfte: Wer ein Foto unter einer
+freien Lizenz weiterverwendet hat, darf das weiter tun, auch wenn Sie die Lizenz später zurücknehmen.
+
+Beiträge aus der Zeit davor haben nur dieser Website zugestimmt. Ihr Bild und ihr Text bleiben aus Linkvorschauen und dem Feed heraus. Das lässt
+sich nicht ändern, ohne die Person zu fragen, und dafür gibt es noch keine Schaltfläche.
+
 ## Viele Einträge bearbeiten
 
 Öffnen Sie die Liste der Einträge und filtern Sie sie: nach Sammlung oder danach, was noch fehlt, zum Beispiel ein Datum.

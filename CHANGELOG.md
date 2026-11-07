@@ -8,7 +8,7 @@ version may change things that need attention when updating, and these notes say
 ### For curators
 
 - Each item can record what others may do with it, as a standard statement with a plain label, who holds the rights, and a
-  credit. Settings has a default. A contributor's answer only suggests a statement, and never a free licence.
+  credit. Settings has a default. A contributor's answer only suggests a statement, and only a free licence if they offered one.
 - Catalogue details for curators only: reference number, where the original is kept, received from and when, internal notes.
 - Each photo can say what it shows, for people who cannot see it. Visitors' pages use this as the picture's description.
 - Filters for items without a rights statement or photo descriptions. A reference number typed into the search finds its item.
@@ -30,6 +30,10 @@ version may change things that need attention when updating, and these notes say
 
 ### For visitors
 
+- Every item says in plain language whether it may be reused, and who to credit, with a link to what the statement means and to the
+  archive's contact page. Without a statement, it says to ask.
+- "Cite this item" gives a line to copy, and "Share" opens a phone's own list of where to share to, or copies the link.
+- A link to an item pasted into a messenger shows its picture, title and the beginning of its text.
 - Photos can be opened large, about 3000 pixels, to read a letter or look at a face. It is the browser's own view of a picture,
   which can zoom on every device, with nothing to load or learn.
 - An item with several photos has a row of numbered thumbnails, and says "Photo 2 of 4" with each caption.
@@ -57,9 +61,19 @@ version may change things that need attention when updating, and these notes say
   connection does not make two contributions, also when the first one arrived.
 - The title, date and description stay on the device for three days until they are sent, with a button to clear them. Name,
   email address and the photographer's name are never kept. Without JavaScript the form works as before.
+- Someone who made a photo, or may decide for whoever did, can offer it for reuse. It is optional, and the answer is only a
+  suggestion to the curators.
+- The consent now also covers link previews and the archive's list of what is new, and says that copies others have made are out of
+  the archive's reach.
 
 ### For people who run an archive
 
+- **Rights statements and credits that curators have written so far now appear on public pages.** The label on the field always said
+  so, but it is worth a look before updating. An item with no statement and no default for the archive tells visitors to ask.
+- **Earlier contributions stay under what they agreed to,** which was "this website". Their picture and text stay out of link previews
+  and the feed. Items that did not come through a contribution, and everything sent in from now on, are in both.
+- An Atom feed at `/feed.xml` and a sitemap at `/sitemap.xml`, named in `robots.txt`. They and link previews are switched off together
+  with "Let search engines list this archive" in "Settings".
 - Older photos get the new picture size in the background, with nothing going offline. See docs/operations.md.
 - **The large photos are off in an archive that has saved its settings before, because they show more than it has chosen to
   show so far.** An admin can switch them on under "Settings" and the archive then makes them in the background. In a new archive,

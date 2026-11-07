@@ -38,6 +38,16 @@ Open **Rights and credit** on an item:
 stay out of public pages and public search. Each photo also has a field for **what it shows**, in a sentence, for people who
 cannot see it.
 
+Visitors see the statement on the item's page, in plain words, and the credit. Without a statement of its own the archive's default
+applies, and without that the page tells them to ask.
+
+If a contributor offered reuse, the statement is already filled in with that, and the review shows what they said. It is still your
+decision. Before you publish, ask yourself whether it was theirs to give: someone who has reused a photo under a free licence may go
+on doing so, even if you take it back later.
+
+Contributions from before this was possible agreed to this website only. Their picture and text stay out of link previews and the feed,
+and that is not something you can change without asking them, and there is no button for it yet.
+
 ## Working through many items
 
 Open the item list and filter it: by collection, or by what is "still needed", such as a date. Open the first item and use

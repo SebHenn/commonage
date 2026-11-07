@@ -102,6 +102,9 @@ public class IndexModel(
         [Display(Name = "Name of the photographer or author, if known")]
         public string? RightsHolder { get; set; }
 
+        [Display(Name = "May others reuse it? (optional)")]
+        public ReuseOffer? Reuse { get; set; }
+
         public bool Consent { get; set; }
     }
 
@@ -166,9 +169,12 @@ public class IndexModel(
             return Page();
         }
 
-        var fingerprint = SendingFingerprints.Of(SendingKey, link.Id, [Input.Title, Input.Date, Input.Description, Input.Rights.ToString(), Input.RightsHolder], Files);
+        var fingerprint = SendingFingerprints.Of(SendingKey, link.Id, [Input.Title, Input.Date, Input.Description, Input.Rights.ToString(), Input.RightsHolder, Input.Reuse.ToString()], Files);
         if (await AlreadySentAsync(fingerprint) is { } reference)
             return Sent(token, reference);
+
+        // Nobody can offer what they do not know to be theirs.
+        var reuse = Input.Rights == RightsStatement.Unknown ? null : Input.Reuse;
 
         var now = DateTime.UtcNow;
         var item = new ArchiveItem
@@ -187,7 +193,14 @@ public class IndexModel(
                 ShowName = Input.ShowName,
                 Rights = Input.Rights!.Value,
                 RightsHolder = string.IsNullOrWhiteSpace(Input.RightsHolder) ? null : Input.RightsHolder.Trim(),
-                ConsentText = ConsentStatement,
+                ConsentText = reuse switch
+                {
+                    ReuseOffer.AnyUseWithCredit => $"{ConsentStatement} {localizer["I also allow anyone to reuse it for any purpose, with credit (CC BY 4.0)."]}",
+                    ReuseOffer.NonCommercialWithCredit => $"{ConsentStatement} {localizer["I also allow anyone to reuse it for non-commercial purposes, with credit (CC BY-NC 4.0)."]}",
+                    _ => ConsentStatement,
+                },
+                Reuse = reuse,
+                ConsentCoversSharing = true,
                 ReferenceCode = Contribution.NewReferenceCode(),
                 SendingFingerprint = fingerprint,
                 SubmittedAt = now,
@@ -250,7 +263,7 @@ public class IndexModel(
 
     /// <summary>Shown next to the consent checkbox and stored with the contribution, in the contributor's language.</summary>
     public string ConsentStatement => localizer[
-        "I agree that the archive may keep what I send in, describe it and publish it on this website. If I chose so above, my name is shown with it. I can ask the archive to take it down at any time."];
+        "I agree that the archive may keep what I send in, describe it and publish it on this website, also where a link to it is shared and in its list of what is new. If I chose so above, my name is shown with it. I can ask the archive to take it down at any time, but it cannot reach copies others have made."];
 
     /// <summary>Counts what is in the bin too, because it still takes up disk space.</summary>
     private async Task<bool> WouldExceedDailyLimitAsync(ContributionLink link, CancellationToken cancellationToken)

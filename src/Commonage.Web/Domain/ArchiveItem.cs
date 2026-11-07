@@ -71,6 +71,9 @@ public class ArchiveItem
     /// </summary>
     public bool NeedsTranscription { get; set; }
 
+    /// <summary>Whether its picture and text may go along when a link is shared or in a feed. Needs <see cref="Contribution"/> to be loaded.</summary>
+    public bool MayTravel => Contribution is null || Contribution.ConsentCoversSharing;
+
     public void MoveToBin(DateTime now) => DeletedAt = now;
 
     public void RestoreFromBin() => DeletedAt = null;

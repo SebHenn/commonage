@@ -123,6 +123,53 @@ for (const input of document.querySelectorAll('input[type=file][data-choose-text
     });
 }
 
+// Copying and sharing. navigator.clipboard only exists on HTTPS, and a browser can refuse it, so there is an older way too.
+async function copyText(text) {
+    try {
+        await navigator.clipboard.writeText(text);
+        return true;
+    } catch {
+        const area = document.createElement('textarea');
+        area.value = text;
+        area.className = 'visually-hidden';
+        document.body.append(area);
+        area.select();
+        const copied = document.execCommand('copy');
+        area.remove();
+        return copied;
+    }
+}
+
+function sayDone(button, done) {
+    const status = document.getElementById(button.getAttribute('aria-describedby'));
+    if (status)
+        status.textContent = done ? button.dataset.doneText : '';
+}
+
+for (const button of document.querySelectorAll('button[data-copy-from]')) {
+    button.hidden = false;
+    button.addEventListener('click', async () => {
+        sayDone(button, await copyText(document.getElementById(button.dataset.copyFrom).textContent));
+    });
+}
+
+// A phone offers its own list of where to share to. Anywhere else, the link is copied.
+for (const button of document.querySelectorAll('button[data-share]')) {
+    button.hidden = false;
+    button.addEventListener('click', async () => {
+        const shared = { title: button.dataset.shareTitle, url: button.dataset.share };
+        if (navigator.share && navigator.canShare?.(shared)) {
+            try {
+                await navigator.share(shared);
+            } catch {
+                // They changed their mind, which is no mistake.
+            }
+            return;
+        }
+        sayDone(button, await copyText(button.dataset.share));
+    });
+}
+
 // A box to tick all boxes of a list. It only exists with JavaScript, because only JavaScript can make it work.
 for (const all of document.querySelectorAll('input[data-tick-all]')) {
     const boxes = () => [...document.getElementsByName(all.dataset.tickAll)];

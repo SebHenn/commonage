@@ -81,6 +81,10 @@ public class AccessibilityTests(BrowserFixture app)
     /// <summary>For states a page only reaches by using it, as well as for each page as it loads.</summary>
     internal static async Task AssertNoViolationsAsync(IPage page, string what)
     {
+        // Away from any button and past its colour change on hover, or its contrast is measured halfway through.
+        await page.Mouse.MoveAsync(0, 0);
+        await page.WaitForTimeoutAsync(250);
+
         var results = await page.RunAxe(new AxeRunOptions
         {
             RunOnly = new RunOnlyOptions { Type = "tag", Values = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa", "best-practice"] },

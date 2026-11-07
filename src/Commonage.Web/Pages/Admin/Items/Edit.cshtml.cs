@@ -186,7 +186,7 @@ public class EditModel(
                 Date = item.DateText,
                 Tags = string.Join(", ", item.Tags.Select(t => t.Name).Order(StringComparer.CurrentCultureIgnoreCase)),
                 Version = item.Version,
-                RightsUri = item.RightsUri ?? (item.Contribution is { } contribution ? RightsOptions.ProposalFor(contribution.Rights) : null),
+                RightsUri = item.RightsUri ?? (item.Contribution is { } contribution ? RightsOptions.ProposalFor(contribution.Rights, contribution.Reuse) : null),
                 RightsHolder = item.RightsHolder,
                 Credit = item.Credit,
                 ReferenceNumber = item.ReferenceNumber,
