@@ -20,10 +20,16 @@ public partial class TranslationTests
 
     private static readonly Lazy<SortedSet<string>> Texts = new(FindTexts);
 
+    /// <summary>
+    /// A language the interface offers must be complete. One that translators are still working on in Weblate may have
+    /// gaps, which show in English, until it is added to <see cref="SupportedLanguages"/>.
+    /// </summary>
     [Fact]
     public void Every_text_in_the_code_has_a_translation()
     {
-        foreach (var (language, translations) in Translations())
+        var offered = new SupportedLanguages(new Microsoft.Extensions.Configuration.ConfigurationBuilder().Build()).Codes;
+        Assert.All(offered.Where(l => l != "en"), l => Assert.Contains(l, Translations().Select(t => t.Language)));
+        foreach (var (language, translations) in Translations().Where(t => offered.Contains(t.Language)))
         {
             var missing = Texts.Value.Where(t => !translations.ContainsKey(t)).ToList();
             Assert.True(missing.Count == 0,
@@ -39,6 +45,17 @@ public partial class TranslationTests
             var unused = translations.Keys.Where(k => !Texts.Value.Contains(k)).ToList();
             Assert.True(unused.Count == 0,
                 $"SharedResource.{language}.resx translates texts the code no longer uses:\n{string.Join("\n", unused)}");
+        }
+    }
+
+    [Fact]
+    public void No_translation_is_empty()
+    {
+        // An empty translation would show nothing at all, where a missing one shows English.
+        foreach (var (language, translations) in Translations())
+        {
+            var empty = translations.Where(t => string.IsNullOrWhiteSpace(t.Value)).Select(t => t.Key).ToList();
+            Assert.True(empty.Count == 0, $"SharedResource.{language}.resx has empty translations for:\n{string.Join("\n", empty)}");
         }
     }
 
@@ -265,7 +282,7 @@ public partial class TranslationTests
         {
             var language = Path.GetFileNameWithoutExtension(file)["SharedResource.".Length..];
             var translations = XDocument.Load(file).Root!.Elements("data")
-                .ToDictionary(d => (string)d.Attribute("name")!, d => (string)d.Element("value")!, StringComparer.Ordinal);
+                .ToDictionary(d => (string)d.Attribute("name")!, d => (string?)d.Element("value") ?? "", StringComparer.Ordinal);
             yield return (language, translations);
         }
     }

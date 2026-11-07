@@ -181,6 +181,6 @@ public partial class SearchTests(CommonageAppFactory app)
     private static partial Regex ItemCard();
 
     // The title has its own element in the card.
-    [GeneratedRegex(@"class=""item-card-title"">\s*([^<]+?)\s*</span>", RegexOptions.Singleline)]
+    [GeneratedRegex(@"class=""item-card-title""[^>]*>\s*([^<]+?)\s*</span>", RegexOptions.Singleline)]
     private static partial Regex CardTitle();
 }
