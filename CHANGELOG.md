@@ -27,6 +27,8 @@ version may change things that need attention when updating, and these notes say
 - Each photo can have a caption, which everyone reads under it.
 - An item can be marked as still needing a transcription, with a filter to find those. The description is the place for the words
   of a letter: handwriting cannot be searched or read aloud.
+- Dates are understood in the languages of the material and in the curator's own. Month names work in any language that writes them
+  as words, also without accents ("Marz 1953", "12 marca 1953").
 
 ### For visitors
 
@@ -49,6 +51,9 @@ version may change things that need attention when updating, and these notes say
 - Pages print cleanly, with their address.
 - A very long tag no longer pushes a page sideways on a phone.
 - Links in a list of mistakes are easier to read: their contrast was too low.
+- What curators and contributors wrote says which language it is in, so screen readers read it aloud correctly, also to a visitor
+  who reads the interface in another language.
+- Counts read as a sentence, such as "for 30 days", get the right form in each language.
 
 ### For contributors
 
@@ -80,6 +85,10 @@ version may change things that need attention when updating, and these notes say
   or one that has never saved its settings, they are on. They take extra disk space for each photo larger than 1600 pixels.
 - **If you wrote your own privacy page:** add that the contribution form keeps the title, date and description in the person's
   own browser for three days or until they are sent. The standard text now says so.
+- "Settings" has the language of the material, which can be any language, and the languages dates can also be written in. Until it
+  is saved, dates are read in English and German as before, and the material counts as being in the archive's language. Choose
+  "Several languages, none of them most" if that is wrong for your archive.
+- The export's README is in the language of the admin who exports, with an English copy beside it.
 
 ### Project
 
@@ -89,6 +98,11 @@ version may change things that need attention when updating, and these notes say
 - The demo archive has a handwritten letter of two pages to try reading, and a story without a picture.
 - Interface languages are one list, in `SupportedLanguages.cs`. Pages switch to right-to-left by language, and browser tests
   try that, and much longer text.
+- Translators can work in Weblate without Git, see docs/translating.md. Hosting it is decided, and setting it up is still to do.
+- A test finds every text in the code and fails when a language the interface offers has no translation for it. It also writes the
+  English base file Weblate needs.
+- Counts in sentences use ICU MessageFormat, with the plural rules of each language.
+- The export settings include `contentLanguage` and `otherContentLanguages`.
 
 ## 0.3.0 (2026-11-05)
 

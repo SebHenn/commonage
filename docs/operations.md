@@ -44,6 +44,17 @@ to what your group does, and find out whether your country requires an imprint.
 
 The list on "Manage archive" shows what is left to set up, and stays until everything is done.
 
+**Language of the material** is the language most items are described in, which can be any language, not only one of the
+interface. Item pages, lists and the feed mark what curators and contributors wrote with it, so that screen readers read it aloud
+in the right language, also to a visitor who reads the interface in another one. "Several languages, none of them most" marks
+nothing, because a wrong language is worse than none.
+
+Dates typed into a form are read in that language, in those ticked under "Dates can also be written in", and in the language of
+whoever types them. Month names work in any language that writes them as words, also without accents, such as "Marz 1953" or "12 pazdziernika 1953".
+Words such as "circa" or "before" are known in English and German so far. Until an admin saves this, dates are read in English
+and German, as before, and saving the settings without a change keeps that. A stored date is only the days it stands for, so
+changing the languages never changes an item.
+
 Curators have their own guide: [curator-handbook.md](curator-handbook.md) ([deutsch](handbuch-kuratoren.md)).
 
 ## Rights and catalogue details
@@ -126,13 +137,15 @@ the material can always move to another system, or be handed to a public archive
 | `archive.json` | All collections and items, complete: titles, descriptions, dates as written and as a range, tags, status, contribution details, and for each file its original name, type, size and SHA-256 checksum. Times are UTC. |
 | `items.csv` | The items as a table for spreadsheet programs (UTF-8). Text that starts with `=`, `+`, `-` or `@` gets a leading apostrophe, so a spreadsheet never runs it as a formula. |
 | `files/<item id>/<file id>-<name>` | The original files, exactly as uploaded. |
-| `README.txt` | A short description of the above. |
+| `README.txt` | A short description of the above, in the language of the admin who exported. |
+| `README.en.txt` | The same in English, if the other one is not. |
 
 An item's title can be empty in a full export: a draft from "Add many photos" that nobody has named yet. Each file says its
 `position` among the item's photos and its `rotation`, how far curators turned it in degrees clockwise. The file itself is the
 original, which is never turned, so whoever uses the export has to apply that. Files are listed in order. `needsTranscription` is
 in a full export only. A contribution says what the contributor offered (`reuse`) and whether they agreed to more than this website
-(`consentCoversSharing`).
+(`consentCoversSharing`). `settings` has `contentLanguage`, the language of the material as a code such as `de` (`mul` for several,
+none of them most, and null if never chosen), and `otherContentLanguages`, separated by commas.
 
 `archive.json` has `"format": "commonage-export"` and `"version": 3`. Version 3 added each item's rights, credit and catalogue
 details and each photo's description; in `items.csv`, `rights` and `rights_holder` are now the item's own, and the contributor's

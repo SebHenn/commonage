@@ -124,7 +124,7 @@ public class BulkModel(
                 if (string.IsNullOrWhiteSpace(Date))
                     ModelState.AddModelError(nameof(Date), localizer["Please enter a date."]);
                 else if (Date.Trim().Length > DateRange.MaxTextLength)
-                    ModelState.AddModelError(nameof(Date), localizer["The date can be at most {0} characters long.", DateRange.MaxTextLength]);
+                    ModelState.AddModelError(nameof(Date), localizer.Plural("The date can be at most {0, plural, one {# character} other {# characters}} long.", DateRange.MaxTextLength));
                 else if (ItemFields.DateError(localizer, Date) is { } dateError)
                     ModelState.AddModelError(nameof(Date), dateError);
                 break;

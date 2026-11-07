@@ -15,6 +15,17 @@ public class SupportedLanguages(IConfiguration configuration)
 
     public bool Offers(string? code) => code is not null && Codes.Contains(code);
 
+    /// <summary>
+    /// Every language .NET knows by a code of its own, such as "pl" or "haw", sorted by its name in that language. The
+    /// material can be in any of them, not only in the languages of the interface.
+    /// </summary>
+    public static IReadOnlyList<string> AllLanguages { get; } = CultureInfo.GetCultures(CultureTypes.NeutralCultures)
+        .Where(c => c.Name.Length is 2 or 3 && c.Name.All(char.IsAsciiLetterLower))
+        .Select(c => c.Name)
+        .Distinct()
+        .OrderBy(NameOf, StringComparer.Create(CultureInfo.InvariantCulture, CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace))
+        .ToList();
+
     /// <summary>A language's name in that language, as people look for their own.</summary>
     public static string NameOf(string code)
     {

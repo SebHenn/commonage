@@ -22,4 +22,10 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- English, for translators only: the English text is the key in the code, and untranslated text falls back to it. -->
+    <EmbeddedResource Remove="Resources\SharedResource.resx" />
+    <None Include="Resources\SharedResource.resx" />
+  </ItemGroup>
+
 </Project>

@@ -4,10 +4,12 @@ Thank you for helping. Bug reports, ideas, translations and code are all welcome
 [Code of Conduct](CODE_OF_CONDUCT.md).
 
 - **Bugs and ideas**: open an issue. Never include real archive material or anyone's personal data.
+- **Translations**: no Git needed, see [docs/translating.md](docs/translating.md).
 - **Security problems**: do not open an issue; see [SECURITY.md](SECURITY.md).
 - **Code**: read [docs/development.md](docs/development.md) first. Open a pull request against `main`; the
   checks (build and tests, backup and restore, secret scan, CodeQL, dependency review, sign-off) must pass, and the
-  pull request is squash-merged. New UI text needs its German translation, and the "Languages" rules in
+  pull request is squash-merged. New UI text needs its German translation and an updated base file for translators
+  (see "Translations" in docs/development.md), and the "Languages" rules in
   [docs/roadmap.md](docs/roadmap.md) apply. Pull requests from first-time contributors run their checks after a
   maintainer has approved them.
 

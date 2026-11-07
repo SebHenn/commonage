@@ -19,9 +19,9 @@ public static class ItemFields
     public static IEnumerable<string> TagErrors(IStringLocalizer localizer, IReadOnlyList<string> names)
     {
         if (names.Any(name => name.Length > Tag.MaxLength))
-            yield return localizer["A tag can be at most {0} characters long.", Tag.MaxLength];
+            yield return localizer.Plural("A tag can be at most {0, plural, one {# character} other {# characters}} long.", Tag.MaxLength);
         if (names.Count > MaxTagsPerItem)
-            yield return localizer["An item can have at most {0} tags.", MaxTagsPerItem];
+            yield return localizer.Plural("An item can have at most {0, plural, one {# tag} other {# tags}}.", MaxTagsPerItem);
     }
 
     public static string? RightsError(IStringLocalizer localizer, string? rightsUri) =>

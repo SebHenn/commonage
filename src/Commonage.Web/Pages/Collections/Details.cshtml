@@ -1,6 +1,8 @@
 @page "/collections/{id:int}"
 @model Commonage.Web.Pages.Collections.DetailsModel
+@inject Commonage.Web.Operations.ArchiveProfile Profile
 @{
+    var material = (await Profile.GetAsync()).MaterialLanguage;
     ViewData["Title"] = Model.Collection.Title;
     var address = $"{HttpContext.Request.BaseAddress()}/collections/{Model.Collection.Id}";
     ViewData["Canonical"] = address;
@@ -13,10 +15,10 @@
     </ol>
 </nav>
 
-<h1>@Model.Collection.Title</h1>
+<h1 lang="@material">@Model.Collection.Title</h1>
 @if (!string.IsNullOrWhiteSpace(Model.Collection.Description))
 {
-    <p class="lead text-preserve-lines prose">@Model.Collection.Description</p>
+    <p class="lead text-preserve-lines prose" lang="@material">@Model.Collection.Description</p>
 }
 
 @if (Model.Items.TotalCount == 0)

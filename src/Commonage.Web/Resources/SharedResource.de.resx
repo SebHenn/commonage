@@ -4,19 +4,22 @@
   <resheader name="version"><value>2.0</value></resheader>
   <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
   <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
-  <data name="A caption can be at most {0} characters long." xml:space="preserve"><value>Eine Bildunterschrift darf höchstens {0} Zeichen lang sein.</value></data>
+  <data name="&quot;contentLanguage&quot; under &quot;settings&quot; says which language most of the material is written in, as a code such as &quot;de&quot; or &quot;pl&quot;. &quot;mul&quot; means several languages, none of them most." xml:space="preserve"><value>„contentLanguage“ unter „settings“ gibt an, in welcher Sprache der größte Teil des Materials geschrieben ist, als Kürzel wie „de“ oder „pl“. „mul“ bedeutet mehrere Sprachen, ohne dass eine überwiegt.</value></data>
+  <data name="&quot;includesPersonalData&quot; in archive.json says whether the names of contributors, photographers and authors and contributors' email addresses are included. If they are, keep this file as carefully as the archive itself." xml:space="preserve"><value>„includesPersonalData“ in archive.json gibt an, ob die Namen von Einsendenden, Fotografinnen, Fotografen, Autorinnen und Autoren sowie die E-Mail-Adressen der Einsendenden enthalten sind. Wenn ja, bewahren Sie diese Datei so sorgfältig auf wie das Archiv selbst.</value></data>
+  <data name="A caption can be at most {0, plural, one {# character} other {# characters}} long." xml:space="preserve"><value>Eine Bildunterschrift darf höchstens {0, plural, one {# Zeichen} other {# Zeichen}} lang sein.</value></data>
   <data name="A closed link shows “not found”. You can open it again at any time." xml:space="preserve"><value>Ein geschlossener Link zeigt „nicht gefunden“. Sie können ihn jederzeit wieder öffnen.</value></data>
   <data name="A curator looks at everything sent in before it appears in the archive." xml:space="preserve"><value>Alles, was Sie einsenden, wird vom Archiv geprüft, bevor es dort erscheint.</value></data>
   <data name="A date" xml:space="preserve"><value>Ein Datum</value></data>
   <data name="A description" xml:space="preserve"><value>Eine Beschreibung</value></data>
   <data name="A few words about what this archive is, for example: Photos and memories from Lindenau." xml:space="preserve"><value>Ein paar Wörter dazu, was dieses Archiv ist, zum Beispiel: Fotos und Erinnerungen aus Lindenau.</value></data>
   <data name="A few words, for example: Flood in Mill Street" xml:space="preserve"><value>Ein paar Worte, zum Beispiel: Hochwasser in der Mühlenstraße</value></data>
+  <data name="A file with &quot;problem&quot;: &quot;missing&quot; was not found on the server; &quot;checksumMismatch&quot; means it no longer matches the checksum taken when it was uploaded. Both should be looked into." xml:space="preserve"><value>Eine Datei mit „problem“: „missing“ wurde auf dem Server nicht gefunden; „checksumMismatch“ bedeutet, dass sie nicht mehr zur Prüfsumme passt, die beim Hochladen ermittelt wurde. Beides sollte untersucht werden.</value></data>
   <data name="A large archive can take a while. Keep this page open until the download has finished." xml:space="preserve"><value>Bei einem großen Archiv kann das eine Weile dauern. Lassen Sie diese Seite geöffnet, bis der Download abgeschlossen ist.</value></data>
   <data name="A lot has been sent through this link today. Please try again tomorrow, or send this without photos." xml:space="preserve"><value>Über diesen Link wurde heute schon sehr viel eingesendet. Bitte versuchen Sie es morgen noch einmal, oder senden Sie es ohne Fotos.</value></data>
   <data name="A new setup link lets the person choose a new password, for example when they forgot theirs. Earlier links stop working. A disabled account cannot log in, but its history stays in the activity log." xml:space="preserve"><value>Mit einem neuen Einrichtungslink kann die Person ein neues Passwort wählen, zum Beispiel wenn sie ihres vergessen hat. Frühere Links funktionieren dann nicht mehr. Ein deaktiviertes Konto kann sich nicht anmelden, sein Verlauf bleibt aber im Aktivitätsprotokoll.</value></data>
-  <data name="A photo description can be at most {0} characters long." xml:space="preserve"><value>Eine Fotobeschreibung darf höchstens {0} Zeichen lang sein.</value></data>
+  <data name="A photo description can be at most {0, plural, one {# character} other {# characters}} long." xml:space="preserve"><value>Eine Fotobeschreibung darf höchstens {0, plural, one {# Zeichen} other {# Zeichen}} lang sein.</value></data>
   <data name="A rights statement" xml:space="preserve"><value>Eine Rechteangabe</value></data>
-  <data name="A tag can be at most {0} characters long." xml:space="preserve"><value>Ein Schlagwort darf höchstens {0} Zeichen lang sein.</value></data>
+  <data name="A tag can be at most {0, plural, one {# character} other {# characters}} long." xml:space="preserve"><value>Ein Schlagwort darf höchstens {0, plural, one {# Zeichen} other {# Zeichen}} lang sein.</value></data>
   <data name="A title" xml:space="preserve"><value>Einen Titel</value></data>
   <data name="A transcription" xml:space="preserve"><value>Eine Abschrift</value></data>
   <data name="A working preview" xml:space="preserve"><value>Eine funktionierende Vorschau</value></data>
@@ -25,6 +28,34 @@
   <data name="Accept as draft" xml:space="preserve"><value>Als Entwurf übernehmen</value></data>
   <data name="Accepted the contribution as a draft" xml:space="preserve"><value>Beitrag als Entwurf übernommen</value></data>
   <data name="Access" xml:space="preserve"><value>Zugang</value></data>
+  <data name="An item can have at most {0, plural, one {# tag} other {# tags}}." xml:space="preserve"><value>Ein Eintrag kann höchstens {0, plural, one {# Schlagwort} other {# Schlagwörter}} haben.</value></data>
+  <data name="At least {0, plural, one {# character} other {# characters}}. A few words in a row are easy to remember and hard to guess." xml:space="preserve"><value>Mindestens {0, plural, one {# Zeichen} other {# Zeichen}}. Ein paar Wörter hintereinander sind leicht zu merken und schwer zu erraten.</value></data>
+  <data name="Commonage archive export" xml:space="preserve"><value>Export eines Commonage-Archivs</value></data>
+  <data name="Curators may have turned a photo: archive.json gives its &quot;rotation&quot; in degrees clockwise, and its &quot;position&quot; among the photos of the item." xml:space="preserve"><value>Kuratoren haben ein Foto vielleicht gedreht: archive.json gibt seine „rotation“ in Grad im Uhrzeigersinn an und seine „position“ unter den Fotos des Eintrags.</value></data>
+  <data name="Dates are always understood in the language above and in the language of whoever types them. In other languages, a month name can mean a different month: listopad is November in Polish, but October in Croatian." xml:space="preserve"><value>Datumsangaben werden immer in der Sprache oben und in der Sprache der Person verstanden, die sie eintippt. In anderen Sprachen kann ein Monatsname einen anderen Monat bedeuten: listopad ist auf Polnisch der November, auf Kroatisch aber der Oktober.</value></data>
+  <data name="Dates can also be written in" xml:space="preserve"><value>Datumsangaben können auch in diesen Sprachen geschrieben sein</value></data>
+  <data name="Deleted items and photos stay here for {0, plural, one {# day} other {# days}}, hidden from everyone but curators. You can restore them until then. After that they are deleted for good, with their original files." xml:space="preserve"><value>Gelöschte Einträge und Fotos bleiben {0, plural, one {# Tag} other {# Tage}} hier und sind nur für Kuratoren sichtbar. Bis dahin können Sie sie wiederherstellen. Danach werden sie mit ihren Originaldateien endgültig gelöscht.</value></data>
+  <data name="Everything that is known about the collections and items, complete and exact. Dates are ISO 8601 and in UTC. Each file lists its SHA-256 checksum, so you can check that a copy is intact." xml:space="preserve"><value>Alles, was über die Sammlungen und Einträge bekannt ist, vollständig und genau. Zeitangaben sind ISO 8601 und in UTC. Zu jeder Datei steht ihre SHA-256-Prüfsumme, sodass Sie prüfen können, ob eine Kopie unversehrt ist.</value></data>
+  <data name="For the account {0}. Use at least {1, plural, one {# character} other {# characters}}. A few words in a row are easy to remember and hard to guess." xml:space="preserve"><value>Für das Konto {0}. Verwenden Sie mindestens {1, plural, one {# Zeichen} other {# Zeichen}}. Ein paar Wörter hintereinander sind leicht zu merken und schwer zu erraten.</value></data>
+  <data name="Language of the material" xml:space="preserve"><value>Sprache des Materials</value></data>
+  <data name="Move this item to the bin? It disappears from the archive at once. You can restore it there for {0, plural, one {# day} other {# days}}." xml:space="preserve"><value>Diesen Eintrag in den Papierkorb legen? Er verschwindet sofort aus dem Archiv. Sie können ihn dort {0, plural, one {# Tag} other {# Tage}} lang wiederherstellen.</value></data>
+  <data name="Move this photo to the bin? You can restore it there for {0, plural, one {# day} other {# days}}." xml:space="preserve"><value>Dieses Foto in den Papierkorb legen? Sie können es dort {0, plural, one {# Tag} other {# Tage}} lang wiederherstellen.</value></data>
+  <data name="Please enter a name of at most {0, plural, one {# character} other {# characters}}." xml:space="preserve"><value>Bitte geben Sie einen Namen mit höchstens {0, plural, one {# Zeichen} other {# Zeichen}} ein.</value></data>
+  <data name="Several languages, none of them most" xml:space="preserve"><value>Mehrere Sprachen, keine überwiegt</value></data>
+  <data name="The archive's logo, if it has one. Its name and pages are under &quot;settings&quot; in archive.json." xml:space="preserve"><value>Das Logo des Archivs, falls es eines hat. Sein Name und seine Seiten stehen unter „settings“ in archive.json.</value></data>
+  <data name="The date can be at most {0, plural, one {# character} other {# characters}} long." xml:space="preserve"><value>Das Datum darf höchstens {0, plural, one {# Zeichen} other {# Zeichen}} lang sein.</value></data>
+  <data name="The format is described in docs/operations.md of the Commonage source code." xml:space="preserve"><value>Das Format ist in docs/operations.md im Quellcode von Commonage beschrieben.</value></data>
+  <data name="The item is in the bin. You can restore it there for {0, plural, one {# day} other {# days}}." xml:space="preserve"><value>Der Eintrag liegt im Papierkorb. Sie können ihn dort {0, plural, one {# Tag} other {# Tage}} lang wiederherstellen.</value></data>
+  <data name="The language most items are described in. Item pages tell browsers and screen readers which language their text is in, so that it is read aloud correctly, and dates written in it are understood." xml:space="preserve"><value>Die Sprache, in der die meisten Einträge beschrieben sind. Die Seiten der Einträge sagen Browsern und Bildschirmlesern, in welcher Sprache ihr Text ist, damit er richtig vorgelesen wird, und Datumsangaben in dieser Sprache werden verstanden.</value></data>
+  <data name="The name can be at most {0, plural, one {# character} other {# characters}} long." xml:space="preserve"><value>Der Name darf höchstens {0, plural, one {# Zeichen} other {# Zeichen}} lang sein.</value></data>
+  <data name="The original files exactly as they were uploaded, in one folder per item:" xml:space="preserve"><value>Die Originaldateien genau so, wie sie hochgeladen wurden, in einem Ordner pro Eintrag:</value></data>
+  <data name="The password must be at least {0, plural, one {# character} other {# characters}} long." xml:space="preserve"><value>Das Passwort muss mindestens {0, plural, one {# Zeichen} other {# Zeichen}} lang sein.</value></data>
+  <data name="The password must contain at least {0, plural, one {# different character} other {# different characters}}." xml:space="preserve"><value>Das Passwort muss mindestens {0, plural, one {# verschiedenes Zeichen} other {# verschiedene Zeichen}} enthalten.</value></data>
+  <data name="The photo is in the bin. You can restore it there for {0, plural, one {# day} other {# days}}." xml:space="preserve"><value>Das Foto liegt im Papierkorb. Sie können es dort {0, plural, one {# Tag} other {# Tage}} lang wiederherstellen.</value></data>
+  <data name="The same items as a table, for spreadsheet programs. It is UTF-8. Cells that start with =, +, - or @ get a leading apostrophe, so a spreadsheet never runs them as formulas; archive.json has the exact text." xml:space="preserve"><value>Dieselben Einträge als Tabelle, für Tabellenkalkulationen. Sie ist in UTF-8. Zellen, die mit =, +, - oder @ beginnen, bekommen ein Apostroph vorangestellt, damit eine Tabellenkalkulation sie nie als Formel ausführt; archive.json enthält den genauen Text.</value></data>
+  <data name="This ZIP file holds a copy of a community archive made with Commonage. You need no special software to use it." xml:space="preserve"><value>Diese ZIP-Datei enthält eine Kopie eines Gemeinschaftsarchivs, das mit Commonage erstellt wurde. Sie brauchen keine besondere Software, um sie zu nutzen.</value></data>
+  <data name="Up to {0, plural, one {# photo} other {# photos}}: JPEG, PNG, TIFF or WebP." xml:space="preserve"><value>Bis zu {0, plural, one {# Foto} other {# Fotos}}: JPEG, PNG, TIFF oder WebP.</value></data>
+  <data name="You can send at most {0, plural, one {# photo} other {# photos}} at once." xml:space="preserve"><value>Sie können höchstens {0, plural, one {# Foto} other {# Fotos}} auf einmal senden.</value></data>
   <data name="accessed {0}" xml:space="preserve"><value>abgerufen am {0}</value></data>
   <data name="Account" xml:space="preserve"><value>Konto</value></data>
   <data name="Accounts" xml:space="preserve"><value>Konten</value></data>
@@ -45,13 +76,11 @@
   <data name="All statuses" xml:space="preserve"><value>Alle Status</value></data>
   <data name="Almost done: the archive is saving what you sent." xml:space="preserve"><value>Fast fertig: Das Archiv speichert, was Sie gesendet haben.</value></data>
   <data name="Also add files the archive already has" xml:space="preserve"><value>Auch Dateien hinzufügen, die das Archiv schon hat</value></data>
-  <data name="An item can have at most {0} tags." xml:space="preserve"><value>Ein Eintrag kann höchstens {0} Schlagwörter haben.</value></data>
   <data name="Anyone can ask for their details, or what they sent in, to be changed or removed. The contact page says how to reach the archive. Backups keep older copies until they are replaced." xml:space="preserve"><value>Alle können darum bitten, dass ihre Angaben oder ihr Beitrag geändert oder entfernt werden. Auf der Kontaktseite steht, wie das Archiv zu erreichen ist. Sicherungen enthalten ältere Kopien, bis sie ersetzt werden.</value></data>
   <data name="Anyone with a contribution link can send in photos and stories for a collection. Share it with a group, put it in a newsletter or on a poster. What people send in waits for your review and is never public before you publish it." xml:space="preserve"><value>Mit einem Beitragslink kann jede Person Fotos und Geschichten für eine Sammlung einsenden. Teilen Sie ihn mit einer Gruppe, in einem Rundbrief oder auf einem Plakat. Eingesendetes wartet auf Ihre Prüfung und ist nie öffentlich, bevor Sie es veröffentlichen.</value></data>
   <data name="Anything" xml:space="preserve"><value>Egal</value></data>
   <data name="Apply filters" xml:space="preserve"><value>Filter anwenden</value></data>
   <data name="Archive settings" xml:space="preserve"><value>Archiv-Einstellungen</value></data>
-  <data name="At least {0} characters. A few words in a row are easy to remember and hard to guess." xml:space="preserve"><value>Mindestens {0} Zeichen. Ein paar Wörter hintereinander sind leicht zu merken und schwer zu erraten.</value></data>
   <data name="Automatic" xml:space="preserve"><value>Automatisch</value></data>
   <data name="Back to editing" xml:space="preserve"><value>Zurück zum Bearbeiten</value></data>
   <data name="Back to managing the archive" xml:space="preserve"><value>Zurück zur Archivverwaltung</value></data>
@@ -128,18 +157,14 @@
   <data name="Current password" xml:space="preserve"><value>Aktuelles Passwort</value></data>
   <data name="Date" xml:space="preserve"><value>Datierung</value></data>
   <data name="Days since the last backup: {0}. Whoever runs the server should check that the nightly backup still works." xml:space="preserve"><value>Tage seit der letzten Sicherung: {0}. Wer den Server betreut, sollte prüfen, ob die nächtliche Sicherung noch läuft.</value></data>
-  <data name="Delete" xml:space="preserve"><value>Löschen</value></data>
   <data name="Delete account" xml:space="preserve"><value>Konto löschen</value></data>
-  <data name="Delete contribution" xml:space="preserve"><value>Beitrag löschen</value></data>
   <data name="Delete for good" xml:space="preserve"><value>Endgültig löschen</value></data>
   <data name="Delete the account of {0}? This cannot be undone. The activity log keeps what the account did." xml:space="preserve"><value>Das Konto von {0} löschen? Das kann nicht rückgängig gemacht werden. Das Aktivitätsprotokoll behält, was mit dem Konto getan wurde.</value></data>
-  <data name="Delete this contribution with all its photos? This cannot be undone." xml:space="preserve"><value>Diesen Beitrag mit allen Fotos löschen? Das kann nicht rückgängig gemacht werden.</value></data>
   <data name="Delete this item for good, with all its photos and original files? This cannot be undone." xml:space="preserve"><value>Diesen Eintrag mit allen Fotos und Originaldateien endgültig löschen? Das kann nicht rückgängig gemacht werden.</value></data>
   <data name="Delete this photo and its original file for good? This cannot be undone." xml:space="preserve"><value>Dieses Foto und seine Originaldatei endgültig löschen? Das kann nicht rückgängig gemacht werden.</value></data>
   <data name="Deleted a photo for good" xml:space="preserve"><value>Hat ein Foto endgültig gelöscht</value></data>
   <data name="Deleted a photo for good after its time in the bin" xml:space="preserve"><value>Foto nach Ablauf der Frist im Papierkorb endgültig gelöscht</value></data>
   <data name="Deleted for good on {0}" xml:space="preserve"><value>Wird am {0} endgültig gelöscht</value></data>
-  <data name="Deleted items and photos stay here for {0} days, hidden from everyone but curators. You can restore them until then. After that they are deleted for good, with their original files." xml:space="preserve"><value>Gelöschte Einträge und Fotos bleiben {0} Tage hier und sind nur für Kuratoren sichtbar. Bis dahin können Sie sie wiederherstellen. Danach werden sie mit ihren Originaldateien endgültig gelöscht.</value></data>
   <data name="Deleted the account" xml:space="preserve"><value>Konto gelöscht</value></data>
   <data name="Deleted the item for good" xml:space="preserve"><value>Hat den Eintrag endgültig gelöscht</value></data>
   <data name="Deleted the item for good after its time in the bin" xml:space="preserve"><value>Eintrag nach Ablauf der Frist im Papierkorb endgültig gelöscht</value></data>
@@ -158,7 +183,6 @@
   <data name="Earlier: {0}" xml:space="preserve"><value>Nach vorne: {0}</value></data>
   <data name="Edit collection" xml:space="preserve"><value>Sammlung bearbeiten</value></data>
   <data name="Edit contribution link" xml:space="preserve"><value>Beitragslink bearbeiten</value></data>
-  <data name="Edit item" xml:space="preserve"><value>Eintrag bearbeiten</value></data>
   <data name="Edit: {0}" xml:space="preserve"><value>Bearbeiten: {0}</value></data>
   <data name="Email" xml:space="preserve"><value>E-Mail</value></data>
   <data name="Email address" xml:space="preserve"><value>E-Mail-Adresse</value></data>
@@ -179,7 +203,6 @@
   <data name="For all in this list: {0}" xml:space="preserve"><value>Für alle in dieser Liste: {0}</value></data>
   <data name="For example: 1953, March 1953, circa 1950 or 1950s." xml:space="preserve"><value>Zum Beispiel: 1953, März 1953, um 1950 oder 1950er Jahre.</value></data>
   <data name="For people who cannot see the photo: who and what is in it, in a sentence. Saved together with the item." xml:space="preserve"><value>Für Menschen, die das Foto nicht sehen können: wer und was darauf ist, in einem Satz. Wird zusammen mit dem Eintrag gespeichert.</value></data>
-  <data name="For the account {0}. Use at least {1} characters. A few words in a row are easy to remember and hard to guess." xml:space="preserve"><value>Für das Konto {0}. Verwenden Sie mindestens {1} Zeichen. Ein paar Wörter hintereinander sind leicht zu merken und schwer zu erraten.</value></data>
   <data name="For the ticked items" xml:space="preserve"><value>Für die angekreuzten Einträge</value></data>
   <data name="For the times shown to curators, such as in the activity log." xml:space="preserve"><value>Für die Zeiten, die Kuratoren sehen, zum Beispiel im Aktivitätsprotokoll.</value></data>
   <data name="For visitors whose browser asks for no language this archive offers." xml:space="preserve"><value>Für Besucher, deren Browser keine Sprache anfragt, die dieses Archiv anbietet.</value></data>
@@ -257,8 +280,6 @@
   <data name="May others reuse it? (optional)" xml:space="preserve"><value>Dürfen andere es weiterverwenden? (optional)</value></data>
   <data name="More from {0}" xml:space="preserve"><value>Mehr aus {0}</value></data>
   <data name="Move many to a collection" xml:space="preserve"><value>Viele in eine Sammlung verschieben</value></data>
-  <data name="Move this item to the bin? It disappears from the archive at once. You can restore it there for {0} days." xml:space="preserve"><value>Diesen Eintrag in den Papierkorb legen? Er verschwindet sofort aus dem Archiv. Sie können ihn dort {0} Tage lang wiederherstellen.</value></data>
-  <data name="Move this photo to the bin? You can restore it there for {0} days." xml:space="preserve"><value>Dieses Foto in den Papierkorb legen? Sie können es dort {0} Tage lang wiederherstellen.</value></data>
   <data name="Move to a collection" xml:space="preserve"><value>In eine Sammlung verschieben</value></data>
   <data name="Move to bin" xml:space="preserve"><value>In den Papierkorb</value></data>
   <data name="Moved a photo to the bin" xml:space="preserve"><value>Hat ein Foto in den Papierkorb gelegt</value></data>
@@ -344,7 +365,6 @@
   <data name="Please choose the photos again." xml:space="preserve"><value>Bitte wählen Sie die Fotos noch einmal aus.</value></data>
   <data name="Please choose your photos again." xml:space="preserve"><value>Bitte wählen Sie Ihre Fotos noch einmal aus.</value></data>
   <data name="Please enter a date." xml:space="preserve"><value>Bitte geben Sie ein Datum ein.</value></data>
-  <data name="Please enter a name of at most {0} characters." xml:space="preserve"><value>Bitte geben Sie einen Namen mit höchstens {0} Zeichen ein.</value></data>
   <data name="Please enter a password." xml:space="preserve"><value>Bitte geben Sie ein Passwort ein.</value></data>
   <data name="Please enter a title." xml:space="preserve"><value>Bitte geben Sie einen Titel ein.</value></data>
   <data name="Please enter a valid email address." xml:space="preserve"><value>Bitte geben Sie eine gültige E-Mail-Adresse ein.</value></data>
@@ -471,7 +491,6 @@
   <data name="The connection to the archive was lost. Nothing is lost on this page: press Send to try again. It will not arrive twice." xml:space="preserve"><value>Die Verbindung zum Archiv wurde unterbrochen. Auf dieser Seite geht nichts verloren: Drücken Sie auf „Senden“, um es noch einmal zu versuchen. Es kommt nicht doppelt an.</value></data>
   <data name="The connection to the archive was lost. The photos that arrived are safe. Continue when the connection is back." xml:space="preserve"><value>Die Verbindung zum Archiv ist abgebrochen. Die angekommenen Fotos sind sicher. Machen Sie weiter, sobald die Verbindung wieder steht.</value></data>
   <data name="The contribution is accepted as a draft." xml:space="preserve"><value>Der Beitrag ist als Entwurf übernommen.</value></data>
-  <data name="The contribution is deleted." xml:space="preserve"><value>Der Beitrag ist gelöscht.</value></data>
   <data name="The contribution is marked as withdrawn. It is hidden and cannot be published again." xml:space="preserve"><value>Der Beitrag ist als zurückgezogen markiert. Er ist verborgen und kann nicht wieder veröffentlicht werden.</value></data>
   <data name="The contribution is rejected. It stays hidden until you delete it." xml:space="preserve"><value>Der Beitrag ist abgelehnt. Er bleibt verborgen, bis Sie ihn löschen.</value></data>
   <data name="The contributor" xml:space="preserve"><value>Die einsendende Person</value></data>
@@ -480,7 +499,6 @@
   <data name="The contributor's details are corrected." xml:space="preserve"><value>Die Angaben der einsendenden Person sind korrigiert.</value></data>
   <data name="The contributor's name and email address are removed." xml:space="preserve"><value>Name und E-Mail-Adresse der einsendenden Person sind entfernt.</value></data>
   <data name="The current password is incorrect." xml:space="preserve"><value>Das aktuelle Passwort ist falsch.</value></data>
-  <data name="The date can be at most {0} characters long." xml:space="preserve"><value>Das Datum darf höchstens {0} Zeichen lang sein.</value></data>
   <data name="The date can be at most {1} characters long." xml:space="preserve"><value>Die Datierung darf höchstens {1} Zeichen lang sein.</value></data>
   <data name="The description can be at most {1} characters long." xml:space="preserve"><value>Die Beschreibung darf höchstens {1} Zeichen lang sein.</value></data>
   <data name="The disk is filling up. Free disk space (GB): {0}. Uploads stop before it is full." xml:space="preserve"><value>Der Speicher wird knapp. Freier Speicher (GB): {0}. Uploads werden gestoppt, bevor er voll ist.</value></data>
@@ -491,24 +509,19 @@
   <data name="The heading contributors see, for example: Share your photos of the Mill Street flood" xml:space="preserve"><value>Die Überschrift, die Einsendende sehen, zum Beispiel: Teilen Sie Ihre Fotos vom Hochwasser in der Mühlenstraße</value></data>
   <data name="The introduction can be at most {1} characters long." xml:space="preserve"><value>Die Einleitung darf höchstens {1} Zeichen lang sein.</value></data>
   <data name="The item is deleted for good." xml:space="preserve"><value>Der Eintrag ist endgültig gelöscht.</value></data>
-  <data name="The item is in the bin. You can restore it there for {0} days." xml:space="preserve"><value>Der Eintrag liegt im Papierkorb. Sie können ihn dort {0} Tage lang wiederherstellen.</value></data>
   <data name="The item is no longer public." xml:space="preserve"><value>Der Eintrag ist nicht mehr öffentlich.</value></data>
   <data name="The item is published." xml:space="preserve"><value>Der Eintrag ist veröffentlicht.</value></data>
   <data name="The item is restored and public again." xml:space="preserve"><value>Der Eintrag ist wiederhergestellt und wieder öffentlich.</value></data>
   <data name="The item is restored." xml:space="preserve"><value>Der Eintrag ist wiederhergestellt.</value></data>
   <data name="The logo must be a JPEG, PNG, TIFF or WebP image of at most {0} MB." xml:space="preserve"><value>Das Logo muss ein JPEG-, PNG-, TIFF- oder WebP-Bild von höchstens {0} MB sein.</value></data>
-  <data name="The name can be at most {0} characters long." xml:space="preserve"><value>Der Name darf höchstens {0} Zeichen lang sein.</value></data>
   <data name="The name can be at most {1} characters long." xml:space="preserve"><value>Der Name darf höchstens {1} Zeichen lang sein.</value></data>
   <data name="The new account gets a setup link instead of a password. Commonage sends no emails, so you pass the link on yourself." xml:space="preserve"><value>Das neue Konto erhält statt eines Passworts einen Einrichtungslink. Commonage versendet keine E-Mails, daher geben Sie den Link selbst weiter.</value></data>
   <data name="The password can be at most {1} characters long." xml:space="preserve"><value>Das Passwort darf höchstens {1} Zeichen lang sein.</value></data>
-  <data name="The password must be at least {0} characters long." xml:space="preserve"><value>Das Passwort muss mindestens {0} Zeichen lang sein.</value></data>
   <data name="The password must contain a character that is not a letter or digit, such as - or !." xml:space="preserve"><value>Das Passwort muss ein Zeichen enthalten, das kein Buchstabe und keine Ziffer ist, zum Beispiel - oder !.</value></data>
   <data name="The password must contain a digit." xml:space="preserve"><value>Das Passwort muss eine Ziffer enthalten.</value></data>
   <data name="The password must contain a lowercase letter." xml:space="preserve"><value>Das Passwort muss einen Kleinbuchstaben enthalten.</value></data>
   <data name="The password must contain an uppercase letter." xml:space="preserve"><value>Das Passwort muss einen Großbuchstaben enthalten.</value></data>
-  <data name="The password must contain at least {0} different characters." xml:space="preserve"><value>Das Passwort muss mindestens {0} verschiedene Zeichen enthalten.</value></data>
   <data name="The photo is deleted for good." xml:space="preserve"><value>Das Foto ist endgültig gelöscht.</value></data>
-  <data name="The photo is in the bin. You can restore it there for {0} days." xml:space="preserve"><value>Das Foto liegt im Papierkorb. Sie können es dort {0} Tage lang wiederherstellen.</value></data>
   <data name="The photo is restored." xml:space="preserve"><value>Das Foto ist wiederhergestellt.</value></data>
   <data name="The request could not be processed" xml:space="preserve"><value>Die Anfrage konnte nicht verarbeitet werden</value></data>
   <data name="The server's clock" xml:space="preserve"><value>Die Uhr des Servers</value></data>
@@ -558,7 +571,6 @@
   <data name="Unpublish" xml:space="preserve"><value>Veröffentlichung zurückziehen</value></data>
   <data name="Unpublished the item" xml:space="preserve"><value>Veröffentlichung des Eintrags zurückgenommen</value></data>
   <data name="Untitled" xml:space="preserve"><value>Ohne Titel</value></data>
-  <data name="Up to {0} photos: JPEG, PNG, TIFF or WebP." xml:space="preserve"><value>Bis zu {0} Fotos: JPEG, PNG, TIFF oder WebP.</value></data>
   <data name="Upload" xml:space="preserve"><value>Hochladen</value></data>
   <data name="Use as cover" xml:space="preserve"><value>Als Titelbild</value></data>
   <data name="Use as cover: {0}" xml:space="preserve"><value>Als Titelbild: {0}</value></data>
@@ -602,7 +614,6 @@
   <data name="Yes, for any purpose, with credit" xml:space="preserve"><value>Ja, für jeden Zweck, mit Namensnennung</value></data>
   <data name="Yes, for non-commercial purposes, with credit" xml:space="preserve"><value>Ja, für nicht kommerzielle Zwecke, mit Namensnennung</value></data>
   <data name="You are no longer logged in. Log in again in another tab, then continue." xml:space="preserve"><value>Sie sind nicht mehr angemeldet. Melden Sie sich in einem anderen Tab wieder an und machen Sie dann weiter.</value></data>
-  <data name="You can send at most {0} photos at once." xml:space="preserve"><value>Sie können höchstens {0} Fotos auf einmal senden.</value></data>
   <data name="Your account cannot open this page. Ask an admin if you need it." xml:space="preserve"><value>Ihr Konto kann diese Seite nicht öffnen. Fragen Sie einen Admin, wenn Sie sie brauchen.</value></data>
   <data name="Your archive" xml:space="preserve"><value>Ihr Archiv</value></data>
   <data name="Your changes are not saved yet. They are still in the form below. Compare them with the version saved by the other person. If you save again, your version replaces theirs." xml:space="preserve"><value>Ihre Änderungen sind noch nicht gespeichert. Sie stehen weiterhin im Formular unten. Vergleichen Sie sie mit der Fassung, die die andere Person gespeichert hat. Wenn Sie noch einmal speichern, ersetzt Ihre Fassung die andere.</value></data>

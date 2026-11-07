@@ -10,6 +10,15 @@ public class ArchiveSettings
     /// <summary>For visitors whose browser asks for no language this archive offers, and the language its own texts are in.</summary>
     public string DefaultLanguage { get; set; } = "en";
 
+    /// <summary>
+    /// The language most of the material is written in, or <see cref="DateLanguages.Several"/>. Null until an admin chooses,
+    /// and then dates are read in English and German, as they were before this setting.
+    /// </summary>
+    public string? ContentLanguage { get; set; }
+
+    /// <summary>Other languages some of the material is in, separated by commas, so that dates written in them are read too.</summary>
+    public string? OtherContentLanguages { get; set; }
+
     /// <summary>A colour such as #1a5f7a, or null for the standard one.</summary>
     public string? AccentColor { get; set; }
 

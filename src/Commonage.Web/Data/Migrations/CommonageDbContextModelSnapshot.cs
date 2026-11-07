@@ -164,6 +164,10 @@ namespace Commonage.Web.Data.Migrations
                     b.Property<bool>("AllowSearchEngines")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("ContentLanguage")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
                     b.Property<string>("DefaultLanguage")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -181,6 +185,10 @@ namespace Commonage.Web.Data.Migrations
 
                     b.Property<Guid?>("LogoId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("OtherContentLanguages")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<bool>("PrivacyReviewed")
                         .HasColumnType("boolean");

@@ -136,6 +136,8 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options)
         {
             settings.Property(s => s.Id).ValueGeneratedNever();
             settings.Property(s => s.DefaultLanguage).HasMaxLength(20);
+            settings.Property(s => s.ContentLanguage).HasMaxLength(20);
+            settings.Property(s => s.OtherContentLanguages).HasMaxLength(200);
             settings.Property(s => s.AccentColor).HasMaxLength(7);
             settings.Property(s => s.TimeZone).HasMaxLength(100);
             settings.Property(s => s.DefaultRightsUri).HasMaxLength(RightsOptions.MaxUriLength);

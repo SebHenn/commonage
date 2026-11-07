@@ -10,6 +10,7 @@ using Commonage.Web.Domain;
 using Commonage.Web.Media;
 using Commonage.Web.Operations;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
 
 namespace Commonage.Web.Export;
 
@@ -20,7 +21,12 @@ public record ExportOptions(bool PublishedOnly, bool IncludePersonalData);
 /// descriptions as JSON (complete) and as CSV (for spreadsheets), and a README that explains the format.
 /// The ZIP is written straight to the output, so even a large archive never has to fit in memory or on disk.
 /// </summary>
-public class ArchiveExporter(CommonageDbContext db, IFileStorage storage, TimeProvider clock, ILogger<ArchiveExporter> logger)
+public class ArchiveExporter(
+    CommonageDbContext db,
+    IFileStorage storage,
+    TimeProvider clock,
+    IStringLocalizer<SharedResource> localizer,
+    ILogger<ArchiveExporter> logger)
 {
     public const string Format = "commonage-export";
     public const int Version = 3;
@@ -87,7 +93,7 @@ public class ArchiveExporter(CommonageDbContext db, IFileStorage storage, TimePr
             collections.Select(c => new ExportCollection(c.Id, c.Title, c.Description, c.CreatedAt)).ToList(),
             exportedItems,
             new ExportSettings(
-                settings.DefaultLanguage, settings.AccentColor, settings.TimeZone, settings.DefaultRightsUri, settings.AllowSearchEngines, settings.LargePhotos, settings.PrivacyReviewed,
+                settings.DefaultLanguage, settings.ContentLanguage, settings.OtherContentLanguages, settings.AccentColor, settings.TimeZone, settings.DefaultRightsUri, settings.AllowSearchEngines, settings.LargePhotos, settings.PrivacyReviewed,
                 settings.ImprintNotNeeded, settings.RestoreTestedAt, logoPath,
                 texts.Select(t => new ExportText(t.Language, t.Kind, t.Text)).ToList()));
 
@@ -95,8 +101,14 @@ public class ArchiveExporter(CommonageDbContext db, IFileStorage storage, TimePr
             stream => JsonSerializer.SerializeAsync(stream, document, JsonOptions, cancellationToken), cancellationToken);
         await WriteEntryAsync(zip, "items.csv", CompressionLevel.Optimal,
             stream => ItemsCsv.WriteAsync(stream, document, cancellationToken), cancellationToken);
+        var readme = Readme(localizer);
         await WriteEntryAsync(zip, "README.txt", CompressionLevel.Optimal,
-            stream => stream.WriteAsync(Encoding.UTF8.GetBytes(Readme), cancellationToken).AsTask(), cancellationToken);
+            stream => stream.WriteAsync(Encoding.UTF8.GetBytes(readme), cancellationToken).AsTask(), cancellationToken);
+        // Whoever opens the copy in years to come may not read the exporter's language.
+        var english = EnglishReadme();
+        if (english != readme)
+            await WriteEntryAsync(zip, "README.en.txt", CompressionLevel.Optimal,
+                stream => stream.WriteAsync(Encoding.UTF8.GetBytes(english), cancellationToken).AsTask(), cancellationToken);
     }
 
     /// <summary>Copies the original into the ZIP and checks it against the checksum taken at upload.</summary>
@@ -199,35 +211,65 @@ public class ArchiveExporter(CommonageDbContext db, IFileStorage storage, TimePr
         return safe.Length <= 100 ? safe : safe[..100];
     }
 
-    private const string Readme = """
-        Commonage archive export
-        ========================
+    /// <summary>
+    /// The README in the language of whoever exports, so that the people who keep the copy can read it. The names of files
+    /// and fields stay English, because they are what the files contain.
+    /// </summary>
+    internal static string Readme(IStringLocalizer localizer)
+    {
+        var text = new StringBuilder();
+        void Paragraph(string paragraph, string indent = "")
+        {
+            var line = new StringBuilder(indent);
+            foreach (var word in paragraph.Split(' '))
+            {
+                if (line.Length > indent.Length && line.Length + 1 + word.Length > 76)
+                {
+                    text.Append(line.ToString().TrimEnd()).Append('\n');
+                    line.Clear().Append(indent);
+                }
+                line.Append(word).Append(' ');
+            }
+            text.Append(line.ToString().TrimEnd()).Append("\n\n");
+        }
+        void Entry(string name, string description)
+        {
+            text.Append(name).Append('\n');
+            Paragraph(description, "    ");
+        }
 
-        This ZIP file holds a copy of a community archive made with Commonage. You need no special
-        software to use it.
+        var title = localizer["Commonage archive export"].Value;
+        text.Append(title).Append('\n').Append(new string('=', title.Length)).Append("\n\n");
+        Paragraph(localizer["This ZIP file holds a copy of a community archive made with Commonage. You need no special software to use it."]);
+        Entry("archive.json", localizer["Everything that is known about the collections and items, complete and exact. Dates are ISO 8601 and in UTC. Each file lists its SHA-256 checksum, so you can check that a copy is intact."]);
+        Entry("items.csv", localizer["The same items as a table, for spreadsheet programs. It is UTF-8. Cells that start with =, +, - or @ get a leading apostrophe, so a spreadsheet never runs them as formulas; archive.json has the exact text."]);
+        text.Append("files/\n");
+        Paragraph(localizer["The original files exactly as they were uploaded, in one folder per item:"], "    ");
+        text.Length -= 1;
+        text.Append("    files/<item id>/<file id>-<original file name>\n\n");
+        Paragraph(localizer["Curators may have turned a photo: archive.json gives its \"rotation\" in degrees clockwise, and its \"position\" among the photos of the item."], "    ");
+        Entry("branding/", localizer["The archive's logo, if it has one. Its name and pages are under \"settings\" in archive.json."]);
+        Paragraph(localizer["\"includesPersonalData\" in archive.json says whether the names of contributors, photographers and authors and contributors' email addresses are included. If they are, keep this file as carefully as the archive itself."]);
+        Paragraph(localizer["\"contentLanguage\" under \"settings\" says which language most of the material is written in, as a code such as \"de\" or \"pl\". \"mul\" means several languages, none of them most."]);
+        Paragraph(localizer["A file with \"problem\": \"missing\" was not found on the server; \"checksumMismatch\" means it no longer matches the checksum taken when it was uploaded. Both should be looked into."]);
+        Paragraph(localizer["The format is described in docs/operations.md of the Commonage source code."]);
+        return text.ToString().TrimEnd() + "\n";
+    }
 
-        archive.json   Everything that is known about the collections and items, complete and exact.
-                       Dates are ISO 8601 and in UTC. Each file lists its SHA-256 checksum, so you can
-                       check that a copy is intact.
-        items.csv      The same items as a table, for spreadsheet programs. It is UTF-8. Cells that
-                       start with =, +, - or @ get a leading apostrophe, so a spreadsheet never runs
-                       them as formulas; archive.json has the exact text.
-        files/         The original files exactly as they were uploaded, in one folder per item:
-                       files/<item id>/<file id>-<original file name>
-                       Curators may have turned a photo: archive.json gives its "rotation" in degrees
-                       clockwise, and its "position" among the photos of the item.
-        branding/      The archive's logo, if it has one. Its name and pages are under "settings" in
-                       archive.json.
-
-        "includesPersonalData" in archive.json says whether the names of contributors, photographers and
-        authors and contributors' email addresses
-        are included. If they are, keep this file as carefully as the archive itself.
-
-        A file with "problem": "missing" was not found on the server; "checksumMismatch" means it
-        no longer matches the checksum taken when it was uploaded. Both should be looked into.
-
-        The format is described in docs/operations.md of the Commonage source code.
-        """;
+    /// <summary>The README in English, whatever the language of whoever exports.</summary>
+    private string EnglishReadme()
+    {
+        var previous = CultureInfo.CurrentUICulture;
+        try
+        {
+            CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo("en");
+            return Readme(localizer);
+        }
+        finally
+        {
+            CultureInfo.CurrentUICulture = previous;
+        }
+    }
 }
 
 internal record ExportDocument(
@@ -242,6 +284,8 @@ internal record ExportDocument(
 
 internal record ExportSettings(
     string DefaultLanguage,
+    string? ContentLanguage,
+    string? OtherContentLanguages,
     string? AccentColor,
     string? TimeZone,
     string? DefaultRightsUri,

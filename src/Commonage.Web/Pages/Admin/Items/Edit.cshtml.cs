@@ -243,12 +243,12 @@ public class EditModel(
         foreach (var (photo, text) in Input.AltTexts)
         {
             if (text is { Length: > MaxAltTextLength })
-                ModelState.AddModelError($"Input.AltTexts[{photo}]", localizer["A photo description can be at most {0} characters long.", MaxAltTextLength]);
+                ModelState.AddModelError($"Input.AltTexts[{photo}]", localizer.Plural("A photo description can be at most {0, plural, one {# character} other {# characters}} long.", MaxAltTextLength));
         }
         foreach (var (photo, text) in Input.Captions)
         {
             if (text is { Length: > MediaFile.MaxCaptionLength })
-                ModelState.AddModelError($"Input.Captions[{photo}]", localizer["A caption can be at most {0} characters long.", MediaFile.MaxCaptionLength]);
+                ModelState.AddModelError($"Input.Captions[{photo}]", localizer.Plural("A caption can be at most {0, plural, one {# character} other {# characters}} long.", MediaFile.MaxCaptionLength));
         }
 
         // Checked before anything is saved, so a new item is not left behind without the photos it was made for.
@@ -557,7 +557,7 @@ public class EditModel(
         audit.Record(AuditAction.ItemMovedToBin, item.Title, item);
         await db.SaveChangesAsync(cancellationToken);
 
-        TempData["Message"] = localizer["The item is in the bin. You can restore it there for {0} days.", ArchiveBin.RetentionDays].Value;
+        TempData["Message"] = localizer.Plural("The item is in the bin. You can restore it there for {0, plural, one {# day} other {# days}}.", ArchiveBin.RetentionDays);
         return RedirectToPage("/Admin/Index");
     }
 
@@ -594,11 +594,11 @@ public class EditModel(
         var email = Clean(contributorEmail);
         var holder = Clean(contributorRightsHolder);
         if (name is null || name.Length > Contribution.NameMaxLength)
-            TempData["Error"] = localizer["Please enter a name of at most {0} characters.", Contribution.NameMaxLength].Value;
+            TempData["Error"] = localizer.Plural("Please enter a name of at most {0, plural, one {# character} other {# characters}}.", Contribution.NameMaxLength);
         else if (email is not null && (email.Length > Contribution.EmailMaxLength || !new EmailAddressAttribute().IsValid(email)))
             TempData["Error"] = localizer["Please enter a valid email address."].Value;
         else if (holder is { Length: > Contribution.RightsHolderMaxLength })
-            TempData["Error"] = localizer["The name can be at most {0} characters long.", Contribution.RightsHolderMaxLength].Value;
+            TempData["Error"] = localizer.Plural("The name can be at most {0, plural, one {# character} other {# characters}} long.", Contribution.RightsHolderMaxLength);
         else
         {
             contribution.ContributorName = name;
@@ -639,7 +639,7 @@ public class EditModel(
         file.DeletedAt = DateTime.UtcNow;
         audit.Record(AuditAction.PhotoMovedToBin, file.ArchiveItem.Title, file.ArchiveItem);
         await db.SaveChangesAsync(cancellationToken);
-        TempData["Message"] = localizer["The photo is in the bin. You can restore it there for {0} days.", ArchiveBin.RetentionDays].Value;
+        TempData["Message"] = localizer.Plural("The photo is in the bin. You can restore it there for {0, plural, one {# day} other {# days}}.", ArchiveBin.RetentionDays);
         return BackToItem(id);
     }
 

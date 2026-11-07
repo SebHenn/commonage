@@ -17,7 +17,7 @@ queue server and no build step for the front end: pages work without JavaScript,
 | `Audit` | The activity log. An entry is saved together with the change it describes. |
 | `Export` | The archive as open files. A test makes every new field a decision: exported, or left out for a reason. |
 | `Operations` | Free disk space, the age of backups, and the archive's name and settings. |
-| `Resources` | Translations. English is the key, and every other language has a file here. |
+| `Resources` | Translations. English is the key, and every other language has a file here. `SharedResource.resx` is the English base file for translators, written by the tests. |
 
 What is special about it, and easy to break by accident:
 
@@ -179,7 +179,7 @@ to try it locally, set `COMMONAGE_DOMAIN=localhost` (Caddy then uses its own loc
 
 `wwwroot/css/site.css` starts with the design's tokens, on top of Bootstrap's variables, so `/branding.css` can override
 them. Use logical properties (`margin-inline-start`, `ms-*`), never left and right, and system fonts only. A new interface
-language is its resource file and one line in `SupportedLanguages.cs`.
+language is its resource file and one line in `SupportedLanguages.cs`, see [translating.md](translating.md#a-new-language).
 
 ## Forms
 
@@ -261,6 +261,26 @@ dotnet ef migrations add <DescriptiveName> --project src/Commonage.Web --output-
 UI text is written in English and used as the key, for example `@T["Save"]` in a page. German
 translations live in `src/Commonage.Web/Resources/SharedResource.de.resx`. Text without a
 translation is shown in English, so add the German entry whenever you add new UI text.
+
+`TranslationTests` reads every text from the code: `T[...]`, `localizer[...]`, `.Plural(...)` and the `Name` and
+`ErrorMessage` of attributes. Only a written-out text is found, so look one up with its words, not through a variable. The
+tests fail when a language the interface offers lacks a text, when a translation is left over, empty or loses a `{0}`, and when
+a count lacks a form its language needs.
+
+They also keep `Resources/SharedResource.resx` up to date: the English base file that translators in Weblate work from. It
+is not built into the application. After changing text, write it again and commit it:
+
+```bash
+UPDATE_TRANSLATION_BASE=1 dotnet test tests/Commonage.Tests --filter TranslationTests
+```
+
+A count in a sentence is written in ICU MessageFormat, so that every language can give it the right form:
+`T.Plural("Up to {0, plural, one {# photo} other {# photos}}.", count)`. Label form, `Photos: {0}`, needs none.
+[translating.md](translating.md) has the rest: Weblate, plurals and adding a language.
+
+Dates are read in the archive's languages (`DateLanguages.Current`, set for each request) through `DateVocabulary`. Stored
+dates are only days, so a new language never changes what is stored. `DateRangeBeforeM17` in the tests is the reader as it was
+before languages came in, kept so that a test can check every date it accepted still means the same.
 
 ## Secrets and private data
 

@@ -6,7 +6,7 @@
 }
 
 <h1>@ViewData["Title"]</h1>
-<p class="col-lg-8">@T["Deleted items and photos stay here for {0} days, hidden from everyone but curators. You can restore them until then. After that they are deleted for good, with their original files.", ArchiveBin.RetentionDays]</p>
+<p class="col-lg-8">@T.Plural("Deleted items and photos stay here for {0, plural, one {# day} other {# days}}, hidden from everyone but curators. You can restore them until then. After that they are deleted for good, with their original files.", ArchiveBin.RetentionDays)</p>
 
 @if (Model.Items.Count == 0 && Model.Photos.Count == 0)
 {

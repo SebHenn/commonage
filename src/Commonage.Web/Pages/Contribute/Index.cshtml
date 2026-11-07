@@ -40,7 +40,7 @@
                    data-max-file-bytes="@Model.MaxFileBytes"
                    data-max-request-bytes="@Commonage.Web.Pages.Contribute.IndexModel.MaxRequestBytes" />
             <span asp-validation-for="Files" class="text-danger"></span>
-            <div id="photos-help" class="form-text">@T["Up to {0} photos: JPEG, PNG, TIFF or WebP.", Commonage.Web.Pages.Contribute.IndexModel.MaxFiles]</div>
+            <div id="photos-help" class="form-text">@T.Plural("Up to {0, plural, one {# photo} other {# photos}}: JPEG, PNG, TIFF or WebP.", Commonage.Web.Pages.Contribute.IndexModel.MaxFiles)</div>
         </div>
         <div class="mb-3">
             <label asp-for="Input.Title" class="form-label"></label>
@@ -139,7 +139,7 @@
          data-too-large="@T["{0} is too large."]"
          data-unsupported="@T["{0} is not a supported photo format. Please use JPEG, PNG, TIFF or WebP."]"
          data-heic="@T["{0} is in the HEIC format, which this archive cannot read yet. Please save it as a JPEG and choose it again."]"
-         data-too-many="@T["You can send at most {0} photos at once.", Commonage.Web.Pages.Contribute.IndexModel.MaxFiles]"
+         data-too-many="@T.Plural("You can send at most {0, plural, one {# photo} other {# photos}} at once.", Commonage.Web.Pages.Contribute.IndexModel.MaxFiles)"
          data-does-not-fit="@T["{0} was left out, because together the photos would be too large to send at once. You can send it afterwards."]"
          data-sending-label="@T["What you are sending"]"
          data-progress="@T["Sending: {0} of {1}"]"

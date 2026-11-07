@@ -1,6 +1,8 @@
 @model IEnumerable<ItemSummary>
+@inject Commonage.Web.Operations.ArchiveProfile Profile
 @{
     var showCollection = ViewData["ShowCollection"] is true;
+    var material = (await Profile.GetAsync()).MaterialLanguage;
 }
 
 <ul class="list-unstyled row g-3">
@@ -17,15 +19,15 @@
                 {
                     <span class="media-thumbnail text-tile" aria-hidden="true"><span>@T["Text"]</span></span>
                 }
-                <span class="item-card-title">@item.Title</span>
+                <span class="item-card-title" lang="@material">@item.Title</span>
             </a>
             @if (item.DateText is not null)
             {
-                <small class="d-block text-muted">@item.DateText</small>
+                <small class="d-block text-muted" lang="@material">@item.DateText</small>
             }
             @if (showCollection)
             {
-                <small class="d-block text-muted">@item.CollectionTitle</small>
+                <small class="d-block text-muted" lang="@material">@item.CollectionTitle</small>
             }
         </li>
     }
