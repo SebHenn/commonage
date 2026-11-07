@@ -194,16 +194,18 @@ public partial class TranslationTests
     [InlineData("{0, plural one {# day} other {# days}}")]
     public void A_broken_plural_is_found(string text) => Assert.Null(Plurals.PluralParts(text));
 
-    [Fact]
-    public void An_untranslated_text_keeps_English_forms()
+    [Theory]
+    [InlineData("ru", 21, "21 days")]
+    [InlineData("fr", 0, "0 days")]
+    [InlineData("pl", 1, "1 day")]
+    public void An_untranslated_text_keeps_English_forms(string reader, int count, string expected)
     {
-        // A Polish reader of a text nobody translated yet reads English, so "few" must not be looked for.
+        // A text nobody translated yet is read in English. Russian says "one" for 21 and French for 0, English does not.
         var previous = CultureInfo.CurrentUICulture;
         try
         {
-            CultureInfo.CurrentUICulture = CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("pl");
-            Assert.Equal("3 days", new Untranslated().Plural("{0, plural, one {# day} other {# days}}", 3));
-            Assert.Equal("1 day", new Untranslated().Plural("{0, plural, one {# day} other {# days}}", 1));
+            CultureInfo.CurrentUICulture = CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo(reader);
+            Assert.Equal(expected, new Untranslated().Plural("{0, plural, one {# day} other {# days}}", count));
         }
         finally
         {

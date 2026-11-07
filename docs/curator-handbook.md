@@ -6,7 +6,8 @@ For the people who look after what an archive holds. You need no technical knowl
 
 - **Title:** a few words that would help someone find it again: "Flood in Mill Street", not "Photo 12".
 - **Date:** as precisely as you know it, and no more. "circa 1950" and "1950s" are fine. The form shows how it understood
-  what you typed. Leave it empty rather than guess.
+  what you typed. Leave it empty rather than guess. It understands the languages of the material, which an admin sets under
+  "Settings", and yours.
 - **Description:** who and what can be seen, where and when, how you know, and how the photo came to the archive. If you
   are not sure, say so: "probably Anna Krause, left".
 - **Tags:** the places, people and topics someone might look for. Before adding a new one, check whether it already

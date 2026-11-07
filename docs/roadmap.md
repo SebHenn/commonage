@@ -172,7 +172,7 @@ real pace over M7 and M8 before promising dates. Each milestone is a minor relea
 | **M14 Phone-first sending** ✅ | 4 | Over slow mobile data, a contributor sees their chosen photos, watches a progress bar and cannot send twice. The new tasks are walked through in the running app and given to the tester, and a week of fixes is done. |
 | **M15 Readable items** ✅ | 4 | A visitor reads a scanned letter at full size, sees "Photo 2 of 4" with its caption, and moves on to the next item or to items from the same time. Curators reorder, rotate and describe each photo. |
 | **M16 Rights and sharing** ✅ | 3 | Every item page says whether it may be reused, in plain language. "Cite this item" gives a line to copy. A link pasted into a messenger shows the picture and the archive's name. |
-| **M17 Language reach** | 5 | A translator without Git has tried Weblate on a few pages. Missing translations fail a test. Counts read correctly under Polish plural rules. Item text carries the right `lang`. Dates that are accepted today are still accepted. |
+| **M17 Language reach** ✅ | 5 | A translator without Git has tried Weblate on a few pages. Missing translations fail a test. Counts read correctly under Polish plural rules. Item text carries the right `lang`. Dates that are accepted today are still accepted. |
 | **M18 Accounts and system** | 4 | A curator logs in with an authenticator app. Login keys are encrypted with a key outside the database, and the backup test still passes. An admin sees version, disk use, failed previews (with retry) and backup age on one page. |
 | **M19 Discovery** | 3 | A visitor taps "1960s" and finds the flood, opens "Places" and picks "Mill Street". A curator merges "Mill St" into "Mill Street". |
 | **M20 Community knowledge** | 4 | With the feature switched on, a visitor says "that's my aunt on the left" or asks for removal from an item page, and a curator handles it. A curator prints a poster with a QR code for a contribution link. |
@@ -372,6 +372,15 @@ a third language yet:
 
 Until then, write counts in label form (`Photos: {0}`), which needs no plural grammar.
 
+**Done (November 2026):** ICU MessageFormat in RESX values, with CLDR rules in `Plurals.cs`; the base file and the tests
+for missing, left-over, empty and broken translations; content languages for dates and `lang`, with a frozen copy of the
+old date reader in the tests; the export README. The demo was already in both languages.
+
+- **Language per item: not now.** An archive chooses one main language for the material, or "several, none of them most",
+  which marks nothing. A language per item is wanted only if mixed archives ask for it, and M21's import could bring it.
+- **Still open:** Weblate is not set up yet, so no translator has tried it. That is on the tester's list in
+  [usability-test.md](usability-test.md), once the maintainer has applied. No third language yet.
+
 **M18 Accounts and system**
 
 - Authenticator two-factor login with recovery codes, using a QR encoder that M20 reuses. Admins can require it. Setup
@@ -470,7 +479,9 @@ Until then, write counts in label form (`Photos: {0}`), which needs no plural gr
 3. **Optional email.** Decide after M20, from whether contributions wait for weeks in practice.
 4. **Exports without personal data: decided.** They leave out the names of photographers and authors too (M7).
 5. **Support policy.** How long older minor versions get security fixes (M8).
-6. **Weblate.** Hosted or self-hosted, and how translators accept the license (M17).
+6. **Weblate: decided.** Hosted Weblate on its gratis plan for libre projects. Translators accept the license and the
+   Developer Certificate of Origin in its contributor agreement, and its commits carry their sign-off. See
+   [translating.md](translating.md).
 
 ### Languages
 
@@ -492,8 +503,10 @@ These are the plans in detail. The structural part lands in M11 and most of the 
   Spanish ñ after n) needs ICU collations in PostgreSQL, chosen from the content language.
 - **Emails, exports and demo content**: exports (README) are English only; the demo exists in English and German.
   Both are translated like the interface.
-- **Dates in more languages.** `DateRange` has English and German words built in: month names and the words
-  for "circa", "before", "until", "after", "since", "between … and", "century" and decades. Plan:
+- **Dates in more languages.** Done in M17 as planned here, except the harder cases at the end. Vocabularies exist
+  for English and German so far, and month names come for every language. Before M17, `DateRange` had English and German
+  words built in: month names and the words for "circa", "before", "until", "after", "since", "between … and",
+  "century" and decades. Plan:
   - Month names come from .NET (`CultureInfo.DateTimeFormat`: full, abbreviated and genitive forms, such as
     Polish "12 marca 1953"), lowercased, without trailing dots and with accents removed. Regional extras such as
     Austrian "Jänner" stay a short hand-written list. The Debian-based Docker image includes the ICU data this

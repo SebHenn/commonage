@@ -88,6 +88,20 @@ only be tried that way, because the messenger's servers have to reach the archiv
 For task B, note whether the person finds "Open at full size", and whether they manage to zoom in and read the letter on the phone, and
 in which browser. Nobody has tried that on a real phone yet.
 
+## Translating, since M17
+
+Once Weblate is set up (see [translating.md](translating.md)), for someone who speaks a language other than English and has never
+used Git:
+
+> **D. Translate a few texts.** You get the link to Commonage in Weblate. Translate ten texts into your language, including one with
+> a count, such as "Up to 20 photos".
+
+Note whether they find where to start, what they make of the agreement Weblate asks them to accept, and what they do with
+`{0, plural, ...}`. Then check that their translations arrive as a pull request whose checks pass, sign-off included.
+
+With a screen reader, open an item page in the archive in a language other than the material's. Is the description read with
+the voice of its own language?
+
 ## Results
 
 **M14, November 2026, walk-through by the developer, not by real users:** tasks A to C acted out in the running demo archive, at

@@ -54,7 +54,8 @@ and share it. If you run a changed version for others, you must offer them its s
 The license covers the software only. The photos, documents and stories in an archive belong to the community and
 the people who contributed them, under the terms they agreed to.
 
-Contributions are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md).
+Contributions are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md). Translations need no Git: see
+[docs/translating.md](docs/translating.md).
 
 ## Tech stack
 

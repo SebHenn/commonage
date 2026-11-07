@@ -6,7 +6,8 @@ Für alle, die sich um den Bestand eines Archivs kümmern. Technische Kenntnisse
 
 - **Titel:** ein paar Wörter, mit denen man es wiederfindet: „Hochwasser in der Mühlenstraße“, nicht „Foto 12“.
 - **Datum:** so genau, wie Sie es wissen, und nicht genauer. „um 1950“ und „1950er Jahre“ sind in Ordnung. Das Formular zeigt,
-  wie es Ihre Eingabe verstanden hat. Lassen Sie das Feld lieber leer, als zu raten.
+  wie es Ihre Eingabe verstanden hat. Lassen Sie das Feld lieber leer, als zu raten. Es versteht die Sprachen des Materials,
+  die ein Admin unter „Einstellungen“ festlegt, und Ihre.
 - **Beschreibung:** wer und was zu sehen ist, wo und wann, woher Sie das wissen und wie das Foto ins Archiv kam. Wenn Sie
   nicht sicher sind, schreiben Sie das dazu: „vermutlich Anna Krause, links“.
 - **Schlagwörter:** die Orte, Personen und Themen, nach denen jemand suchen könnte. Prüfen Sie vor einem neuen Schlagwort, ob
