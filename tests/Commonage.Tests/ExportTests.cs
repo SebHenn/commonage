@@ -206,6 +206,26 @@ public class ExportTests(CommonageAppFactory app)
         curator.Dispose();
     }
 
+    [Fact]
+    public async Task The_README_is_in_the_language_of_whoever_exports_with_an_English_copy()
+    {
+        using var admin = app.CreateClient();
+        await Browser.LogInAsCuratorAsync(admin);
+        using var english = await ExportAsync(admin, publishedOnly: true, includePersonalData: false);
+        await Browser.SendFormAsync(admin, "/SetLanguage", new() { ["culture"] = "de", ["returnUrl"] = "/" }, pageUrl: "/");
+
+        using var german = await ExportAsync(admin, publishedOnly: true, includePersonalData: false);
+
+        var readme = Encoding.UTF8.GetString(Read(english, "README.txt"));
+        Assert.StartsWith("Commonage archive export\n========================\n", readme);
+        Assert.Contains("archive.json\n    Everything that is known", readme);
+        Assert.All(readme.Split('\n'), line => Assert.True(line.Length <= 76, line));
+        Assert.Null(english.GetEntry("README.en.txt"));
+        Assert.StartsWith("Export eines Commonage-Archivs\n", Encoding.UTF8.GetString(Read(german, "README.txt")));
+        Assert.Contains("files/<item id>/<file id>-<original file name>", Encoding.UTF8.GetString(Read(german, "README.txt")));
+        Assert.Equal(readme, Encoding.UTF8.GetString(Read(german, "README.en.txt")));
+    }
+
     private static async Task<ZipArchive> ExportAsync(HttpClient admin, bool publishedOnly, bool includePersonalData)
     {
         var fields = new Dictionary<string, string>();

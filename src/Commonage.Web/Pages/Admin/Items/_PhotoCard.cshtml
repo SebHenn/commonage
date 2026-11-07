@@ -67,7 +67,7 @@
             <div class="d-flex flex-wrap gap-2 mt-auto justify-content-between">
                 <a href="/admin/media/@file.Id/original" class="btn btn-sm btn-outline-secondary">@T["Original"]</a>
                 <form method="post" asp-page="/Admin/Items/Edit" asp-page-handler="DeleteMedia" asp-route-id="@Model.ItemId" asp-route-mediaFileId="@file.Id" asp-route-back="@Model.Back"
-                      data-confirm="@T["Move this photo to the bin? You can restore it there for {0} days.", Commonage.Web.Data.ArchiveBin.RetentionDays]">
+                      data-confirm="@T.Plural("Move this photo to the bin? You can restore it there for {0, plural, one {# day} other {# days}}.", Commonage.Web.Data.ArchiveBin.RetentionDays)">
                     <button type="submit" class="btn btn-sm btn-outline-danger">@T["Move to bin"]</button>
                 </form>
             </div>

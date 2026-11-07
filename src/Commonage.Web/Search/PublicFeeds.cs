@@ -91,9 +91,11 @@ public static class PublicFeeds
     {
         var url = $"{address}/items/{item.Id}";
         var rights = RightsOptions.LabelOrAsk(localizer, item.RightsUri ?? identity.DefaultRightsUri);
+        // The feed is in the reader's language. What curators wrote is in the material's.
+        XAttribute? Material() => identity.MaterialLanguage is { } language ? new XAttribute(XNamespace.Xml + "lang", language) : null;
         var entry = new XElement(Atom + "entry",
             new XElement(Atom + "id", url),
-            new XElement(Atom + "title", XmlText(item.Title)),
+            new XElement(Atom + "title", Material(), XmlText(item.Title)),
             new XElement(Atom + "link", new XAttribute("rel", "alternate"), new XAttribute("type", "text/html"), new XAttribute("href", url)),
             new XElement(Atom + "published", Timestamp(item.PublishedAt ?? item.UpdatedAt)),
             new XElement(Atom + "updated", Timestamp(item.UpdatedAt)),
@@ -110,7 +112,7 @@ public static class PublicFeeds
         if (item.Credit is { } credit)
             content.Append(CultureInfo.InvariantCulture, $"<p>{WebUtility.HtmlEncode(credit)}</p>");
         if (content.Length > 0)
-            entry.Add(new XElement(Atom + "content", new XAttribute("type", "html"), XmlText(content.ToString())));
+            entry.Add(new XElement(Atom + "content", Material(), new XAttribute("type", "html"), XmlText(content.ToString())));
         return entry;
     }
 

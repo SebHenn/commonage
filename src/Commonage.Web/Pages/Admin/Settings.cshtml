@@ -106,6 +106,31 @@
             <div id="language-help" class="form-text">@T["For visitors whose browser asks for no language this archive offers."]</div>
         </div>
         <div class="mb-3">
+            <label asp-for="Input.ContentLanguage" class="form-label"></label>
+            <select asp-for="Input.ContentLanguage" class="form-select" aria-describedby="content-language-help">
+                <option value="@DateLanguages.Several">@T["Several languages, none of them most"]</option>
+                @foreach (var language in SupportedLanguages.AllLanguages)
+                {
+                    <option value="@language" lang="@language">@SupportedLanguages.NameOf(language)</option>
+                }
+            </select>
+            <span asp-validation-for="Input.ContentLanguage" class="text-danger"></span>
+            <div id="content-language-help" class="form-text">@T["The language most items are described in. Item pages tell browsers and screen readers which language their text is in, so that it is read aloud correctly, and dates written in it are understood."]</div>
+        </div>
+        <fieldset class="mb-3" id="Input_OtherContentLanguages" tabindex="-1" aria-describedby="date-languages-help">
+            <legend class="form-label fs-6">@T["Dates can also be written in"]</legend>
+            @foreach (var language in Model.DateLanguageChoices)
+            {
+                <div class="form-check">
+                    <input type="checkbox" name="Input.OtherContentLanguages" value="@language" id="date-language-@language" class="form-check-input"
+                           checked="@Model.Input.OtherContentLanguages.Contains(language)" />
+                    <label for="date-language-@language" class="form-check-label" lang="@language">@SupportedLanguages.NameOf(language)</label>
+                </div>
+            }
+            <span asp-validation-for="Input.OtherContentLanguages" class="text-danger"></span>
+            <div id="date-languages-help" class="form-text">@T["Dates are always understood in the language above and in the language of whoever types them. In other languages, a month name can mean a different month: listopad is November in Polish, but October in Croatian."]</div>
+        </fieldset>
+        <div class="mb-3">
             <label asp-for="Input.TimeZone" class="form-label"></label>
             <select asp-for="Input.TimeZone" class="form-select" aria-describedby="timezone-help">
                 <option value="">@T["The server's clock"]</option>

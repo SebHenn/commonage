@@ -310,7 +310,7 @@
     }
 
     <form method="post" asp-page-handler="Delete" asp-route-id="@Model.ItemId" class="mt-5"
-          data-confirm="@T["Move this item to the bin? It disappears from the archive at once. You can restore it there for {0} days.", Commonage.Web.Data.ArchiveBin.RetentionDays]">
+          data-confirm="@T.Plural("Move this item to the bin? It disappears from the archive at once. You can restore it there for {0, plural, one {# day} other {# days}}.", Commonage.Web.Data.ArchiveBin.RetentionDays)">
         <button type="submit" class="btn btn-outline-danger">@T["Move to bin"]</button>
     </form>
 }

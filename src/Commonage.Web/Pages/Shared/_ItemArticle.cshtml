@@ -10,21 +10,23 @@
     var identity = await Profile.GetAsync();
     var largePhotos = identity.LargePhotos;
     var rights = Model.RightsUri ?? identity.DefaultRightsUri;
+    // What curators and contributors wrote is in the material's language, which may not be the reader's.
+    var material = identity.MaterialLanguage;
 }
 
 <article class="item-layout @(Model.MediaFiles.Count > 0 ? "item-layout-with-media" : "")">
     <div class="item-head">
-        <h1>@title</h1>
+        <h1 lang="@(Model.Title.Length > 0 ? material : null)">@title</h1>
         @if (Model.DateText is not null)
         {
             @* Everything from that time, so that a date leads somewhere. *@
             @if (Model.DateFrom is not null || Model.DateTo is not null)
             {
-                <p class="mb-0"><a asp-page="/Search" asp-route-from="@Model.DateFrom?.Year" asp-route-to="@Model.DateTo?.Year" class="item-date" title="@T["Everything from this time"]">@Model.DateText</a></p>
+                <p class="mb-0"><a asp-page="/Search" asp-route-from="@Model.DateFrom?.Year" asp-route-to="@Model.DateTo?.Year" class="item-date" title="@T["Everything from this time"]" lang="@material">@Model.DateText</a></p>
             }
             else
             {
-                <p class="text-muted mb-0">@Model.DateText</p>
+                <p class="text-muted mb-0" lang="@material">@Model.DateText</p>
             }
         }
     </div>
@@ -54,20 +56,21 @@
                 number++;
                 var alt = file.AltText ?? (count > 1 ? T["{0}, photo {1} of {2}", title, number, count].Value : title);
                 var picture = number == 1 ? "eager" : "lazy";
+                var altLanguage = file.AltText is not null || Model.Title.Length > 0 && count == 1 ? material : null;
                 @* The first picture is what the page is about, so it does not wait. *@
                 <figure id="photo-@number">
                     @if (largePhotos && file.HasLarge)
                     {
                         @* The browser's own view of a picture can already zoom, on every device, without any script. *@
                         <a href="@mediaAddress/@file.Id/large" class="photo-link">
-                            <img src="@mediaAddress/@file.Id/preview" alt="@alt" width="@file.PreviewWidth" height="@file.PreviewHeight"
+                            <img src="@mediaAddress/@file.Id/preview" alt="@alt" lang="@altLanguage" width="@file.PreviewWidth" height="@file.PreviewHeight"
                                  class="media-preview rounded" loading="@picture" fetchpriority="@(number == 1 ? "high" : "auto")" />
                             <span class="d-print-none">@T["Open at full size"]</span>
                         </a>
                     }
                     else
                     {
-                        <img src="@mediaAddress/@file.Id/preview" alt="@alt" width="@file.PreviewWidth" height="@file.PreviewHeight"
+                        <img src="@mediaAddress/@file.Id/preview" alt="@alt" lang="@altLanguage" width="@file.PreviewWidth" height="@file.PreviewHeight"
                              class="media-preview rounded" loading="@picture" fetchpriority="@(number == 1 ? "high" : "auto")" />
                     }
                     @if (count > 1 || file.Caption is not null)
@@ -77,7 +80,10 @@
                             {
                                 <span class="photo-number">@T["Photo {0} of {1}", number, count]</span>
                             }
-                            @file.Caption
+                            @if (file.Caption is not null)
+                            {
+                                <span lang="@material">@file.Caption</span>
+                            }
                         </figcaption>
                     }
                 </figure>
@@ -87,7 +93,7 @@
     <div class="item-text prose">
         @if (!string.IsNullOrWhiteSpace(Model.Description))
         {
-            <p class="text-preserve-lines">@Model.Description</p>
+            <p class="text-preserve-lines" lang="@material">@Model.Description</p>
         }
         @if (Model.Contribution is { ShowName: true, ContributorName: { } contributorName })
         {
@@ -96,7 +102,7 @@
         @if (Model.Tags.Count > 0)
         {
             <h2 class="visually-hidden">@T["Tags"]</h2>
-            <ul class="list-unstyled d-flex flex-wrap gap-2">
+            <ul class="list-unstyled d-flex flex-wrap gap-2" lang="@material">
                 @foreach (var tag in Model.Tags)
                 {
                     <li><a asp-page="/Search" asp-route-tag="@tag.Name" class="badge rounded-pill text-bg-light border tag-link">@tag.Name</a></li>
@@ -114,7 +120,7 @@
             </p>
             @if (Model.Credit is not null)
             {
-                <p class="mb-1">@Model.Credit</p>
+                <p class="mb-1" lang="@material">@Model.Credit</p>
             }
             @if (identity.Text(ArchiveTextKind.Contact) is not null)
             {

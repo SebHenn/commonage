@@ -168,7 +168,7 @@ public static class DemoContent
 
         db.ArchiveItems.AddRange(items);
         // A made-up group, so the demo shows an archive as a group would set it up.
-        db.ArchiveSettings.Add(new ArchiveSettings { DefaultLanguage = language, PrivacyReviewed = true, ImprintNotNeeded = true, DefaultRightsUri = RightsOptions.NotEvaluated });
+        db.ArchiveSettings.Add(new ArchiveSettings { DefaultLanguage = language, ContentLanguage = language, PrivacyReviewed = true, ImprintNotNeeded = true, DefaultRightsUri = RightsOptions.NotEvaluated });
         void Text(ArchiveTextKind kind, string text) => db.ArchiveTexts.Add(new ArchiveText { Language = language, Kind = kind, Text = text });
         Text(ArchiveTextKind.Name, T("Lindenau History Group", "Geschichtsverein Lindenau"));
         Text(ArchiveTextKind.Tagline, T("Photos and memories from a town that does not exist.", "Fotos und Erinnerungen aus einem Ort, den es nicht gibt."));

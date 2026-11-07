@@ -49,7 +49,7 @@ public static class Accounts
 public class LocalizedIdentityErrorDescriber(IStringLocalizer<SharedResource> localizer) : IdentityErrorDescriber
 {
     public override IdentityError PasswordTooShort(int length) =>
-        new() { Code = nameof(PasswordTooShort), Description = localizer["The password must be at least {0} characters long.", length] };
+        new() { Code = nameof(PasswordTooShort), Description = localizer.Plural("The password must be at least {0, plural, one {# character} other {# characters}} long.", length) };
 
     public override IdentityError PasswordRequiresDigit() =>
         new() { Code = nameof(PasswordRequiresDigit), Description = localizer["The password must contain a digit."] };
@@ -64,7 +64,7 @@ public class LocalizedIdentityErrorDescriber(IStringLocalizer<SharedResource> lo
         new() { Code = nameof(PasswordRequiresNonAlphanumeric), Description = localizer["The password must contain a character that is not a letter or digit, such as - or !."] };
 
     public override IdentityError PasswordRequiresUniqueChars(int uniqueChars) =>
-        new() { Code = nameof(PasswordRequiresUniqueChars), Description = localizer["The password must contain at least {0} different characters.", uniqueChars] };
+        new() { Code = nameof(PasswordRequiresUniqueChars), Description = localizer.Plural("The password must contain at least {0, plural, one {# different character} other {# different characters}}.", uniqueChars) };
 
     public override IdentityError PasswordMismatch() =>
         new() { Code = nameof(PasswordMismatch), Description = localizer["The current password is incorrect."] };

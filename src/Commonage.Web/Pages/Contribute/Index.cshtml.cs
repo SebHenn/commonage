@@ -137,7 +137,7 @@ public class IndexModel(
         if (!string.IsNullOrWhiteSpace(Input.Date) && !DateRange.TryParse(Input.Date, out _))
             ModelState.AddModelError("Input.Date", localizer["This date could not be understood. Please include a year, for example: 1953, 12.03.1953, circa 1950, 1950s, 1950–1955."]);
         if (Files.Count > MaxFiles)
-            ModelState.AddModelError("Files", localizer["You can send at most {0} photos at once.", MaxFiles]);
+            ModelState.AddModelError("Files", localizer.Plural("You can send at most {0, plural, one {# photo} other {# photos}} at once.", MaxFiles));
         foreach (var file in Files)
         {
             if (await uploads.CheckAsync(file, cancellationToken) is var error and not UploadError.None)

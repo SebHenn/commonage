@@ -40,6 +40,10 @@ public class SettingsModel(
     public IReadOnlyList<string> TimeZones { get; private set; } = [];
     public IReadOnlyList<string> Languages => languages.Codes;
 
+    /// <summary>Languages dates can also be read in: those with words of their own, and those of the interface.</summary>
+    public IReadOnlyList<string> DateLanguageChoices =>
+        DateVocabulary.All.Select(v => v.Language).Concat(languages.Codes).Distinct().Where(SupportedLanguages.AllLanguages.Contains).ToList();
+
     public class InputModel
     {
         [StringLength(200, ErrorMessage = "The name can be at most {1} characters long.")]
@@ -88,6 +92,11 @@ public class SettingsModel(
         [Display(Name = "Language of the archive")]
         public string DefaultLanguage { get; set; } = "en";
 
+        [Display(Name = "Language of the material")]
+        public string? ContentLanguage { get; set; }
+
+        public List<string> OtherContentLanguages { get; set; } = [];
+
         [Display(Name = "Time zone")]
         public string? TimeZone { get; set; }
 
@@ -121,6 +130,11 @@ public class SettingsModel(
             AccentColor = settings.AccentColor ?? StandardColor,
             UseStandardColor = settings.AccentColor is null,
             DefaultLanguage = settings.DefaultLanguage,
+            // Before an admin chose, dates were read in English and German. Saving without a change keeps that.
+            ContentLanguage = settings.ContentLanguage ?? settings.DefaultLanguage,
+            OtherContentLanguages = settings.ContentLanguage is null
+                ? DateLanguages.BeforeTheSetting.Where(l => l != settings.DefaultLanguage).ToList()
+                : settings.OtherContentLanguages?.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList() ?? [],
             TimeZone = settings.TimeZone,
             AllowSearchEngines = settings.AllowSearchEngines,
             LargePhotos = settings.LargePhotos,
@@ -140,6 +154,11 @@ public class SettingsModel(
 
         if (!languages.Offers(Input.DefaultLanguage))
             ModelState.AddModelError("Input.DefaultLanguage", localizer["Please choose one of the languages."]);
+        // A form from before these fields existed leaves them as they are.
+        if (Input.ContentLanguage is not null && Input.ContentLanguage != DateLanguages.Several && !SupportedLanguages.AllLanguages.Contains(Input.ContentLanguage))
+            ModelState.AddModelError("Input.ContentLanguage", localizer["Please choose one of the languages."]);
+        if (Input.OtherContentLanguages.Any(l => !DateLanguageChoices.Contains(l)))
+            ModelState.AddModelError("Input.OtherContentLanguages", localizer["Please choose one of the languages."]);
         if (!string.IsNullOrEmpty(Input.TimeZone) && !TimeZoneInfo.TryFindSystemTimeZoneById(Input.TimeZone, out _))
             ModelState.AddModelError("Input.TimeZone", localizer["Please choose one of the time zones."]);
 
@@ -176,6 +195,12 @@ public class SettingsModel(
             settings.LogoId = newLogo;
 
         settings.DefaultLanguage = Input.DefaultLanguage;
+        if (Input.ContentLanguage is not null)
+        {
+            settings.ContentLanguage = Input.ContentLanguage;
+            var others = Input.OtherContentLanguages.Where(l => l != Input.ContentLanguage).Distinct().ToList();
+            settings.OtherContentLanguages = others.Count == 0 ? null : string.Join(',', others);
+        }
         settings.AccentColor = accent;
         settings.TimeZone = string.IsNullOrEmpty(Input.TimeZone) ? null : Input.TimeZone;
         settings.AllowSearchEngines = Input.AllowSearchEngines;

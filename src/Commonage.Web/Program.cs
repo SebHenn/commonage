@@ -6,6 +6,7 @@ using Commonage.Web.Audit;
 using Commonage.Web.Contributions;
 using Commonage.Web.Data;
 using Commonage.Web.Demo;
+using Commonage.Web.Domain;
 using Commonage.Web.Export;
 using Commonage.Web.Forms;
 using Commonage.Web.Identity;
@@ -154,8 +155,10 @@ app.UseRequestLocalization(localization);
 
 app.Use(async (context, next) =>
 {
-    var zone = (await context.RequestServices.GetRequiredService<ArchiveProfile>().GetAsync()).TimeZoneId;
+    var identity = await context.RequestServices.GetRequiredService<ArchiveProfile>().GetAsync();
+    var zone = identity.TimeZoneId;
     Dates.Zone.Value = zone is not null && TimeZoneInfo.TryFindSystemTimeZoneById(zone, out var found) ? found : null;
+    DateLanguages.Current = identity.DateLanguagesFor(CultureInfo.CurrentUICulture.TwoLetterISOLanguageName);
     await next(context);
 });
 

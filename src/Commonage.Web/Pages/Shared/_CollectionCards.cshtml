@@ -1,4 +1,8 @@
 @model IEnumerable<CollectionCard>
+@inject Commonage.Web.Operations.ArchiveProfile Profile
+@{
+    var material = (await Profile.GetAsync()).MaterialLanguage;
+}
 
 <ul class="list-unstyled row g-4">
     @foreach (var collection in Model)
@@ -14,11 +18,11 @@
                 {
                     <span class="media-thumbnail text-tile" aria-hidden="true"><span>@T["Text"]</span></span>
                 }
-                <span class="collection-card-title">@collection.Title</span>
+                <span class="collection-card-title" lang="@material">@collection.Title</span>
             </a>
             @if (!string.IsNullOrWhiteSpace(collection.Description))
             {
-                <p class="mb-1">@collection.Description</p>
+                <p class="mb-1" lang="@material">@collection.Description</p>
             }
             <small class="text-muted">@T["Items: {0}", collection.PublishedItemCount]</small>
         </li>

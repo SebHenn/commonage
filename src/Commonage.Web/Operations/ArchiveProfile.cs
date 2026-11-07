@@ -15,6 +15,25 @@ public sealed class ArchiveIdentity(ArchiveSettings settings, IReadOnlyList<Arch
     public const string SoftwareName = "Commonage";
 
     public string DefaultLanguage => settings.DefaultLanguage;
+    public string? ContentLanguage => settings.ContentLanguage;
+    public IReadOnlyList<string> OtherContentLanguages =>
+        settings.OtherContentLanguages?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries) ?? [];
+
+    /// <summary>
+    /// What the archive's own material is written in, for the lang attribute: its main language, or else the language of
+    /// its own texts. Null if it is in several languages without a main one, so that no wrong language is claimed.
+    /// </summary>
+    public string? MaterialLanguage => settings.ContentLanguage switch
+    {
+        DateLanguages.Several => null,
+        { } language => language,
+        null => settings.DefaultLanguage,
+    };
+
+    /// <summary>Dates are read in the material's languages and in the language of whoever types them.</summary>
+    public DateLanguages DateLanguagesFor(string interfaceLanguage) =>
+        DateLanguages.For(settings.ContentLanguage, OtherContentLanguages, interfaceLanguage);
+
     public string? AccentColor => settings.AccentColor;
     public Guid? LogoId => settings.LogoId;
     public string? TimeZoneId => settings.TimeZone;

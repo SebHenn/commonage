@@ -4,6 +4,7 @@ using Commonage.Web.Operations;
 using Commonage.Web.Domain;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 
@@ -414,5 +415,118 @@ public class ArchiveSettingsTests(CommonageAppFactory app)
 
         Assert.Contains(name, await visitor.GetStringAsync("/"));
         Assert.Equal(HttpStatusCode.OK, (await visitor.GetAsync("/contact")).StatusCode);
+    }
+
+    private static async Task<string> DateCheckAsync(HttpClient client, string text) =>
+        System.Text.Json.JsonDocument.Parse(await client.GetStringAsync($"/date-check?text={Uri.EscapeDataString(text)}"))
+            .RootElement.GetProperty("message").GetString()!;
+
+    private static Task ReadInAsync(HttpClient client, string language) =>
+        Browser.SendFormAsync(client, "/SetLanguage", new() { ["culture"] = language, ["returnUrl"] = "/" }, pageUrl: "/");
+
+    [Fact]
+    public async Task Item_text_says_which_language_it_is_in_also_to_a_reader_of_another()
+    {
+        await using var demo = await NewArchiveAsync("de");
+        using var visitor = demo.CreateClient();
+        visitor.DefaultRequestHeaders.Add("Accept-Language", "en");
+        var home = await visitor.GetStringAsync("/");
+        var itemUrl = System.Text.RegularExpressions.Regex.Match(home, @"href=""(/items/\d+)""").Groups[1].Value;
+
+        var page = await visitor.GetStringAsync(itemUrl);
+
+        Assert.Contains("<html lang=\"en\"", page);
+        Assert.Matches(@"<h1 lang=""de"">", page);
+        Assert.Contains("class=\"text-preserve-lines\" lang=\"de\"", page);
+        Assert.Contains("class=\"item-card-title\" lang=\"de\"", home);
+        Assert.Contains("<h2 id=\"reuse-heading\" class=\"h6 mb-1\">May I reuse this?</h2>", page);
+        Assert.Contains("xml:lang=\"de\"", await visitor.GetStringAsync("/feed.xml"));
+
+        // In several languages without a main one, no language is claimed for them.
+        using var admin = await AdminAsync(demo);
+        await SaveAsync(admin, new() { ["Input.DefaultLanguage"] = "de", ["Input.ContentLanguage"] = DateLanguages.Several });
+        var mixed = await visitor.GetStringAsync(itemUrl);
+        Assert.Contains("<h1>", mixed);
+        Assert.DoesNotContain("class=\"text-preserve-lines\" lang=", mixed);
+    }
+
+    [Fact]
+    public async Task Without_a_choice_the_material_is_taken_to_be_in_the_archive_language()
+    {
+        await using var archive = await NewArchiveAsync();
+        using var admin = await AdminAsync(archive);
+        await SaveAsync(admin, new() { ["Input.DefaultLanguage"] = "de" });
+
+        var settings = await admin.GetStringAsync("/Admin/Settings");
+
+        Assert.Matches(@"<option value=""de"" lang=""de"" selected=""selected"">Deutsch</option>", settings);
+        Assert.Matches(@"id=""date-language-en""[^>]*checked=""checked""", settings);
+        Assert.DoesNotMatch(@"id=""date-language-de""[^>]*checked=""checked""", settings);
+    }
+
+    [Fact]
+    public async Task Saving_the_settings_without_a_change_reads_dates_as_before()
+    {
+        await using var archive = await NewArchiveAsync();
+        using var admin = await AdminAsync(archive);
+        Assert.Equal("Understood as: 1945–1955", await DateCheckAsync(admin, "um 1950"));
+
+        // What the page offers when nothing was chosen: English, and German as well.
+        await SaveAsync(admin, new() { ["Input.ContentLanguage"] = "en", ["Input.OtherContentLanguages"] = "de" });
+
+        Assert.Equal("Understood as: 1945–1955", await DateCheckAsync(admin, "um 1950"));
+        Assert.Equal("Understood as: 1950–1959", await DateCheckAsync(admin, "1950er Jahre"));
+        var saved = await archive.Services.CreateScope().ServiceProvider.GetRequiredService<Commonage.Web.Data.CommonageDbContext>()
+            .ArchiveSettings.SingleAsync();
+        Assert.Equal(("en", "de"), (saved.ContentLanguage, saved.OtherContentLanguages));
+    }
+
+    [Fact]
+    public async Task Dates_are_read_in_the_languages_of_the_material_and_of_whoever_types_them()
+    {
+        await using var archive = await NewArchiveAsync();
+        using var admin = await AdminAsync(archive);
+        Assert.Equal("Understood as: 1953", await DateCheckAsync(admin, "12 marca 1953"));
+
+        var saved = await SaveAsync(admin, new() { ["Input.ContentLanguage"] = "pl" });
+
+        Assert.Contains("Your changes are saved", await saved.Content.ReadAsStringAsync());
+        Assert.Equal("Understood as: 1953-03-12", await DateCheckAsync(admin, "12 marca 1953"));
+        // German is no longer the material's, and this admin reads English.
+        Assert.Equal("Understood as: 1950", await DateCheckAsync(admin, "um 1950"));
+        Assert.Equal("Understood as: 1950–1959", await DateCheckAsync(admin, "1950s"));
+        await ReadInAsync(admin, "de");
+        Assert.Equal("Verstanden als: 1945–1955", await DateCheckAsync(admin, "um 1950"));
+    }
+
+    [Fact]
+    public async Task Only_languages_from_the_list_can_be_chosen()
+    {
+        await using var archive = await NewArchiveAsync();
+        using var admin = await AdminAsync(archive);
+
+        var wrong = await (await SaveAsync(admin, new() { ["Input.ContentLanguage"] = "<script>" })).Content.ReadAsStringAsync();
+        var wrongOther = await (await SaveAsync(admin, new() { ["Input.ContentLanguage"] = "en", ["Input.OtherContentLanguages"] = "pl" })).Content.ReadAsStringAsync();
+
+        Assert.Contains("Please choose one of the languages.", wrong);
+        Assert.Contains("Please choose one of the languages.", wrongOther);
+        Assert.DoesNotContain("Your changes are saved", wrong + wrongOther);
+    }
+
+    [Fact]
+    public async Task A_language_without_translations_reads_English_with_English_counts()
+    {
+        await using var polish = app.WithWebHostBuilder(b => b.UseSetting("Languages:ForTesting", "pl"));
+        using var curator = polish.CreateClient();
+        await Browser.LogInAsCuratorAsync(curator);
+        await ReadInAsync(curator, "pl");
+
+        var bin = await curator.GetStringAsync("/Admin/Bin");
+        await ReadInAsync(curator, "de");
+        var german = await curator.GetStringAsync("/Admin/Bin");
+
+        Assert.Contains("<html lang=\"pl\"", bin);
+        Assert.Contains("Deleted items and photos stay here for 30 days,", bin);
+        Assert.Contains("bleiben 30 Tage hier", german);
     }
 }
