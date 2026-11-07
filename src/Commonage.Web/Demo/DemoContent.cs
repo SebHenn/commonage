@@ -130,8 +130,9 @@ public static class DemoContent
                 ShowName = true,
                 Rights = RightsStatement.PermissionFromRightsHolder,
                 RightsHolder = T("Grandfather Example", "Großvater Beispiel"),
-                ConsentText = T("I agree that the archive may keep what I send in, describe it and publish it on this website. If I chose so above, my name is shown with it. I can ask the archive to take it down at any time.",
-                    "Ich bin einverstanden, dass das Archiv meinen Beitrag aufbewahrt, beschreibt und auf dieser Website veröffentlicht. Wenn ich es oben gewählt habe, wird mein Name dabei angezeigt. Ich kann das Archiv jederzeit bitten, ihn wieder zu entfernen."),
+                ConsentText = T("I agree that the archive may keep what I send in, describe it and publish it on this website, also where a link to it is shared and in its list of what is new. If I chose so above, my name is shown with it. I can ask the archive to take it down at any time, but it cannot reach copies others have made.",
+                    "Ich bin einverstanden, dass das Archiv meinen Beitrag aufbewahrt, beschreibt und auf dieser Website veröffentlicht, auch dort, wo ein Link darauf geteilt wird, und in seiner Liste der Neuigkeiten. Wenn ich es oben gewählt habe, wird mein Name dabei angezeigt. Ich kann das Archiv jederzeit bitten, ihn wieder zu entfernen, aber es kann Kopien nicht erreichen, die andere gemacht haben."),
+                ConsentCoversSharing = true,
                 SubmittedAt = now,
             },
         };
@@ -199,6 +200,7 @@ public static class DemoContent
                     ShowName = true,
                     Rights = RightsStatement.CreatedByContributor,
                     ConsentText = T("Agreed in conversation; recorded by a curator.", "Im Gespräch zugestimmt; von der Kuratorin erfasst."),
+                    ConsentCoversSharing = true,
                     SubmittedAt = now,
                 };
             }

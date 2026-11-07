@@ -269,13 +269,17 @@
 
     function showRightsHolderWhenItApplies() {
         const holder = form.querySelector('[data-rights-holder]');
+        const reuse = form.querySelector('[data-reuse]');
         const radios = form.querySelectorAll('input[name="Input.Rights"]');
         const field = holder.querySelector('input');
+        const offer = reuse.querySelector('select');
         const update = () => {
-            const applies = form.querySelector('input[name="Input.Rights"]:checked')?.value === 'PermissionFromRightsHolder';
-            holder.hidden = !applies;
+            const answer = form.querySelector('input[name="Input.Rights"]:checked')?.value;
+            holder.hidden = answer !== 'PermissionFromRightsHolder';
+            reuse.hidden = !answer || answer === 'Unknown';
             // What cannot be seen is not sent.
-            field.disabled = !applies;
+            field.disabled = holder.hidden;
+            offer.disabled = reuse.hidden;
         };
         radios.forEach(radio => radio.addEventListener('change', update));
         update();

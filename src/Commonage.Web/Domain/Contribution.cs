@@ -11,6 +11,13 @@ public enum RightsStatement
     Unknown = 2,
 }
 
+/// <summary>What a contributor offered others, if anything. Only a suggestion for curators, who decide what visitors are told.</summary>
+public enum ReuseOffer
+{
+    NonCommercialWithCredit = 1,
+    AnyUseWithCredit = 2,
+}
+
 /// <summary>
 /// Who sent in an archive item through a contribution link, and what they agreed to. Only curators see it,
 /// except the contributor's name on the public page when <see cref="ShowName"/> is set.
@@ -64,8 +71,17 @@ public class Contribution
     /// <summary>Who took the photos or wrote the text, if the contributor knows and it is not them.</summary>
     public string? RightsHolder { get; set; }
 
-    /// <summary>The consent statement exactly as the contributor saw and accepted it, in their language.</summary>
+    /// <summary>The consent statement exactly as the contributor saw and accepted it, in their language, with any reuse they offered.</summary>
     public required string ConsentText { get; set; }
+
+    /// <summary>What they offered others. Null means others have to ask.</summary>
+    public ReuseOffer? Reuse { get; set; }
+
+    /// <summary>
+    /// They agreed to what travels beyond this website: link previews and the feed. Earlier contributions agreed to
+    /// "this website" and stay under what they agreed to, so they stay out of those.
+    /// </summary>
+    public bool ConsentCoversSharing { get; set; }
 
     public DateTime SubmittedAt { get; set; }
 

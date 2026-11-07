@@ -29,6 +29,10 @@ public static class RightsOptions
 
     public static bool IsKnown(string uri) => All.Contains(uri);
 
+    /// <summary>What a visitor is told, also when nobody has decided anything yet.</summary>
+    public static string LabelOrAsk(IStringLocalizer localizer, string? uri) =>
+        uri is null ? localizer["Nothing has been decided yet: please ask the archive before reusing it"] : Label(localizer, uri);
+
     public static string Label(IStringLocalizer localizer, string uri) => uri switch
     {
         InCopyright => localizer["In copyright: ask before reusing"],
@@ -46,11 +50,13 @@ public static class RightsOptions
 
     /// <summary>
     /// A first suggestion from what a contributor answered. Even someone who made a photo has not given it away by sending
-    /// it in, so the suggestion is never an open licence: the contributor agreed to publication on this website, no more.
+    /// it in, so the suggestion is only an open licence if they offered one themselves, and never when they do not know who made it.
     /// </summary>
-    public static string ProposalFor(RightsStatement answer) => answer switch
+    public static string ProposalFor(RightsStatement answer, ReuseOffer? offer = null) => (answer, offer) switch
     {
-        RightsStatement.Unknown => NotEvaluated,
+        (RightsStatement.Unknown, _) => NotEvaluated,
+        (_, ReuseOffer.AnyUseWithCredit) => CcBy,
+        (_, ReuseOffer.NonCommercialWithCredit) => CcByNc,
         _ => InCopyright,
     };
 }

@@ -49,8 +49,22 @@ Curators have their own guide: [curator-handbook.md](curator-handbook.md) ([deut
 ## Rights and catalogue details
 
 On each item, curators can say what others may do with it, as a standard statement with a plain label. "Settings" has a
-default for items without one of their own. A contributor's answer only suggests a statement, and never a free licence: they
-agreed to publication on this website, not to reuse by others. Visitors do not see these yet; that comes in a later version.
+default for items without one of their own. Each item page tells visitors what applies, with the credit if there is one. Without a
+statement or a default, it tells them to ask. "Who holds the rights?" stays with curators.
+
+A contributor's answer only suggests a statement: a free licence only if they offered one themselves, and never if they do not know
+who made it. Their offer is stored in the words they saw, as part of the consent. A curator decides, because a free licence cannot be
+taken back from those who have already reused something.
+
+## Beyond this website
+
+If search engines may list the archive, it also has a feed of the latest 30 items at `/feed.xml`, a list of its public pages at
+`/sitemap.xml`, named in `robots.txt`, and what a link shows when it is pasted into a messenger. Switching that setting off ends all
+of them at once, though what was already copied elsewhere stays there.
+
+Contributions sent in before this was added agreed to "this website" only, and stay under that: `consentCoversSharing` is false, so their
+picture and text stay out of previews, and the whole item stays out of the feed. A link to one still shows its title. There is no
+button to change this, because it would take the contributor's agreement, which the archive has no record of.
 
 "Catalogue details" (reference number, where the original is kept, received from and when, notes) are for curators only and
 stay out of public pages and public search. A reference number typed into the search on "Manage archive" finds its item.
@@ -117,7 +131,8 @@ the material can always move to another system, or be handed to a public archive
 An item's title can be empty in a full export: a draft from "Add many photos" that nobody has named yet. Each file says its
 `position` among the item's photos and its `rotation`, how far curators turned it in degrees clockwise. The file itself is the
 original, which is never turned, so whoever uses the export has to apply that. Files are listed in order. `needsTranscription` is
-in a full export only.
+in a full export only. A contribution says what the contributor offered (`reuse`) and whether they agreed to more than this website
+(`consentCoversSharing`).
 
 `archive.json` has `"format": "commonage-export"` and `"version": 3`. Version 3 added each item's rights, credit and catalogue
 details and each photo's description; in `items.csv`, `rights` and `rights_holder` are now the item's own, and the contributor's

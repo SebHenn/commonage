@@ -21,6 +21,36 @@
     {
         <meta name="robots" content="noindex" />
     }
+    @if (ViewData["Canonical"] is string canonical)
+    {
+        <link rel="canonical" href="@canonical" />
+    }
+    @if (!isPrivatePage && identity.AllowSearchEngines)
+    {
+        var address = Context.Request.BaseAddress();
+        var preview = ViewData["LinkPreview"] as Commonage.Web.Search.LinkPreview
+            ?? new Commonage.Web.Search.LinkPreview(pageTitle ?? identity.Name, identity.Text(ArchiveTextKind.Tagline), $"{address}{Context.Request.Path}");
+        var image = preview.ImageUrl ?? (identity.LogoId is { } logo ? $"{address}/branding/{logo}/icon" : null);
+        <link rel="alternate" type="application/atom+xml" title="@T["What is new in {0}", identity.Name]" href="@Commonage.Web.Search.PublicFeeds.FeedPath" />
+        <meta property="og:site_name" content="@identity.Name" />
+        <meta property="og:title" content="@preview.Title" />
+        <meta property="og:type" content="@preview.Type" />
+        <meta property="og:url" content="@preview.Url" />
+        @if (preview.Description is not null)
+        {
+            <meta property="og:description" content="@preview.Description" />
+            <meta name="description" content="@preview.Description" />
+        }
+        @if (image is not null)
+        {
+            <meta property="og:image" content="@image" />
+            if (preview.ImageAlt is not null)
+            {
+                <meta property="og:image:alt" content="@preview.ImageAlt" />
+            }
+            <meta name="twitter:card" content="summary_large_image" />
+        }
+    }
     @if (identity.LogoId is { } iconId)
     {
         <link rel="icon" type="image/png" href="/branding/@iconId/favicon" />

@@ -127,6 +127,13 @@ redirects or shows the page again.
   again keeps its draft until the browser's storage is cleared.
 - **Pictures from the device** need `img-src blob:`. `SecurityHeaders` allows that on `/contribute` only.
 
+## Beyond the website
+
+`Search/PublicFeeds.cs` has the feed, the sitemap and `LinkPreview`. All of them follow `AllowSearchEngines`. Addresses come from
+the request, so behind Caddy they depend on `ASPNETCORE_FORWARDEDHEADERS_ENABLED` in `compose.production.yaml`; `SharingTests`
+tries that setting. Text goes into XML through `XmlText`, because one pasted control character would make a whole feed unreadable.
+`ArchiveItem.MayTravel` decides what goes along with a link, and it needs the contribution to be loaded.
+
 ## Photos of an item
 
 `MediaFile.Position` orders an item's photos, and the first is its cover. Anything that picks or lists photos must order by

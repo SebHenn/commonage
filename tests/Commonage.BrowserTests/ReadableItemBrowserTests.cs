@@ -178,9 +178,6 @@ public class ReadableItemBrowserTests(BrowserFixture app)
         Assert.True(await page.Locator($"{Cards}:has-text('three.jpg') [data-photo-cover]").IsVisibleAsync());
         Assert.False(await page.Locator($"{Cards}:has-text('two.jpg') [data-photo-cover]").IsVisibleAsync());
         Assert.False(await page.Locator($"{Cards}:has-text('three.jpg') button[value=first]").IsVisibleAsync());
-        // Away from the buttons and past their colour change on hover, which would otherwise be measured halfway.
-        await page.Mouse.MoveAsync(0, 0);
-        await page.WaitForTimeoutAsync(400);
         await AccessibilityTests.AssertNoViolationsAsync(page, "photos being put in order");
 
         // Saved after all that, the order is what it looks like and nobody is told that someone else changed the item.

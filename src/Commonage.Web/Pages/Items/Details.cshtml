@@ -2,6 +2,9 @@
 @model Commonage.Web.Pages.Items.DetailsModel
 @{
     ViewData["Title"] = Model.Item.Title;
+    ViewData["Canonical"] = Model.Address;
+    ViewData["Citation"] = Model.Citation;
+    ViewData["LinkPreview"] = Model.Preview;
 }
 
 <nav aria-label="breadcrumb">

@@ -14,7 +14,11 @@
             </select>
             <span asp-validation-for="Input.RightsUri" class="text-danger"></span>
             <div id="rights-help" class="form-text">
-                @if (Model.RightsWereProposed)
+                @if (Model.RightsWereProposed && Model.Contribution?.Reuse is not null)
+                {
+                    @T["Suggested because the contributor offered this themselves. Check that it is theirs to give before you publish: a free licence cannot be taken back from those who have already reused it."]
+                }
+                else if (Model.RightsWereProposed)
                 {
                     @T["Suggested from what the contributor answered. They agreed to publication on this website, not to reuse by others, so only a free licence they gave you themselves should go further."]
                 }
