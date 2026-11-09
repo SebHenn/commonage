@@ -9,7 +9,7 @@ RUN dotnet restore src/Commonage.Web/Commonage.Web.csproj -a $TARGETARCH --locke
 COPY src/ src/
 RUN dotnet publish src/Commonage.Web/Commonage.Web.csproj -c Release -a $TARGETARCH --self-contained false -o /app --no-restore
 
-FROM mcr.microsoft.com/dotnet/aspnet:10.0@sha256:de0ee358cdd672f7017a003bed21e9ac9ed48a27c922a59b18175b6e82fa7fee
+FROM mcr.microsoft.com/dotnet/aspnet:10.0@sha256:1a48394b6f29d3a32c79d9edecd4abda0ecbe8776d567dbfc4590ed6979c740c
 WORKDIR /app
 COPY --from=build /app .
 # Uploaded files live here; Compose mounts a volume so they survive container updates.
