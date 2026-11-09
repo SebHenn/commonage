@@ -53,7 +53,10 @@ public class ArchiveBin(CommonageDbContext db, MediaUploadService uploads, Audit
     }
 }
 
-/// <summary>Empties what has expired from the bin, at startup and then a few times a day.</summary>
+/// <summary>
+/// At startup and then a few times a day: moves rejected and withdrawn contributions to the bin and shortens the activity
+/// log, if the archive keeps them for a set time (<see cref="ArchiveRetention"/>), then empties what has expired from the bin.
+/// </summary>
 public class ArchiveBinPurger(IServiceScopeFactory scopeFactory, ILogger<ArchiveBinPurger> logger) : BackgroundService
 {
     private static readonly TimeSpan Interval = TimeSpan.FromHours(6);
@@ -66,11 +69,21 @@ public class ArchiveBinPurger(IServiceScopeFactory scopeFactory, ILogger<Archive
             try
             {
                 using var scope = scopeFactory.CreateScope();
-                await scope.ServiceProvider.GetRequiredService<ArchiveBin>().PurgeExpiredAsync(stoppingToken);
+                await scope.ServiceProvider.GetRequiredService<ArchiveRetention>().ApplyAsync(stoppingToken);
             }
             catch (Exception exception) when (exception is not OperationCanceledException)
             {
                 // The next round tries again; nothing is lost by waiting.
+                logger.LogError(exception, "Could not apply the times the archive keeps records.");
+            }
+
+            try
+            {
+                using var scope = scopeFactory.CreateScope();
+                await scope.ServiceProvider.GetRequiredService<ArchiveBin>().PurgeExpiredAsync(stoppingToken);
+            }
+            catch (Exception exception) when (exception is not OperationCanceledException)
+            {
                 logger.LogError(exception, "Could not empty the bin.");
             }
         }

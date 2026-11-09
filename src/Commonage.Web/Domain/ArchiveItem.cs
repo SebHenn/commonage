@@ -43,6 +43,12 @@ public class ArchiveItem
     /// <summary>When the item was moved to the bin. Items in the bin are hidden from everything but the bin page.</summary>
     public DateTime? DeletedAt { get; private set; }
 
+    /// <summary>
+    /// When a curator rejected it, or it was withdrawn. An archive can keep such contributions for a set time, see
+    /// <see cref="ArchiveSettings.RejectedKeptMonths"/>, which counts from here. Null for every other status.
+    /// </summary>
+    public DateTime? RejectedOrWithdrawnAt { get; private set; }
+
     /// <summary>Changes with every save. Lets a form notice that someone else changed the item since it was opened.</summary>
     public uint Version { get; private set; }
 
@@ -76,7 +82,13 @@ public class ArchiveItem
 
     public void MoveToBin(DateTime now) => DeletedAt = now;
 
-    public void RestoreFromBin() => DeletedAt = null;
+    /// <summary>A rejected or withdrawn contribution someone took back out of the bin is kept for the full time again.</summary>
+    public void RestoreFromBin(DateTime now)
+    {
+        DeletedAt = null;
+        if (RejectedOrWithdrawnAt is not null)
+            RejectedOrWithdrawnAt = now;
+    }
 
     /// <summary>
     /// A draft made from a photo that nobody has named yet. Its title is empty rather than a stored word like "Untitled",
@@ -97,6 +109,7 @@ public class ArchiveItem
         MarkReviewed(now);
         Status = ItemStatus.Published;
         PublishedAt ??= now;
+        RejectedOrWithdrawnAt = null;
     }
 
     public void Unpublish()
@@ -110,12 +123,14 @@ public class ArchiveItem
     {
         MarkReviewed(now);
         Status = ItemStatus.Draft;
+        RejectedOrWithdrawnAt = null;
     }
 
     public void Reject(DateTime now)
     {
         MarkReviewed(now);
         Status = ItemStatus.Rejected;
+        RejectedOrWithdrawnAt = now;
     }
 
     /// <summary>Hides a contribution for good because the contributor withdrew their consent.</summary>
@@ -125,6 +140,7 @@ public class ArchiveItem
             throw new InvalidOperationException("Only contributions can be withdrawn.");
         MarkReviewed(now);
         Status = ItemStatus.Withdrawn;
+        RejectedOrWithdrawnAt ??= now;
     }
 
     /// <summary>Sets the date from free text. Returns false, and changes nothing, if no date can be read from it.</summary>

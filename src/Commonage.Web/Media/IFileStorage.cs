@@ -13,6 +13,19 @@ public interface IFileStorage
 
     /// <summary>Removes the file stored under the key. Does nothing if there is none, for example a preview that failed.</summary>
     void Delete(string key);
+
+    bool Exists(string key)
+    {
+        try
+        {
+            OpenRead(key).Dispose();
+            return true;
+        }
+        catch (Exception exception) when (exception is FileNotFoundException or DirectoryNotFoundException)
+        {
+            return false;
+        }
+    }
 }
 
 /// <summary>Stores files in a directory on the server, which should be a persistent volume in Docker.</summary>
@@ -46,6 +59,8 @@ public class LocalFileStorage(string rootPath) : IFileStorage
         if (File.Exists(path))
             File.Delete(path);
     }
+
+    public bool Exists(string key) => File.Exists(Resolve(key));
 
     private string Resolve(string key)
     {

@@ -147,8 +147,10 @@ Set `COMMONAGE_VERSION=0.3` in `.env`, then run `docker compose pull` and `docke
 
 ## Keeping an eye on it
 
-- `https://archive.example.org/health` answers "Healthy" while the app and the database work. An uptime monitor can
-  check it every few minutes.
+- `https://archive.example.org/health` answers "Healthy" while the app, the database and the media folder work, the
+  disk has room and the last backup is recent. An uptime monitor can check it every few minutes. "Degraded" still answers
+  with HTTP 200, so set the monitor to look for the word `Healthy` ([operations.md](operations.md#health-check-for-uptime-monitors)).
+  "Manage archive" → "System" shows each check.
 - `docker compose logs --tail 100 web` shows the app's log; `docker compose logs caddy` shows certificate problems.
 - Keep the server's own updates switched on (`unattended-upgrades` on Debian and Ubuntu).
 

@@ -173,7 +173,7 @@ real pace over M7 and M8 before promising dates. Each milestone is a minor relea
 | **M15 Readable items** ✅ | 4 | A visitor reads a scanned letter at full size, sees "Photo 2 of 4" with its caption, and moves on to the next item or to items from the same time. Curators reorder, rotate and describe each photo. |
 | **M16 Rights and sharing** ✅ | 3 | Every item page says whether it may be reused, in plain language. "Cite this item" gives a line to copy. A link pasted into a messenger shows the picture and the archive's name. |
 | **M17 Language reach** ✅ | 5 | A translator without Git has tried Weblate on a few pages. Missing translations fail a test. Counts read correctly under Polish plural rules. Item text carries the right `lang`. Dates that are accepted today are still accepted. |
-| **M18 Accounts and system** | 4 | A curator logs in with an authenticator app. Login keys are encrypted with a key outside the database, and the backup test still passes. An admin sees version, disk use, failed previews (with retry) and backup age on one page. |
+| **M18 Accounts and system** ✅ | 4 | A curator logs in with an authenticator app. Login keys are encrypted with a key outside the database, and the backup test still passes. An admin sees version, disk use, failed previews (with retry) and backup age on one page. |
 | **M19 Discovery** | 3 | A visitor taps "1960s" and finds the flood, opens "Places" and picks "Mill Street". A curator merges "Mill St" into "Mill Street". |
 | **M20 Community knowledge** | 4 | With the feature switched on, a visitor says "that's my aunt on the left" or asks for removal from an item page, and a curator handles it. A curator prints a poster with a QR code for a contribution link. |
 | **M21 Import and scale** | 4 | A group imports a spreadsheet and a ZIP of scans after a dry run that lists every problem. A 50,000-item archive on a small ARM server stays fast and exports without running out of memory. |
@@ -391,10 +391,14 @@ old date reader in the tests; the export README. The demo was already in both la
   checks in `/health`, with a note for uptime monitors that a degraded answer is still HTTP 200.
 - How long the activity log and Rejected or Withdrawn items are kept; activity log filters.
 
-**First half done (November 2026):** authenticator apps, and the login keys encrypted with `COMMONAGE_LOGIN_KEY`. A setup
-link still only sets a new password, so that someone who forgot it keeps their app. For a lost phone, an admin turns the
-app off, and `reset-two-factor` on the server does it for the last admin or after the key was lost. The system page and
-how long things are kept follow in a second pull request.
+**Done (November 2026), in two pull requests.** First, authenticator apps and the login keys encrypted with
+`COMMONAGE_LOGIN_KEY`. A setup link still only sets a new password, so that someone who forgot it keeps their app. For a lost
+phone, an admin turns the app off, and `reset-two-factor` on the server does it for the last admin or after the key was lost.
+Second, the System page, the checks behind `/health` (media folder, disk and backup as well as the database), and how long the
+activity log and rejected or withdrawn contributions are kept, with activity log filters. Both times start as "Always", so an
+update deletes nothing; rejected contributions go to the bin rather than straight away, and the log keeps at least a year. A
+missing newest original answers `Unhealthy`, which also makes `update.sh` roll back, because an unmounted media volume loses
+every upload after it.
 
 **M19 Discovery**
 

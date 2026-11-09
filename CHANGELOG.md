@@ -96,6 +96,16 @@ version may change things that need attention when updating, and these notes say
   be used to log in. `scripts/update.sh` adds the key to `.env`; after updating by hand, add one as docs/deployment.md
   describes. **Everyone logs in again once, and setup links created before stop working.** Keep a copy of `.env` apart from
   the backups: a restore needs the same key.
+- **A System page** for admins: the version, the checks behind `/health`, free disk space and how fast it is used up, the
+  database, the last backup and restore test, and previews that could not be made, with "Try again".
+- **`/health` also checks the media folder, free disk space and the last backup.** A full disk or an old backup answers
+  `Degraded`, still with HTTP 200, so set an uptime monitor to look for the word `Healthy`. A media folder that cannot be written
+  to, or that misses the newest original, answers `Unhealthy` with 503, which also makes `scripts/update.sh` roll back. See
+  docs/operations.md.
+- "Settings" can limit how long the activity log, and rejected or withdrawn contributions, are kept. Both stay "Always" until an
+  admin changes them. Rejected and withdrawn contributions then go to the bin, and for those from before this update, the time
+  starts with it.
+- The activity log can be filtered by who, what and a title or name.
 
 ### Project
 

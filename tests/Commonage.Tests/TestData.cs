@@ -2,7 +2,10 @@ using System.Net;
 using System.Text.RegularExpressions;
 using Commonage.Web.Data;
 using Commonage.Web.Domain;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 
 namespace Commonage.Tests;
 
@@ -19,9 +22,35 @@ public static partial class TestData
 
     public static string Unique(string text) => $"{text} {Guid.NewGuid():N}";
 
+    /// <summary>The app with a database of its own, for tests of what applies to a whole archive, such as its settings.</summary>
+    public static async Task<WebApplicationFactory<Program>> NewArchiveAsync(this CommonageAppFactory app, Action<IWebHostBuilder>? configure = null)
+    {
+        var name = "archive_" + Guid.NewGuid().ToString("N");
+        await using (var connection = new NpgsqlConnection(app.ConnectionString))
+        {
+            await connection.OpenAsync();
+            await using var create = new NpgsqlCommand($"CREATE DATABASE {name}", connection);
+            await create.ExecuteNonQueryAsync();
+        }
+        // Without pooling, because each archive would otherwise keep its own connections open after the test, and PostgreSQL
+        // allows only so many.
+        var connectionString = new NpgsqlConnectionStringBuilder(app.ConnectionString) { Database = name, Pooling = false }.ConnectionString;
+        return app.WithWebHostBuilder(b =>
+        {
+            b.UseSetting("ConnectionStrings:Default", connectionString);
+            configure?.Invoke(b);
+        });
+    }
+
+    public static async Task<T> WithDbAsync<T>(this WebApplicationFactory<Program> archive, Func<CommonageDbContext, Task<T>> query)
+    {
+        using var scope = archive.Services.CreateScope();
+        return await query(scope.ServiceProvider.GetRequiredService<CommonageDbContext>());
+    }
+
     /// <summary>Creates an item that came in through a contribution link, in a collection of its own.</summary>
     public static Task<ArchiveItem> CreateContributionAsync(
-        this CommonageAppFactory app, ItemStatus status, string name = "Erika Muster", string? email = "erika@example.org") =>
+        this WebApplicationFactory<Program> app, ItemStatus status, string name = "Erika Muster", string? email = "erika@example.org") =>
         app.WithDbAsync(async db =>
         {
             var now = DateTime.UtcNow;
@@ -47,6 +76,8 @@ public static partial class TestData
                 item.Publish(now);
             else if (status == ItemStatus.Rejected)
                 item.Reject(now);
+            else if (status == ItemStatus.Withdrawn)
+                item.Withdraw(now);
             db.ArchiveItems.Add(item);
             await db.SaveChangesAsync();
             return item;

@@ -13,6 +13,7 @@ public class BinModel(
     CommonageDbContext db,
     ArchiveBin bin,
     AuditLog audit,
+    TimeProvider clock,
     IStringLocalizer<SharedResource> localizer) : PageModel
 {
     public const int MaxShown = 200;
@@ -43,7 +44,7 @@ public class BinModel(
         if (item is null)
             return NotFound();
 
-        item.RestoreFromBin();
+        item.RestoreFromBin(clock.GetUtcNow().UtcDateTime);
         audit.Record(AuditAction.ItemRestored, item.Title, item);
         await db.SaveChangesAsync(cancellationToken);
 

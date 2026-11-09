@@ -94,7 +94,7 @@ public class ArchiveExporter(
             exportedItems,
             new ExportSettings(
                 settings.DefaultLanguage, settings.ContentLanguage, settings.OtherContentLanguages, settings.AccentColor, settings.TimeZone, settings.DefaultRightsUri, settings.AllowSearchEngines, settings.RequireTwoFactor, settings.LargePhotos, settings.PrivacyReviewed,
-                settings.ImprintNotNeeded, settings.RestoreTestedAt, logoPath,
+                settings.ImprintNotNeeded, settings.RestoreTestedAt, settings.ActivityLogKeptYears, settings.RejectedKeptMonths, logoPath,
                 texts.Select(t => new ExportText(t.Language, t.Kind, t.Text)).ToList()));
 
         await WriteEntryAsync(zip, "archive.json", CompressionLevel.Optimal,
@@ -167,6 +167,7 @@ public class ArchiveExporter(
         item.CreatedAt,
         item.UpdatedAt,
         item.PublishedAt,
+        item.RejectedOrWithdrawnAt,
         item.RightsUri,
         options.IncludePersonalData ? item.RightsHolder : null,
         options.IncludePersonalData ? item.Credit : null,
@@ -295,6 +296,8 @@ internal record ExportSettings(
     bool PrivacyReviewed,
     bool ImprintNotNeeded,
     DateTime? RestoreTestedAt,
+    int? ActivityLogKeptYears,
+    int? RejectedKeptMonths,
     string? Logo,
     IReadOnlyList<ExportText> Texts);
 
@@ -313,6 +316,7 @@ internal record ExportItem(
     DateTime CreatedAt,
     DateTime UpdatedAt,
     DateTime? PublishedAt,
+    DateTime? RejectedOrWithdrawnAt,
     string? RightsUri,
     string? RightsHolder,
     string? Credit,

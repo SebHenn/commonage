@@ -41,6 +41,9 @@ public class EditModel(
     public int? ItemId { get; private set; }
     public ItemStatus? CurrentStatus { get; private set; }
 
+    /// <summary>When a rejected or withdrawn contribution goes to the bin, if the archive keeps them for a set time.</summary>
+    public DateTime? GoesToBinOn { get; private set; }
+
     /// <summary>The period the saved date stands for, shown so curators can check how it was understood.</summary>
     public DateRange? CurrentDateRange { get; private set; }
     public SelectList CollectionOptions { get; private set; } = null!;
@@ -342,7 +345,9 @@ public class EditModel(
             case "reject" when item.Status == ItemStatus.Submitted:
                 item.Reject(now);
                 audit.Record(AuditAction.ContributionRejected, item.Title, item);
-                TempData["Message"] = localizer["The contribution is rejected. It stays hidden until you delete it."].Value;
+                TempData["Message"] = (await profile.GetAsync()).RejectedKeptMonths is { } months
+                    ? localizer.Plural("The contribution is rejected. It stays hidden, and goes to the bin in {0, plural, one {# month} other {# months}}.", months)
+                    : localizer["The contribution is rejected. It stays hidden until you delete it."].Value;
                 break;
             default:
                 TempData["Message"] = localizer["Your changes are saved."].Value;
@@ -648,6 +653,8 @@ public class EditModel(
         ItemId = item?.Id;
         SavedTitle = item?.Title;
         CurrentStatus = item?.Status;
+        if (item?.RejectedOrWithdrawnAt is { } setAside && (await profile.GetAsync()).RejectedKeptMonths is { } months)
+            GoesToBinOn = setAside.AddMonths(months);
         await LoadNeighboursAsync(item?.Id);
         Contribution = item?.Contribution;
         if (item is not null)

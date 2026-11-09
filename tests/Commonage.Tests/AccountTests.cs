@@ -17,7 +17,7 @@ public class AccountTests(CommonageAppFactory app)
 
         Assert.True(await Browser.IsLoggedInAsync(curator));
         Assert.Equal(HttpStatusCode.OK, (await curator.GetAsync("/Admin/Contributors")).StatusCode);
-        foreach (var adminPage in new[] { "/Admin/Users", "/Admin/Export", "/Admin/Activity" })
+        foreach (var adminPage in new[] { "/Admin/Users", "/Admin/Export", "/Admin/Activity", "/Admin/Activity?who=automatic", "/Admin/System" })
             Assert.Equal(HttpStatusCode.Forbidden, (await curator.GetAsync(adminPage)).StatusCode);
         Assert.DoesNotContain("/Admin/Users", await curator.GetStringAsync("/Admin"));
         Assert.Contains(email, await admin.GetStringAsync("/Admin/Users"));

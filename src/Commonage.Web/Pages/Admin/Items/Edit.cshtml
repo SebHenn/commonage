@@ -58,6 +58,10 @@
             {
                 <p>@T["The contributor withdrew their consent. The item stays hidden and cannot be published again. Delete it once it is no longer needed."]</p>
             }
+            @if (Model.GoesToBinOn is { } binOn)
+            {
+                <p>@T["This archive keeps rejected and withdrawn contributions for a set time. This one goes to the bin on {0}.", Dates.Day(binOn)]</p>
+            }
             <dl class="row mb-0">
                 <dt class="col-sm-4">@T["Sent in by"]</dt>
                 <dd class="col-sm-8">
