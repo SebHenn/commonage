@@ -19,6 +19,8 @@ export COMMONAGE_DB_PORT=15432
 export POSTGRES_PASSWORD="backup-test-$(date +%s)"
 export COMMONAGE_ADMIN_EMAIL=admin@example.org
 export COMMONAGE_ADMIN_PASSWORD=Backup-test-password-1
+# The login keys in the database are encrypted with this. The restore uses the same .env, and so the same key.
+export COMMONAGE_LOGIN_KEY="$(head -c 32 /dev/urandom | base64 | tr -d '\n')"
 
 base="http://127.0.0.1:$COMMONAGE_PORT"
 work=$(mktemp -d)
@@ -98,6 +100,11 @@ until curl -fsS -o "$work/preview-before.jpg" "$base/media/$file/preview" 2>/dev
     sleep 1
 done
 cp "$jar" "$work/cookies-before.txt"
+
+# Nothing in the database can be used to log in without the key from outside it.
+keys=$(docker compose exec -T db psql --username=commonage --dbname=commonage -Atc \
+    "select count(*) filter (where \"Xml\" like '%encryptedKey%'), count(*) filter (where \"Xml\" like '%requiresEncryption=\"true\"%') from \"DataProtectionKeys\"" | tr -d '\r')
+[ "${keys#*|}" = 0 ] && [ "${keys%|*}" -gt 0 ] || fail "the login keys in the database are not encrypted ($keys: encrypted|readable)"
 
 echo "Backing up..."
 sh scripts/backup.sh "$work/backups"

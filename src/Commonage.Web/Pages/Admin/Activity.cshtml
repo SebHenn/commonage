@@ -13,7 +13,8 @@
 }
 else
 {
-    <div class="table-responsive">
+    @* Its rows have nothing to focus, so on a phone the region itself takes the focus, to be scrolled with the keyboard. *@
+    <div class="table-responsive" tabindex="0" role="region" aria-label="@T["Activity log"]">
         <table class="table table-sm align-middle">
             <thead>
                 <tr>

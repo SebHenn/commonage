@@ -93,7 +93,7 @@ public class ArchiveExporter(
             collections.Select(c => new ExportCollection(c.Id, c.Title, c.Description, c.CreatedAt)).ToList(),
             exportedItems,
             new ExportSettings(
-                settings.DefaultLanguage, settings.ContentLanguage, settings.OtherContentLanguages, settings.AccentColor, settings.TimeZone, settings.DefaultRightsUri, settings.AllowSearchEngines, settings.LargePhotos, settings.PrivacyReviewed,
+                settings.DefaultLanguage, settings.ContentLanguage, settings.OtherContentLanguages, settings.AccentColor, settings.TimeZone, settings.DefaultRightsUri, settings.AllowSearchEngines, settings.RequireTwoFactor, settings.LargePhotos, settings.PrivacyReviewed,
                 settings.ImprintNotNeeded, settings.RestoreTestedAt, logoPath,
                 texts.Select(t => new ExportText(t.Language, t.Kind, t.Text)).ToList()));
 
@@ -290,6 +290,7 @@ internal record ExportSettings(
     string? TimeZone,
     string? DefaultRightsUri,
     bool AllowSearchEngines,
+    bool RequireTwoFactor,
     bool LargePhotos,
     bool PrivacyReviewed,
     bool ImprintNotNeeded,

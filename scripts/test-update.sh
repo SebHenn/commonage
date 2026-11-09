@@ -129,6 +129,10 @@ wait_for_page
 [ "$(running_image)" = "$image:9.0.0" ] || fail "the new image does not run, but $(running_image)"
 [ "$(git describe --tags --exact-match HEAD)" = v9.0.0 ] || fail "the checkout is not on the new release"
 grep -q '^COMMONAGE_VERSION=9.0.0' .env || fail ".env does not name the new version"
+[ "$(grep -c '^COMMONAGE_LOGIN_KEY=.\{44\}$' .env)" = 1 ] || fail ".env did not get exactly one login key"
+readable=$(docker compose exec -T db psql --username=commonage --dbname=commonage -Atc \
+    "select count(*) from \"DataProtectionKeys\" where \"Xml\" like '%requiresEncryption=\"true\"%'" | tr -d '\r')
+[ "$readable" = 0 ] || fail "$readable login keys in the database are still readable without the key"
 curl -kfsS https://localhost/search | grep -q "Flood in Mill Street" || fail "the content did not survive the update"
 [ "$(ls -d "$work"/backups/commonage-* | wc -l)" -ge 2 ] || fail "no backup was made"
 

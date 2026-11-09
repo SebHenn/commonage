@@ -144,6 +144,22 @@ public class EditModel(
         return await ShowSetupLinkAsync(account);
     }
 
+    /// <summary>For someone who lost their phone and their recovery codes. Commonage sends no emails, so an admin is the way back in.</summary>
+    public async Task<IActionResult> OnPostTurnOffTwoFactorAsync(string id)
+    {
+        if (await LoadForChangeAsync(id) is not { } account)
+            return NotFound();
+        if (IsOwnAccount)
+            return BadRequest();
+
+        await TwoFactorReset.TurnOffAsync(users, account);
+        audit.Record(AuditAction.TwoFactorTurnedOff, account.Email);
+        await db.SaveChangesAsync();
+
+        TempData["Message"] = localizer["The authenticator app is turned off for this account. The person logs in with their password now."].Value;
+        return RedirectToPage(new { id });
+    }
+
     public async Task<IActionResult> OnPostDeleteAsync(string id)
     {
         if (await LoadForChangeAsync(id) is not { } account)

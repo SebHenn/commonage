@@ -104,7 +104,7 @@ public class ExportTests(CommonageAppFactory app)
     [InlineData(typeof(MediaFile), "file", "id originalFileName contentType sizeBytes sha256 uploadedAt altText caption position rotation",
         "ArchiveItemId, ArchiveItem: the file is listed under its item. StorageId, OriginalKey, PreviewKey, ThumbnailKey: storage details. "
         + "Status, ProcessingError, PreviewWidth, PreviewHeight, CardKey, LargeKey, HasLarge, RenderedRotation, IsBeingTurned, DerivativeVersion, CurrentDerivativeVersion, MaxCaptionLength: previews are made anew. DeletedAt: the bin is not exported.")]
-    [InlineData(typeof(ArchiveSettings), "settings", "defaultLanguage contentLanguage otherContentLanguages accentColor timeZone defaultRightsUri allowSearchEngines largePhotos privacyReviewed imprintNotNeeded restoreTestedAt logo texts",
+    [InlineData(typeof(ArchiveSettings), "settings", "defaultLanguage contentLanguage otherContentLanguages accentColor timeZone defaultRightsUri allowSearchEngines requireTwoFactor largePhotos privacyReviewed imprintNotNeeded restoreTestedAt logo texts",
         "Id, TheOnlyId: there is only one. LogoId: as logo.")]
     [InlineData(typeof(Contribution), "contribution", "contributorName contributorEmail showName rights rightsHolder consentText reuse consentCoversSharing referenceCode submittedAt reviewedAt personalDetailsRemovedAt contributionLink",
         "Id, ArchiveItemId, ArchiveItem: listed under its item. ContributionLinkId: the link is named. SendingFingerprint: only there to recognise a form sent twice.")]

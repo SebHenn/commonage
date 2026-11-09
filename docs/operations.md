@@ -22,6 +22,42 @@ there is always at least one admin left. Everyone changes their own password und
 The first admin comes from `COMMONAGE_ADMIN_EMAIL` and `COMMONAGE_ADMIN_PASSWORD` in `.env`, only while the archive
 has no accounts yet.
 
+### Authenticator apps
+
+Under "Change password" → "Log in with an authenticator app", each person can add a code from an app on their phone to
+their login, such as Aegis, 2FAS, Google Authenticator or Microsoft Authenticator. They scan a QR code, type one code to show it
+works, and get ten recovery codes, each of which logs them in once without the phone. With the app, a password alone is no
+longer enough to log in. "Settings" → "Logging in" can require it of everyone who manages the archive; each of them then sets
+it up the next time they open those pages, and nothing else opens for them until they have, original files included.
+"Accounts" shows who uses one.
+
+Someone who loses their phone and their recovery codes asks an admin, who opens their account and chooses "Turn off the
+authenticator app". Commonage sends no emails, so this is the way back in: make sure it is really them asking. They then log
+in with their password and set up the app again. An admin cannot do this for their own account, so for the only admin, or for
+everyone after the login key was lost, it is done on the server:
+
+```sh
+docker compose run --rm web reset-two-factor admin@example.org
+```
+
+Every change to an authenticator app, and every login with a recovery code, is in the activity log.
+
+### Login keys
+
+Logins, setup links and form tokens are signed with keys that are kept in the database, so that they survive a new container
+and a restore. The authenticator apps' secrets and the recovery codes are encrypted with them too. These keys are encrypted
+with `COMMONAGE_LOGIN_KEY` from `.env`, which is not in the database or in the backups, so a stolen backup alone cannot be used
+to log in. Without that setting, admins see a notice. `scripts/update.sh` adds one to `.env` when it updates an archive that
+has none.
+
+The first start with a key removes the keys that were stored without one. **Everyone logs in again once**, and setup links
+created before stop working.
+
+**Keep a copy of `.env` apart from the backups**, for example in a password manager. If the key is lost, or a restore runs
+with another one, nothing in the archive is lost, but everyone is logged out, setup links stop working, and nobody who uses an
+authenticator app can log in until their app is turned off: by an admin who does not use one, or with `reset-two-factor` on
+the server for each of them. Then they set it up again.
+
 ## Activity log
 
 "Manage archive" → "Activity log" (admins) lists who did what and when: items created, changed, published,
@@ -189,13 +225,15 @@ scripts/restore.sh backups/commonage-20261101-143532
 ```
 
 It checks the checksums, asks you to type `restore`, stops the app, replaces the database and all files, and starts
-the app again. Logins and setup links from before the backup keep working. Restore into the same or a newer version
+the app again. Logins and setup links from before the backup keep working, as long as `.env` has the same `COMMONAGE_LOGIN_KEY`
+(see [Login keys](#login-keys)): a backup does not contain it, on purpose. Restore into the same or a newer version
 of Commonage; the app upgrades the database when it starts. This is also how to move an archive to a new server: back
 up, copy the folder, restore. Addresses of items, accounts and logins all stay the same. After a restore the backup date
 stays as it was on that server, or none is recorded on a new one, until the next backup runs.
 
 `scripts/test-backup-restore.sh` checks the whole cycle: it creates an archive through the web interface, backs it
-up, deletes all containers and volumes, restores and compares. It runs in CI on every pull request, as its own
+up, deletes all containers and volumes, restores and compares, and checks that no login key in the database can be read
+without `COMMONAGE_LOGIN_KEY`. It runs in CI on every pull request, as its own
 Compose project on ports 18080 and 15432, so it can also run next to your own archive.
 
 ## Demo archive

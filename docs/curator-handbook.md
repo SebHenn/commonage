@@ -122,6 +122,16 @@ For a shoebox someone hands you in person: create the items yourself with **New 
 to you and when, and what they agreed to. Ask for their permission in writing if you can, and keep it with your group's
 papers.
 
+## Your login
+
+Under **Change password** → **Log in with an authenticator app**, you can add a code from your phone to your login. Install an
+authenticator app, such as Aegis, 2FAS, Google Authenticator or Microsoft Authenticator, scan the code on the page and type the six
+digits the app shows. From then on the login asks for them after your password, so someone who finds out your password still
+cannot log in as you. The archive may require this of everyone.
+
+You then get ten **recovery codes**. Write them down or print them, and keep them away from your phone: without the phone, each
+of them lets you log in once. If you lose your phone and the codes, an admin can turn the app off for your account.
+
 ## If something goes wrong
 
 - **Deleted by mistake:** look in the **Bin**. Items and photos stay there for 30 days.

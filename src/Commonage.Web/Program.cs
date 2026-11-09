@@ -14,7 +14,7 @@ using Commonage.Web.Media;
 using Commonage.Web.Operations;
 using Commonage.Web.Search;
 using Commonage.Web.Security;
-using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
@@ -33,7 +33,8 @@ var connectionString = builder.Configuration.GetConnectionString("Default")
 
 builder.Services.AddDbContext<CommonageDbContext>(options => options.UseNpgsql(connectionString));
 builder.Services.AddHealthChecks().AddDbContextCheck<CommonageDbContext>();
-builder.Services.AddDataProtection().PersistKeysToDbContext<CommonageDbContext>();
+// Login keys live in the database, encrypted with COMMONAGE_LOGIN_KEY from outside it. See Security/LoginKeys.cs.
+builder.Services.AddLoginKeys(builder.Configuration);
 
 builder.Services
     .AddIdentity<IdentityUser, IdentityRole>(options =>
@@ -49,6 +50,8 @@ builder.Services
         options.Password.RequireNonAlphanumeric = false;
     })
     .AddEntityFrameworkStores<CommonageDbContext>()
+    // Encrypts the authenticator secret and the recovery codes.
+    .AddUserStore<ProtectedUserStore>()
     .AddDefaultTokenProviders()
     .AddErrorDescriber<LocalizedIdentityErrorDescriber>();
 builder.Services.ConfigureApplicationCookie(options =>
@@ -61,8 +64,9 @@ builder.Services.Configure<SecurityStampValidatorOptions>(options => options.Val
 // Setup links for new accounts are handed over in person or by the admin's own email, so they stay valid for a week.
 builder.Services.Configure<DataProtectionTokenProviderOptions>(options => options.TokenLifespan = TimeSpan.FromDays(7));
 builder.Services.AddAuthorizationBuilder()
-    .AddPolicy(Policies.ManageArchive, policy => policy.RequireRole(Roles.Admin, Roles.Curator))
-    .AddPolicy(Policies.Administer, policy => policy.RequireRole(Roles.Admin));
+    .AddPolicy(Policies.ManageArchive, policy => policy.RequireRole(Roles.Admin, Roles.Curator).AddRequirements(new TwoFactorIfRequired()))
+    .AddPolicy(Policies.Administer, policy => policy.RequireRole(Roles.Admin).AddRequirements(new TwoFactorIfRequired()));
+builder.Services.AddScoped<IAuthorizationHandler, TwoFactorIfRequiredHandler>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton(TimeProvider.System);
@@ -111,6 +115,7 @@ builder.Services.AddRazorPages(options =>
         options.Conventions.AuthorizePage("/Admin/Activity", Policies.Administer);
         options.Conventions.AuthorizePage("/Admin/Settings", Policies.Administer);
         options.Conventions.AuthorizePage("/Account/Password");
+        options.Conventions.AuthorizePage("/Account/TwoFactor");
     })
     .AddViewLocalization()
     .AddDataAnnotationsLocalization(options =>
@@ -124,7 +129,16 @@ using (var scope = app.Services.CreateScope())
     // and saves operators a manual upgrade step.
     var db = scope.ServiceProvider.GetRequiredService<CommonageDbContext>();
     await db.Database.MigrateAsync();
+    await LoginKeys.RemoveUnencryptedAsync(db, app.Services.GetRequiredService<LoginKeyStatus>(), app.Logger);
     await AccentFolding.TryUseUnaccentAsync(db, app.Logger);
+
+    // "docker compose run --rm web reset-two-factor someone@example.org", for the last admin who lost their phone and
+    // recovery codes, or after the login key was lost. See docs/operations.md.
+    if (args is ["reset-two-factor", var email])
+    {
+        Environment.ExitCode = await TwoFactorReset.RunAsync(scope.ServiceProvider, email, Console.Out);
+        return;
+    }
     await InitialAdminSeeder.SeedAsync(scope.ServiceProvider, app.Configuration, app.Logger);
     await DemoContent.SeedAsync(scope.ServiceProvider, app.Configuration, app.Logger);
 }

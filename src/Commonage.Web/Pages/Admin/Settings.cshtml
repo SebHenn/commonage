@@ -167,6 +167,15 @@
         </div>
     </fieldset>
 
+    <fieldset class="mb-4">
+        <legend class="h4">@T["Logging in"]</legend>
+        <div class="form-check mb-3">
+            <input asp-for="Input.RequireTwoFactor" class="form-check-input" aria-describedby="two-factor-help" />
+            <label asp-for="Input.RequireTwoFactor" class="form-check-label"></label>
+            <div id="two-factor-help" class="form-text">@T["After their password, curators and admins then type a code from an app on their phone, so a stolen password alone is not enough. Each of them sets it up the next time they open these pages, you too. Someone who loses their phone and their recovery codes needs an admin to turn the app off for them."]</div>
+        </div>
+    </fieldset>
+
     <button type="submit" class="btn btn-primary">@T["Save"]</button>
 </form>
 

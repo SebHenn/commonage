@@ -48,6 +48,7 @@
     else if (Model.IsOwnAccount)
     {
         <p>@T["This is your own account. Another admin can change its role, disable or delete it."] <a asp-page="/Account/Password">@T["Change your password"]</a></p>
+        <p><a asp-page="/Account/TwoFactor">@T["Log in with an authenticator app"]</a></p>
     }
     else
     {
@@ -75,6 +76,20 @@
             }
         </div>
         <p class="form-text">@T["A new setup link lets the person choose a new password, for example when they forgot theirs. Earlier links stop working. A disabled account cannot log in, but its history stays in the activity log."]</p>
+
+        <h2 class="h5 mt-4">@T["Authenticator app"]</h2>
+        @if (Model.Account.TwoFactorEnabled)
+        {
+            <p>@T["This person logs in with a code from an authenticator app as well as their password."]</p>
+            <form method="post" asp-page-handler="TurnOffTwoFactor" asp-route-id="@Model.Account.Id"
+                  data-confirm="@T["Turn off the authenticator app of {0}? Only do this when you are sure it is them asking, for example because they lost their phone. They then log in with their password only, and can set up an app again.", Model.Account.Email!]">
+                <button type="submit" class="btn btn-outline-secondary">@T["Turn off the authenticator app"]</button>
+            </form>
+        }
+        else
+        {
+            <p>@T["This person logs in with their password only."]</p>
+        }
 
         <form method="post" asp-page-handler="Delete" asp-route-id="@Model.Account.Id" class="mt-5"
               data-confirm="@T["Delete the account of {0}? This cannot be undone. The activity log keeps what the account did.", Model.Account.Email!]">
