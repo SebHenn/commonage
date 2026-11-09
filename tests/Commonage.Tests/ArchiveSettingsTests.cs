@@ -14,23 +14,12 @@ namespace Commonage.Tests;
 [Collection(nameof(AppCollection))]
 public class ArchiveSettingsTests(CommonageAppFactory app)
 {
-    private async Task<WebApplicationFactory<Program>> NewArchiveAsync(string? demo = null)
-    {
-        var name = "settings_" + Guid.NewGuid().ToString("N");
-        await using (var connection = new NpgsqlConnection(app.ConnectionString))
+    private Task<WebApplicationFactory<Program>> NewArchiveAsync(string? demo = null) =>
+        app.NewArchiveAsync(b =>
         {
-            await connection.OpenAsync();
-            await using var create = new NpgsqlCommand($"CREATE DATABASE {name}", connection);
-            await create.ExecuteNonQueryAsync();
-        }
-        var connectionString = new NpgsqlConnectionStringBuilder(app.ConnectionString) { Database = name }.ConnectionString;
-        return app.WithWebHostBuilder(b =>
-        {
-            b.UseSetting("ConnectionStrings:Default", connectionString);
             if (demo is not null)
                 b.UseSetting("Demo:Language", demo);
         });
-    }
 
     private static async Task<HttpClient> AdminAsync(WebApplicationFactory<Program> archive)
     {

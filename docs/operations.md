@@ -9,7 +9,7 @@ Admins manage accounts under "Manage archive" → "Accounts".
 
 - **Curators** review contributions, describe, publish and delete items, empty the bin, and manage collections and
   contribution links.
-- **Admins** can also manage accounts, export the archive and read the activity log.
+- **Admins** can also manage accounts, export the archive, read the activity log and open the System page.
 
 Commonage sends no emails. A new account gets a **setup link** instead of a password; the admin passes it on (by
 their own email, a message, or in person), and the person chooses their own password with it. A link works once
@@ -63,10 +63,28 @@ the server for each of them. Then they set it up again.
 "Manage archive" → "Activity log" (admins) lists who did what and when: items created, changed, published,
 unpublished, moved to the bin, restored and deleted, photos added and deleted, contributions received, accepted, rejected and withdrawn,
 contributor details removed, collections and links changed, accounts managed, exports. Each item's edit page shows
-its own history to all curators.
+its own history to all curators. It can be narrowed down by who did something (an account, a contributor, or "Automatic"),
+by what it was about (items, photos, contributions and links, collections, accounts and logins, or export and settings),
+and by a title or name.
 
 The log keeps the title of an item even after the item is deleted, and the account name even after the account is
-deleted. It holds no contributor names or email addresses. The app never changes or deletes entries.
+deleted. It holds no contributor names or email addresses. The app never changes entries, and only deletes them once they
+are older than the archive keeps them.
+
+## How long records are kept
+
+"Settings" → "How long records are kept" (admins). Both start as "Always", so an update deletes nothing.
+
+- **The activity log**: always, or for 1, 2, 5 or 10 years. It names the accounts that changed something, which is personal
+  data too. Older entries are deleted a few times a day, and the log notes each time with an "Automatic" entry, which is
+  then the newest one. The shortest time is a year, so changing the setting cannot hide what happened recently.
+- **Rejected and withdrawn contributions**: until a curator deletes them, or for 3, 6, 12 or 24 months after the
+  decision. They hold the contributor's name and email address, and material that will not be published. When their time
+  is up, they go to the bin, where they can still be restored for 30 days, and the log records it as "Automatic". One that
+  is restored, or rejected again, starts its time anew. For contributions rejected or withdrawn before this setting
+  existed, the time starts with the update that added it, because when they were rejected is not recorded reliably.
+
+Backups keep older copies until they are replaced, and the privacy text says so.
 
 ## Settings
 
@@ -133,6 +151,39 @@ back as it was, so a published item is public again.
 "Delete for good" in the bin does not wait for the 30 days. Use it for spam that takes up space, and when someone asks
 for their material to be removed.
 
+## The System page
+
+"Manage archive" → "System" (admins) shows in one place what whoever runs the server should keep an eye on:
+
+- **The checks behind `/health`**: the database, the media folder, free disk space and the last backup, each "All right",
+  "Needs attention" or "Not working".
+- **Disk**: free space, how much the media folder and the database take up, what was added in the last 30 days, and how
+  long the free space lasts at the pace of the last 90 days. The media folder is measured at most every 15 minutes, because
+  reading every file of a large archive takes a moment.
+- **Backups and keys**: the last backup, the last restore test, and whether the login keys are encrypted.
+- **Previews**: how many photos wait for their previews, and those for which none could be made, with "Try again" for one or
+  all of them. A file the archive cannot read will fail again; its original stays safe and curators can download it from the item.
+- **Software**: the version, PostgreSQL's version, the last change to the database, and whether search ignores accents with
+  the PostgreSQL extension `unaccent` or with the built-in folding.
+
+## Health check for uptime monitors
+
+`/health` answers with one word, and nothing else, so visitors learn no details:
+
+| Answer | HTTP status | When |
+|---|---|---|
+| `Healthy` | 200 | Everything is all right. |
+| `Degraded` | 200 | The disk is filling up or uploads have stopped, or the last backup is older than `Backups__WarnAfterDays` (3 days), or there has been none. The archive itself still works. |
+| `Unhealthy` | 503 | The database cannot be reached, the media folder cannot be written to, or the newest original is missing from it. |
+
+**`Degraded` still answers with 200**, so `scripts/update.sh` does not roll back an update because of an old backup, and an
+uptime monitor that only looks at the status code does not notice it. To be told about it too, set the monitor to look for the
+keyword `Healthy` in the answer (most monitors, such as Uptime Kuma, call this a keyword or content check).
+
+"The newest original is missing" usually means that the media volume is not mounted, so the app writes into an empty folder
+in the container, or that a database was restored without its files. Check `docker compose config` and the restore. If only
+that one file is lost, its item shows it; delete the photo there, or upload it again, and the check looks at the next one.
+
 ## Disk space and limits
 
 A full disk also stops the database, so the archive stops taking in files before that happens:
@@ -181,7 +232,9 @@ An item's title can be empty in a full export: a draft from "Add many photos" th
 original, which is never turned, so whoever uses the export has to apply that. Files are listed in order. `needsTranscription` is
 in a full export only. A contribution says what the contributor offered (`reuse`) and whether they agreed to more than this website
 (`consentCoversSharing`). `settings` has `contentLanguage`, the language of the material as a code such as `de` (`mul` for several,
-none of them most, and null if never chosen), and `otherContentLanguages`, separated by commas.
+none of them most, and null if never chosen), and `otherContentLanguages`, separated by commas. `activityLogKeptYears` and
+`rejectedKeptMonths` are how long records are kept (null for always), and each item's `rejectedOrWithdrawnAt` is when that time
+started for it.
 
 `archive.json` has `"format": "commonage-export"` and `"version": 3`. Version 3 added each item's rights, credit and catalogue
 details and each photo's description; in `items.csv`, `rights` and `rights_holder` are now the item's own, and the contributor's

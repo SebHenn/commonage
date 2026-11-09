@@ -1,0 +1,196 @@
+@page
+@using Commonage.Web.Operations
+@using Microsoft.Extensions.Diagnostics.HealthChecks
+@model Commonage.Web.Pages.Admin.SystemModel
+@inject IConfiguration Configuration
+@{
+    ViewData["Title"] = T["System"];
+    var source = Commonage.Web.SourceCode.UrlFrom(Configuration);
+
+    string CheckName(string name) => name switch
+    {
+        ArchiveHealthChecks.Database => T["Database"],
+        ArchiveHealthChecks.Storage => T["Media folder"],
+        ArchiveHealthChecks.Disk => T["Disk space"],
+        ArchiveHealthChecks.Backup => T["Backup"],
+        _ => name,
+    };
+
+    string CheckState(string name, HealthStatus status) => (name, status) switch
+    {
+        (_, HealthStatus.Healthy) => T["All right"],
+        (ArchiveHealthChecks.Database, _) => T["The archive cannot reach its database."],
+        (ArchiveHealthChecks.Storage, _) => T["The media folder cannot be written to, or the newest original is missing from it. Is the media volume mounted?"],
+        (ArchiveHealthChecks.Disk, _) => T["The disk is filling up, or uploads have already stopped."],
+        (ArchiveHealthChecks.Backup, _) => T["There has been no backup for too long, or none yet."],
+        _ => status.ToString(),
+    };
+
+    string Badge(HealthStatus status) => status switch
+    {
+        HealthStatus.Healthy => "text-bg-success",
+        HealthStatus.Degraded => "text-bg-warning",
+        _ => "text-bg-danger",
+    };
+
+    string Overall(HealthStatus status) => status switch
+    {
+        HealthStatus.Healthy => T["All right"],
+        HealthStatus.Degraded => T["Needs attention"],
+        _ => T["Not working"],
+    };
+}
+
+<h1>@ViewData["Title"]</h1>
+<p class="col-lg-8">@T["What whoever runs the server should keep an eye on. Visitors and uptime monitors that open /health learn only whether all is well, not what follows here."]</p>
+
+<section class="mb-5" aria-labelledby="checks-heading">
+    <h2 id="checks-heading" class="h4">@T["Checks"]</h2>
+    <p>@T["/health answers:"] <span class="badge @Badge(Model.Overall)">@Overall(Model.Overall)</span> <code>@Model.Overall</code></p>
+    <dl class="row">
+        @foreach (var (name, status) in Model.Checks)
+        {
+            <dt class="col-sm-4">@CheckName(name)</dt>
+            <dd class="col-sm-8"><span class="badge @Badge(status)">@Overall(status)</span> @(status == HealthStatus.Healthy ? "" : CheckState(name, status))</dd>
+        }
+    </dl>
+    <p class="small text-muted col-lg-8">@T["\"Needs attention\" still answers with HTTP status 200, so an uptime monitor only notices it if it looks for the word Healthy. docs/operations.md says how."]</p>
+</section>
+
+<section class="mb-5" aria-labelledby="disk-heading">
+    <h2 id="disk-heading" class="h4">@T["Disk"]</h2>
+    <dl class="row">
+        <dt class="col-sm-4">@T["Free disk space"]</dt>
+        <dd class="col-sm-8">@(Model.FreeBytes is { } free ? Sizes.Of(T, free) : T["Unknown"])</dd>
+
+        <dt class="col-sm-4">@T["Media folder"]</dt>
+        <dd class="col-sm-8">
+            @Sizes.Of(T, Model.StorageBytes)<br />
+            <span class="small text-muted">@T.Plural("Of which originals: {0} in {1, plural, one {# file} other {# files}}. The rest are the picture sizes made from them.", Sizes.Of(T, Model.OriginalsBytes), Model.OriginalsCount)</span>
+        </dd>
+
+        <dt class="col-sm-4">@T["Database"]</dt>
+        <dd class="col-sm-8">@Sizes.Of(T, Model.DatabaseBytes)</dd>
+
+        <dt class="col-sm-4">@T["Added in the last 30 days"]</dt>
+        <dd class="col-sm-8">
+            @T.Plural("{0} in {1, plural, one {# file} other {# files}}", Sizes.Of(T, Model.AddedLast30DaysBytes), Model.AddedLast30DaysCount)
+            @if (Model.FreeSpaceLasts is { } lasts)
+            {
+                <br />
+                <span class="small text-muted">
+                    @if (lasts.Months >= 120)
+                    {
+                        @T.Plural("At the pace of the last {0, plural, one {# day} other {# days}}, the free space lasts more than ten years.", lasts.Days)
+                    }
+                    else
+                    {
+                        @T.Plural("At the pace of the last {0, plural, one {# day} other {# days}}, the free space lasts about {1, plural, one {# month} other {# months}}.", lasts.Days, Math.Max(1, (int)Math.Round(lasts.Months)))
+                    }
+                </span>
+            }
+        </dd>
+    </dl>
+</section>
+
+<section class="mb-5" aria-labelledby="backup-heading">
+    <h2 id="backup-heading" class="h4">@T["Backups and keys"]</h2>
+    <dl class="row">
+        <dt class="col-sm-4">@T["Last backup"]</dt>
+        <dd class="col-sm-8">
+            @if (Model.LastBackupAt is { } backup)
+            {
+                @Dates.Moment(backup)
+                @if (Model.BackupIsOverdue)
+                {
+                    <span class="badge text-bg-warning">@T["Needs attention"]</span>
+                }
+            }
+            else
+            {
+                @T["None yet. docs/deployment.md says how to set up the nightly backup."]
+            }
+        </dd>
+
+        <dt class="col-sm-4">@T["Restore last tested"]</dt>
+        <dd class="col-sm-8">@(Model.RestoreTestedAt is { } tested ? Dates.Day(tested) : T["Not noted yet"])</dd>
+
+        <dt class="col-sm-4">@T["Login keys"]</dt>
+        <dd class="col-sm-8">@(Model.LoginKeyEncrypted ? T["Encrypted with COMMONAGE_LOGIN_KEY"] : T["Not encrypted. Whoever runs the server should set COMMONAGE_LOGIN_KEY."])</dd>
+    </dl>
+</section>
+
+<section class="mb-5" aria-labelledby="previews-heading">
+    <h2 id="previews-heading" class="h4">@T["Previews"]</h2>
+    <p>@T.Plural("{0, plural, =0 {No photos are waiting for their previews.} one {One photo is waiting for its previews.} other {# photos are waiting for their previews.}}", Model.WaitingCount)</p>
+    @if (Model.FailedCount == 0)
+    {
+        <p class="text-muted">@T["No previews have failed."]</p>
+    }
+    else
+    {
+        <p class="col-lg-8">@T.Plural("{0, plural, one {For one photo, no preview could be made.} other {For # photos, no preview could be made.}} Visitors do not see them. A file the archive cannot read will fail again; the original stays safe either way, and curators can download it from the item.", Model.FailedCount)</p>
+        <form method="post" asp-page-handler="Retry" class="mb-3">
+            <button type="submit" class="btn btn-outline-primary">@T["Try them all again"]</button>
+        </form>
+        @if (Model.FailedCount > Model.Failed.Count)
+        {
+            <p class="text-muted small">@T["Showing the newest {0}.", SystemModel.MaxFailedShown]</p>
+        }
+        @* A list rather than a table, because a file name and an error message need the whole width on a phone. *@
+        <ul class="list-unstyled col-lg-8" aria-label="@T["Previews that failed"]">
+            @foreach (var failed in Model.Failed)
+            {
+                <li class="border-top py-2 d-flex flex-wrap gap-2 align-items-start justify-content-between">
+                    <div class="text-break">
+                        <a asp-page="/Admin/Items/Edit" asp-route-id="@failed.ItemId">@Commonage.Web.Domain.ArchiveItem.ShownTitle(T, failed.ItemTitle)</a><br />
+                        @failed.FileName · @T["Uploaded"] @Dates.Day(failed.UploadedAt)
+                        @if (failed.Error is not null)
+                        {
+                            <br /><span class="small text-muted">@failed.Error</span>
+                        }
+                    </div>
+                    <form method="post" asp-page-handler="Retry" asp-route-id="@failed.Id">
+                        <button type="submit" class="btn btn-sm btn-outline-secondary">@T["Try again"]<span class="visually-hidden">: @failed.FileName</span></button>
+                    </form>
+                </li>
+            }
+        </ul>
+    }
+</section>
+
+<section class="mb-5" aria-labelledby="software-heading">
+    <h2 id="software-heading" class="h4">@T["Software"]</h2>
+    <dl class="row">
+        <dt class="col-sm-4">@T["Version"]</dt>
+        <dd class="col-sm-8">Commonage @Model.Version · <a href="@source/releases" rel="noopener">@T["What changed"]</a></dd>
+
+        <dt class="col-sm-4">PostgreSQL</dt>
+        <dd class="col-sm-8">@Model.PostgresVersion</dd>
+
+        <dt class="col-sm-4">@T["Last database change"]</dt>
+        <dd class="col-sm-8">
+            <code class="text-break">@Model.LastMigration</code>
+            @if (Model.LastMigrationAt is { } changedAt)
+            {
+                <span class="text-nowrap">(@Dates.Day(changedAt))</span>
+            }
+            @if (Model.PendingMigrations > 0)
+            {
+                <br /><span class="badge text-bg-warning">@T["Needs attention"]</span> @T.Plural("{0, plural, one {One database change has not been made yet.} other {# database changes have not been made yet.}} They are made when the archive starts.", Model.PendingMigrations)
+            }
+        </dd>
+
+        <dt class="col-sm-4">@T["Search ignores accents with"]</dt>
+        <dd class="col-sm-8">
+            @if (Model.UsesUnaccent)
+            {
+                @T["The PostgreSQL extension unaccent"]
+            }
+            else
+            {
+                @T["A built-in folding that covers most, but not all, letters. With the PostgreSQL extension unaccent on the database server, the archive uses it from the next start."]
+            }
+        </dd>
+    </dl>
+</section>

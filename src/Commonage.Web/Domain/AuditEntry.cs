@@ -43,10 +43,14 @@ public enum AuditAction
     TwoFactorTurnedOff,
     RecoveryCodesCreated,
     RecoveryCodeUsed,
+    ItemMovedToBinAfterKeptTime,
+    ActivityLogShortened,
+    PreviewRetried,
 }
 
 /// <summary>
-/// One line of the activity log: who did what, and when. Entries are never changed or deleted by the app.
+/// One line of the activity log: who did what, and when. Entries are never changed by the app, and only deleted once they
+/// are older than an admin chose to keep them (<see cref="ArchiveSettings.ActivityLogKeptYears"/>), which itself leaves an entry.
 /// They hold no contributor details, so removing a contributor's personal data never has to touch the log.
 /// </summary>
 public class AuditEntry

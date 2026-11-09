@@ -99,6 +99,9 @@ namespace Commonage.Web.Data.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<DateTime?>("RejectedOrWithdrawnAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("RightsHolder")
                         .HasMaxLength(300)
                         .HasColumnType("character varying(300)");
@@ -161,6 +164,9 @@ namespace Commonage.Web.Data.Migrations
                         .HasMaxLength(7)
                         .HasColumnType("character varying(7)");
 
+                    b.Property<int?>("ActivityLogKeptYears")
+                        .HasColumnType("integer");
+
                     b.Property<bool>("AllowSearchEngines")
                         .HasColumnType("boolean");
 
@@ -192,6 +198,9 @@ namespace Commonage.Web.Data.Migrations
 
                     b.Property<bool>("PrivacyReviewed")
                         .HasColumnType("boolean");
+
+                    b.Property<int?>("RejectedKeptMonths")
+                        .HasColumnType("integer");
 
                     b.Property<bool>("RequireTwoFactor")
                         .HasColumnType("boolean");

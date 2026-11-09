@@ -176,6 +176,35 @@
         </div>
     </fieldset>
 
+    <fieldset class="mb-4">
+        <legend class="h4">@T["How long records are kept"]</legend>
+        <p class="form-text mt-0">@T["Data protection laws such as the GDPR ask that personal data is kept no longer than it is needed. Backups keep older copies until they are replaced."]</p>
+        <div class="mb-3 col-md-6">
+            <label asp-for="Input.ActivityLogKeptYears" class="form-label"></label>
+            <select asp-for="Input.ActivityLogKeptYears" class="form-select" aria-describedby="activity-kept-help">
+                <option value="0">@T["Always"]</option>
+                @foreach (var years in Commonage.Web.Domain.ArchiveSettings.ActivityLogYearChoices)
+                {
+                    <option value="@years">@T.Plural("{0, plural, one {For # year} other {For # years}}", years)</option>
+                }
+            </select>
+            <span asp-validation-for="Input.ActivityLogKeptYears" class="text-danger"></span>
+            <div id="activity-kept-help" class="form-text">@T["The log names the accounts that changed something. Older entries are deleted, and the log notes that it was shortened."]</div>
+        </div>
+        <div class="mb-3 col-md-6">
+            <label asp-for="Input.RejectedKeptMonths" class="form-label"></label>
+            <select asp-for="Input.RejectedKeptMonths" class="form-select" aria-describedby="rejected-kept-help">
+                <option value="0">@T["Until a curator deletes them"]</option>
+                @foreach (var months in Commonage.Web.Domain.ArchiveSettings.RejectedMonthChoices)
+                {
+                    <option value="@months">@T.Plural("{0, plural, one {For # month after the decision} other {For # months after the decision}}", months)</option>
+                }
+            </select>
+            <span asp-validation-for="Input.RejectedKeptMonths" class="text-danger"></span>
+            <div id="rejected-kept-help" class="form-text">@T["They hold the contributor's name and email address, and material that will not be published. Afterwards they go to the bin, and are deleted for good 30 days later."]</div>
+        </div>
+    </fieldset>
+
     <button type="submit" class="btn btn-primary">@T["Save"]</button>
 </form>
 

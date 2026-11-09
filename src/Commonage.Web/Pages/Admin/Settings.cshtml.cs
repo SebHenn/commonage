@@ -111,6 +111,14 @@ public class SettingsModel(
 
         [Display(Name = "Let visitors open photos at a large size")]
         public bool LargePhotos { get; set; } = true;
+
+        /// <summary>0 keeps everything. Null is a form from before this field, which leaves the setting as it is.</summary>
+        [Display(Name = "Keep the activity log")]
+        public int? ActivityLogKeptYears { get; set; }
+
+        /// <summary>0 keeps them until a curator deletes them. Null leaves the setting as it is.</summary>
+        [Display(Name = "Keep rejected and withdrawn contributions")]
+        public int? RejectedKeptMonths { get; set; }
     }
 
     public async Task OnGetAsync(CancellationToken cancellationToken)
@@ -143,6 +151,8 @@ public class SettingsModel(
             RequireTwoFactor = settings.RequireTwoFactor,
             LargePhotos = settings.LargePhotos,
             DefaultRightsUri = settings.DefaultRightsUri,
+            ActivityLogKeptYears = settings.ActivityLogKeptYears ?? 0,
+            RejectedKeptMonths = settings.RejectedKeptMonths ?? 0,
         };
         ShowState(settings);
     }
@@ -168,6 +178,11 @@ public class SettingsModel(
 
         if (!string.IsNullOrEmpty(Input.DefaultRightsUri) && !RightsOptions.IsKnown(Input.DefaultRightsUri))
             ModelState.AddModelError("Input.DefaultRightsUri", localizer["Please choose one of the statements."]);
+
+        if (Input.ActivityLogKeptYears is { } years && years != 0 && !ArchiveSettings.ActivityLogYearChoices.Contains(years))
+            ModelState.AddModelError("Input.ActivityLogKeptYears", localizer["Please choose one of the times."]);
+        if (Input.RejectedKeptMonths is { } months && months != 0 && !ArchiveSettings.RejectedMonthChoices.Contains(months))
+            ModelState.AddModelError("Input.RejectedKeptMonths", localizer["Please choose one of the times."]);
 
         string? accent = null;
         if (!Input.UseStandardColor && !string.Equals(Input.AccentColor, StandardColor, StringComparison.OrdinalIgnoreCase))
@@ -214,6 +229,10 @@ public class SettingsModel(
         settings.DefaultRightsUri = string.IsNullOrEmpty(Input.DefaultRightsUri) ? null : Input.DefaultRightsUri;
         settings.PrivacyReviewed = Input.PrivacyReviewed;
         settings.ImprintNotNeeded = Input.ImprintNotNeeded;
+        if (Input.ActivityLogKeptYears is { } keptYears)
+            settings.ActivityLogKeptYears = keptYears == 0 ? null : keptYears;
+        if (Input.RejectedKeptMonths is { } keptMonths)
+            settings.RejectedKeptMonths = keptMonths == 0 ? null : keptMonths;
 
         // Only one language can be written here so far. Texts for more languages come with the languages themselves.
         db.ArchiveTexts.RemoveRange(await db.ArchiveTexts.ToListAsync(cancellationToken));

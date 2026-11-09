@@ -88,7 +88,8 @@ Without JavaScript, all the photos go in one request, at most 1 GB in all, and t
 
 - **Save and publish:** it is good as it is, or after you corrected the description.
 - **Accept as draft:** you want to keep it, but it needs more work.
-- **Reject:** spam, or not for this archive. It stays hidden until someone deletes it.
+- **Reject:** spam, or not for this archive. It stays hidden until someone deletes it. An archive can also keep rejected and
+  withdrawn contributions for a set time, under "Settings"; then the item page says when it goes to the bin.
 
 A yellow note, "The archive already has this file", means a file in it is identical to one you have, with a link to that item.
 It may be a second copy, or someone else's copy of the same photo. Contributors are not told.
@@ -137,3 +138,5 @@ of them lets you log in once. If you lose your phone and the codes, an admin can
 - **Deleted by mistake:** look in the **Bin**. Items and photos stay there for 30 days.
 - **Someone else changed the same item:** the page shows both versions, and nothing is lost until you decide.
 - **The archive says its disk is full:** tell the person who runs the server.
+- **A photo has no preview:** the filter "A working preview" on the management page finds such items. An admin can try
+  again under **System**. If it fails again, the archive cannot read the file; the original is safe and can be downloaded.

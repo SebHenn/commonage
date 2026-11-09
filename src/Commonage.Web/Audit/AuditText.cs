@@ -3,6 +3,17 @@ using Microsoft.Extensions.Localization;
 
 namespace Commonage.Web.Audit;
 
+/// <summary>What an entry of the activity log is about, for its filter.</summary>
+public enum AuditKind
+{
+    Items,
+    Photos,
+    Contributions,
+    Collections,
+    Accounts,
+    Archive,
+}
+
 /// <summary>How the activity log describes each action, in the reader's language.</summary>
 public static class AuditText
 {
@@ -48,7 +59,41 @@ public static class AuditText
         AuditAction.TwoFactorTurnedOff => localizer["Turned off the account's authenticator app"],
         AuditAction.RecoveryCodesCreated => localizer["Created new recovery codes"],
         AuditAction.RecoveryCodeUsed => localizer["Logged in with a recovery code"],
+        AuditAction.ItemMovedToBinAfterKeptTime => localizer["Moved the rejected or withdrawn contribution to the bin, at the end of the time the archive keeps them"],
+        AuditAction.ActivityLogShortened => localizer["Deleted activity log entries older than the archive keeps them"],
+        AuditAction.PreviewRetried => localizer["Asked for a failed preview to be made again"],
         _ => action.ToString(),
+    };
+
+    public static AuditKind KindOf(AuditAction action) => action switch
+    {
+        AuditAction.ItemCreated or AuditAction.ItemChanged or AuditAction.ItemPublished or AuditAction.ItemUnpublished
+            or AuditAction.ItemDeleted or AuditAction.ItemMovedToBin or AuditAction.ItemRestored or AuditAction.ItemPurged
+            or AuditAction.ItemMovedToBinAfterKeptTime => AuditKind.Items,
+        AuditAction.PhotosAdded or AuditAction.PhotosArranged or AuditAction.PhotoDeleted or AuditAction.PhotoMovedToBin
+            or AuditAction.PhotoRestored or AuditAction.PhotoPurged or AuditAction.PreviewRetried => AuditKind.Photos,
+        AuditAction.ContributionReceived or AuditAction.ContributionAccepted or AuditAction.ContributionRejected
+            or AuditAction.ContributionWithdrawn or AuditAction.ContributorDetailsRemoved or AuditAction.ContributorDetailsChanged
+            or AuditAction.ContributionLinkCreated or AuditAction.ContributionLinkChanged => AuditKind.Contributions,
+        AuditAction.CollectionCreated or AuditAction.CollectionChanged => AuditKind.Collections,
+        AuditAction.AccountCreated or AuditAction.AccountRoleChanged or AuditAction.AccountDisabled or AuditAction.AccountEnabled
+            or AuditAction.AccountDeleted or AuditAction.SetupLinkCreated or AuditAction.PasswordChanged
+            or AuditAction.TwoFactorEnabled or AuditAction.TwoFactorDisabled or AuditAction.TwoFactorTurnedOff
+            or AuditAction.RecoveryCodesCreated or AuditAction.RecoveryCodeUsed => AuditKind.Accounts,
+        AuditAction.ArchiveExported or AuditAction.ArchiveExportedWithPersonalData or AuditAction.SettingsChanged
+            or AuditAction.RestoreTested or AuditAction.ActivityLogShortened => AuditKind.Archive,
+        _ => throw new ArgumentOutOfRangeException(nameof(action), action, "Every action needs a kind, for the activity log's filter."),
+    };
+
+    public static string Describe(IStringLocalizer localizer, AuditKind kind) => kind switch
+    {
+        AuditKind.Items => localizer["Items"],
+        AuditKind.Photos => localizer["Photos"],
+        AuditKind.Contributions => localizer["Contributions and links"],
+        AuditKind.Collections => localizer["Collections"],
+        AuditKind.Accounts => localizer["Accounts and logins"],
+        AuditKind.Archive => localizer["Export, settings and the log itself"],
+        _ => kind.ToString(),
     };
 
     /// <summary>Who did it: the account's name, a contributor, or the archive itself.</summary>

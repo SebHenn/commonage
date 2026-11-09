@@ -95,7 +95,9 @@ Beitrag:
 
 - **Speichern und veröffentlichen:** er ist in Ordnung, so wie er ist oder nachdem Sie die Beschreibung korrigiert haben.
 - **Als Entwurf übernehmen:** Sie möchten ihn behalten, aber er braucht noch Arbeit.
-- **Ablehnen:** Spam, oder er passt nicht ins Archiv. Er bleibt verborgen, bis jemand ihn löscht.
+- **Ablehnen:** Spam, oder er passt nicht ins Archiv. Er bleibt verborgen, bis jemand ihn löscht. Ein Archiv kann abgelehnte und
+  zurückgezogene Beiträge auch für eine festgelegte Zeit aufbewahren, unter „Einstellungen“; dann steht beim Eintrag, wann er in
+  den Papierkorb kommt.
 
 Ein gelber Hinweis „Das Archiv hat diese Datei schon“ bedeutet, dass eine Datei darin mit einer vorhandenen identisch ist, mit einem
 Link zu diesem Eintrag. Es kann eine zweite Kopie sein oder die Kopie einer anderen Person vom selben Foto. Einsendende erfahren
@@ -150,3 +152,6 @@ App für Ihr Konto ausschalten.
 - **Jemand anderes hat denselben Eintrag geändert:** die Seite zeigt beide Fassungen, und nichts geht verloren, bis Sie
   entscheiden.
 - **Das Archiv meldet einen vollen Speicher:** Sagen Sie der Person Bescheid, die den Server betreut.
+- **Ein Foto hat keine Vorschau:** Der Filter „Eine funktionierende Vorschau“ auf der Verwaltungsseite findet solche Einträge. Ein
+  Admin kann es unter **System** erneut versuchen. Schlägt es wieder fehl, kann das Archiv die Datei nicht lesen; das Original ist
+  sicher und kann heruntergeladen werden.

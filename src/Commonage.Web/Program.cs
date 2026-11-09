@@ -32,7 +32,8 @@ var connectionString = builder.Configuration.GetConnectionString("Default")
         "ConnectionStrings:Default is not configured. See docs/development.md.");
 
 builder.Services.AddDbContext<CommonageDbContext>(options => options.UseNpgsql(connectionString));
-builder.Services.AddHealthChecks().AddDbContextCheck<CommonageDbContext>();
+// The database, the media folder, free disk space and the last backup. See Operations/ArchiveHealthChecks.cs.
+builder.Services.AddArchiveHealthChecks();
 // Login keys live in the database, encrypted with COMMONAGE_LOGIN_KEY from outside it. See Security/LoginKeys.cs.
 builder.Services.AddLoginKeys(builder.Configuration);
 
@@ -82,6 +83,7 @@ builder.Services.AddScoped<MediaUploadService>();
 builder.Services.AddSingleton<MediaProcessingQueue>();
 builder.Services.AddHostedService<MediaProcessor>();
 builder.Services.AddScoped<ArchiveBin>();
+builder.Services.AddScoped<ArchiveRetention>();
 builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<SupportedLanguages>();
 builder.Services.AddSingleton<ArchiveProfile>();
@@ -114,6 +116,7 @@ builder.Services.AddRazorPages(options =>
         options.Conventions.AuthorizePage("/Admin/Export", Policies.Administer);
         options.Conventions.AuthorizePage("/Admin/Activity", Policies.Administer);
         options.Conventions.AuthorizePage("/Admin/Settings", Policies.Administer);
+        options.Conventions.AuthorizePage("/Admin/System", Policies.Administer);
         options.Conventions.AuthorizePage("/Account/Password");
         options.Conventions.AuthorizePage("/Account/TwoFactor");
     })

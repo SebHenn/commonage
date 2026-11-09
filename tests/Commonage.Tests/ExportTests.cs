@@ -98,13 +98,13 @@ public class ExportTests(CommonageAppFactory app)
     /// and nobody would notice until then. Names are as they appear in archive.json.
     /// </summary>
     [Theory]
-    [InlineData(typeof(ArchiveItem), "item", "id collectionId title description status createdAt updatedAt publishedAt contribution files tags rightsUri rightsHolder credit referenceNumber originalLocation receivedFrom receivedOn internalNotes needsTranscription",
+    [InlineData(typeof(ArchiveItem), "item", "id collectionId title description status createdAt updatedAt publishedAt rejectedOrWithdrawnAt contribution files tags rightsUri rightsHolder credit referenceNumber originalLocation receivedFrom receivedOn internalNotes needsTranscription",
         "Collection: by collectionId. MediaFiles: as files. DateText, DateFrom, DateTo: as date. TagNames: repeats tags. "
         + "CanBePublished: follows from status. IsUntitled: follows from the empty title. MayTravel: follows from the contribution. DeletedAt: the bin is not exported. Version: only for open forms.")]
     [InlineData(typeof(MediaFile), "file", "id originalFileName contentType sizeBytes sha256 uploadedAt altText caption position rotation",
         "ArchiveItemId, ArchiveItem: the file is listed under its item. StorageId, OriginalKey, PreviewKey, ThumbnailKey: storage details. "
         + "Status, ProcessingError, PreviewWidth, PreviewHeight, CardKey, LargeKey, HasLarge, RenderedRotation, IsBeingTurned, DerivativeVersion, CurrentDerivativeVersion, MaxCaptionLength: previews are made anew. DeletedAt: the bin is not exported.")]
-    [InlineData(typeof(ArchiveSettings), "settings", "defaultLanguage contentLanguage otherContentLanguages accentColor timeZone defaultRightsUri allowSearchEngines requireTwoFactor largePhotos privacyReviewed imprintNotNeeded restoreTestedAt logo texts",
+    [InlineData(typeof(ArchiveSettings), "settings", "defaultLanguage contentLanguage otherContentLanguages accentColor timeZone defaultRightsUri allowSearchEngines requireTwoFactor largePhotos privacyReviewed imprintNotNeeded restoreTestedAt activityLogKeptYears rejectedKeptMonths logo texts",
         "Id, TheOnlyId: there is only one. LogoId: as logo.")]
     [InlineData(typeof(Contribution), "contribution", "contributorName contributorEmail showName rights rightsHolder consentText reuse consentCoversSharing referenceCode submittedAt reviewedAt personalDetailsRemovedAt contributionLink",
         "Id, ArchiveItemId, ArchiveItem: listed under its item. ContributionLinkId: the link is named. SendingFingerprint: only there to recognise a form sent twice.")]

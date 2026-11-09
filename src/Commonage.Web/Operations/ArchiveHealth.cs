@@ -94,6 +94,18 @@ public class ArchiveHealth(
         }
     }
 
+    /// <summary>
+    /// Bytes in the media folder: the originals, every picture size made from them, and the logo. Reads the whole folder,
+    /// so whoever asks keeps the answer for a while.
+    /// </summary>
+    public long MeasureStorageBytes()
+    {
+        if (!Directory.Exists(storageRoot))
+            return 0;
+        var everything = new EnumerationOptions { RecurseSubdirectories = true, IgnoreInaccessible = true, AttributesToSkip = 0 };
+        return new DirectoryInfo(storageRoot).EnumerateFiles("*", everything).Sum(f => f.Length);
+    }
+
     public bool BackupIsOverdue =>
         LastBackupAt is not { } at || clock.GetUtcNow().UtcDateTime - at > TimeSpan.FromDays(backups.Value.WarnAfterDays);
 

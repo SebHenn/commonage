@@ -67,7 +67,9 @@ server updated and its access limited is what protects against that.
   forge logins. Admins see a notice then, and `scripts/update.sh` adds the key to `.env`.
 - **Images are decoded by libvips**, a large C library. Keep the Docker image up to date by installing each new
   release ([deployment.md](deployment.md)) to get its security fixes.
-- **The activity log is kept indefinitely** and holds curators' email addresses.
+- **The activity log and rejected or withdrawn contributions are kept indefinitely** unless an admin sets a time under
+  "Settings" → "How long records are kept". The log holds curators' email addresses; rejected contributions hold
+  contributors' names, email addresses and material that will not be published.
 
 ## Checking for vulnerable packages
 

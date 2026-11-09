@@ -16,7 +16,7 @@ queue server and no build step for the front end: pages work without JavaScript,
 | `Identity`, `Security` | Accounts and roles, and security headers. |
 | `Audit` | The activity log. An entry is saved together with the change it describes. |
 | `Export` | The archive as open files. A test makes every new field a decision: exported, or left out for a reason. |
-| `Operations` | Free disk space, the age of backups, and the archive's name and settings. |
+| `Operations` | Free disk space, the age of backups, the checks behind `/health`, and the archive's name and settings. |
 | `Resources` | Translations. English is the key, and every other language has a file here. `SharedResource.resx` is the English base file for translators, written by the tests. |
 
 What is special about it, and easy to break by accident:
@@ -153,9 +153,14 @@ view styles itself inline, so `/media` and `/admin/media` have their own `Pictur
 How these work for the people running an archive is in [operations.md](operations.md). In the code:
 
 - Admin-only pages are protected by the `Administer` policy in `Program.cs` (`/Admin/Users`, `/Admin/Export`,
-  `/Admin/Activity`). Setup links come from `Identity/Accounts.cs`.
+  `/Admin/Activity`, `/Admin/Settings`, `/Admin/System`). Setup links come from `Identity/Accounts.cs`.
 - Every change a curator or admin makes should call `AuditLog.Record` before `SaveChanges`, with a new
-  `AuditAction` and its text in `Audit/AuditText.cs` if needed. Never put contributor details into an entry.
+  `AuditAction`, its text in `AuditText.Describe` and its kind for the log's filter in `AuditText.KindOf` if needed. A test
+  fails if either is missing. Never put contributor details into an entry.
+- `Data/ArchiveRetention.cs` deletes old activity log entries and moves rejected and withdrawn contributions to the bin, as
+  "Settings" asks, a few times a day in the same background job that empties the bin.
+- `/health` runs the checks in `Operations/ArchiveHealthChecks.cs`; the System page shows the same checks. Its answer is one
+  word, so visitors learn nothing else.
 - `Export/ArchiveExporter.cs` writes the export. If you change its format, raise `ArchiveExporter.Version` and
   update operations.md.
 - `scripts/backup.sh`, `scripts/restore.sh`, `scripts/update.sh` and their tests are POSIX `sh` and must keep working

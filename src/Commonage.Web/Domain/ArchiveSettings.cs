@@ -46,6 +46,18 @@ public class ArchiveSettings
     public bool ImprintNotNeeded { get; set; }
 
     public DateTime? RestoreTestedAt { get; set; }
+
+    /// <summary>Activity log entries older than this many years are deleted. Null keeps them all, as before this setting.</summary>
+    public int? ActivityLogKeptYears { get; set; }
+
+    /// <summary>
+    /// Rejected and withdrawn contributions go to the bin this many months after the decision, and are gone for good 30 days
+    /// later. They hold a contributor's name and photos that will never be published. Null keeps them until a curator deletes them.
+    /// </summary>
+    public int? RejectedKeptMonths { get; set; }
+
+    public static readonly int[] ActivityLogYearChoices = [1, 2, 5, 10];
+    public static readonly int[] RejectedMonthChoices = [3, 6, 12, 24];
 }
 
 public enum ArchiveTextKind

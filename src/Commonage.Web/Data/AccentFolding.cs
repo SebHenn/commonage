@@ -14,12 +14,16 @@ namespace Commonage.Web.Data;
 /// </summary>
 public static class AccentFolding
 {
+    /// <summary>Whether search uses unaccent now, rather than the built-in folding. The System page shows it.</summary>
+    public static Task<bool> UsesUnaccentAsync(CommonageDbContext db, CancellationToken cancellationToken = default) =>
+        db.Database.SqlQuery<bool>($"""
+            SELECT prosrc LIKE '%unaccent%' AS "Value" FROM pg_proc WHERE oid = 'commonage_fold(text)'::regprocedure
+            """).SingleAsync(cancellationToken);
+
     public static async Task<bool> TryUseUnaccentAsync(CommonageDbContext db, ILogger logger, CancellationToken cancellationToken = default)
     {
         var database = db.Database;
-        if (await database.SqlQuery<bool>($"""
-                SELECT prosrc LIKE '%unaccent%' AS "Value" FROM pg_proc WHERE oid = 'commonage_fold(text)'::regprocedure
-                """).SingleAsync(cancellationToken))
+        if (await UsesUnaccentAsync(db, cancellationToken))
             return true;
 
         if (!await database.SqlQuery<bool>($"""
