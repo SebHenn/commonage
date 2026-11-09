@@ -14,8 +14,8 @@ a fix before you publish details.
 
 Only the newest minor version. A vulnerability in Commonage, or a relevant one in .NET, libvips or the base images,
 gets a bug-fix release of it, as a rule within a week of a fix being available. Older minor versions get none, so stay
-on the newest one: a server with `COMMONAGE_VERSION=0.3` gets the fixes for 0.3 from `scripts/update.sh`, but does not
-move to 0.4 by itself. To hear about releases, follow the
+on the newest one: a server with `COMMONAGE_VERSION=0.4` gets the fixes for 0.4 from `scripts/update.sh`, but does not
+move to 0.5 by itself. To hear about releases, follow the
 [release feed](https://github.com/SebHenn/commonage/releases.atom) or choose **Watch** → **Releases** on GitHub.
 
 How Commonage is protected, and its known limits, are described in [docs/security.md](docs/security.md).
