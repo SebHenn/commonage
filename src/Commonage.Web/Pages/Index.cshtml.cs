@@ -17,6 +17,9 @@ public class IndexModel(CommonageDbContext db, Commonage.Web.Operations.ArchiveP
 
     public IReadOnlyList<ItemSummary> Recent { get; private set; } = [];
 
+    /// <summary>How many published items each decade has.</summary>
+    public IReadOnlyList<DecadeCount> Decades { get; private set; } = [];
+
     /// <summary>The most used tags of published items, in alphabetical order.</summary>
     public IReadOnlyList<string> Tags { get; private set; } = [];
 
@@ -30,6 +33,8 @@ public class IndexModel(CommonageDbContext db, Commonage.Web.Operations.ArchiveP
             .Take(RecentCount)
             .Select(ItemSummary.FromItem)
             .ToListAsync();
+
+        Decades = await DecadeTimeline.LoadAsync(db.PublishedItems, HttpContext.RequestAborted);
 
         var popularTags = await db.PublishedItems
             .SelectMany(i => i.Tags)

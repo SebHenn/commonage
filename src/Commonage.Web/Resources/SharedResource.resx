@@ -157,6 +157,7 @@
   <data name="Dates are always understood in the language above and in the language of whoever types them. In other languages, a month name can mean a different month: listopad is November in Polish, but October in Croatian." xml:space="preserve"><value>Dates are always understood in the language above and in the language of whoever types them. In other languages, a month name can mean a different month: listopad is November in Polish, but October in Croatian.</value></data>
   <data name="Dates can also be written in" xml:space="preserve"><value>Dates can also be written in</value></data>
   <data name="Days since the last backup: {0}. Whoever runs the server should check that the nightly backup still works." xml:space="preserve"><value>Days since the last backup: {0}. Whoever runs the server should check that the nightly backup still works.</value></data>
+  <data name="Decades" xml:space="preserve"><value>Decades</value></data>
   <data name="Delete account" xml:space="preserve"><value>Delete account</value></data>
   <data name="Delete for good" xml:space="preserve"><value>Delete for good</value></data>
   <data name="Delete the account of {0}? This cannot be undone. The activity log keeps what the account did." xml:space="preserve"><value>Delete the account of {0}? This cannot be undone. The activity log keeps what the account did.</value></data>
@@ -640,6 +641,7 @@
   <data name="This site only sets the cookies it needs: one for the chosen language, one to protect forms, and one to keep curators logged in. There are no analytics and no third-party services. Visitors' addresses are held in memory for a short time, to limit abuse of forms and logins." xml:space="preserve"><value>This site only sets the cookies it needs: one for the chosen language, one to protect forms, and one to keep curators logged in. There are no analytics and no third-party services. Visitors' addresses are held in memory for a short time, to limit abuse of forms and logins.</value><comment>Part of the privacy text an archive starts with. Please have a second translator review it.</comment></data>
   <data name="This text can be at most {1} characters long." xml:space="preserve"><value>This text can be at most {1} characters long.</value></data>
   <data name="This text was started on this device earlier. If it is not yours, clear it." xml:space="preserve"><value>This text was started on this device earlier. If it is not yours, clear it.</value></data>
+  <data name="Through the decades" xml:space="preserve"><value>Through the decades</value></data>
   <data name="Tick all on this page" xml:space="preserve"><value>Tick all on this page</value></data>
   <data name="Time zone" xml:space="preserve"><value>Time zone</value></data>
   <data name="Title" xml:space="preserve"><value>Title</value></data>
@@ -755,4 +757,7 @@
   <data name="{0} was left out, because together the photos would be too large to send at once. You can send it afterwards." xml:space="preserve"><value>{0} was left out, because together the photos would be too large to send at once. You can send it afterwards.</value></data>
   <data name="{0}, photo {1} of {2}" xml:space="preserve"><value>{0}, photo {1} of {2}</value></data>
   <data name="{0}: the archive already has this file: {1}" xml:space="preserve"><value>{0}: the archive already has this file: {1}</value></data>
+  <data name="{0}: {1, plural, one {# item} other {# items}}" xml:space="preserve"><value>{0}: {1, plural, one {# item} other {# items}}</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
+  <data name="{0}s" xml:space="preserve"><value>{0}s</value></data>
+  <data name="“{0}” also finds what is dated {1}." xml:space="preserve"><value>“{0}” also finds what is dated {1}.</value></data>
 </root>

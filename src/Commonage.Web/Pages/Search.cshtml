@@ -65,6 +65,12 @@
                     }
                 </div>
 
+                @if (Model.Decades.Count > 0)
+                {
+                    <h2 class="h6">@T["Decades"]</h2>
+                    <partial name="_DecadeTimeline" model="new DecadeTimelineView(Model.Decades, KeepSearch: true)" />
+                }
+
                 @if (Model.Tags.Any(t => !string.Equals(t.Name, Model.Tag, StringComparison.OrdinalIgnoreCase)))
                 {
                     <h2 class="h6">@T["Tags"]</h2>
@@ -95,6 +101,11 @@
                        title="@T["Remove this filter"]">@text <span aria-hidden="true">×</span><span class="visually-hidden">@T["Remove this filter"]</span></a>
                 }
             </div>
+
+            @foreach (var (date, _) in Model.Dates)
+            {
+                <p class="small text-muted">@T["“{0}” also finds what is dated {1}.", date.Text, date.Period]</p>
+            }
 
             @if (Model.Results.TotalCount == 0)
             {

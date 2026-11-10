@@ -54,6 +54,10 @@ and that is not something you can change without asking them, and there is no bu
 Open the item list and filter it: by collection, or by what is "still needed", such as a date. Open the first item and use
 **Save and next** to go through the list. Use **Preview** to see a draft as visitors will.
 
+A year or decade typed into the search, such as "1958", "1950s" or "March 1953", also finds what is dated then, not only what
+has those words. "Mill Street 1950s" finds the tram of 1930–1955 if it is about Mill Street. This is why a date on each item
+matters: visitors find it through the decades on the start page too.
+
 To change many at once, tick them, or take everything the filter found. Choose what to do: publish, add tags, set the date,
 move to a collection or set the rights statement. The next page says how many items it is about and what would happen to
 them, and nothing changes until you confirm. Each item that changes gets a line in its history.

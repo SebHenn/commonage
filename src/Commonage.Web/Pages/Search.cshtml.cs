@@ -42,8 +42,14 @@ public class SearchModel(CommonageDbContext db) : PageModel
     /// <summary>The order actually used: without search text there is nothing to rank by relevance.</summary>
     public ItemSort EffectiveSort => Sort == ItemSort.Relevance && Query is null ? ItemSort.RecentlyAdded : Sort;
 
-    /// <summary>The full-text query made from <see cref="Text"/>; null when there is nothing to search for.</summary>
+    /// <summary>The full-text query made from the words of <see cref="Text"/>; null when there is nothing to search for.</summary>
     public string? Query { get; private set; }
+
+    /// <summary>Dates in <see cref="Text"/>, such as "1950s", which also find what is dated within them.</summary>
+    public IReadOnlyList<DateInSearch> Dates { get; private set; } = [];
+
+    /// <summary>The decades of what was found, while no period is chosen.</summary>
+    public IReadOnlyList<DecadeCount> Decades { get; private set; } = [];
 
     public bool HasFilters => ActiveFilterCount > 0;
 
@@ -67,8 +73,9 @@ public class SearchModel(CommonageDbContext db) : PageModel
         if (string.IsNullOrWhiteSpace(Tag))
             Tag = null;
 
-        Query = await db.ToSearchQueryAsync(Text, cancellationToken);
-        var filter = new ItemFilter(Query, Tag, Collection, From, To);
+        var search = await db.ToSearchAsync(Text, cancellationToken);
+        (Query, Dates) = (search.Query, search.Dates);
+        var filter = new ItemFilter(Query, Tag, Collection, From, To, Dates);
         var matches = db.PublishedItems.Filter(filter);
 
         Results = await matches
@@ -85,6 +92,14 @@ public class SearchModel(CommonageDbContext db) : PageModel
             .Take(MaxTagSuggestions)
             .Select(g => new TagCount(g.Key, g.Count()))
             .ToListAsync(cancellationToken);
+
+        // A timeline of one decade, or of a chosen period, would say nothing new.
+        if (From is null && To is null && Dates.Count == 0)
+        {
+            Decades = await DecadeTimeline.LoadAsync(matches, cancellationToken);
+            if (Decades.Count < 2)
+                Decades = [];
+        }
 
         var collections = await db.Collections.OrderBy(c => c.Title).ToListAsync(cancellationToken);
         CollectionOptions = new SelectList(collections, nameof(Domain.Collection.Id), nameof(Domain.Collection.Title), Collection);

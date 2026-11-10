@@ -47,7 +47,8 @@ public sealed record DateVocabulary(
         Since: ["seit", "ab"],
         Century: ["jahrhundert", "jh"],
         CenturyOrdinal: @"\.",
-        DecadeEnding: "ern?",
+        // "1950er", and "1950er Jahre" as people often write it.
+        DecadeEnding: @"ern?(?:\s+jahren?)?",
         // Austrian. .NET knows only "Januar".
         ExtraMonths: new Dictionary<string, int> { ["jänner"] = 1 });
 

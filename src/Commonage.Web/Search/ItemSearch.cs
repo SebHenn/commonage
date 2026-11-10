@@ -17,7 +17,19 @@ public enum ItemSort
 }
 
 /// <param name="Query">A full-text query from <see cref="ItemSearch.ToSearchQueryAsync"/>, or null to match all items.</param>
-public record ItemFilter(string? Query = null, string? Tag = null, int? CollectionId = null, int? YearFrom = null, int? YearTo = null);
+/// <param name="Dates">Dates typed into the search. Each one matches what is dated within it, or has its words.</param>
+public record ItemFilter(
+    string? Query = null, string? Tag = null, int? CollectionId = null, int? YearFrom = null, int? YearTo = null,
+    IReadOnlyList<DateInSearch>? Dates = null);
+
+/// <param name="Query">The full-text query for the words of the date itself, so that "1958" also finds "Team photo 1958".</param>
+public record DateInSearch(SearchDate Date, string Query);
+
+/// <summary>What someone typed into the search: the full-text query for its words, and the dates in it.</summary>
+public record TextSearch(string? Query, IReadOnlyList<DateInSearch> Dates)
+{
+    public static readonly TextSearch None = new(null, []);
+}
 
 /// <summary>
 /// Filters and sorts archive items. It never decides what the caller may see: public pages pass
@@ -44,6 +56,17 @@ public static class ItemSearch
 
         if (filter.CollectionId is { } collectionId)
             items = items.Where(i => i.CollectionId == collectionId);
+
+        foreach (var (date, words) in filter.Dates ?? [])
+        {
+            // Like the year filter: the item's possible dates overlap the date typed. Either end of either can be open.
+            var (from, to) = (date.From, date.To);
+            items = items.Where(i => ((i.DateFrom != null || i.DateTo != null)
+                    && (from == null || i.DateTo == null || i.DateTo >= from)
+                    && (to == null || i.DateFrom == null || i.DateFrom <= to))
+                || EF.Property<NpgsqlTsVector>(i, CommonageDbContext.SearchVector)
+                    .Matches(EF.Functions.ToTsQuery(CommonageDbContext.SearchConfiguration, words)));
+        }
 
         // An item matches a period when its possible dates overlap it. Undated items never match.
         if (filter.YearFrom is { } yearFrom)
@@ -87,6 +110,26 @@ public static class ItemSearch
                 .OrderByDescending(i => i.PublishedAt)
                 .ThenByDescending(i => i.Id),
         };
+    }
+
+    /// <summary>
+    /// Turns what someone typed into a full-text query for its words and the dates in it (<see cref="SearchDates"/>).
+    /// </summary>
+    public static async Task<TextSearch> ToSearchAsync(this CommonageDbContext db, string? text, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+            return TextSearch.None;
+        if (text.Length > MaxSearchTextLength)
+            text = text[..MaxSearchTextLength];
+        var (words, found) = SearchDates.Extract(text);
+        var dates = new List<DateInSearch>();
+        // A date always has digits, so it always has words to search for as well.
+        foreach (var date in found)
+        {
+            if (await db.ToSearchQueryAsync(date.Text, cancellationToken) is { } query)
+                dates.Add(new DateInSearch(date, query));
+        }
+        return new TextSearch(await db.ToSearchQueryAsync(words, cancellationToken), dates);
     }
 
     /// <summary>

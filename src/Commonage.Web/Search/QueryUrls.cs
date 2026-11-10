@@ -11,13 +11,20 @@ public static class QueryUrls
     /// The current URL with one query value replaced, or removed when <paramref name="value"/> is null.
     /// The page number is reset, because a changed filter starts again on the first page.
     /// </summary>
-    public static string WithQueryValue(this HttpRequest request, string key, string? value)
+    public static string WithQueryValue(this HttpRequest request, string key, string? value) =>
+        request.WithQueryValues((key, value));
+
+    /// <summary>Like <see cref="WithQueryValue"/>, for several values at once, such as both ends of a period.</summary>
+    public static string WithQueryValues(this HttpRequest request, params (string Key, string? Value)[] values)
     {
         var query = QueryHelpers.ParseQuery(request.QueryString.Value);
         query.Remove(PageKey);
-        query.Remove(key);
-        if (value is not null)
-            query[key] = value;
+        foreach (var (key, value) in values)
+        {
+            query.Remove(key);
+            if (value is not null)
+                query[key] = value;
+        }
         return QueryHelpers.AddQueryString(request.PathBase + request.Path, query);
     }
 }
