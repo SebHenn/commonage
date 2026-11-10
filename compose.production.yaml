@@ -23,9 +23,9 @@ services:
       - web
 
   web:
-    # The published, attested image instead of building on the server. COMMONAGE_VERSION "0.3" follows bug-fix
-    # releases of 0.3 with "docker compose pull"; a changed version of Commonage sets COMMONAGE_IMAGE to its own image.
-    image: ${COMMONAGE_IMAGE:-ghcr.io/sebhenn/commonage}:${COMMONAGE_VERSION:-0.3}
+    # The published, attested image instead of building on the server. COMMONAGE_VERSION "0.4" follows bug-fix
+    # releases of 0.4 with "docker compose pull"; a changed version of Commonage sets COMMONAGE_IMAGE to its own image.
+    image: ${COMMONAGE_IMAGE:-ghcr.io/sebhenn/commonage}:${COMMONAGE_VERSION:-0.4}
     build: !reset null
     restart: unless-stopped
     environment:

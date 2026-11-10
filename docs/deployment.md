@@ -38,7 +38,7 @@ The database and the app itself are never exposed; only Caddy, the HTTPS front, 
 ```sh
 git clone https://github.com/SebHenn/commonage.git
 cd commonage
-git checkout v0.3.0        # a released version, not the development branch
+git checkout v0.4.0        # a released version, not the development branch
 ```
 
 This gives you the Compose files and the backup scripts. The app itself comes as a ready-made Docker image,
@@ -64,7 +64,7 @@ COMMONAGE_LOGIN_KEY=<the third value>
 
 COMMONAGE_DOMAIN=archive.example.org
 COMPOSE_FILE=compose.yaml:compose.production.yaml
-COMMONAGE_VERSION=0.3
+COMMONAGE_VERSION=0.4
 ```
 
 `COMMONAGE_LOGIN_KEY` encrypts the keys in the database that keep people logged in and that protect their authenticator
@@ -72,8 +72,8 @@ apps. Without it, a stolen copy of the database, such as a backup, would be enou
 `.env` somewhere safe, apart from the backups**, for example in a password manager: a restore needs the same key, or everyone
 has to log in again and set up their authenticator apps again ([operations.md](operations.md#login-keys)).
 
-`COMMONAGE_VERSION=0.3` follows the bug-fix releases of 0.3 (0.3.1, 0.3.2, ...) whenever you update; a new minor
-version such as 0.2 only comes when you change this line.
+`COMMONAGE_VERSION=0.4` follows the bug-fix releases of 0.4 (0.4.1, 0.4.2, ...) whenever you update; a new minor
+version such as 0.5 only comes when you change this line, or with `scripts/update.sh`.
 
 The `COMPOSE_FILE` line adds `compose.production.yaml`, so every `docker compose` command, and the backup scripts,
 use the production setup: HTTPS through Caddy, automatic restarts, and no ports open except 80 and 443. (On Windows
@@ -127,8 +127,8 @@ Read the release notes in `CHANGELOG.md`, then:
 
 ```sh
 scripts/update.sh                    # the newest release
-scripts/update.sh 0.3                # or the newest 0.3.x
-scripts/update.sh 0.3 /srv/backups   # with the backup in another folder
+scripts/update.sh 0.4                # or the newest 0.4.x
+scripts/update.sh 0.4 /srv/backups   # with the backup in another folder
 ```
 
 It checks that there is room, makes a backup, switches to the new version and waits until the app answers; the app
@@ -140,10 +140,10 @@ The script is part of Commonage from version 0.3. To get from 0.2 to it once, by
 
 ```sh
 scripts/backup.sh
-git fetch --tags && git checkout v0.3.0
+git fetch --tags && git checkout v0.4.0
 ```
 
-Set `COMMONAGE_VERSION=0.3` in `.env`, then run `docker compose pull` and `docker compose up -d`.
+Add a login key to `.env` as described above, set `COMMONAGE_VERSION=0.4`, then run `docker compose pull` and `docker compose up -d`.
 
 ## Keeping an eye on it
 

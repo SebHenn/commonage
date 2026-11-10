@@ -13,7 +13,7 @@ PDFs and sound recordings are planned.
 - **The group stays in control**: it runs the archive on its own server, can export everything in an open format at
   any time, handles contributors' requests to remove their data, and sees who changed what.
 
-> **Status:** v0.3, an early version for real community archives. See [CHANGELOG.md](CHANGELOG.md) and
+> **Status:** v0.4, an early version for real community archives. See [CHANGELOG.md](CHANGELOG.md) and
 > [docs/roadmap.md](docs/roadmap.md).
 
 ## Try it
