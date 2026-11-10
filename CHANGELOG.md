@@ -3,6 +3,15 @@
 All notable changes to Commonage. Versions follow [Semantic Versioning](https://semver.org/); before 1.0, a minor
 version may change things that need attention when updating, and these notes say so.
 
+## Unreleased
+
+### For visitors and curators
+
+- A year, decade, month or period typed into the search, such as "Mill Street 1950s", "circa 1960" or "before 1945", also finds
+  what is dated then. The page says how it read the date. Curators' item list searches the same way.
+- The start page shows the archive through the decades, and the search shows the decades of what it found. Each decade opens
+  what it counts.
+
 ## 0.4.0 (2026-11-09)
 
 Letters that can be read, items that say what may be done with them, any language for the material, logins with an
