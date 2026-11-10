@@ -11,6 +11,16 @@ version may change things that need attention when updating, and these notes say
   what is dated then. The page says how it read the date. Curators' item list searches the same way.
 - The start page shows the archive through the decades, and the search shows the decades of what it found. Each decade opens
   what it counts.
+- "Places" and "People" list from A to Z what published items are tagged with, and an item shows its places and people first.
+
+### For curators
+
+- A Tags page: say whether a tag names a place, a person or a topic, rename it on every item at once, merge two tags into one,
+  and delete tags no item has.
+
+### For people who run an archive
+
+- The export is version 4: it lists the tags with their kinds. Items still list their tags by name.
 
 ## 0.4.0 (2026-11-09)
 

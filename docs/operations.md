@@ -236,7 +236,8 @@ none of them most, and null if never chosen), and `otherContentLanguages`, separ
 `rejectedKeptMonths` are how long records are kept (null for always), and each item's `rejectedOrWithdrawnAt` is when that time
 started for it.
 
-`archive.json` has `"format": "commonage-export"` and `"version": 3`. Version 3 added each item's rights, credit and catalogue
+`archive.json` has `"format": "commonage-export"` and `"version": 4`. Version 4 added `tags`, each with its `name` and `kind`
+(`Topic`, `Place` or `Person`); items still list their tags by name. Version 3 added each item's rights, credit and catalogue
 details and each photo's description; in `items.csv`, `rights` and `rights_holder` are now the item's own, and the contributor's
 answers moved to `contributor_rights` and `contributor_rights_holder`. An export of published items leaves out what only
 curators see. Without personal data, it also leaves out rights holders, credits, "received from" and internal notes. Version 2 added `settings` with the archive's name, pages and colours, and the logo under `branding/`. While exporting, every file is checked against

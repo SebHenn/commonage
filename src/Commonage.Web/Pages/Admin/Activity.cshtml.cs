@@ -59,8 +59,7 @@ public class ActivityModel(CommonageDbContext db) : PageModel
         }
         if (Text?.Trim() is { Length: > 0 } text)
         {
-            // Matched literally, so % and _ are not wildcards.
-            var pattern = "%" + text.Replace(@"\", @"\\").Replace("%", @"\%").Replace("_", @"\_") + "%";
+            var pattern = LikePattern.Containing(text);
             entries = entries.Where(e => EF.Functions.ILike(e.Subject!, pattern));
         }
 

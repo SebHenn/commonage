@@ -700,3 +700,14 @@ main:focus {
 .decade-bar-20 {
   inline-size: 100%;
 }
+
+/* Places and people from A to Z, in as many columns as fit. */
+.tag-index {
+  columns: 15rem;
+  column-gap: 2rem;
+}
+
+.tag-index-letter {
+  break-inside: avoid;
+  margin-bottom: 1rem;
+}

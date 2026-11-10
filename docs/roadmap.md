@@ -412,8 +412,14 @@ every upload after it.
 **First part done (November 2026):** a year, decade, month or "circa 1950" typed into the search finds what is dated then, or
 what has the words, for visitors and curators alike, and the page says how it understood the date. The decades are on the
 start page and beside the results, each as a bar whose number is what tapping it finds; items with open ends such as "before
-1945" reach to the edge, as in the year filter. "1950er Jahre" is one decade, as Germans often write it. Tags
-and collections follow in pull requests of their own.
+1945" reach to the edge, as in the year filter. "1950er Jahre" is one decade, as Germans often write it.
+
+**Second part done (November 2026):** each tag is a topic, place or person, set on the new Tags page, which also renames,
+merges and deletes unused tags. Every item with a changed tag is brought up to date for the search, items in the bin
+included, and a tag that only items in the bin have is not unused. `/places` and `/people` list from A to Z what published
+items are tagged with, so a name only drafts have stays unseen; whether to name living people stays the curators' decision,
+and the page and the handbook say that the People page lists names on their own. The export (version 4) has the tags with
+their kinds. Collections follow in a pull request of their own.
 
 **M20 Community knowledge**
 

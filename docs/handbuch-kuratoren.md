@@ -13,6 +13,22 @@ Für alle, die sich um den Bestand eines Archivs kümmern. Technische Kenntnisse
 - **Schlagwörter:** die Orte, Personen und Themen, nach denen jemand suchen könnte. Prüfen Sie vor einem neuen Schlagwort, ob
   es schon unter einem ähnlichen Namen existiert.
 
+## Schlagwörter aufräumen
+
+**Schlagwörter** listet jedes Schlagwort auf, mit der Zahl der Einträge, die es haben. Öffnen Sie eines, um:
+
+- **festzulegen, was es nennt:** einen Ort, eine Person oder ein Thema. Besucher finden alle Orte und alle Personen auf eigenen
+  Seiten, „Orte“ und „Personen“, von A bis Z, und ein Eintrag zeigt seine Orte und Personen zuerst. Es zählen nur
+  veröffentlichte Einträge, ein Name, den nur Entwürfe haben, bleibt also unsichtbar. Die Seite „Personen“ listet Namen für sich
+  auf, nennen Sie lebende Menschen also nur, wenn sie einverstanden sind.
+- **es umzubenennen:** der neue Name gilt sofort bei jedem Eintrag, auch in der Suche. Einen Namen, den schon ein anderes
+  Schlagwort hat, lehnt das Archiv ab; das wäre ein Zusammenführen.
+- **es mit einem anderen zusammenzuführen,** bei einem Tippfehler oder zwei Wörtern für dasselbe: Jeder Eintrag bekommt
+  stattdessen das andere Schlagwort, und dieses verschwindet. Das lässt sich nicht rückgängig machen, und das
+  Aktivitätsprotokoll hält es fest.
+- **es zu löschen,** sobald kein Eintrag es mehr hat, auch keiner im Papierkorb. „Die unbenutzten Schlagwörter löschen“ in der
+  Liste erledigt das für alle.
+
 ## Mehrere Fotos und Briefe
 
 - **Reihenfolge:** „Nach vorne“ und „Nach hinten“ verschieben ein Foto, und zwar sofort auch für Besucher. Das erste Foto ist das

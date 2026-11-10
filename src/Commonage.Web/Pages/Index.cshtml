@@ -63,5 +63,14 @@
                 <li><a asp-page="/Search" asp-route-tag="@tag" class="badge rounded-pill text-bg-light border tag-link">@tag</a></li>
             }
         </ul>
+        @if (Model.TagKinds.Count > 0)
+        {
+            <p class="d-flex flex-wrap gap-3">
+                @foreach (var kind in Model.TagKinds)
+                {
+                    <a asp-page="/TagIndex" asp-route-kind="@Commonage.Web.Domain.TagKinds.Slug(kind)">@(kind == TagKind.Place ? T["All places"] : T["All people"])</a>
+                }
+            </p>
+        }
     </section>
 }

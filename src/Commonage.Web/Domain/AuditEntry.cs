@@ -46,6 +46,10 @@ public enum AuditAction
     ItemMovedToBinAfterKeptTime,
     ActivityLogShortened,
     PreviewRetried,
+    TagChanged,
+    TagsMerged,
+    TagDeleted,
+    UnusedTagsDeleted,
 }
 
 /// <summary>
