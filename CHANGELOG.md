@@ -3,7 +3,13 @@
 All notable changes to Commonage. Versions follow [Semantic Versioning](https://semver.org/); before 1.0, a minor
 version may change things that need attention when updating, and these notes say so.
 
-## Unreleased
+## 0.4.0 (2026-11-09)
+
+Letters that can be read, items that say what may be done with them, any language for the material, logins with an
+authenticator app, and a System page. `scripts/update.sh 0.4` updates and adds the new login key to `.env`. **Before updating,
+read the points in bold under "For people who run an archive"**: everyone logs in again once, rights statements curators wrote
+become public, and the large photos stay off in an archive that saved its settings before. **Keep a copy of `.env` apart from the
+backups** from now on, because a restore needs the same login key.
 
 ### For curators
 
