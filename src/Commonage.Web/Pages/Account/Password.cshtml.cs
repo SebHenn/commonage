@@ -51,6 +51,17 @@ public class PasswordModel(
         if (await users.GetUserAsync(User) is not { } account)
             return Challenge();
 
+        // Counts towards locking the account, like a login. Otherwise someone at a computer left logged in, or with a
+        // stolen login, could try passwords here for as long as they liked.
+        var check = await signIn.CheckPasswordSignInAsync(account, Input.CurrentPassword, lockoutOnFailure: true);
+        if (!check.Succeeded)
+        {
+            ModelState.AddModelError("Input.CurrentPassword", check.IsLockedOut
+                ? localizer["Too many failed attempts. Please try again in a few minutes."]
+                : localizer["The current password is incorrect."]);
+            return Page();
+        }
+
         var result = await users.ChangePasswordAsync(account, Input.CurrentPassword, Input.Password);
         if (!result.Succeeded)
         {

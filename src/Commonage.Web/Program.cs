@@ -69,6 +69,9 @@ builder.Services.AddAuthorizationBuilder()
     .AddPolicy(Policies.Administer, policy => policy.RequireRole(Roles.Admin).AddRequirements(new TwoFactorIfRequired()));
 builder.Services.AddScoped<IAuthorizationHandler, TwoFactorIfRequiredHandler>();
 
+// Browsers that have seen the archive over HTTPS refuse plain HTTP for a year, not the 30 days ASP.NET starts with.
+builder.Services.AddHsts(options => options.MaxAge = TimeSpan.FromDays(365));
+
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddScoped<AuditLog>();
