@@ -27,6 +27,11 @@ version may change things that need attention when updating, and these notes say
 - The export is version 4: it lists the tags with their kinds, and each collection's position, order of items and cover. Items
   still list their tags by name.
 
+## 0.4.1 (2026-11-12)
+
+Security fixes: .NET 10.0.15, and a photo that cannot stop the archive any more. `scripts/update.sh 0.4` updates; the
+database change is made at the first start. Pictures do not need to be made again.
+
 ### For people who run an archive
 
 - Security: the image runs on .NET 10.0.15, which fixes three vulnerabilities in ASP.NET Core rated high (CVE-2026-114146,
