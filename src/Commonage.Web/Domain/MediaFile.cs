@@ -34,6 +34,16 @@ public class MediaFile
 
     public ProcessingStatus Status { get; set; }
     public string? ProcessingError { get; set; }
+
+    /// <summary>
+    /// How often making the previews was begun, counted before the file is opened. A file that stops the whole app, by
+    /// using up the memory or by crashing the image library, would otherwise be the first thing the app tries after
+    /// every restart.
+    /// </summary>
+    public int ProcessingAttempts { get; set; }
+
+    public const int MaxProcessingAttempts = 3;
+
     public int? PreviewWidth { get; set; }
     public int? PreviewHeight { get; set; }
 

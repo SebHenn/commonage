@@ -9,6 +9,8 @@
 #
 # See docs/deployment.md.
 set -eu
+# The copy of .env made while changing it holds the passwords, and so does the backup.
+umask 077
 
 export MSYS_NO_PATHCONV=1
 cd "$(dirname "$0")/.."

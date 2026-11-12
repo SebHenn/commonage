@@ -32,8 +32,11 @@ public class SetPasswordModel(UserManager<IdentityUser> users, IStringLocalizer<
 
     public async Task<IActionResult> OnGetAsync(string? user, string? code)
     {
-        // The link's code is checked when the form is sent; checking it here would not make it any safer.
-        if (await users.FindByIdAsync(user ?? "") is not { } account || Accounts.DecodeSetupCode(code) is null)
+        // The code is checked again when the form is sent. Checking it here keeps the page, which names the account's
+        // email address, from anyone who has only the first half of a link.
+        if (await users.FindByIdAsync(user ?? "") is not { } account
+            || Accounts.DecodeSetupCode(code) is not { } token
+            || !await users.VerifyUserTokenAsync(account, users.Options.Tokens.PasswordResetTokenProvider, UserManager<IdentityUser>.ResetPasswordTokenPurpose, token))
             return InvalidLink();
 
         Email = account.Email;
