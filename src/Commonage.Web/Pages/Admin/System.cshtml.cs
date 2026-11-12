@@ -146,6 +146,7 @@ public class SystemModel(
         {
             file.Status = ProcessingStatus.Pending;
             file.ProcessingError = null;
+            file.ProcessingAttempts = 0;
         }
         foreach (var item in failed.Select(f => f.ArchiveItem).DistinctBy(i => i.Id))
             audit.Record(AuditAction.PreviewRetried, item.Title, item);

@@ -465,6 +465,9 @@ namespace Commonage.Web.Data.Migrations
                     b.Property<int?>("PreviewWidth")
                         .HasColumnType("integer");
 
+                    b.Property<int>("ProcessingAttempts")
+                        .HasColumnType("integer");
+
                     b.Property<string>("ProcessingError")
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");

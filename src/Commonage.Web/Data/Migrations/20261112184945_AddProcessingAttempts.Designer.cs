@@ -13,8 +13,8 @@ using NpgsqlTypes;
 namespace Commonage.Web.Data.Migrations
 {
     [DbContext(typeof(CommonageDbContext))]
-    [Migration("20261110175016_AddTagKind")]
-    partial class AddTagKind
+    [Migration("20261112184945_AddProcessingAttempts")]
+    partial class AddProcessingAttempts
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -468,6 +468,9 @@ namespace Commonage.Web.Data.Migrations
                     b.Property<int?>("PreviewWidth")
                         .HasColumnType("integer");
 
+                    b.Property<int>("ProcessingAttempts")
+                        .HasColumnType("integer");
+
                     b.Property<string>("ProcessingError")
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
@@ -517,9 +520,6 @@ namespace Commonage.Web.Data.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Kind")
-                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()

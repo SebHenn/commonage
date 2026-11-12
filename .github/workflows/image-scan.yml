@@ -1,0 +1,28 @@
+name: Image scan
+
+# Looks through the newest released image for known vulnerabilities that have a fix: in .NET, in libvips and in the
+# packages of the base image. Those appear between releases, and nothing else says so. A failed run means a bug-fix
+# release with updated base images is due, see SECURITY.md. Wednesday, the day after Microsoft's monthly fixes.
+on:
+  schedule:
+    - cron: "17 5 * * 3"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  IMAGE: ghcr.io/sebhenn/commonage:latest
+
+jobs:
+  image-scan:
+    # Forks have no released image of their own.
+    if: ${{ github.repository == 'SebHenn/commonage' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      # Pinned by digest, like every image here. Only what is high or critical and can be fixed by updating fails the run.
+      - run: >-
+          docker run --rm
+          ghcr.io/aquasecurity/trivy:0.76.2@sha256:8f6bb947dbc528902e11f2f5be52f7b519f6a39d5d148f41166f2040499768fb
+          image --quiet --scanners vuln --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 "$IMAGE"

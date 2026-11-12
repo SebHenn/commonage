@@ -22,6 +22,29 @@ version may change things that need attention when updating, and these notes say
 
 - The export is version 4: it lists the tags with their kinds. Items still list their tags by name.
 
+### For people who run an archive
+
+- Security: the image runs on .NET 10.0.15, which fixes three vulnerabilities in ASP.NET Core rated high (CVE-2026-114146,
+  CVE-2026-114147, CVE-2026-114149), and on an updated base system.
+- Security: a photo that the preview maker cannot cope with can no longer stop the archive. Whatever goes wrong with one
+  file now costs only that file's preview, and a file that took the app down three times, by using up the memory or by
+  crashing the image library, is given up as failed instead of being tried again at every start. Anyone with a contribution
+  link could have sent such a file. "Try again" on the System page still works for it.
+- Wrong guesses of the current password on "Change password" now count towards locking the account, like wrong logins.
+- A setup link's page only opens with the whole link. With the first half alone, it used to name the account's email address.
+- Browsers are told to use HTTPS only for a year instead of 30 days (HSTS).
+- `/health` keeps its answer for five seconds, so asking it very often costs the archive nothing.
+- The app's container gives up every right it does not need (`cap_drop`, `no-new-privileges`).
+- `scripts/backup.sh` and `scripts/update.sh` write backups, and the copy of `.env` made during an update, readable by
+  their owner only. Backups made before are as readable as the folder they are in: `chmod -R go-rwx backups` closes them.
+
+### Project
+
+- Dependabot proposes a package or action update only once its release is a week old; fixes for known vulnerabilities and new
+  base images do not wait.
+- A weekly scan of the newest released image fails when .NET, libvips or the base image has a known vulnerability with a fix.
+- Tests list every address the app answers and fail when one is open to everyone without being meant to.
+
 ## 0.4.0 (2026-11-09)
 
 Letters that can be read, items that say what may be done with them, any language for the material, logins with an
