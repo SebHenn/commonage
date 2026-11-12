@@ -1,6 +1,7 @@
 using Commonage.Web.Data;
 using Commonage.Web.Media;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Commonage.Web.Operations;
@@ -23,6 +24,28 @@ public static class ArchiveHealthChecks
             .AddCheck<StorageHealthCheck>(Storage)
             .AddCheck<DiskHealthCheck>(Disk)
             .AddCheck<BackupHealthCheck>(Backup);
+
+    public const string Path = "/health";
+
+    /// <summary>
+    /// Anyone can ask, and each look writes a file and asks the database twice. So an answer is kept for a few seconds,
+    /// and asking a thousand times a second costs the archive no more than asking once.
+    /// </summary>
+    public static readonly TimeSpan AnswerKeptFor = TimeSpan.FromSeconds(5);
+
+    public static void MapArchiveHealth(this WebApplication app) =>
+        app.MapGet(Path, async (HealthCheckService checks, IMemoryCache cache, HttpContext context) =>
+        {
+            var status = await cache.GetOrCreateAsync("Commonage.Health", async entry =>
+            {
+                entry.AbsoluteExpirationRelativeToNow = AnswerKeptFor;
+                // Not the visitor's cancellation: an answer that others wait for must not end with one of them.
+                return (await checks.CheckHealthAsync(CancellationToken.None)).Status;
+            });
+            context.Response.Headers.CacheControl = "no-store";
+            return Results.Text(status.ToString(), "text/plain",
+                statusCode: status == HealthStatus.Unhealthy ? StatusCodes.Status503ServiceUnavailable : StatusCodes.Status200OK);
+        });
 }
 
 /// <summary>

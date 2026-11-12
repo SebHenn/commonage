@@ -3,6 +3,24 @@
 All notable changes to Commonage. Versions follow [Semantic Versioning](https://semver.org/); before 1.0, a minor
 version may change things that need attention when updating, and these notes say so.
 
+## Unreleased
+
+### For people who run an archive
+
+- Security: a photo that the preview maker cannot cope with can no longer stop the archive. Whatever goes wrong with one
+  file now costs only that file's preview, and a file that took the app down three times, by using up the memory or by
+  crashing the image library, is given up as failed instead of being tried again at every start. Anyone with a contribution
+  link could have sent such a file. "Try again" on the System page still works for it.
+- `/health` keeps its answer for five seconds, so asking it very often costs the archive nothing.
+- The app's container gives up every right it does not need (`cap_drop`, `no-new-privileges`).
+- `scripts/backup.sh` and `scripts/update.sh` write backups, and the copy of `.env` made during an update, readable by
+  their owner only. Backups made before are as readable as the folder they are in: `chmod -R go-rwx backups` closes them.
+
+### Project
+
+- Dependabot proposes an update only once its release is a week old; fixes for known vulnerabilities do not wait.
+- Tests list every address the app answers and fail when one is open to everyone without being meant to.
+
 ## 0.4.0 (2026-11-09)
 
 Letters that can be read, items that say what may be done with them, any language for the material, logins with an

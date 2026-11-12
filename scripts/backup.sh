@@ -8,6 +8,8 @@
 # Backups contain everything in the archive, including contributors' personal data: keep them safe, and delete
 # old ones you no longer need. See docs/operations.md.
 set -eu
+# A backup holds everything, so only the person who makes it can read it.
+umask 077
 
 # Git Bash on Windows would otherwise turn paths such as /app/App_Data into Windows paths.
 export MSYS_NO_PATHCONV=1

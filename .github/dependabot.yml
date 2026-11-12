@@ -1,6 +1,8 @@
 # Weekly update pull requests for everything Commonage depends on. Minor and patch updates of one kind come as a
 # single pull request; major updates come one by one, because they may need code changes. Patch and minor updates
 # merge by themselves once all checks pass (.github/workflows/dependabot-auto-merge.yml); major ones wait for review.
+# An update is proposed only once its release is a week old, because a release that was tampered with is usually found
+# and withdrawn within days. Updates that fix a known vulnerability do not wait.
 # Not covered: Bootstrap, jQuery and jQuery Validation, which are copied into src/Commonage.Web/wwwroot/lib.
 # Check those by hand before each release (see docs/development.md).
 version: 2
@@ -15,6 +17,8 @@ updates:
     schedule:
       interval: weekly
       day: monday
+    cooldown:
+      default-days: 7
     groups:
       nuget-minor-and-patch:
         update-types: [minor, patch]
@@ -26,6 +30,8 @@ updates:
     schedule:
       interval: weekly
       day: monday
+    cooldown:
+      default-days: 7
     commit-message:
       prefix: deps
 
@@ -34,6 +40,8 @@ updates:
     schedule:
       interval: weekly
       day: monday
+    cooldown:
+      default-days: 7
     groups:
       actions-minor-and-patch:
         update-types: [minor, patch]
@@ -45,6 +53,8 @@ updates:
     schedule:
       interval: weekly
       day: monday
+    cooldown:
+      default-days: 7
     commit-message:
       prefix: deps
 
@@ -53,5 +63,7 @@ updates:
     schedule:
       interval: weekly
       day: monday
+    cooldown:
+      default-days: 7
     commit-message:
       prefix: deps

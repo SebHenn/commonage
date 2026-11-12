@@ -77,7 +77,10 @@ Originals and their previews are stored under `Storage:RootPath`. It defaults to
 
 Previews are generated in the background with [NetVips](https://github.com/kleisauke/net-vips)
 (libvips). They are rotated upright and contain no EXIF, so GPS coordinates stay in the private
-original.
+original. `MediaProcessor` works through them one at a time. Nothing a single file does may leave its loop, because an
+exception there stops the whole app: any failure marks that file as failed. A file that kills the process leaves no
+exception behind, so each attempt is counted in `ProcessingAttempts` before the file is opened, and after three the file
+is given up without being opened again. Files come from anyone with a contribution link; `PreviewFailureTests` pins this.
 
 `wwwroot/js/uploads.js` sends curators' photos one per request, so a batch is not limited by the size
 of a request and one lost connection does not lose it. A request that accepts `application/json` gets a
@@ -160,7 +163,9 @@ How these work for the people running an archive is in [operations.md](operation
 - `Data/ArchiveRetention.cs` deletes old activity log entries and moves rejected and withdrawn contributions to the bin, as
   "Settings" asks, a few times a day in the same background job that empties the bin.
 - `/health` runs the checks in `Operations/ArchiveHealthChecks.cs`; the System page shows the same checks. Its answer is one
-  word, so visitors learn nothing else.
+  word, so visitors learn nothing else, and is kept for a few seconds, because anyone can ask and each look writes a file.
+- A new page or address is open to everyone unless `Program.cs` gives its folder a policy or it calls
+  `RequireAuthorization`. `EndpointAccessTests` lists what is meant for visitors and fails for anything else that is open.
 - `Export/ArchiveExporter.cs` writes the export. If you change its format, raise `ArchiveExporter.Version` and
   update operations.md.
 - `scripts/backup.sh`, `scripts/restore.sh`, `scripts/update.sh` and their tests are POSIX `sh` and must keep working

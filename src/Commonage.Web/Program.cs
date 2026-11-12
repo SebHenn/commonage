@@ -186,7 +186,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseUploadGuard();
 
-app.MapHealthChecks("/health");
+app.MapArchiveHealth();
 app.MapMediaEndpoints();
 app.MapDateCheck();
 app.MapPublicFeeds();
