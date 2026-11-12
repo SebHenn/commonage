@@ -62,21 +62,33 @@ public class MediaProcessor(
             if (queue.ShouldLookAgain())
                 lastUpgraded = 0;
 
-            if (queue.TryDequeue(out var mediaFileId))
+            try
             {
-                await ProcessAsync(mediaFileId, stoppingToken);
+                if (queue.TryDequeue(out var mediaFileId))
+                {
+                    await ProcessAsync(mediaFileId, stoppingToken);
+                }
+                else if (await NextToUpgradeAsync(lastUpgraded, stoppingToken) is { } upgrade)
+                {
+                    lastUpgraded = upgrade;
+                    await UpgradeAsync(upgrade, stoppingToken);
+                }
+                else
+                {
+                    await queue.WaitAsync(stoppingToken);
+                }
             }
-            else if (await NextToUpgradeAsync(lastUpgraded, stoppingToken) is { } upgrade)
+            catch (Exception exception) when (!stoppingToken.IsCancellationRequested)
             {
-                lastUpgraded = upgrade;
-                await UpgradeAsync(upgrade, stoppingToken);
-            }
-            else
-            {
-                await queue.WaitAsync(stoppingToken);
+                // An exception that leaves this method stops the whole app. No single file is worth that, and neither is
+                // a database that is away for a moment: the files still waiting are picked up at the next start.
+                logger.LogError(exception, "Making previews failed unexpectedly. The archive carries on with the next file.");
+                await Task.Delay(RestAfterFailure, stoppingToken);
             }
         }
     }
+
+    private static readonly TimeSpan RestAfterFailure = TimeSpan.FromSeconds(5);
 
     private async Task<int?> NextToUpgradeAsync(int after, CancellationToken cancellationToken)
     {
@@ -226,6 +238,30 @@ public class MediaProcessor(
         if (file is null || file.Status != ProcessingStatus.Pending)
             return;
 
+        // Counted and saved before the file is opened. If the file takes the whole app down, by using up the memory or by
+        // crashing the image library, nothing after this line runs, and the count is all the next start has to go by.
+        if (file.ProcessingAttempts >= MediaFile.MaxProcessingAttempts)
+        {
+            logger.LogWarning("Gave up on previews for media file {MediaFileId}: the archive stopped each time it tried.", file.Id);
+            file.Status = ProcessingStatus.Failed;
+            file.ProcessingError = "The archive stopped each time it tried to read this file.";
+        }
+        else
+        {
+            file.ProcessingAttempts++;
+        }
+        try
+        {
+            await db.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            // Deleted meanwhile.
+            return;
+        }
+        if (file.Status == ProcessingStatus.Failed)
+            return;
+
         try
         {
             await using (var original = storage.OpenRead(file.OriginalKey))
@@ -240,7 +276,8 @@ public class MediaProcessor(
             file.Status = ProcessingStatus.Ready;
             file.ProcessingError = null;
         }
-        catch (Exception exception) when (exception is VipsException or IOException)
+        // Whatever goes wrong with one file is that file's problem. Only the app stopping is let through.
+        catch (Exception exception) when (!cancellationToken.IsCancellationRequested)
         {
             logger.LogWarning(exception, "Could not create previews for media file {MediaFileId}", file.Id);
             file.Status = ProcessingStatus.Failed;

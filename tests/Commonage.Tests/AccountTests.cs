@@ -127,4 +127,48 @@ public class AccountTests(CommonageAppFactory app)
         Assert.True(await Browser.IsLoggedInAsync(again));
         curator.Dispose();
     }
+
+    /// <summary>Someone at a computer that was left logged in must not get to try passwords without end.</summary>
+    [Fact]
+    public async Task Wrong_current_passwords_lock_the_account_like_wrong_logins()
+    {
+        using var admin = app.CreateClient();
+        await Browser.LogInAsCuratorAsync(admin);
+        var (curator, _, _, password) = await app.CreateAccountAsync(admin);
+        Dictionary<string, string> Change(string current) => new()
+        {
+            ["Input.CurrentPassword"] = current,
+            ["Input.Password"] = "Changed-password-1",
+            ["Input.ConfirmPassword"] = "Changed-password-1",
+        };
+
+        for (var guess = 1; guess <= 5; guess++)
+            await Browser.SendFormAsync(curator, "/Account/Password", Change($"guess number {guess}"));
+        var right = await Browser.SendFormAsync(curator, "/Account/Password", Change(password));
+
+        Assert.Contains("Too many failed attempts", await right.Content.ReadAsStringAsync());
+        curator.Dispose();
+    }
+
+    [Fact]
+    public async Task Half_a_setup_link_does_not_say_whose_account_it_is()
+    {
+        using var admin = app.CreateClient();
+        await Browser.LogInAsCuratorAsync(admin);
+        var email = $"half-{Guid.NewGuid():N}@example.org";
+        var created = await Browser.PostFormAsync(admin, "/Admin/Users/Edit?handler=Create", new()
+        {
+            ["Input.Email"] = email,
+            ["Input.Role"] = "Curator",
+        }, pageUrl: "/Admin/Users/Edit");
+        var setupLink = TestData.SetupLinkIn(await created.Content.ReadAsStringAsync());
+        using var stranger = app.CreateClient();
+
+        var whole = await stranger.GetStringAsync(setupLink);
+        var half = await stranger.GetStringAsync(setupLink[..setupLink.IndexOf("&code=", StringComparison.Ordinal)] + "&code=bm90LXRoZS1jb2Rl");
+
+        Assert.Contains(email, whole);
+        Assert.DoesNotContain(email, half);
+        Assert.Contains("This link is no longer valid", half);
+    }
 }

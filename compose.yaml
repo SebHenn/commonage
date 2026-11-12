@@ -19,6 +19,12 @@ services:
 
   web:
     build: .
+    # The app reads files that strangers send in. It needs none of the rights a container has by default, and nothing in
+    # it may gain any.
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
     environment:
       ConnectionStrings__Default: "Host=db;Database=commonage;Username=commonage;Password=${POSTGRES_PASSWORD};GSS Encryption Mode=Disable"
       # Only used on first start, when the archive has no users yet.
