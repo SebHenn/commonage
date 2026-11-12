@@ -3,7 +3,10 @@
 All notable changes to Commonage. Versions follow [Semantic Versioning](https://semver.org/); before 1.0, a minor
 version may change things that need attention when updating, and these notes say so.
 
-## Unreleased
+## 0.4.1 (2026-11-12)
+
+Security fixes: .NET 10.0.15, and a photo that cannot stop the archive any more. `scripts/update.sh 0.4` updates; the
+database change is made at the first start. Pictures do not need to be made again.
 
 ### For people who run an archive
 
