@@ -16,6 +16,10 @@
 </nav>
 
 <h1 lang="@material">@Model.Collection.Title</h1>
+@if (Model.Years.Describe(T) is { } years)
+{
+    <p class="text-muted">@years</p>
+}
 @if (!string.IsNullOrWhiteSpace(Model.Collection.Description))
 {
     <p class="lead text-preserve-lines prose" lang="@material">@Model.Collection.Description</p>

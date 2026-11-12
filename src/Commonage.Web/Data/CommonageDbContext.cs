@@ -59,6 +59,12 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options)
         {
             collection.Property(c => c.Title).HasMaxLength(200);
             collection.Property(c => c.Description).HasMaxLength(4000);
+            collection.HasIndex(c => c.Position);
+            // A photo deleted for good leaves the collection without a chosen cover, not without its page.
+            collection.HasOne<MediaFile>()
+                .WithMany()
+                .HasForeignKey(c => c.CoverMediaFileId)
+                .OnDelete(DeleteBehavior.SetNull);
         });
 
         builder.Entity<ArchiveItem>(item =>

@@ -29,6 +29,23 @@ Für alle, die sich um den Bestand eines Archivs kümmern. Technische Kenntnisse
 - **es zu löschen,** sobald kein Eintrag es mehr hat, auch keiner im Papierkorb. „Die unbenutzten Schlagwörter löschen“ in der
   Liste erledigt das für alle.
 
+## Sammlungen ordnen
+
+**Sammlungen** listet sie in der Reihenfolge, in der Besucher sie finden. „Nach vorne“ und „Nach hinten“ verschieben eine um
+einen Platz; eine neue Sammlung kommt ans Ende. Öffnen Sie eine, um:
+
+- **die Reihenfolge ihrer Einträge zu wählen:** zuletzt hinzugefügt, älteste zuerst oder neueste zuerst. „Vorheriger“ und
+  „Nächster“ bei einem Eintrag führen in derselben Reihenfolge durch die Sammlung. Einträge ohne Datum kommen zuletzt, wenn nach
+  Datum sortiert wird.
+- **ihr Titelbild zu wählen,** aus den Fotos ihrer Einträge. Besucher sehen dieses Foto nur, solange sein Eintrag veröffentlicht
+  ist und zu dieser Sammlung gehört; bis dahin und ohne Auswahl sehen sie das erste Foto. Das Foto eines Entwurfs lässt sich
+  schon vor der Veröffentlichung wählen.
+- **sie zu löschen,** sobald sie leer ist: keine Einträge, auch nicht im Papierkorb, und keine Beitragslinks, über die Material
+  in sie kommt.
+
+Besucher sehen auf der Seite und der Karte einer Sammlung, aus welchen Jahren ihre veröffentlichten Einträge stammen, etwa
+„1930–1965“. Dafür muss nichts eingetragen werden.
+
 ## Mehrere Fotos und Briefe
 
 - **Reihenfolge:** „Nach vorne“ und „Nach hinten“ verschieben ein Foto, und zwar sofort auch für Besucher. Das erste Foto ist das

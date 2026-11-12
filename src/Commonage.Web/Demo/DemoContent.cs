@@ -48,6 +48,9 @@ public static class DemoContent
         var school = Collection(T("School memories", "Schulerinnerungen"),
             T("The old school on the hill and the people who learned and taught there.",
               "Die alte Schule am Berg und die Menschen, die dort gelernt und gelehrt haben."));
+        // The street first, told from its beginnings; the others keep the order their items were added in.
+        millStreet.Sort = CollectionSort.OldestFirst;
+        (millStreet.Position, club.Position, school.Position) = (0, 1, 2);
         db.Collections.AddRange(millStreet, club, school);
 
         var items = new List<ArchiveItem>

@@ -71,6 +71,7 @@ public class ArchiveExporter(
             exportedItems.Add(Describe(item, files, options));
         }
 
+        var exportedFiles = exportedItems.SelectMany(i => i.Files).Select(f => f.Id).ToHashSet();
         var settings = await db.ArchiveSettings.AsNoTracking().FirstOrDefaultAsync(cancellationToken) ?? new ArchiveSettings();
         var texts = await db.ArchiveTexts.AsNoTracking().OrderBy(t => t.Language).ThenBy(t => t.Kind).ToListAsync(cancellationToken);
         string? logoPath = null;
@@ -90,7 +91,10 @@ public class ArchiveExporter(
 
         var document = new ExportDocument(
             Format, Version, clock.GetUtcNow().UtcDateTime, options.PublishedOnly, options.IncludePersonalData,
-            collections.Select(c => new ExportCollection(c.Id, c.Title, c.Description, c.CreatedAt)).ToList(),
+            collections.Select(c => new ExportCollection(
+                c.Id, c.Title, c.Description, c.CreatedAt, c.Position, c.Sort,
+                // The cover is named by the id of its file, and only when that file is in this export.
+                exportedFiles.Contains(c.CoverMediaFileId ?? 0) ? c.CoverMediaFileId : null)).ToList(),
             // The tags of what is exported only: an export of published items does not name what only drafts mention.
             items.SelectMany(i => i.Tags).DistinctBy(t => t.Id).OrderBy(t => t.Name, StringComparer.Ordinal).Select(t => new ExportTag(t.Name, t.Kind)).ToList(),
             exportedItems,
@@ -306,7 +310,7 @@ internal record ExportSettings(
 
 internal record ExportText(string Language, ArchiveTextKind Kind, string Text);
 
-internal record ExportCollection(int Id, string Title, string? Description, DateTime CreatedAt);
+internal record ExportCollection(int Id, string Title, string? Description, DateTime CreatedAt, int Position, CollectionSort Sort, int? CoverFileId);
 
 /// <summary>A tag and what it names. Items list their tags by name.</summary>
 internal record ExportTag(string Name, TagKind Kind);

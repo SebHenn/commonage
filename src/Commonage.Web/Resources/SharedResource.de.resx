@@ -52,10 +52,12 @@
   <data name="Authenticator app" xml:space="preserve"><value>Authenticator-App</value></data>
   <data name="Backup" xml:space="preserve"><value>Sicherung</value></data>
   <data name="Backups and keys" xml:space="preserve"><value>Sicherungen und Schlüssel</value></data>
+  <data name="Changed the order of the collections" xml:space="preserve"><value>Reihenfolge der Sammlungen geändert</value></data>
   <data name="Changed the tag" xml:space="preserve"><value>Schlagwort geändert</value></data>
   <data name="Checks" xml:space="preserve"><value>Prüfungen</value></data>
   <data name="Code from your authenticator app" xml:space="preserve"><value>Code aus Ihrer Authenticator-App</value></data>
   <data name="Commonage archive export" xml:space="preserve"><value>Export eines Commonage-Archivs</value></data>
+  <data name="Contribution links: {0}" xml:space="preserve"><value>Beitragslinks: {0}</value></data>
   <data name="Contributions and links" xml:space="preserve"><value>Beiträge und Links</value></data>
   <data name="Create new recovery codes" xml:space="preserve"><value>Neue Wiederherstellungscodes erstellen</value></data>
   <data name="Created new recovery codes" xml:space="preserve"><value>Neue Wiederherstellungscodes erstellt</value></data>
@@ -66,10 +68,12 @@
   <data name="Dates can also be written in" xml:space="preserve"><value>Datumsangaben können auch in diesen Sprachen geschrieben sein</value></data>
   <data name="Decades" xml:space="preserve"><value>Jahrzehnte</value></data>
   <data name="Delete" xml:space="preserve"><value>Löschen</value></data>
+  <data name="Delete the collection" xml:space="preserve"><value>Sammlung löschen</value></data>
   <data name="Delete the tag" xml:space="preserve"><value>Schlagwort löschen</value></data>
   <data name="Deleted activity log entries older than the archive keeps them" xml:space="preserve"><value>Einträge im Aktivitätsprotokoll gelöscht, die älter sind, als das Archiv sie aufbewahrt</value></data>
   <data name="Deleted all unused tags" xml:space="preserve"><value>Alle unbenutzten Schlagwörter gelöscht</value></data>
   <data name="Deleted items and photos stay here for {0, plural, one {# day} other {# days}}, hidden from everyone but curators. You can restore them until then. After that they are deleted for good, with their original files." xml:space="preserve"><value>Gelöschte Einträge und Fotos bleiben {0, plural, one {# Tag} other {# Tage}} hier und sind nur für Kuratoren sichtbar. Bis dahin können Sie sie wiederherstellen. Danach werden sie mit ihren Originaldateien endgültig gelöscht.</value></data>
+  <data name="Deleted the empty collection" xml:space="preserve"><value>Leere Sammlung gelöscht</value></data>
   <data name="Deleted the unused tag" xml:space="preserve"><value>Unbenutztes Schlagwort gelöscht</value></data>
   <data name="Disk" xml:space="preserve"><value>Speicher</value></data>
   <data name="Disk space" xml:space="preserve"><value>Speicherplatz</value></data>
@@ -90,8 +94,10 @@
   <data name="Free disk space" xml:space="preserve"><value>Freier Speicher</value></data>
   <data name="Go on to managing the archive" xml:space="preserve"><value>Weiter zur Archivverwaltung</value></data>
   <data name="How long records are kept" xml:space="preserve"><value>Wie lange aufbewahrt wird</value></data>
+  <data name="How visitors find the items on the collection's page, and where “previous” and “next” on an item lead. Undated items come last when the order goes by date." xml:space="preserve"><value>So finden Besucher die Einträge auf der Seite der Sammlung, und dorthin führen „vorheriges“ und „nächstes“ bei einem Eintrag. Einträge ohne Datum kommen zuletzt, wenn nach Datum sortiert wird.</value></data>
   <data name="In the app, add an account and scan this code." xml:space="preserve"><value>Fügen Sie in der App ein Konto hinzu und scannen Sie diesen Code.</value></data>
   <data name="Install an authenticator app on your phone, if you have none yet. Many work, for example Aegis, 2FAS, Google Authenticator or Microsoft Authenticator." xml:space="preserve"><value>Installieren Sie eine Authenticator-App auf Ihrem Handy, falls Sie noch keine haben. Viele funktionieren, zum Beispiel Aegis, 2FAS, Google Authenticator oder Microsoft Authenticator.</value></data>
+  <data name="Items in the bin: {0}" xml:space="preserve"><value>Einträge im Papierkorb: {0}</value></data>
   <data name="Keep rejected and withdrawn contributions" xml:space="preserve"><value>Abgelehnte und zurückgezogene Beiträge aufbewahren</value></data>
   <data name="Keep the activity log" xml:space="preserve"><value>Aktivitätsprotokoll aufbewahren</value></data>
   <data name="Kind" xml:space="preserve"><value>Art</value></data>
@@ -126,15 +132,20 @@
   <data name="Not encrypted. Whoever runs the server should set COMMONAGE_LOGIN_KEY." xml:space="preserve"><value>Nicht verschlüsselt. Wer den Server betreibt, sollte COMMONAGE_LOGIN_KEY setzen.</value></data>
   <data name="Not noted yet" xml:space="preserve"><value>Noch nicht vermerkt</value></data>
   <data name="Not on any item." xml:space="preserve"><value>Bei keinem Eintrag.</value></data>
+  <data name="Not published" xml:space="preserve"><value>Nicht veröffentlicht</value></data>
   <data name="Not working" xml:space="preserve"><value>Funktioniert nicht</value></data>
   <data name="Of which originals: {0} in {1, plural, one {# file} other {# files}}. The rest are the picture sizes made from them." xml:space="preserve"><value>Davon Originale: {0} in {1, plural, one {# Datei} other {# Dateien}}. Der Rest sind die daraus erstellten Bildgrößen.</value></data>
   <data name="Only a tag that no item has can be deleted. To move its items to another tag, merge it." xml:space="preserve"><value>Nur ein Schlagwort, das kein Eintrag hat, kann gelöscht werden. Um seine Einträge einem anderen Schlagwort zu geben, führen Sie es zusammen.</value></data>
+  <data name="Only an empty collection can be deleted. Move its items to another collection first." xml:space="preserve"><value>Nur eine leere Sammlung kann gelöscht werden. Verschieben Sie ihre Einträge zuerst in eine andere Sammlung.</value></data>
+  <data name="Only an empty collection can be deleted: without items, also in the bin, and without contribution links that send material to it." xml:space="preserve"><value>Nur eine leere Sammlung kann gelöscht werden: ohne Einträge, auch im Papierkorb, und ohne Beitragslinks, über die Material in sie kommt.</value></data>
   <data name="Or type this key into the app:" xml:space="preserve"><value>Oder tippen Sie diesen Schlüssel in die App:</value></data>
+  <data name="Order of the items" xml:space="preserve"><value>Reihenfolge der Einträge</value></data>
   <data name="People" xml:space="preserve"><value>Personen</value></data>
   <data name="Person" xml:space="preserve"><value>Person</value></data>
   <data name="Place" xml:space="preserve"><value>Ort</value></data>
   <data name="Places" xml:space="preserve"><value>Orte</value></data>
   <data name="Please choose a different tag to merge this one into." xml:space="preserve"><value>Bitte wählen Sie ein anderes Schlagwort zum Zusammenführen.</value></data>
+  <data name="Please choose one of the photos shown." xml:space="preserve"><value>Bitte wählen Sie eines der angezeigten Fotos.</value></data>
   <data name="Please choose one of the times." xml:space="preserve"><value>Bitte wählen Sie eine der Zeiten.</value></data>
   <data name="Please enter a name of at most {0, plural, one {# character} other {# characters}}." xml:space="preserve"><value>Bitte geben Sie einen Namen mit höchstens {0, plural, one {# Zeichen} other {# Zeichen}} ein.</value></data>
   <data name="Please enter a name." xml:space="preserve"><value>Bitte geben Sie einen Namen ein.</value></data>
@@ -159,9 +170,13 @@
   <data name="The archive cannot reach its database." xml:space="preserve"><value>Das Archiv erreicht seine Datenbank nicht.</value></data>
   <data name="The archive's logo, if it has one. Its name and pages are under &quot;settings&quot; in archive.json." xml:space="preserve"><value>Das Logo des Archivs, falls es eines hat. Sein Name und seine Seiten stehen unter „settings“ in archive.json.</value></data>
   <data name="The authenticator app is turned off for this account. The person logs in with their password now." xml:space="preserve"><value>Die Authenticator-App ist für dieses Konto ausgeschaltet. Die Person meldet sich jetzt mit ihrem Passwort an.</value></data>
+  <data name="The collection is empty, so it can be deleted." xml:space="preserve"><value>Die Sammlung ist leer und kann daher gelöscht werden.</value></data>
+  <data name="The collection “{0}” is deleted." xml:space="preserve"><value>Die Sammlung „{0}“ ist gelöscht.</value></data>
+  <data name="The collection's public page" xml:space="preserve"><value>Öffentliche Seite der Sammlung</value></data>
   <data name="The contribution is rejected. It stays hidden, and goes to the bin in {0, plural, one {# month} other {# months}}." xml:space="preserve"><value>Der Beitrag ist abgelehnt. Er bleibt verborgen und kommt in {0, plural, one {einem Monat} other {# Monaten}} in den Papierkorb.</value></data>
   <data name="The date can be at most {0, plural, one {# character} other {# characters}} long." xml:space="preserve"><value>Das Datum darf höchstens {0, plural, one {# Zeichen} other {# Zeichen}} lang sein.</value></data>
   <data name="The disk is filling up, or uploads have already stopped." xml:space="preserve"><value>Der Speicher wird knapp, oder Uploads sind schon gestoppt.</value></data>
+  <data name="The first photo" xml:space="preserve"><value>Das erste Foto</value></data>
   <data name="The format is described in docs/operations.md of the Commonage source code." xml:space="preserve"><value>Das Format ist in docs/operations.md im Quellcode von Commonage beschrieben.</value></data>
   <data name="The item is in the bin. You can restore it there for {0, plural, one {# day} other {# days}}." xml:space="preserve"><value>Der Eintrag liegt im Papierkorb. Sie können ihn dort {0, plural, one {# Tag} other {# Tage}} lang wiederherstellen.</value></data>
   <data name="The keys that keep people logged in are stored in the database without encryption, so a copy of the database, such as a backup, could be used to log in. Whoever runs the server should set COMMONAGE_LOGIN_KEY, as docs/deployment.md describes." xml:space="preserve"><value>Die Schlüssel, die Personen angemeldet halten, liegen unverschlüsselt in der Datenbank, sodass man sich mit einer Kopie der Datenbank, etwa einer Sicherung, anmelden könnte. Wer den Server betreut, sollte COMMONAGE_LOGIN_KEY setzen, wie es docs/deployment.md beschreibt.</value></data>
@@ -175,6 +190,7 @@
   <data name="The password must be at least {0, plural, one {# character} other {# characters}} long." xml:space="preserve"><value>Das Passwort muss mindestens {0, plural, one {# Zeichen} other {# Zeichen}} lang sein.</value></data>
   <data name="The password must contain at least {0, plural, one {# different character} other {# different characters}}." xml:space="preserve"><value>Das Passwort muss mindestens {0, plural, one {# verschiedenes Zeichen} other {# verschiedene Zeichen}} enthalten.</value></data>
   <data name="The photo is in the bin. You can restore it there for {0, plural, one {# day} other {# days}}." xml:space="preserve"><value>Das Foto liegt im Papierkorb. Sie können es dort {0, plural, one {# Tag} other {# Tage}} lang wiederherstellen.</value></data>
+  <data name="The photo visitors see for the collection. They only see a photo while its item is published; until then, and without a choice, they see the first photo of the collection." xml:space="preserve"><value>Das Foto, das Besucher für die Sammlung sehen. Sie sehen ein Foto nur, solange sein Eintrag veröffentlicht ist; bis dahin und ohne Auswahl sehen sie das erste Foto der Sammlung.</value></data>
   <data name="The same items as a table, for spreadsheet programs. It is UTF-8. Cells that start with =, +, - or @ get a leading apostrophe, so a spreadsheet never runs them as formulas; archive.json has the exact text." xml:space="preserve"><value>Dieselben Einträge als Tabelle, für Tabellenkalkulationen. Sie ist in UTF-8. Zellen, die mit =, +, - oder @ beginnen, bekommen ein Apostroph vorangestellt, damit eine Tabellenkalkulation sie nie als Formel ausführt; archive.json enthält den genauen Text.</value></data>
   <data name="The tag “{0}” is deleted." xml:space="preserve"><value>Das Schlagwort „{0}“ ist gelöscht.</value></data>
   <data name="There are no tags yet. Tags are added on each item." xml:space="preserve"><value>Es gibt noch keine Schlagwörter. Schlagwörter werden bei jedem Eintrag vergeben.</value></data>
@@ -207,6 +223,7 @@
   <data name="Uploaded" xml:space="preserve"><value>Hochgeladen</value></data>
   <data name="Version" xml:space="preserve"><value>Version</value></data>
   <data name="Visitors find all places and all people on pages of their own, once an item with the tag is published. That page lists every person's name, so name living people only when they agree." xml:space="preserve"><value>Besucher finden alle Orte und alle Personen auf eigenen Seiten, sobald ein Eintrag mit dem Schlagwort veröffentlicht ist. Diese Seite listet den Namen jeder Person auf, nennen Sie lebende Menschen also nur, wenn sie einverstanden sind.</value></data>
+  <data name="Visitors find the collections in this order." xml:space="preserve"><value>In dieser Reihenfolge finden Besucher die Sammlungen.</value></data>
   <data name="What changed" xml:space="preserve"><value>Was sich geändert hat</value></data>
   <data name="What whoever runs the server should keep an eye on. Visitors and uptime monitors that open /health learn only whether all is well, not what follows here." xml:space="preserve"><value>Was im Blick behalten sollte, wer den Server betreibt. Besucher und Uptime-Überwachungen, die /health öffnen, erfahren nur, ob alles in Ordnung ist, nicht was hier folgt.</value></data>
   <data name="Who changed what in the archive, newest first. The log keeps no contributor details, and nobody can change or delete its entries in the app. Entries older than the archive keeps them, as set in the settings, are deleted, and the log notes that." xml:space="preserve"><value>Wer was im Archiv geändert hat, das Neueste zuerst. Das Protokoll enthält keine Angaben zu Einsendenden, und niemand kann seine Einträge in der App ändern oder löschen. Einträge, die älter sind, als das Archiv laut Einstellungen aufbewahrt, werden gelöscht, und das Protokoll vermerkt das.</value></data>
@@ -796,6 +813,7 @@
   <data name="{0, plural, one {One database change has not been made yet.} other {# database changes have not been made yet.}} They are made when the archive starts." xml:space="preserve"><value>{0, plural, one {Eine Änderung an der Datenbank ist noch nicht ausgeführt.} other {# Änderungen an der Datenbank sind noch nicht ausgeführt.}} Sie werden beim Start des Archivs ausgeführt.</value></data>
   <data name="{0, plural, one {One more item in the bin has it.} other {# more items in the bin have it.}}" xml:space="preserve"><value>{0, plural, one {Ein weiterer Eintrag im Papierkorb hat es.} other {# weitere Einträge im Papierkorb haben es.}}</value></data>
   <data name="{0, plural, one {One tag is not on any item, not even one in the bin.} other {# tags are not on any item, not even one in the bin.}}" xml:space="preserve"><value>{0, plural, one {Ein Schlagwort steht bei keinem Eintrag, auch bei keinem im Papierkorb.} other {# Schlagwörter stehen bei keinem Eintrag, auch bei keinem im Papierkorb.}}</value></data>
+  <data name="{0, plural, one {Only one photo is shown: the chosen one, or else that of the newest published item.} other {At most # photos are shown: the chosen one, then those of published items, the newest items first.}}" xml:space="preserve"><value>{0, plural, one {Nur ein Foto wird angezeigt: das gewählte oder sonst das des neuesten veröffentlichten Eintrags.} other {Höchstens # Fotos werden angezeigt: das gewählte, dann die von veröffentlichten Einträgen, die neuesten Einträge zuerst.}}</value></data>
   <data name="{0, plural, one {The preview is being made again.} other {# previews are being made again.}}" xml:space="preserve"><value>{0, plural, one {Die Vorschau wird neu erstellt.} other {# Vorschauen werden neu erstellt.}}</value></data>
   <data name="{0} GB" xml:space="preserve"><value>{0} GB</value></data>
   <data name="{0} KB" xml:space="preserve"><value>{0} KB</value></data>
@@ -810,6 +828,7 @@
   <data name="{0}: the archive already has this file: {1}" xml:space="preserve"><value>{0}: Das Archiv hat diese Datei schon: {1}</value></data>
   <data name="{0}: {1, plural, one {# item} other {# items}}" xml:space="preserve"><value>{0}: {1, plural, one {# Eintrag} other {# Einträge}}</value></data>
   <data name="{0}s" xml:space="preserve"><value>{0}er</value></data>
+  <data name="{0}–{1}" xml:space="preserve"><value>{0}–{1}</value></data>
   <data name="“{0}” also finds what is dated {1}." xml:space="preserve"><value>„{0}“ findet auch, was auf {1} datiert ist.</value></data>
   <data name="“{1}” is merged into “{2}”, {0, plural, =0 {which no item had.} one {on one item.} other {on # items.}}" xml:space="preserve"><value>„{1}“ ist mit „{2}“ zusammengeführt, {0, plural, =0 {das kein Eintrag hatte.} one {bei einem Eintrag.} other {bei # Einträgen.}}</value></data>
 </root>

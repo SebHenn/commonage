@@ -15,14 +15,24 @@
 }
 else
 {
-    <ul class="list-group">
-        @foreach (var collection in Model.Collections)
+    <p class="text-muted">@T["Visitors find the collections in this order."]</p>
+    <ol class="list-group">
+        @for (var index = 0; index < Model.Collections.Count; index++)
         {
-            <li class="list-group-item d-flex flex-wrap gap-2 align-items-center">
-                <a asp-page="/Admin/Collections/Edit" asp-route-id="@collection.Id" class="me-auto">@collection.Title</a>
-                <small class="text-muted">@T["Items: {0}", collection.ItemCount]</small>
-                <a asp-page="/Admin/Items/Edit" asp-route-collectionId="@collection.Id" class="btn btn-sm btn-outline-primary">@T["Add item"]</a>
+            var collection = Model.Collections[index];
+            <li id="collection-@collection.Id" class="list-group-item d-flex flex-wrap gap-2 align-items-center">
+                <span class="d-flex flex-wrap gap-2 align-items-baseline me-auto">
+                    <a asp-page="/Admin/Collections/Edit" asp-route-id="@collection.Id" class="text-break">@collection.Title</a>
+                    <small class="text-muted">@T["Items: {0}", collection.ItemCount]</small>
+                </span>
+                <form method="post" class="d-flex flex-wrap gap-1">
+                    <a asp-page="/Admin/Items/Edit" asp-route-collectionId="@collection.Id" class="btn btn-sm btn-outline-primary">@T["Add item"]</a>
+                    <button type="submit" asp-page-handler="MoveEarlier" asp-route-id="@collection.Id" class="btn btn-sm btn-outline-secondary"
+                            disabled="@(index == 0)" aria-label="@T["Earlier: {0}", collection.Title]">@T["Earlier"]</button>
+                    <button type="submit" asp-page-handler="MoveLater" asp-route-id="@collection.Id" class="btn btn-sm btn-outline-secondary"
+                            disabled="@(index == Model.Collections.Count - 1)" aria-label="@T["Later: {0}", collection.Title]">@T["Later"]</button>
+                </form>
             </li>
         }
-    </ul>
+    </ol>
 }

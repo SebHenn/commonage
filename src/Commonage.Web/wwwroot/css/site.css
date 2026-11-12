@@ -711,3 +711,20 @@ main:focus {
   break-inside: avoid;
   margin-bottom: 1rem;
 }
+
+/* Choosing a collection's cover: photos as a grid of choices, each with its radio button beside the item's title. */
+.cover-choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+  gap: 1rem;
+}
+
+.cover-choice {
+  display: block;
+  cursor: pointer;
+}
+
+.cover-choice:has(input:checked) .media-thumbnail {
+  outline: 3px solid var(--bs-primary);
+  outline-offset: 2px;
+}
