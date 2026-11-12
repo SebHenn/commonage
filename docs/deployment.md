@@ -38,7 +38,7 @@ The database and the app itself are never exposed; only Caddy, the HTTPS front, 
 ```sh
 git clone https://github.com/SebHenn/commonage.git
 cd commonage
-git checkout v0.4.0        # a released version, not the development branch
+git checkout v0.4.1        # a released version, not the development branch
 ```
 
 This gives you the Compose files and the backup scripts. The app itself comes as a ready-made Docker image,
@@ -140,7 +140,7 @@ The script is part of Commonage from version 0.3. To get from 0.2 to it once, by
 
 ```sh
 scripts/backup.sh
-git fetch --tags && git checkout v0.4.0
+git fetch --tags && git checkout v0.4.1
 ```
 
 Add a login key to `.env` as described above, set `COMMONAGE_VERSION=0.4`, then run `docker compose pull` and `docker compose up -d`.
