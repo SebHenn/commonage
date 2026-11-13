@@ -605,6 +605,11 @@
           "Microsoft.TestPlatform.ObjectModel": "18.11.0"
         }
       },
+      "Microsoft.Win32.SystemEvents": {
+        "type": "Transitive",
+        "resolved": "6.0.0",
+        "contentHash": "hqTM5628jSsQiv+HGpiq3WKBl2c8v1KZfby2J6Pr7pEPlK9waPdgEO6b8A/+/xn/yZ9ulv8HuqK71ONy2tg67A=="
+      },
       "NetVips": {
         "type": "Transitive",
         "resolved": "3.2.0",
@@ -702,8 +707,11 @@
       },
       "QRCoder": {
         "type": "Transitive",
-        "resolved": "1.6.0",
-        "contentHash": "XmPA81eo+oRxBuyVdswsSkTGTE1d3thfF11Z1PdD7oB56A6HU4G4AAOdySmGRMb/cljwlFTMWUtosGEnwpS6GA=="
+        "resolved": "1.8.1",
+        "contentHash": "aGfRFpU/IPexAtEOEXCNxC3fMCAqgn6kqALRvXt6LxVAW0VolSDGHiyrY+o2CJgTITOsMpsrsDi7svMJaJ9Vfg==",
+        "dependencies": {
+          "System.Drawing.Common": "6.0.0"
+        }
       },
       "SharpZipLib": {
         "type": "Transitive",
@@ -728,6 +736,14 @@
         "type": "Transitive",
         "resolved": "10.0.14",
         "contentHash": "O/RzNwWoDzehkLlAG9hR8xooY5L41U7VUaYlcKvE3+FhHohBJqF10oLUzuv0v59VeJ62hv3uw9VoeX12zej7Sg=="
+      },
+      "System.Drawing.Common": {
+        "type": "Transitive",
+        "resolved": "6.0.0",
+        "contentHash": "NfuoKUiP2nUWwKZN6twGqXioIe1zVD0RIj2t976A+czLHr2nY454RwwXs6JU9Htc6mwqL6Dn/nEL3dpVf2jOhg==",
+        "dependencies": {
+          "Microsoft.Win32.SystemEvents": "6.0.0"
+        }
       },
       "System.IO.Abstractions": {
         "type": "Transitive",
@@ -808,7 +824,7 @@
           "NetVips": "[3.2.0, )",
           "NetVips.Native": "[8.18.7, )",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.3, )",
-          "QRCoder": "[1.6.0, )"
+          "QRCoder": "[1.8.1, )"
         }
       }
     }
