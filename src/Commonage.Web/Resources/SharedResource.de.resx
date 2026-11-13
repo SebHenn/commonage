@@ -10,7 +10,6 @@
   <data name="/health answers:" xml:space="preserve"><value>/health antwortet:</value></data>
   <data name="A built-in folding that covers most, but not all, letters. With the PostgreSQL extension unaccent on the database server, the archive uses it from the next start." xml:space="preserve"><value>Einer eingebauten Umwandlung, die die meisten, aber nicht alle Buchstaben abdeckt. Ist die PostgreSQL-Erweiterung unaccent auf dem Datenbankserver vorhanden, nutzt das Archiv sie ab dem nächsten Start.</value></data>
   <data name="A caption can be at most {0, plural, one {# character} other {# characters}} long." xml:space="preserve"><value>Eine Bildunterschrift darf höchstens {0, plural, one {# Zeichen} other {# Zeichen}} lang sein.</value></data>
-  <data name="A closed link shows “not found”. You can open it again at any time." xml:space="preserve"><value>Ein geschlossener Link zeigt „nicht gefunden“. Sie können ihn jederzeit wieder öffnen.</value></data>
   <data name="A curator looks at everything sent in before it appears in the archive." xml:space="preserve"><value>Alles, was Sie einsenden, wird vom Archiv geprüft, bevor es dort erscheint.</value></data>
   <data name="A date" xml:space="preserve"><value>Ein Datum</value></data>
   <data name="A description" xml:space="preserve"><value>Eine Beschreibung</value></data>
@@ -897,4 +896,19 @@
   <data name="{0, plural, one {# item asks visitors for help} other {# items ask visitors for help}}" xml:space="preserve"><value>{0, plural, one {# Eintrag bittet Besucher um Hilfe} other {# Einträge bitten Besucher um Hilfe}}</value></data>
   <data name="{0, plural, one {# item waits for a transcription} other {# items wait for a transcription}}" xml:space="preserve"><value>{0, plural, one {# Eintrag wartet auf eine Abschrift} other {# Einträge warten auf eine Abschrift}}</value></data>
   <data name="{0, plural, one {# note from visitors to deal with} other {# notes from visitors to deal with}}" xml:space="preserve"><value>{0, plural, one {# Hinweis von Besuchern zu bearbeiten} other {# Hinweise von Besuchern zu bearbeiten}}</value></data>
+  <data name="Copy the link" xml:space="preserve"><value>Link kopieren</value></data>
+  <data name="Do you have photos or stories that belong here? You can send them in. Curators look at everything before it is published." xml:space="preserve"><value>Haben Sie Fotos oder Geschichten, die hierher gehören? Sie können sie einsenden. Alles wird von den Kuratoren geprüft, bevor es veröffentlicht wird.</value></data>
+  <data name="Invite visitors on the collection's page" xml:space="preserve"><value>Besucher auf der Seite der Sammlung einladen</value></data>
+  <data name="Poster to print" xml:space="preserve"><value>Plakat zum Drucken</value></data>
+  <data name="Poster: {0}" xml:space="preserve"><value>Plakat: {0}</value></data>
+  <data name="Print" xml:space="preserve"><value>Drucken</value></data>
+  <data name="Print this page and pin it up. The code opens the contribution form, and the address below it is for those who cannot scan." xml:space="preserve"><value>Drucken Sie diese Seite aus und hängen Sie sie auf. Der Code öffnet das Formular zum Einsenden, die Adresse darunter ist für alle, die nicht scannen können.</value></data>
+  <data name="Scan the code with your phone's camera, or type this address:" xml:space="preserve"><value>Scannen Sie den Code mit der Kamera Ihres Handys oder geben Sie diese Adresse ein:</value></data>
+  <data name="Send something in" xml:space="preserve"><value>Etwas einsenden</value></data>
+  <data name="Someone who opens a closed link is told that it is closed, and that nothing can be sent through it. You can open it again at any time." xml:space="preserve"><value>Wer einen geschlossenen Link öffnet, erfährt, dass er geschlossen ist und darüber nichts eingesendet werden kann. Sie können ihn jederzeit wieder öffnen.</value></data>
+  <data name="The collection's public page then shows the heading of this link and a button to it, while the link is open. Without this, only the people you give the link to know it exists. Turn it on only if anyone may send something in." xml:space="preserve"><value>Die öffentliche Seite der Sammlung zeigt dann die Überschrift dieses Links und einen Knopf dorthin, solange der Link offen ist. Ohne das kennen nur die Menschen den Link, denen Sie ihn geben. Schalten Sie das nur ein, wenn jeder etwas einsenden darf.</value></data>
+  <data name="The curators are not taking in anything through this link at the moment, and nothing you send here would arrive. If you were given the link by someone, ask them whether it will open again." xml:space="preserve"><value>Die Kuratoren nehmen über diesen Link im Moment nichts an, und was Sie hier einsenden würden, käme nicht an. Wenn jemand Ihnen den Link gegeben hat, fragen Sie ihn, ob er wieder geöffnet wird.</value></data>
+  <data name="This link is closed" xml:space="preserve"><value>Dieser Link ist geschlossen</value></data>
+  <data name="This link is closed. The poster would send people to a page that says so. Open the link first." xml:space="preserve"><value>Dieser Link ist geschlossen. Das Plakat würde die Leute auf eine Seite schicken, die das sagt. Öffnen Sie zuerst den Link.</value></data>
+  <data name="To the archive" xml:space="preserve"><value>Zum Archiv</value></data>
 </root>

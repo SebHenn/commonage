@@ -153,6 +153,12 @@ for (const button of document.querySelectorAll('button[data-copy-from]')) {
     });
 }
 
+// A button that prints the page. Without JavaScript the browser's own print command does the same.
+for (const button of document.querySelectorAll('button[data-print]')) {
+    button.hidden = false;
+    button.addEventListener('click', () => window.print());
+}
+
 // A phone offers its own list of where to share to. Anywhere else, the link is copied.
 for (const button of document.querySelectorAll('button[data-share]')) {
     button.hidden = false;

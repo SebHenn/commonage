@@ -243,7 +243,8 @@ cover, or null when none is chosen or that file is not in the export. Items also
 "Do you know more about this?" (kind, message, when received and dealt with); they are null in an export of published items, and
 a note's `message`, `name` and `email` are only there with personal data. `settings` has `acceptVisitorNotes`. Version 3 added each item's rights, credit and catalogue
 details and each photo's description; in `items.csv`, `rights` and `rights_holder` are now the item's own, and the contributor's
-answers moved to `contributor_rights` and `contributor_rights_holder`. An export of published items leaves out what only
+answers moved to `contributor_rights` and `contributor_rights_holder`. Contribution links, with their settings such as inviting visitors from a collection, are not exported; a contribution only
+names the title of its link. An export of published items leaves out what only
 curators see. Without personal data, it also leaves out rights holders, credits, "received from" and internal notes. Version 2 added `settings` with the archive's name, pages and colours, and the logo under `branding/`. While exporting, every file is checked against
 its checksum. A file entry with `"problem": "missing"` was not found in storage, `"checksumMismatch"` means it has
 changed since the upload; both need looking into.

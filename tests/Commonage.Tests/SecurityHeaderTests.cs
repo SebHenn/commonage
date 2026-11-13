@@ -44,6 +44,7 @@ public partial class SecurityHeaderTests(CommonageAppFactory app)
         using var curator = app.CreateClient();
         await Browser.LogInAsCuratorAsync(curator);
         var token = await CreateLinkAsync(item.CollectionId);
+        var linkId = await app.WithDbAsync(db => db.ContributionLinks.Where(l => l.Token == token).Select(l => l.Id).SingleAsync());
         var tagId = await app.WithDbAsync(async db =>
         {
             var name = TestData.Unique("place");
@@ -58,7 +59,7 @@ public partial class SecurityHeaderTests(CommonageAppFactory app)
         var results = new List<string>();
         foreach (var route in routes)
         {
-            var url = FillIn(route, item, token, tagId);
+            var url = FillIn(route, item, token, tagId, linkId);
             using var response = await curator.GetAsync(url);
             var html = await response.Content.ReadAsStringAsync();
             if (InlineScript().IsMatch(html) || EventHandlerAttribute().IsMatch(html) || StyleAttributeOrElement().IsMatch(html))
@@ -85,11 +86,12 @@ public partial class SecurityHeaderTests(CommonageAppFactory app)
         return saved;
     });
 
-    private static string FillIn(string route, ArchiveItem item, string token, int tagId)
+    private static string FillIn(string route, ArchiveItem item, string token, int tagId, int linkId)
     {
         var id = route.StartsWith("/Collections", StringComparison.OrdinalIgnoreCase) || route.Contains("Admin/Collections", StringComparison.OrdinalIgnoreCase)
             ? item.CollectionId.ToString()
-            : route.Contains("Admin/Tags", StringComparison.OrdinalIgnoreCase) ? tagId.ToString() : item.Id.ToString();
+            : route.Contains("Admin/Tags", StringComparison.OrdinalIgnoreCase) ? tagId.ToString()
+            : route.Contains("Admin/Contributions", StringComparison.OrdinalIgnoreCase) ? linkId.ToString() : item.Id.ToString();
         var url = route
             .Replace("{token}", token)
             .Replace("{id:int}", id)

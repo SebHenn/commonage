@@ -1,7 +1,17 @@
 @page "/contribute/{token}"
 @model Commonage.Web.Pages.Contribute.IndexModel
 @{
-    ViewData["Title"] = Model.Link.Title;
+    ViewData["Title"] = Model.Closed ? T["This link is closed"] : Model.Link.Title;
+}
+
+@if (Model.Closed)
+{
+    <div class="col-lg-8">
+        <h1>@ViewData["Title"]</h1>
+        <p>@T["The curators are not taking in anything through this link at the moment, and nothing you send here would arrive. If you were given the link by someone, ask them whether it will open again."]</p>
+        <p><a asp-page="/Index">@T["To the archive"]</a></p>
+    </div>
+    return;
 }
 
 <div class="col-lg-8">

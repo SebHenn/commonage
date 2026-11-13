@@ -38,7 +38,12 @@
     <div class="form-check mb-3">
         <input asp-for="Input.IsActive" class="form-check-input" aria-describedby="active-help" />
         <label asp-for="Input.IsActive" class="form-check-label"></label>
-        <div id="active-help" class="form-text">@T["A closed link shows “not found”. You can open it again at any time."]</div>
+        <div id="active-help" class="form-text">@T["Someone who opens a closed link is told that it is closed, and that nothing can be sent through it. You can open it again at any time."]</div>
+    </div>
+    <div class="form-check mb-3">
+        <input asp-for="Input.InviteOnCollectionPage" class="form-check-input" aria-describedby="invite-help" />
+        <label asp-for="Input.InviteOnCollectionPage" class="form-check-label"></label>
+        <div id="invite-help" class="form-text">@T["The collection's public page then shows the heading of this link and a button to it, while the link is open. Without this, only the people you give the link to know it exists. Turn it on only if anyone may send something in."]</div>
     </div>
     <button type="submit" class="btn btn-primary">@T["Save"]</button>
 </form>

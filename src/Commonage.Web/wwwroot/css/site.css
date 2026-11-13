@@ -403,8 +403,20 @@ main:focus {
 
 /* On paper: the item, without what only works on a screen, and with where it came from. */
 @media print {
-  header, footer, .admin-nav, .breadcrumb, .btn, form {
+  header, footer, .admin-nav, .breadcrumb, .btn, form, .no-print {
     display: none !important;
+  }
+
+  /* More specific than the screen rule for .poster, which comes later in this file. */
+  main .poster {
+    border: 0;
+    color: #000;
+    background: #fff;
+  }
+
+  /* The address under a printed page is the curators' page, which a poster on a wall must not show. */
+  main:has(.poster)::after {
+    content: none;
   }
 
   .media-preview {
@@ -556,6 +568,35 @@ main:focus {
     display: block;
     inline-size: 100%;
     block-size: auto;
+}
+
+/* The sheet a curator prints to pin up. Black on white and large, because it is read from a distance. */
+.poster {
+    max-inline-size: 40rem;
+    margin-inline: auto;
+    text-align: center;
+    padding: 2rem 1rem;
+    border: 1px solid var(--bs-border-color);
+}
+
+.poster-title {
+    font-size: 2.5rem;
+    overflow-wrap: anywhere;
+}
+
+.poster-text {
+    font-size: 1.25rem;
+}
+
+.poster-qr {
+    inline-size: min(22rem, 100%);
+    margin-inline: auto;
+    margin-block: 1.5rem;
+}
+
+.poster-address {
+    font-family: var(--bs-font-monospace);
+    font-size: 1.1rem;
 }
 
 .setup-key,

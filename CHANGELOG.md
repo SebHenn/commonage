@@ -22,6 +22,10 @@ version may change things that need attention when updating, and these notes say
 
 ### For curators
 
+- Contribution links have a **Copy the link** button and a **Poster to print**: the heading, introduction, a QR code and the address
+  in words. A curator can tick "Invite visitors on the collection's page" for a link, so that its heading and a button to it show
+  on the collection's public page; off by default. Someone who opens a closed link is now told it is closed (before: "not found").
+
 - The first page of Manage archive shows what needs attention: notes from visitors to deal with (and how many ask for removal),
   items waiting for a transcription, and items that ask visitors for help, each opening that list.
 

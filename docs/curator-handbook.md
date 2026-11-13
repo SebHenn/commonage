@@ -131,6 +131,18 @@ seen, ask yourself whether it should be public. When in doubt, ask them, or keep
 If someone says a phone photo was refused because of its format, it is probably HEIC, which the archive cannot read yet. They
 need to save it as a JPEG first. The form tells them so.
 
+## Sharing a contribution link
+
+"Contribution links" lists each link with its address. **Copy the link** puts the address on the clipboard, ready for a
+newsletter or a message. **Poster to print** opens a sheet with the link's heading and introduction, a QR code that opens the
+form and the address in words for those who cannot scan; print it from the page or with the browser's print command. A poster
+for a closed link would send people to a page that says it is closed, so open the link first.
+
+Only the people you give a link to know it exists. If anyone may send something in, tick "Invite visitors on the collection's
+page" on the link: while it is open, the collection's public page then shows its heading and a button to the form. That gives up
+the link being unlisted, so a closed link is not shown, and you cannot take the invitation back from people who already
+copied the address. Someone who opens a closed link is told that it is closed.
+
 ## Asking visitors for help
 
 On an item, tick **Ask visitors for help with this item**. Once it is published, it appears on the page "Can you help?", which

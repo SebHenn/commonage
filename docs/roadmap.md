@@ -436,8 +436,9 @@ shows the years of its published items. M19 is complete.
 - ✅ "Help wanted" flag and a "Can you help?" page (only while visitors are asked; unpublished items are not listed, and the
   export, version 5, carries the flag). Dashboard cards for what needs attention: notes (removal requests counted), items
   waiting for a transcription, help wanted.
-- Links: copy button, a printable poster with QR code (checked against the no-inline-style test), and an opt-in
-  invitation on the collection page, which gives up being unlisted. A clear page for closed links.
+- ✅ Links: copy button, a printable poster with QR code (no inline styles), and an opt-in invitation on the collection page,
+  which gives up being unlisted. A clear page for closed links (`410`, showing nothing from the link). Contribution links are
+  not part of the export, so the invitation setting is not either.
 
 **M21 Import and scale**
 

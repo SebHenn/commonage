@@ -76,12 +76,22 @@ public class ContributionTests(CommonageAppFactory app)
     }
 
     [Fact]
-    public async Task Closed_and_unknown_links_show_not_found()
+    public async Task A_closed_link_says_so_and_takes_nothing_while_an_unknown_one_is_not_found()
     {
         var closed = await CreateLinkAsync(isActive: false);
         using var visitor = app.CreateClient();
 
-        Assert.Equal(HttpStatusCode.NotFound, (await visitor.GetAsync($"/contribute/{closed}")).StatusCode);
+        var page = await visitor.GetAsync($"/contribute/{closed}");
+        var body = await page.Content.ReadAsStringAsync();
+        Assert.Equal(HttpStatusCode.Gone, page.StatusCode);
+        Assert.Contains("This link is closed", body);
+        Assert.DoesNotContain("Share your photos", body);
+        Assert.DoesNotContain("<form method=\"post\" enctype", body);
+        // The form of an open link gives the antiforgery token; sending it to the closed link is what a stale open tab does.
+        var open = await CreateLinkAsync();
+        var sent = await Browser.SendFormAsync(visitor, $"/contribute/{closed}", ValidFields("Late photo"), pageUrl: $"/contribute/{open}");
+        Assert.Equal(HttpStatusCode.Gone, sent.StatusCode);
+        Assert.Equal(0, await WithDbAsync(db => db.ArchiveItems.CountAsync(i => i.Title == "Late photo")));
         Assert.Equal(HttpStatusCode.NotFound, (await visitor.GetAsync($"/contribute/{ContributionLink.NewToken()}")).StatusCode);
     }
 
