@@ -9,6 +9,7 @@ using Commonage.Web.Demo;
 using Commonage.Web.Domain;
 using Commonage.Web.Export;
 using Commonage.Web.Forms;
+using Commonage.Web.Import;
 using Commonage.Web.Identity;
 using Commonage.Web.Media;
 using Commonage.Web.Operations;
@@ -81,6 +82,8 @@ builder.Services.AddScoped<ArchiveExporter>();
 var storageRoot = Path.GetFullPath(
     builder.Configuration["Storage:RootPath"] ?? Path.Combine("App_Data", "media"), builder.Environment.ContentRootPath);
 builder.Services.AddSingleton<IFileStorage>(new LocalFileStorage(storageRoot));
+builder.Services.AddSingleton(new ImportStaging(storageRoot));
+builder.Services.AddScoped<ItemImport>();
 builder.Services.Configure<UploadOptions>(builder.Configuration.GetSection("Uploads"));
 builder.Services.AddScoped<MediaUploadService>();
 builder.Services.AddSingleton<MediaProcessingQueue>();

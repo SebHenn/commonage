@@ -63,7 +63,7 @@ public class MediaUploadService(
     public async Task<UploadError> CheckAsync(IFormFile upload, CancellationToken cancellationToken = default)
     {
         await using var content = upload.OpenReadStream();
-        return (await DetectAsync(upload, content, cancellationToken)).Error;
+        return (await DetectAsync(upload.Length, content, cancellationToken)).Error;
     }
 
     public async Task<UploadError> AddAsync(ArchiveItem item, IFormFile upload, CancellationToken cancellationToken = default)
@@ -78,7 +78,14 @@ public class MediaUploadService(
     public async Task<ExaminedUpload> ExamineAsync(IFormFile upload, CancellationToken cancellationToken = default)
     {
         await using var content = upload.OpenReadStream();
-        var (error, contentType) = await DetectAsync(upload, content, cancellationToken);
+        return await ExamineAsync(content, upload.Length, cancellationToken);
+    }
+
+    /// <summary>The same for a file that is not an upload, such as one from an import. The stream must be seekable.</summary>
+    public async Task<ExaminedUpload> ExamineAsync(Stream content, long length, CancellationToken cancellationToken = default)
+    {
+        content.Position = 0;
+        var (error, contentType) = await DetectAsync(length, content, cancellationToken);
         if (error != UploadError.None)
             return new ExaminedUpload(error);
 
@@ -97,22 +104,29 @@ public class MediaUploadService(
     /// <summary>Stores a file that passed <see cref="ExamineAsync"/>. Also saves whatever else is waiting in the context, such as a new item.</summary>
     public async Task<MediaFile> StoreAsync(ArchiveItem item, IFormFile upload, ExaminedUpload examined, CancellationToken cancellationToken = default)
     {
+        await using var content = upload.OpenReadStream();
+        return await StoreAsync(item, content, upload.FileName, upload.Length, examined, cancellationToken);
+    }
+
+    /// <summary>The same for a file that is not an upload, such as one from an import.</summary>
+    public async Task<MediaFile> StoreAsync(ArchiveItem item, Stream content, string fileName, long length, ExaminedUpload examined, CancellationToken cancellationToken = default)
+    {
         // After everything else, also what is in the bin, because it may come back to its place.
         var last = await db.MediaFiles.IgnoreQueryFilters().Where(f => f.ArchiveItemId == item.Id).MaxAsync(f => (int?)f.Position, cancellationToken);
         var file = new MediaFile
         {
             ArchiveItem = item,
             Position = (last ?? -1) + 1,
-            OriginalFileName = CleanFileName(upload.FileName),
+            OriginalFileName = CleanFileName(fileName),
             ContentType = examined.ContentType!,
-            SizeBytes = upload.Length,
+            SizeBytes = length,
             Sha256 = examined.Sha256!,
             StorageId = Guid.NewGuid(),
             Status = ProcessingStatus.Pending,
             UploadedAt = DateTime.UtcNow,
         };
-        await using (var content = upload.OpenReadStream())
-            await storage.SaveAsync(file.OriginalKey, content, cancellationToken);
+        content.Position = 0;
+        await storage.SaveAsync(file.OriginalKey, content, cancellationToken);
         db.MediaFiles.Add(file);
         await db.SaveChangesAsync(cancellationToken);
 
@@ -128,11 +142,11 @@ public class MediaUploadService(
             storage.Delete(key);
     }
 
-    private async Task<(UploadError Error, string? ContentType)> DetectAsync(IFormFile upload, Stream content, CancellationToken cancellationToken)
+    private async Task<(UploadError Error, string? ContentType)> DetectAsync(long length, Stream content, CancellationToken cancellationToken)
     {
-        if (upload.Length == 0)
+        if (length == 0)
             return (UploadError.Empty, null);
-        if (upload.Length > options.Value.MaxFileSizeBytes)
+        if (length > options.Value.MaxFileSizeBytes)
             return (UploadError.TooLarge, null);
 
         var header = new byte[ImageFormats.HeaderLength];

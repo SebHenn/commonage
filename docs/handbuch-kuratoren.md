@@ -102,6 +102,18 @@ bestätigen. Jeder geänderte Eintrag bekommt eine Zeile in seinem Verlauf.
 Beim Veröffentlichen von vielen werden nur Entwürfe mit Titel genommen. Über Beiträge wird einzeln entschieden. Rückgängig
 machen lässt sich eine Änderung an vielen nicht, also probieren Sie sie im Zweifel erst an wenigen aus.
 
+## Eine Tabelle voller Einträge
+
+Liegt das Archiv schon in einer Tabelle vor, macht **Tabelle importieren** unter Archiv verwalten aus jeder Zeile einen Entwurf.
+Laden Sie die Vorlage herunter, tragen Sie pro Eintrag eine Zeile ein und speichern Sie als **CSV UTF-8**. Die Scans können in
+einer ZIP-Datei kommen oder in einem Ordner, den die Person, die den Server betreibt, dort abgelegt hat; die Spalte `files` nennt
+sie.
+
+Zuerst sehen Sie einen Probelauf. Er ändert nichts und listet unlesbare Daten, Sammlungen, die es nicht gibt, fehlende Dateien und
+Zeilen, die doppelt da wären. Korrigieren Sie die Tabelle und prüfen Sie erneut, oder importieren Sie die Zeilen, die in Ordnung
+sind, und kümmern Sie sich später um den Rest. Alles Importierte ist ein Entwurf. Bricht es ab, starten Sie erneut: Was schon da
+ist, wird ausgelassen.
+
 ## Eine Kiste voller Fotos
 
 **Viele Fotos hinzufügen** in der Liste der Einträge macht aus jedem Foto einen Entwurf. Tragen Sie zuerst ein, was sie gemeinsam

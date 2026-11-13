@@ -92,6 +92,16 @@ them, and nothing changes until you confirm. Each item that changes gets a line 
 Publishing many at once only takes drafts with a title. Contributions wait for a decision of their own. There is no undo for
 many at once, so try a change on a few items first if you are unsure.
 
+## A spreadsheet full of items
+
+If the archive is already in a spreadsheet, **Import a spreadsheet** on Manage archive makes a draft of each row. Download the
+template, fill in one row per item, and save it as **CSV UTF-8**. Scans can come in a ZIP file, or in a folder that whoever runs
+the server has put on the server, and the `files` cell of a row names them.
+
+First you see a dry run. It changes nothing and lists unreadable dates, collections that do not exist, files that are not there,
+and rows that would be there twice. Fix the spreadsheet and check again, or import the rows that are in order and deal with the
+rest later. Everything imported is a draft. If it breaks off, run it again: what is already there is left out.
+
 ## A box full of photos
 
 **Add many photos** on the item list makes one draft from each photo. Enter what they share first: the collection, and if

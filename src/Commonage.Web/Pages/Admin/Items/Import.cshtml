@@ -1,0 +1,207 @@
+@page
+@model Commonage.Web.Pages.Admin.Items.ImportModel
+@using Commonage.Web.Import
+@{
+    ViewData["Title"] = T["Import from a spreadsheet"];
+    var plan = Model.Plan;
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="@Commonage.Web.Search.AdminItemList.Page">@T["Items"]</a></li>
+    </ol>
+</nav>
+
+<h1>@ViewData["Title"]</h1>
+
+@if (plan is { Error: not CsvError.None })
+{
+    <p class="alert alert-danger col-lg-8" role="alert">
+        @(plan.Error switch
+        {
+            CsvError.Empty => T["The spreadsheet has no rows."],
+            CsvError.NotUtf8 => T["The spreadsheet is not saved as UTF-8, so letters such as ä or ł would be wrong. In the spreadsheet program, save it again as \"CSV UTF-8\"."],
+            CsvError.TooManyRows => T["The spreadsheet has too many rows for one import. Split it into several files."],
+            _ => T["The spreadsheet could not be read: a quotation mark is never closed."],
+        })
+    </p>
+}
+else if (plan is { NoUsableColumns: true })
+{
+    <p class="alert alert-danger col-lg-8" role="alert">@T["The first row of the spreadsheet must name the columns. None of them is one this import knows. Download the template to see them."]</p>
+}
+
+@if (plan is { Error: CsvError.None, NoUsableColumns: false })
+{
+    <section class="col-lg-10" aria-labelledby="dry-run-heading">
+        <h2 id="dry-run-heading" class="h4">@T["The dry run"]</h2>
+        <p>@T["Nothing has been imported yet. This is what would happen."]</p>
+        <ul class="list-unstyled">
+            <li>@T["Rows read: {0}", plan.Rows.Count]</li>
+            <li><strong>@T["Rows that can be imported: {0}", plan.Ready.Count()]</strong></li>
+            <li>@T["Photos that would be added: {0}", plan.ReadyFileCount]</li>
+            <li>@T["Rows with problems, which are left out: {0}", plan.Rows.Count(r => r.HasProblem)]</li>
+            <li>@T["Rows left out because they would be there twice: {0}", plan.Rows.Count(r => r.IsLeftOut)]</li>
+            @if (plan.FilesNotUsed > 0)
+            {
+                <li>@T["Files in the ZIP file or folder that no row names: {0}", plan.FilesNotUsed]</li>
+            }
+        </ul>
+
+        @if (plan.IgnoredColumns.Count > 0)
+        {
+            <p class="text-body-secondary">@T["Columns that are not imported: {0}", string.Join(", ", plan.IgnoredColumns)]</p>
+        }
+        @if (plan.CollectionColumnMissing && Model.CollectionId is null)
+        {
+            <p class="alert alert-warning" role="status">@T["The spreadsheet has no collection column, and no collection was chosen. Every row would be left out."]</p>
+        }
+        @if (plan.SourceMissing)
+        {
+            <p class="alert alert-warning" role="status">@T["The spreadsheet names files, but no ZIP file or folder was given to find them in."]</p>
+        }
+
+        @if (plan.Rows.Any(r => r.HasProblem))
+        {
+            <h3 class="h5">@T["Problems"]</h3>
+            <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                    <caption class="visually-hidden">@T["Problems"]</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">@T["Row"]</th>
+                            <th scope="col">@T["Column"]</th>
+                            <th scope="col">@T["What the cell says"]</th>
+                            <th scope="col">@T["What is wrong"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var (row, issue) in Model.Problems.Take(Commonage.Web.Pages.Admin.Items.ImportModel.ShownIssues))
+                        {
+                            <tr>
+                                <td>@row.Number</td>
+                                <td><code>@issue.Column</code></td>
+                                <td dir="auto">@issue.Value</td>
+                                <td>@Model.Describe(issue)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            @if (Model.Problems.Count() > Commonage.Web.Pages.Admin.Items.ImportModel.ShownIssues)
+            {
+                <p>@T["More problems than are listed here: {0}", Model.Problems.Count() - Commonage.Web.Pages.Admin.Items.ImportModel.ShownIssues]</p>
+            }
+        }
+
+        @if (plan.Rows.Any(r => r.IsLeftOut))
+        {
+            <h3 class="h5">@T["Left out, because they would be there twice"]</h3>
+            <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                    <caption class="visually-hidden">@T["Left out, because they would be there twice"]</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">@T["Row"]</th>
+                            <th scope="col">@T["Column"]</th>
+                            <th scope="col">@T["What the cell says"]</th>
+                            <th scope="col">@T["Why"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var (row, issue) in Model.LeftOut.Take(Commonage.Web.Pages.Admin.Items.ImportModel.ShownIssues))
+                        {
+                            <tr>
+                                <td>@row.Number</td>
+                                <td><code>@issue.Column</code></td>
+                                <td dir="auto">@issue.Value</td>
+                                <td>@Model.Describe(issue)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        <div class="d-flex flex-wrap gap-2 mt-3">
+            @if (plan.CanImport)
+            {
+                <form method="post" asp-page-handler="Import" data-send-once>
+                    <input type="hidden" asp-for="StagingId" />
+                    <input type="hidden" asp-for="SheetName" />
+                    <input type="hidden" asp-for="Folder" />
+                    <input type="hidden" asp-for="CollectionId" />
+                    <button type="submit" class="btn btn-primary">@T.Plural("{0, plural, one {Import the one row that is in order} other {Import the # rows that are in order}}", plan.Ready.Count())</button>
+                </form>
+            }
+            <form method="post" asp-page-handler="Cancel">
+                <input type="hidden" asp-for="StagingId" />
+                <button type="submit" class="btn btn-outline-secondary">@(plan.CanImport ? T["Do not import"] : T["Start again"])</button>
+            </form>
+        </div>
+        @if (plan.CanImport)
+        {
+            <p class="form-text">@T["Imported rows become drafts, whatever the spreadsheet says. A large import takes a while: keep this page open. If it breaks off, run it again: what is already there is left out."]</p>
+        }
+    </section>
+}
+else if (!Model.CanUpload)
+{
+    <p class="alert alert-warning" role="status">@T["The disk is nearly full, so no photos can be added at the moment. Tell the person who runs the server."]</p>
+}
+else
+{
+    <div class="col-lg-8">
+        <p>@T["Each row of a spreadsheet becomes a draft, and the files it names are added to it as photos. Nothing is published, and nothing is imported before you have seen a dry run that lists what is wrong."]</p>
+        <p>
+            <a asp-page="Import" asp-page-handler="Template">@T["Download the template"]</a>
+        </p>
+        <details class="mb-3">
+            <summary>@T["The columns"]</summary>
+            <dl class="mt-2">
+                <dt><code>collection</code></dt><dd>@T["The name of an existing collection. May be left out when you choose one below."]</dd>
+                <dt><code>title</code></dt><dd>@T["May be empty: the draft then waits for a title."]</dd>
+                <dt><code>date</code></dt><dd>@T["As elsewhere: 1953, 12.03.1953, circa 1950, 1950s, 1950–1955."]</dd>
+                <dt><code>tags</code></dt><dd>@T["Separated by semicolons or commas."]</dd>
+                <dt><code>description</code>, <code>credit</code>, <code>rights_holder</code>, <code>reference_number</code>, <code>original_location</code></dt><dd>@T["Text."]</dd>
+                <dt><code>rights</code></dt><dd>@T["The web address of one of the rights statements, as an export writes it. Empty means the archive's default."]</dd>
+                <dt><code>files</code></dt><dd>@T["File names in the ZIP file or folder, separated by semicolons. A name is enough when it is only there once; otherwise write the path."]</dd>
+            </dl>
+            <p>@T["Columns that are not in this list, such as id or status, are not imported. A cell that starts with an apostrophe before =, +, - or @ is read without it, as exports write them."]</p>
+        </details>
+
+        <form method="post" enctype="multipart/form-data">
+            <partial name="_ErrorSummary" />
+            <div class="mb-3">
+                <label for="sheet" class="form-label">@T["Spreadsheet, saved as CSV (UTF-8)"]</label>
+                <input type="file" id="sheet" name="sheet" class="form-control" accept=".csv,text/csv" required />
+                <span class="text-danger field-validation-valid" data-valmsg-for="sheet" data-valmsg-replace="true"></span>
+            </div>
+            <div class="mb-3">
+                <label for="scans" class="form-label">@T["ZIP file with the scans (optional)"]</label>
+                <input type="file" id="scans" name="scans" class="form-control" accept=".zip,application/zip" />
+            </div>
+            @if (Model.Folders.Count > 0)
+            {
+                <div class="mb-3">
+                    <label asp-for="Folder" class="form-label">@T["Or a folder on the server"]</label>
+                    <select asp-for="Folder" class="form-select" aria-describedby="folder-help">
+                        <option value="">@T["No folder"]</option>
+                        @foreach (var folder in Model.Folders)
+                        {
+                            <option value="@folder">@folder</option>
+                        }
+                    </select>
+                    <div id="folder-help" class="form-text">@T["For more scans than a web page can send. Whoever runs the server puts a folder into the \"import\" folder of the media volume."]</div>
+                </div>
+            }
+            <div class="mb-3">
+                <label asp-for="CollectionId" class="form-label">@T["Collection for rows that name none"]</label>
+                <select asp-for="CollectionId" asp-items="Model.CollectionOptions" class="form-select">
+                    <option value="">@T["None"]</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">@T["Check the spreadsheet"]</button>
+        </form>
+    </div>
+}

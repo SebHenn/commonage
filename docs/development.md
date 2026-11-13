@@ -151,6 +151,17 @@ exist. Raising `CurrentDerivativeVersion` makes older files catch up when nothin
 A large picture is opened as the picture itself, because the browser's own view already fits and zooms it on every device. That
 view styles itself inline, so `/media` and `/admin/media` have their own `PicturePolicy`, with no script at all.
 
+## Import
+
+`Import/` brings a CSV and scans in as drafts. `CsvReader` reads strict UTF-8 (a file in another encoding is refused, never
+guessed) with `,`, `;` or tab. `ItemImport.PlanAsync` is the dry run and writes nothing; `RunAsync` creates the items in
+batches, clears the change tracker every 100 rows, and stores photos through `MediaUploadService`, the same path as an upload.
+Duplicates are found by (collection, title, date) and by the content of a file, so a second run adds nothing. The sheet and ZIP
+wait in `import-staging/<id>/` on the media volume until the import or a day; folders to import from are the ones in `import/`,
+chosen from a listing and never joined from what a browser sent. A name inside a ZIP is only ever a key into the archive, never
+a path. One import runs at a time. A cell starting with `'` before `=`, `+`, `-` or `@` loses it, as exports add it for
+spreadsheet safety. The columns are `ItemImport.Columns`; there is no id or status column on purpose.
+
 ## Accounts, activity log, export and backups
 
 How these work for the people running an archive is in [operations.md](operations.md). In the code:
