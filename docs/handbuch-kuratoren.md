@@ -147,6 +147,20 @@ Zweifel nach, oder lassen Sie es als Entwurf.
 Wenn jemand sagt, ein Handyfoto sei wegen seines Formats abgelehnt worden, ist es wahrscheinlich HEIC, das das Archiv noch nicht
 lesen kann. Es muss zuerst als JPEG gespeichert werden. Das Formular sagt das auch.
 
+## Einen Link zum Einsenden weitergeben
+
+„Links zum Einsenden“ listet jeden Link mit seiner Adresse. **Link kopieren** legt die Adresse in die Zwischenablage, bereit für
+einen Rundbrief oder eine Nachricht. **Plakat zum Drucken** öffnet ein Blatt mit Überschrift und Einleitung des Links, einem
+QR-Code, der das Formular öffnet, und der Adresse in Worten für alle, die nicht scannen können; drucken Sie es von der Seite
+oder mit dem Druckbefehl des Browsers. Ein Plakat für einen geschlossenen Link würde die Leute auf eine Seite schicken, die
+sagt, dass er geschlossen ist; öffnen Sie den Link also zuerst.
+
+Nur die Menschen, denen Sie einen Link geben, wissen, dass es ihn gibt. Wenn jeder etwas einsenden darf, setzen Sie beim Link
+das Häkchen „Besucher auf der Seite der Sammlung einladen“: Solange er offen ist, zeigt die öffentliche Seite der Sammlung dann
+seine Überschrift und einen Knopf zum Formular. Damit ist der Link nicht mehr unauffindbar; ein geschlossener Link wird nicht
+gezeigt, und die Einladung lässt sich nicht von denen zurücknehmen, die die Adresse schon kopiert haben. Wer einen geschlossenen
+Link öffnet, erfährt, dass er geschlossen ist.
+
 ## Besucher um Hilfe bitten
 
 Haken Sie bei einem Eintrag **Besucher um Hilfe zu diesem Eintrag bitten** an. Sobald er veröffentlicht ist, steht er auf der Seite «Können Sie helfen?», auf die die Startseite verweist, und seine eigene Seite sagt, dass die Kuratoren Hilfe suchen. Beides gibt es nur, solange «Wissen Sie mehr darüber?» eingeschaltet ist, weil Besucher so antworten. Unter «Fehlt noch» zeigt **Hilfe von Besuchern** alle; die Karten oben in der Verwaltung zählen sie und sagen, wie viele noch nicht veröffentlicht sind.

@@ -50,8 +50,10 @@ else
                     </p>
                     @if (link.IsActive)
                     {
-                        <label for="link-@link.Id" class="visually-hidden">@T["Address of the link"]</label>
-                        <input id="link-@link.Id" type="text" readonly value="@Model.AddressOf(link)" class="form-control form-control-sm font-monospace" />
+                        <p id="link-@link.Id" class="font-monospace small text-break mb-2" aria-label="@T["Address of the link"]">@Model.AddressOf(link)</p>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" hidden data-copy-from="link-@link.Id" data-done-text="@T["Copied"]" aria-describedby="copy-status-@link.Id">@T["Copy the link"]</button>
+                        <a asp-page="Poster" asp-route-id="@link.Id" class="btn btn-sm btn-outline-secondary">@T["Poster to print"]</a>
+                        <span id="copy-status-@link.Id" class="small ms-2" role="status"></span>
                     }
                 </div>
             </li>

@@ -1,0 +1,37 @@
+@page "{id:int}"
+@model Commonage.Web.Pages.Admin.Contributions.PosterModel
+@{
+    ViewData["Title"] = T["Poster: {0}", Model.Title];
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="/Admin/Index">@T["Items"]</a></li>
+        <li class="breadcrumb-item"><a asp-page="Index">@T["Contribution links"]</a></li>
+    </ol>
+</nav>
+
+<div class="d-flex flex-wrap gap-2 align-items-center mb-3 no-print">
+    <p class="mb-0 me-auto col-lg-8">@T["Print this page and pin it up. The code opens the contribution form, and the address below it is for those who cannot scan."]</p>
+    <button type="button" class="btn btn-primary" hidden data-print>@T["Print"]</button>
+</div>
+
+@if (!Model.IsActive)
+{
+    <p class="alert alert-warning no-print" role="status">@T["This link is closed. The poster would send people to a page that says so. Open the link first."]</p>
+}
+
+<section class="poster" aria-labelledby="poster-title">
+    <h1 id="poster-title" class="poster-title">@Model.Title</h1>
+    @if (!string.IsNullOrWhiteSpace(Model.Introduction))
+    {
+        <p class="poster-text text-preserve-lines">@Model.Introduction</p>
+    }
+    <div class="qr-frame poster-qr">@Model.Qr</div>
+    <p class="poster-text">@T["Scan the code with your phone's camera, or type this address:"]</p>
+    <p class="poster-address text-break" dir="ltr">@Model.Address</p>
+    @if (Model.ArchiveName is { } name)
+    {
+        <p class="poster-text">@name</p>
+    }
+</section>

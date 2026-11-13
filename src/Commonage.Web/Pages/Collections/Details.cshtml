@@ -25,6 +25,17 @@
     <p class="lead text-preserve-lines prose" lang="@material">@Model.Collection.Description</p>
 }
 
+@foreach (var invitation in Model.Invitations)
+{
+    <section class="card mb-4" aria-labelledby="invite-@invitation.Token">
+        <div class="card-body">
+            <h2 id="invite-@invitation.Token" class="h5">@invitation.Title</h2>
+            <p class="mb-2">@T["Do you have photos or stories that belong here? You can send them in. Curators look at everything before it is published."]</p>
+            <a asp-page="/Contribute/Index" asp-route-token="@invitation.Token" class="btn btn-outline-primary">@T["Send something in"]</a>
+        </div>
+    </section>
+}
+
 @if (Model.Items.TotalCount == 0)
 {
     <p class="text-muted">@T["This collection has no published items yet."]</p>

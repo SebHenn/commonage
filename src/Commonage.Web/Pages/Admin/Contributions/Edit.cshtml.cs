@@ -35,6 +35,9 @@ public class EditModel(CommonageDbContext db, AuditLog audit, IStringLocalizer<S
 
         [Display(Name = "Open: the link accepts contributions")]
         public bool IsActive { get; set; } = true;
+
+        [Display(Name = "Invite visitors on the collection's page")]
+        public bool InviteOnCollectionPage { get; set; }
     }
 
     public async Task<IActionResult> OnGetAsync(int? id)
@@ -51,6 +54,7 @@ public class EditModel(CommonageDbContext db, AuditLog audit, IStringLocalizer<S
                 Introduction = link.Introduction,
                 CollectionId = link.CollectionId,
                 IsActive = link.IsActive,
+                InviteOnCollectionPage = link.InviteOnCollectionPage,
             };
             LinkId = link.Id;
         }
@@ -90,6 +94,7 @@ public class EditModel(CommonageDbContext db, AuditLog audit, IStringLocalizer<S
         link.Introduction = string.IsNullOrWhiteSpace(Input.Introduction) ? null : Input.Introduction.Trim();
         link.CollectionId = Input.CollectionId!.Value;
         link.IsActive = Input.IsActive;
+        link.InviteOnCollectionPage = Input.InviteOnCollectionPage;
         audit.Record(isNew ? AuditAction.ContributionLinkCreated : AuditAction.ContributionLinkChanged, link.Title);
         await db.SaveChangesAsync();
 

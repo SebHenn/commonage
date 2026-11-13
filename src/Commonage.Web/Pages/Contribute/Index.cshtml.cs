@@ -62,6 +62,9 @@ public class IndexModel(
 
     public ContributionLink Link { get; private set; } = null!;
 
+    /// <summary>The link exists but a curator closed it. The page says so, instead of "not found" that sounds like a mistake.</summary>
+    public bool Closed { get; private set; }
+
     /// <summary>When the disk is nearly full, people are told so before they fill in the form.</summary>
     public bool CanTakeContributions => health.CanAcceptUploads();
 
@@ -111,7 +114,7 @@ public class IndexModel(
     public async Task<IActionResult> OnGetAsync(string token)
     {
         if (await FindLinkAsync(token) is not { } link)
-            return NotFound();
+            return await ClosedOrNotFoundAsync(token);
 
         Link = link;
         Identity = await profile.GetAsync();
@@ -123,7 +126,7 @@ public class IndexModel(
     public async Task<IActionResult> OnPostAsync(string token, CancellationToken cancellationToken)
     {
         if (await FindLinkAsync(token) is not { } link)
-            return NotFound();
+            return await ClosedOrNotFoundAsync(token);
 
         // Spam gets the same answer as a real contribution, so its sender learns nothing from trying.
         if (!string.IsNullOrEmpty(Website) || !formTimer.WasFilledInByAPerson(FormStarted))
@@ -274,6 +277,18 @@ public class IndexModel(
             .Where(f => f.ArchiveItem.Contribution!.ContributionLinkId == link.Id && f.UploadedAt >= since)
             .SumAsync(f => f.SizeBytes, cancellationToken);
         return received + Files.Sum(f => f.Length) > options.Value.MaxUploadMegabytesPerLinkPerDay * 1024L * 1024L;
+    }
+
+    /// <summary>Only a closed link of this archive gets the page; the page shows nothing from the link, not even its heading.</summary>
+    private async Task<IActionResult> ClosedOrNotFoundAsync(string token)
+    {
+        if (!await db.ContributionLinks.AnyAsync(l => l.Token == token))
+            return NotFound();
+
+        Closed = true;
+        Identity = await profile.GetAsync();
+        Response.StatusCode = StatusCodes.Status410Gone;
+        return Page();
     }
 
     private Task<ContributionLink?> FindLinkAsync(string token) =>

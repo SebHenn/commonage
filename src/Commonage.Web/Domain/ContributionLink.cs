@@ -24,6 +24,12 @@ public class ContributionLink
     public required string Token { get; init; }
 
     public bool IsActive { get; set; } = true;
+
+    /// <summary>
+    /// A curator chose to invite visitors to this link from the collection's public page. Off by default, because a link
+    /// is otherwise only known to the people it was given to, and showing it gives that up.
+    /// </summary>
+    public bool InviteOnCollectionPage { get; set; }
     public DateTime CreatedAt { get; set; }
 
     public List<Contribution> Contributions { get; set; } = [];

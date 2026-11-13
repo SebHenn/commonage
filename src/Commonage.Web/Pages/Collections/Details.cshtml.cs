@@ -15,6 +15,11 @@ public class DetailsModel(CommonageDbContext db) : PageModel
     public YearSpan Years { get; private set; } = YearSpan.None;
     public PagedList<ItemSummary> Items { get; private set; } = PagedList<ItemSummary>.Empty;
 
+    /// <summary>Open links whose curators chose to invite visitors here. Only a heading and an address, nothing about who sent what.</summary>
+    public IReadOnlyList<Invitation> Invitations { get; private set; } = [];
+
+    public record Invitation(string Title, string Token);
+
     [BindProperty(SupportsGet = true, Name = QueryUrls.PageKey)]
     public int PageNumber { get; set; } = 1;
 
@@ -31,6 +36,11 @@ public class DetailsModel(CommonageDbContext db) : PageModel
             .Sort(collection.Sort.ToItemSort(), query: null)
             .Select(ItemSummary.FromItem)
             .ToPagedListAsync(PageNumber, SearchModel.PageSize, cancellationToken);
+        Invitations = await db.ContributionLinks
+            .Where(l => l.CollectionId == id && l.IsActive && l.InviteOnCollectionPage)
+            .OrderBy(l => l.CreatedAt).ThenBy(l => l.Id)
+            .Select(l => new Invitation(l.Title, l.Token))
+            .ToListAsync(cancellationToken);
         return Page();
     }
 }
