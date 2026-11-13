@@ -109,12 +109,20 @@ public class ExportTests(CommonageAppFactory app)
     [InlineData(typeof(Contribution), "contribution", "contributorName contributorEmail showName rights rightsHolder consentText reuse consentCoversSharing referenceCode submittedAt reviewedAt personalDetailsRemovedAt contributionLink",
         "Id, ArchiveItemId, ArchiveItem: listed under its item. ContributionLinkId: the link is named. SendingFingerprint: only there to recognise a form sent twice.")]
     [InlineData(typeof(Collection), "collection", "id title description createdAt", "Items: each item names its collection.")]
+    [InlineData(typeof(Tag), "tag", "name kind", "Id: items name their tags. NormalizedName: follows from the name. Items: each item lists its tags.")]
     public async Task Every_field_is_exported_or_left_out_on_purpose(Type type, string part, string exported, string leftOut)
     {
         var item = await app.CreateContributionAsync(ItemStatus.Published);
         using var admin = app.CreateClient();
         await Browser.LogInAsCuratorAsync(admin);
         await Browser.UploadAsync(admin, $"/Admin/Items/Edit/{item.Id}", "Upload", "photo.jpg", TestData.Photo);
+        await app.WithDbAsync(async db =>
+        {
+            var tagged = await db.ArchiveItems.Include(i => i.Tags).SingleAsync(i => i.Id == item.Id);
+            var name = TestData.Unique("place");
+            tagged.SetTags([new Tag { Name = name, NormalizedName = Tag.Normalize(name), Kind = TagKind.Place }]);
+            return await db.SaveChangesAsync();
+        });
         using var zip = await ExportAsync(admin, publishedOnly: false, includePersonalData: true);
         var exportedItem = FindItem(zip, item.Id);
         var json = part switch
@@ -123,6 +131,7 @@ public class ExportTests(CommonageAppFactory app)
             "file" => exportedItem.GetProperty("files")[0],
             "contribution" => exportedItem.GetProperty("contribution"),
             "settings" => JsonDocument.Parse(Read(zip, "archive.json")).RootElement.GetProperty("settings"),
+            "tag" => JsonDocument.Parse(Read(zip, "archive.json")).RootElement.GetProperty("tags")[0],
             _ => JsonDocument.Parse(Read(zip, "archive.json")).RootElement.GetProperty("collections")[0],
         };
 
@@ -168,7 +177,7 @@ public class ExportTests(CommonageAppFactory app)
         Assert.Contains(published.Id, ids);
         Assert.DoesNotContain(waiting.Id, ids);
         Assert.Equal(["Published"], statuses);
-        Assert.Equal(3, document.GetProperty("version").GetInt32());
+        Assert.Equal(4, document.GetProperty("version").GetInt32());
     }
 
     [Fact]

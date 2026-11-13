@@ -23,6 +23,9 @@ public class IndexModel(CommonageDbContext db, Commonage.Web.Operations.ArchiveP
     /// <summary>The most used tags of published items, in alphabetical order.</summary>
     public IReadOnlyList<string> Tags { get; private set; } = [];
 
+    /// <summary>The kinds with a page of their own, places and people, that published items have tags of.</summary>
+    public IReadOnlyList<Domain.TagKind> TagKinds { get; private set; } = [];
+
     public async Task OnGetAsync()
     {
         Identity = await profile.GetAsync();
@@ -45,5 +48,12 @@ public class IndexModel(CommonageDbContext db, Commonage.Web.Operations.ArchiveP
             .Take(MaxTags)
             .ToListAsync();
         Tags = popularTags.Order(StringComparer.CurrentCultureIgnoreCase).ToList();
+        TagKinds = await db.PublishedItems
+            .SelectMany(i => i.Tags)
+            .Where(t => t.Kind != Domain.TagKind.Topic)
+            .Select(t => t.Kind)
+            .Distinct()
+            .OrderBy(k => k)
+            .ToListAsync();
     }
 }

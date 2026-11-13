@@ -1,0 +1,68 @@
+@page
+@model Commonage.Web.Pages.Admin.Tags.IndexModel
+@{
+    ViewData["Title"] = T["Tags"];
+}
+
+<h1>@ViewData["Title"]</h1>
+<p class="col-lg-8">@T["Each tag can say whether it names a place, a person or a topic. Visitors find all places and all people on pages of their own. Renaming or merging a tag changes it on every item at once."]</p>
+
+<form method="get" role="search" aria-label="@T["Filter the tags"]" class="row g-2 align-items-end mb-3">
+    <div class="col-sm-6 col-lg-3">
+        <label for="tags-kind" class="form-label">@T["Kind"]</label>
+        <select id="tags-kind" name="kind" class="form-select">
+            <option value="">@T["All kinds"]</option>
+            @foreach (var kind in Enum.GetValues<TagKind>())
+            {
+                <option value="@kind" selected="@(Model.Kind == kind)">@TagKinds.Plural(T, kind)</option>
+            }
+        </select>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+        <label for="tags-text" class="form-label">@T["Name"]</label>
+        <input id="tags-text" type="search" name="q" value="@Model.Text" class="form-control" />
+    </div>
+    <div class="col-auto">
+        <div class="form-check mb-2">
+            <input id="tags-unused" type="checkbox" name="unused" value="true" class="form-check-input" checked="@Model.UnusedOnly" />
+            <label for="tags-unused" class="form-check-label">@T["Unused only"]</label>
+        </div>
+    </div>
+    <div class="col-auto d-flex flex-wrap gap-2">
+        <button type="submit" class="btn btn-outline-primary">@T["Filter"]</button>
+        @if (Model.IsFiltered)
+        {
+            <a asp-page="/Admin/Tags/Index" class="btn btn-link">@T["Show all tags"]</a>
+        }
+    </div>
+</form>
+
+@if (Model.Tags.TotalCount == 0)
+{
+    <p class="text-muted">@(Model.IsFiltered ? T["No tags match."] : T["There are no tags yet. Tags are added on each item."])</p>
+}
+else
+{
+    <ul class="list-group mb-3">
+        @foreach (var tag in Model.Tags.Items)
+        {
+            <li class="list-group-item d-flex flex-wrap gap-2 align-items-center">
+                <a asp-page="/Admin/Tags/Edit" asp-route-id="@tag.Id" class="me-auto text-break">@tag.Name</a>
+                @if (tag.Kind != TagKind.Topic)
+                {
+                    <span class="badge text-bg-light border">@TagKinds.Name(T, tag.Kind)</span>
+                }
+                <small class="text-muted">@T["Items: {0}", tag.ItemCount]</small>
+            </li>
+        }
+    </ul>
+    <partial name="_Pager" model="Model.Tags" />
+}
+
+@if (Model.UnusedCount > 0)
+{
+    <form method="post" asp-page-handler="DeleteUnused" class="mt-4">
+        <p>@T.Plural("{0, plural, one {One tag is not on any item, not even one in the bin.} other {# tags are not on any item, not even one in the bin.}}", Model.UnusedCount)</p>
+        <button type="submit" class="btn btn-outline-danger">@T.Plural("{0, plural, one {Delete the unused tag} other {Delete the # unused tags}}", Model.UnusedCount)</button>
+    </form>
+}

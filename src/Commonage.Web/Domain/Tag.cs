@@ -2,6 +2,14 @@ using System.Text.RegularExpressions;
 
 namespace Commonage.Web.Domain;
 
+/// <summary>What a tag names. Places and people have pages of their own for visitors; the number is stored, so new kinds go at the end.</summary>
+public enum TagKind
+{
+    Topic,
+    Place,
+    Person,
+}
+
 /// <summary>A keyword such as a place, a person or a topic. Curators enter tags freely; matching ignores case.</summary>
 public partial class Tag
 {
@@ -12,6 +20,8 @@ public partial class Tag
 
     /// <summary>Lower-case form of <see cref="Name"/>, so "Mill Street" and "mill street" are the same tag.</summary>
     public required string NormalizedName { get; set; }
+
+    public TagKind Kind { get; set; }
 
     public List<ArchiveItem> Items { get; set; } = [];
 

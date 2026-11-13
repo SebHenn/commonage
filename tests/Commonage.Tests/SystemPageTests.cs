@@ -50,7 +50,8 @@ public class SystemPageTests(CommonageAppFactory app)
         Assert.Contains("Media folder", page);
         Assert.Contains("in 1 file.", page);
         Assert.Contains("PostgreSQL", page);
-        Assert.Contains("_AddProcessingAttempts", page);
+        // The newest migration, whichever it is.
+        Assert.Contains(await archive.WithDbAsync(db => Task.FromResult(db.Database.GetMigrations().Last())), page);
         Assert.True(page.Contains("The PostgreSQL extension unaccent") || page.Contains("A built-in folding"), "The page says how search ignores accents.");
         Assert.Contains("No previews have failed.", page);
         Assert.Matches(@"aria-current=""page""[^>]*>System</a>", page);

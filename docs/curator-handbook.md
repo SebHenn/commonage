@@ -13,6 +13,19 @@ For the people who look after what an archive holds. You need no technical knowl
 - **Tags:** the places, people and topics someone might look for. Before adding a new one, check whether it already
   exists under a slightly different name.
 
+## Tidying up tags
+
+**Tags** lists every tag with how many items have it. Open one to:
+
+- **Say what it names:** a place, a person or a topic. Visitors find every place and every person on pages of their own,
+  "Places" and "People", from A to Z, and an item shows its places and people first. Only published items count, so a name
+  that only drafts have stays unseen. The People page lists names on their own, so name living people only when they agree.
+- **Rename it:** the new name reaches every item at once, also in the search. A name another tag already has is refused;
+  that is a merge.
+- **Merge it into another tag,** for a misspelling or two words for the same thing: every item gets the other tag instead,
+  and this one is gone. This cannot be undone, and the activity log notes it.
+- **Delete it,** once no item has it, not even one in the bin. "Delete the unused tags" on the list does that for all of them.
+
 ## Several photos, and letters
 
 - **Order:** "Earlier" and "Later" move a photo, and it happens at once for visitors too. The first photo is the cover, the one seen

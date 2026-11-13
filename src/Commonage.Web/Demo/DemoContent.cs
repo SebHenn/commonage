@@ -142,7 +142,7 @@ public static class DemoContent
         items.Add(Published(club, T("What the old goalkeeper told us", "Was der alte Torwart uns erzählte"), T("1950s", "1950er Jahre"),
                 T("Karl kept goal for eleven seasons. He says the pitch sloped so much that you could only see the far goal from the top of the hill. No photo of him has been found yet.",
                   "Karl stand elf Spielzeiten im Tor. Er sagt, der Platz sei so schief gewesen, dass man das andere Tor nur von oben sehen konnte. Ein Foto von ihm ist noch nicht gefunden."),
-                [T("football", "Fußball"), T("memories", "Erinnerungen")], scene: null));
+                [T("football", "Fußball"), T("memories", "Erinnerungen"), "Karl"], scene: null));
         await AddPhotoAsync(waiting, "grandmother-shop", DemoImages.Render("grandmother-shop"));
 
         foreach (var (item, scene) in scenes)
@@ -230,12 +230,16 @@ public static class DemoContent
             item.MediaFiles.Add(file);
         }
 
-        // Items share tags with the same name, as they would if a curator typed them.
+        // Items share tags with the same name, as they would if a curator typed them. A few name a place or a person, as a curator
+        // would set on the tags page, so the pages for places and people have something to show.
         Tag TagFor(string name)
         {
             var normalized = Tag.Normalize(name);
             if (!tags.TryGetValue(normalized, out var tag))
-                tags[normalized] = tag = new Tag { Name = name, NormalizedName = normalized };
+            {
+                var kind = normalized == Tag.Normalize(T("Mill Street", "Mühlenstraße")) ? TagKind.Place : normalized == "karl" ? TagKind.Person : TagKind.Topic;
+                tags[normalized] = tag = new Tag { Name = name, NormalizedName = normalized, Kind = kind };
+            }
             return tag;
         }
     }

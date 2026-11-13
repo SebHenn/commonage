@@ -10,6 +10,7 @@ public enum AuditKind
     Photos,
     Contributions,
     Collections,
+    Tags,
     Accounts,
     Archive,
 }
@@ -62,6 +63,10 @@ public static class AuditText
         AuditAction.ItemMovedToBinAfterKeptTime => localizer["Moved the rejected or withdrawn contribution to the bin, at the end of the time the archive keeps them"],
         AuditAction.ActivityLogShortened => localizer["Deleted activity log entries older than the archive keeps them"],
         AuditAction.PreviewRetried => localizer["Asked for a failed preview to be made again"],
+        AuditAction.TagChanged => localizer["Changed the tag"],
+        AuditAction.TagsMerged => localizer["Merged two tags into one"],
+        AuditAction.TagDeleted => localizer["Deleted the unused tag"],
+        AuditAction.UnusedTagsDeleted => localizer["Deleted all unused tags"],
         _ => action.ToString(),
     };
 
@@ -76,6 +81,7 @@ public static class AuditText
             or AuditAction.ContributionWithdrawn or AuditAction.ContributorDetailsRemoved or AuditAction.ContributorDetailsChanged
             or AuditAction.ContributionLinkCreated or AuditAction.ContributionLinkChanged => AuditKind.Contributions,
         AuditAction.CollectionCreated or AuditAction.CollectionChanged => AuditKind.Collections,
+        AuditAction.TagChanged or AuditAction.TagsMerged or AuditAction.TagDeleted or AuditAction.UnusedTagsDeleted => AuditKind.Tags,
         AuditAction.AccountCreated or AuditAction.AccountRoleChanged or AuditAction.AccountDisabled or AuditAction.AccountEnabled
             or AuditAction.AccountDeleted or AuditAction.SetupLinkCreated or AuditAction.PasswordChanged
             or AuditAction.TwoFactorEnabled or AuditAction.TwoFactorDisabled or AuditAction.TwoFactorTurnedOff
@@ -91,6 +97,7 @@ public static class AuditText
         AuditKind.Photos => localizer["Photos"],
         AuditKind.Contributions => localizer["Contributions and links"],
         AuditKind.Collections => localizer["Collections"],
+        AuditKind.Tags => localizer["Tags"],
         AuditKind.Accounts => localizer["Accounts and logins"],
         AuditKind.Archive => localizer["Export, settings and the log itself"],
         _ => kind.ToString(),

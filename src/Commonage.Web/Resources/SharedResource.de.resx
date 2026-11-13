@@ -19,10 +19,13 @@
   <data name="A file with &quot;problem&quot;: &quot;missing&quot; was not found on the server; &quot;checksumMismatch&quot; means it no longer matches the checksum taken when it was uploaded. Both should be looked into." xml:space="preserve"><value>Eine Datei mit „problem“: „missing“ wurde auf dem Server nicht gefunden; „checksumMismatch“ bedeutet, dass sie nicht mehr zur Prüfsumme passt, die beim Hochladen ermittelt wurde. Beides sollte untersucht werden.</value></data>
   <data name="A large archive can take a while. Keep this page open until the download has finished." xml:space="preserve"><value>Bei einem großen Archiv kann das eine Weile dauern. Lassen Sie diese Seite geöffnet, bis der Download abgeschlossen ist.</value></data>
   <data name="A lot has been sent through this link today. Please try again tomorrow, or send this without photos." xml:space="preserve"><value>Über diesen Link wurde heute schon sehr viel eingesendet. Bitte versuchen Sie es morgen noch einmal, oder senden Sie es ohne Fotos.</value></data>
+  <data name="A new name changes the tag on every item that has it, also in the search." xml:space="preserve"><value>Ein neuer Name ändert das Schlagwort bei jedem Eintrag, der es hat, auch in der Suche.</value></data>
   <data name="A new setup link lets the person choose a new password, for example when they forgot theirs. Earlier links stop working. A disabled account cannot log in, but its history stays in the activity log." xml:space="preserve"><value>Mit einem neuen Einrichtungslink kann die Person ein neues Passwort wählen, zum Beispiel wenn sie ihres vergessen hat. Frühere Links funktionieren dann nicht mehr. Ein deaktiviertes Konto kann sich nicht anmelden, sein Verlauf bleibt aber im Aktivitätsprotokoll.</value></data>
   <data name="A photo description can be at most {0, plural, one {# character} other {# characters}} long." xml:space="preserve"><value>Eine Fotobeschreibung darf höchstens {0, plural, one {# Zeichen} other {# Zeichen}} lang sein.</value></data>
   <data name="A rights statement" xml:space="preserve"><value>Eine Rechteangabe</value></data>
   <data name="A tag can be at most {0, plural, one {# character} other {# characters}} long." xml:space="preserve"><value>Ein Schlagwort darf höchstens {0, plural, one {# Zeichen} other {# Zeichen}} lang sein.</value></data>
+  <data name="A tag can be at most {1} characters long." xml:space="preserve"><value>Ein Schlagwort kann höchstens {1} Zeichen lang sein.</value></data>
+  <data name="A tag name cannot contain commas or semicolons." xml:space="preserve"><value>Ein Schlagwort kann keine Kommas oder Semikolons enthalten.</value></data>
   <data name="A title" xml:space="preserve"><value>Einen Titel</value></data>
   <data name="A transcription" xml:space="preserve"><value>Eine Abschrift</value></data>
   <data name="A working preview" xml:space="preserve"><value>Eine funktionierende Vorschau</value></data>
@@ -35,9 +38,13 @@
   <data name="Added in the last 30 days" xml:space="preserve"><value>In den letzten 30 Tagen hinzugekommen</value></data>
   <data name="After their password, curators and admins then type a code from an app on their phone, so a stolen password alone is not enough. Each of them sets it up the next time they open these pages, you too. Someone who loses their phone and their recovery codes needs an admin to turn the app off for them." xml:space="preserve"><value>Nach ihrem Passwort geben Kuratoren und Admins dann einen Code aus einer App auf ihrem Handy ein, sodass ein gestohlenes Passwort allein nicht reicht. Alle richten das ein, wenn sie diese Seiten das nächste Mal öffnen, Sie auch. Wer Handy und Wiederherstellungscodes verliert, braucht einen Admin, der die App für ihn ausschaltet.</value></data>
   <data name="After your password, the login then asks for a code from an app on your phone. Someone who finds out your password cannot log in without your phone." xml:space="preserve"><value>Nach Ihrem Passwort fragt die Anmeldung dann nach einem Code aus einer App auf Ihrem Handy. Wer Ihr Passwort herausfindet, kann sich ohne Ihr Handy nicht anmelden.</value></data>
+  <data name="All kinds" xml:space="preserve"><value>Alle Arten</value></data>
+  <data name="All people" xml:space="preserve"><value>Alle Personen</value></data>
+  <data name="All places" xml:space="preserve"><value>Alle Orte</value></data>
   <data name="All right" xml:space="preserve"><value>In Ordnung</value></data>
   <data name="Always" xml:space="preserve"><value>Immer</value></data>
   <data name="An item can have at most {0, plural, one {# tag} other {# tags}}." xml:space="preserve"><value>Ein Eintrag kann höchstens {0, plural, one {# Schlagwort} other {# Schlagwörter}} haben.</value></data>
+  <data name="An item with this tag was changed at the same moment. Nothing was changed; please try again." xml:space="preserve"><value>Ein Eintrag mit diesem Schlagwort wurde im selben Moment geändert. Es wurde nichts geändert; bitte versuchen Sie es noch einmal.</value></data>
   <data name="Asked for a failed preview to be made again" xml:space="preserve"><value>Fehlgeschlagene Vorschau neu angefordert</value></data>
   <data name="At least {0, plural, one {# character} other {# characters}}. A few words in a row are easy to remember and hard to guess." xml:space="preserve"><value>Mindestens {0, plural, one {# Zeichen} other {# Zeichen}}. Ein paar Wörter hintereinander sind leicht zu merken und schwer zu erraten.</value></data>
   <data name="At the pace of the last {0, plural, one {# day} other {# days}}, the free space lasts about {1, plural, one {# month} other {# months}}." xml:space="preserve"><value>{0, plural, one {Im Tempo des letzten Tages} other {Im Tempo der letzten # Tage}} reicht der freie Speicher etwa {1, plural, one {# Monat} other {# Monate}}.</value></data>
@@ -45,6 +52,7 @@
   <data name="Authenticator app" xml:space="preserve"><value>Authenticator-App</value></data>
   <data name="Backup" xml:space="preserve"><value>Sicherung</value></data>
   <data name="Backups and keys" xml:space="preserve"><value>Sicherungen und Schlüssel</value></data>
+  <data name="Changed the tag" xml:space="preserve"><value>Schlagwort geändert</value></data>
   <data name="Checks" xml:space="preserve"><value>Prüfungen</value></data>
   <data name="Code from your authenticator app" xml:space="preserve"><value>Code aus Ihrer Authenticator-App</value></data>
   <data name="Commonage archive export" xml:space="preserve"><value>Export eines Commonage-Archivs</value></data>
@@ -57,19 +65,28 @@
   <data name="Dates are always understood in the language above and in the language of whoever types them. In other languages, a month name can mean a different month: listopad is November in Polish, but October in Croatian." xml:space="preserve"><value>Datumsangaben werden immer in der Sprache oben und in der Sprache der Person verstanden, die sie eintippt. In anderen Sprachen kann ein Monatsname einen anderen Monat bedeuten: listopad ist auf Polnisch der November, auf Kroatisch aber der Oktober.</value></data>
   <data name="Dates can also be written in" xml:space="preserve"><value>Datumsangaben können auch in diesen Sprachen geschrieben sein</value></data>
   <data name="Decades" xml:space="preserve"><value>Jahrzehnte</value></data>
+  <data name="Delete" xml:space="preserve"><value>Löschen</value></data>
+  <data name="Delete the tag" xml:space="preserve"><value>Schlagwort löschen</value></data>
   <data name="Deleted activity log entries older than the archive keeps them" xml:space="preserve"><value>Einträge im Aktivitätsprotokoll gelöscht, die älter sind, als das Archiv sie aufbewahrt</value></data>
+  <data name="Deleted all unused tags" xml:space="preserve"><value>Alle unbenutzten Schlagwörter gelöscht</value></data>
   <data name="Deleted items and photos stay here for {0, plural, one {# day} other {# days}}, hidden from everyone but curators. You can restore them until then. After that they are deleted for good, with their original files." xml:space="preserve"><value>Gelöschte Einträge und Fotos bleiben {0, plural, one {# Tag} other {# Tage}} hier und sind nur für Kuratoren sichtbar. Bis dahin können Sie sie wiederherstellen. Danach werden sie mit ihren Originaldateien endgültig gelöscht.</value></data>
+  <data name="Deleted the unused tag" xml:space="preserve"><value>Unbenutztes Schlagwort gelöscht</value></data>
   <data name="Disk" xml:space="preserve"><value>Speicher</value></data>
   <data name="Disk space" xml:space="preserve"><value>Speicherplatz</value></data>
+  <data name="Each tag can say whether it names a place, a person or a topic. Visitors find all places and all people on pages of their own. Renaming or merging a tag changes it on every item at once." xml:space="preserve"><value>Jedes Schlagwort kann sagen, ob es einen Ort, eine Person oder ein Thema nennt. Besucher finden alle Orte und alle Personen auf eigenen Seiten. Umbenennen oder Zusammenführen ändert ein Schlagwort bei allen Einträgen auf einmal.</value></data>
   <data name="Encrypted with COMMONAGE_LOGIN_KEY" xml:space="preserve"><value>Mit COMMONAGE_LOGIN_KEY verschlüsselt</value></data>
+  <data name="Every place named in the archive, with how many items show it." xml:space="preserve"><value>Jeder Ort, den das Archiv nennt, und wie viele Einträge ihn zeigen.</value></data>
   <data name="Everyone" xml:space="preserve"><value>Alle</value></data>
+  <data name="Everyone named in the archive, with how many items they appear in." xml:space="preserve"><value>Alle Personen, die das Archiv nennt, und in wie vielen Einträgen sie vorkommen.</value></data>
   <data name="Everyone who manages the archive must log in with an authenticator app" xml:space="preserve"><value>Alle, die das Archiv verwalten, müssen sich mit einer Authenticator-App anmelden</value></data>
   <data name="Everything" xml:space="preserve"><value>Alles</value></data>
   <data name="Everything that is known about the collections and items, complete and exact. Dates are ISO 8601 and in UTC. Each file lists its SHA-256 checksum, so you can check that a copy is intact." xml:space="preserve"><value>Alles, was über die Sammlungen und Einträge bekannt ist, vollständig und genau. Zeitangaben sind ISO 8601 und in UTC. Zu jeder Datei steht ihre SHA-256-Prüfsumme, sodass Sie prüfen können, ob eine Kopie unversehrt ist.</value></data>
   <data name="Export, settings and the log itself" xml:space="preserve"><value>Export, Einstellungen und das Protokoll selbst</value></data>
   <data name="Filter" xml:space="preserve"><value>Filtern</value></data>
   <data name="Filter the activity log" xml:space="preserve"><value>Aktivitätsprotokoll filtern</value></data>
+  <data name="Filter the tags" xml:space="preserve"><value>Schlagwörter filtern</value></data>
   <data name="For the account {0}. Use at least {1, plural, one {# character} other {# characters}}. A few words in a row are easy to remember and hard to guess." xml:space="preserve"><value>Für das Konto {0}. Verwenden Sie mindestens {1, plural, one {# Zeichen} other {# Zeichen}}. Ein paar Wörter hintereinander sind leicht zu merken und schwer zu erraten.</value></data>
+  <data name="For two tags that mean the same, such as a misspelling. Every item with “{0}” gets the other tag instead, and “{0}” is gone. This cannot be undone." xml:space="preserve"><value>Für zwei Schlagwörter, die dasselbe meinen, etwa bei einem Tippfehler. Jeder Eintrag mit „{0}“ bekommt stattdessen das andere Schlagwort, und „{0}“ verschwindet. Das lässt sich nicht rückgängig machen.</value></data>
   <data name="Free disk space" xml:space="preserve"><value>Freier Speicher</value></data>
   <data name="Go on to managing the archive" xml:space="preserve"><value>Weiter zur Archivverwaltung</value></data>
   <data name="How long records are kept" xml:space="preserve"><value>Wie lange aufbewahrt wird</value></data>
@@ -77,15 +94,21 @@
   <data name="Install an authenticator app on your phone, if you have none yet. Many work, for example Aegis, 2FAS, Google Authenticator or Microsoft Authenticator." xml:space="preserve"><value>Installieren Sie eine Authenticator-App auf Ihrem Handy, falls Sie noch keine haben. Viele funktionieren, zum Beispiel Aegis, 2FAS, Google Authenticator oder Microsoft Authenticator.</value></data>
   <data name="Keep rejected and withdrawn contributions" xml:space="preserve"><value>Abgelehnte und zurückgezogene Beiträge aufbewahren</value></data>
   <data name="Keep the activity log" xml:space="preserve"><value>Aktivitätsprotokoll aufbewahren</value></data>
+  <data name="Kind" xml:space="preserve"><value>Art</value></data>
   <data name="Language of the material" xml:space="preserve"><value>Sprache des Materials</value></data>
   <data name="Last backup" xml:space="preserve"><value>Letzte Sicherung</value></data>
   <data name="Last database change" xml:space="preserve"><value>Letzte Änderung an der Datenbank</value></data>
+  <data name="Letters" xml:space="preserve"><value>Buchstaben</value></data>
   <data name="Log in with an authenticator app" xml:space="preserve"><value>Mit einer Authenticator-App anmelden</value></data>
   <data name="Logged in with a recovery code" xml:space="preserve"><value>Mit einem Wiederherstellungscode angemeldet</value></data>
   <data name="Logging in" xml:space="preserve"><value>Anmeldung</value></data>
   <data name="Login keys" xml:space="preserve"><value>Anmeldeschlüssel</value></data>
   <data name="Lost your phone and your recovery codes? An admin can turn the app off for your account." xml:space="preserve"><value>Handy und Wiederherstellungscodes verloren? Ein Admin kann die App für Ihr Konto ausschalten.</value></data>
   <data name="Media folder" xml:space="preserve"><value>Medienordner</value></data>
+  <data name="Merge" xml:space="preserve"><value>Zusammenführen</value></data>
+  <data name="Merge into" xml:space="preserve"><value>Zusammenführen mit</value></data>
+  <data name="Merge into another tag" xml:space="preserve"><value>Mit einem anderen Schlagwort zusammenführen</value></data>
+  <data name="Merged two tags into one" xml:space="preserve"><value>Zwei Schlagwörter zu einem zusammengeführt</value></data>
   <data name="Move this item to the bin? It disappears from the archive at once. You can restore it there for {0, plural, one {# day} other {# days}}." xml:space="preserve"><value>Diesen Eintrag in den Papierkorb legen? Er verschwindet sofort aus dem Archiv. Sie können ihn dort {0, plural, one {# Tag} other {# Tage}} lang wiederherstellen.</value></data>
   <data name="Move this photo to the bin? You can restore it there for {0, plural, one {# day} other {# days}}." xml:space="preserve"><value>Dieses Foto in den Papierkorb legen? Sie können es dort {0, plural, one {# Tag} other {# Tage}} lang wiederherstellen.</value></data>
   <data name="Moved the rejected or withdrawn contribution to the bin, at the end of the time the archive keeps them" xml:space="preserve"><value>Hat den abgelehnten oder zurückgezogenen Beitrag in den Papierkorb gelegt, weil die Zeit abgelaufen ist, die das Archiv sie aufbewahrt</value></data>
@@ -94,28 +117,43 @@
   <data name="New recovery codes replace the old ones." xml:space="preserve"><value>Neue Wiederherstellungscodes ersetzen die alten.</value></data>
   <data name="No" xml:space="preserve"><value>Nein</value></data>
   <data name="No entries match." xml:space="preserve"><value>Keine Einträge passen.</value></data>
+  <data name="No item has this tag, so it can be deleted." xml:space="preserve"><value>Kein Eintrag hat dieses Schlagwort, daher kann es gelöscht werden.</value></data>
+  <data name="No people are named in the archive yet." xml:space="preserve"><value>Das Archiv nennt noch keine Personen.</value></data>
+  <data name="No places are named in the archive yet." xml:space="preserve"><value>Das Archiv nennt noch keine Orte.</value></data>
   <data name="No previews have failed." xml:space="preserve"><value>Keine Vorschau ist fehlgeschlagen.</value></data>
+  <data name="No tags match." xml:space="preserve"><value>Keine Schlagwörter passen.</value></data>
   <data name="None yet. docs/deployment.md says how to set up the nightly backup." xml:space="preserve"><value>Noch keine. docs/deployment.md beschreibt, wie die nächtliche Sicherung eingerichtet wird.</value></data>
   <data name="Not encrypted. Whoever runs the server should set COMMONAGE_LOGIN_KEY." xml:space="preserve"><value>Nicht verschlüsselt. Wer den Server betreibt, sollte COMMONAGE_LOGIN_KEY setzen.</value></data>
   <data name="Not noted yet" xml:space="preserve"><value>Noch nicht vermerkt</value></data>
+  <data name="Not on any item." xml:space="preserve"><value>Bei keinem Eintrag.</value></data>
   <data name="Not working" xml:space="preserve"><value>Funktioniert nicht</value></data>
   <data name="Of which originals: {0} in {1, plural, one {# file} other {# files}}. The rest are the picture sizes made from them." xml:space="preserve"><value>Davon Originale: {0} in {1, plural, one {# Datei} other {# Dateien}}. Der Rest sind die daraus erstellten Bildgrößen.</value></data>
+  <data name="Only a tag that no item has can be deleted. To move its items to another tag, merge it." xml:space="preserve"><value>Nur ein Schlagwort, das kein Eintrag hat, kann gelöscht werden. Um seine Einträge einem anderen Schlagwort zu geben, führen Sie es zusammen.</value></data>
   <data name="Or type this key into the app:" xml:space="preserve"><value>Oder tippen Sie diesen Schlüssel in die App:</value></data>
+  <data name="People" xml:space="preserve"><value>Personen</value></data>
+  <data name="Person" xml:space="preserve"><value>Person</value></data>
+  <data name="Place" xml:space="preserve"><value>Ort</value></data>
+  <data name="Places" xml:space="preserve"><value>Orte</value></data>
+  <data name="Please choose a different tag to merge this one into." xml:space="preserve"><value>Bitte wählen Sie ein anderes Schlagwort zum Zusammenführen.</value></data>
   <data name="Please choose one of the times." xml:space="preserve"><value>Bitte wählen Sie eine der Zeiten.</value></data>
   <data name="Please enter a name of at most {0, plural, one {# character} other {# characters}}." xml:space="preserve"><value>Bitte geben Sie einen Namen mit höchstens {0, plural, one {# Zeichen} other {# Zeichen}} ein.</value></data>
+  <data name="Please enter a name." xml:space="preserve"><value>Bitte geben Sie einen Namen ein.</value></data>
   <data name="Please enter the code from your app." xml:space="preserve"><value>Bitte geben Sie den Code aus Ihrer App ein.</value></data>
+  <data name="Please enter the tag to merge this one into." xml:space="preserve"><value>Bitte geben Sie das Schlagwort ein, mit dem dieses zusammengeführt werden soll.</value></data>
   <data name="Previews" xml:space="preserve"><value>Vorschauen</value></data>
   <data name="Previews that failed" xml:space="preserve"><value>Fehlgeschlagene Vorschauen</value></data>
   <data name="Restore last tested" xml:space="preserve"><value>Wiederherstellung zuletzt getestet</value></data>
   <data name="Search ignores accents with" xml:space="preserve"><value>Die Suche ignoriert Akzente mit</value></data>
   <data name="Set up on a new phone" xml:space="preserve"><value>Auf einem neuen Handy einrichten</value></data>
   <data name="Several languages, none of them most" xml:space="preserve"><value>Mehrere Sprachen, keine überwiegt</value></data>
+  <data name="Show all tags" xml:space="preserve"><value>Alle Schlagwörter zeigen</value></data>
   <data name="Show everything" xml:space="preserve"><value>Alles zeigen</value></data>
   <data name="Six digits. Without your phone, type one of your recovery codes instead. Each one works once." xml:space="preserve"><value>Sechs Ziffern. Ohne Ihr Handy tippen Sie stattdessen einen Ihrer Wiederherstellungscodes ein. Jeder funktioniert einmal.</value></data>
   <data name="Software" xml:space="preserve"><value>Software</value></data>
   <data name="Started logging in with an authenticator app" xml:space="preserve"><value>Meldet sich jetzt mit einer Authenticator-App an</value></data>
   <data name="Stopped logging in with an authenticator app" xml:space="preserve"><value>Meldet sich nicht mehr mit einer Authenticator-App an</value></data>
   <data name="System" xml:space="preserve"><value>System</value></data>
+  <data name="Tag “{0}”" xml:space="preserve"><value>Schlagwort „{0}“</value></data>
   <data name="That took too long. Please log in again." xml:space="preserve"><value>Das hat zu lange gedauert. Bitte melden Sie sich noch einmal an.</value></data>
   <data name="The PostgreSQL extension unaccent" xml:space="preserve"><value>Der PostgreSQL-Erweiterung unaccent</value></data>
   <data name="The archive cannot reach its database." xml:space="preserve"><value>Das Archiv erreicht seine Datenbank nicht.</value></data>
@@ -138,7 +176,11 @@
   <data name="The password must contain at least {0, plural, one {# different character} other {# different characters}}." xml:space="preserve"><value>Das Passwort muss mindestens {0, plural, one {# verschiedenes Zeichen} other {# verschiedene Zeichen}} enthalten.</value></data>
   <data name="The photo is in the bin. You can restore it there for {0, plural, one {# day} other {# days}}." xml:space="preserve"><value>Das Foto liegt im Papierkorb. Sie können es dort {0, plural, one {# Tag} other {# Tage}} lang wiederherstellen.</value></data>
   <data name="The same items as a table, for spreadsheet programs. It is UTF-8. Cells that start with =, +, - or @ get a leading apostrophe, so a spreadsheet never runs them as formulas; archive.json has the exact text." xml:space="preserve"><value>Dieselben Einträge als Tabelle, für Tabellenkalkulationen. Sie ist in UTF-8. Zellen, die mit =, +, - oder @ beginnen, bekommen ein Apostroph vorangestellt, damit eine Tabellenkalkulation sie nie als Formel ausführt; archive.json enthält den genauen Text.</value></data>
+  <data name="The tag “{0}” is deleted." xml:space="preserve"><value>Das Schlagwort „{0}“ ist gelöscht.</value></data>
+  <data name="There are no tags yet. Tags are added on each item." xml:space="preserve"><value>Es gibt noch keine Schlagwörter. Schlagwörter werden bei jedem Eintrag vergeben.</value></data>
   <data name="There has been no backup for too long, or none yet." xml:space="preserve"><value>Es gab zu lange keine Sicherung, oder noch gar keine.</value></data>
+  <data name="There is already a tag “{0}”. To make one tag of the two, merge them below." xml:space="preserve"><value>Es gibt schon ein Schlagwort „{0}“. Um aus beiden eines zu machen, führen Sie sie unten zusammen.</value></data>
+  <data name="There is no tag “{0}”. To give this tag a new name, change its name above." xml:space="preserve"><value>Es gibt kein Schlagwort „{0}“. Um diesem Schlagwort einen neuen Namen zu geben, ändern Sie oben seinen Namen.</value></data>
   <data name="They hold the contributor's name and email address, and material that will not be published. Afterwards they go to the bin, and are deleted for good 30 days later." xml:space="preserve"><value>Sie enthalten Name und E-Mail-Adresse der einsendenden Person und Material, das nicht veröffentlicht wird. Danach kommen sie in den Papierkorb und werden 30 Tage später endgültig gelöscht.</value></data>
   <data name="This ZIP file holds a copy of a community archive made with Commonage. You need no special software to use it." xml:space="preserve"><value>Diese ZIP-Datei enthält eine Kopie eines Gemeinschaftsarchivs, das mit Commonage erstellt wurde. Sie brauchen keine besondere Software, um sie zu nutzen.</value></data>
   <data name="This archive keeps rejected and withdrawn contributions for a set time. This one goes to the bin on {0}." xml:space="preserve"><value>Dieses Archiv bewahrt abgelehnte und zurückgezogene Beiträge für eine festgelegte Zeit auf. Dieser kommt am {0} in den Papierkorb.</value></data>
@@ -149,6 +191,8 @@
   <data name="This recovery code is not right, or it has been used already." xml:space="preserve"><value>Dieser Wiederherstellungscode stimmt nicht, oder er wurde schon benutzt.</value></data>
   <data name="Through the decades" xml:space="preserve"><value>Durch die Jahrzehnte</value></data>
   <data name="Title or name" xml:space="preserve"><value>Titel oder Name</value></data>
+  <data name="Topic" xml:space="preserve"><value>Thema</value></data>
+  <data name="Topics" xml:space="preserve"><value>Themen</value></data>
   <data name="Try again" xml:space="preserve"><value>Erneut versuchen</value></data>
   <data name="Try them all again" xml:space="preserve"><value>Alle erneut versuchen</value></data>
   <data name="Turn off" xml:space="preserve"><value>Ausschalten</value></data>
@@ -158,9 +202,11 @@
   <data name="Turned off the account's authenticator app" xml:space="preserve"><value>Authenticator-App des Kontos ausgeschaltet</value></data>
   <data name="Type the six digits the app shows now:" xml:space="preserve"><value>Tippen Sie die sechs Ziffern ein, die die App jetzt zeigt:</value></data>
   <data name="Until a curator deletes them" xml:space="preserve"><value>Bis Kuratoren sie löschen</value></data>
+  <data name="Unused only" xml:space="preserve"><value>Nur unbenutzte</value></data>
   <data name="Up to {0, plural, one {# photo} other {# photos}}: JPEG, PNG, TIFF or WebP." xml:space="preserve"><value>Bis zu {0, plural, one {# Foto} other {# Fotos}}: JPEG, PNG, TIFF oder WebP.</value></data>
   <data name="Uploaded" xml:space="preserve"><value>Hochgeladen</value></data>
   <data name="Version" xml:space="preserve"><value>Version</value></data>
+  <data name="Visitors find all places and all people on pages of their own, once an item with the tag is published. That page lists every person's name, so name living people only when they agree." xml:space="preserve"><value>Besucher finden alle Orte und alle Personen auf eigenen Seiten, sobald ein Eintrag mit dem Schlagwort veröffentlicht ist. Diese Seite listet den Namen jeder Person auf, nennen Sie lebende Menschen also nur, wenn sie einverstanden sind.</value></data>
   <data name="What changed" xml:space="preserve"><value>Was sich geändert hat</value></data>
   <data name="What whoever runs the server should keep an eye on. Visitors and uptime monitors that open /health learn only whether all is well, not what follows here." xml:space="preserve"><value>Was im Blick behalten sollte, wer den Server betreibt. Besucher und Uptime-Überwachungen, die /health öffnen, erfahren nur, ob alles in Ordnung ist, nicht was hier folgt.</value></data>
   <data name="Who changed what in the archive, newest first. The log keeps no contributor details, and nobody can change or delete its entries in the app. Entries older than the archive keeps them, as set in the settings, are deleted, and the log notes that." xml:space="preserve"><value>Wer was im Archiv geändert hat, das Neueste zuerst. Das Protokoll enthält keine Angaben zu Einsendenden, und niemand kann seine Einträge in der App ändern oder löschen. Einträge, die älter sind, als das Archiv laut Einstellungen aufbewahrt, werden gelöscht, und das Protokoll vermerkt das.</value></data>
@@ -739,11 +785,17 @@
   <data name="Your password is set. You can log in now." xml:space="preserve"><value>Ihr Passwort ist gespeichert. Sie können sich jetzt anmelden.</value></data>
   <data name="Your reference: {0}. Please note it down: you can quote it if you want to ask about what you sent, or have it taken down. No email will follow." xml:space="preserve"><value>Ihre Referenz: {0}. Bitte notieren Sie sie: Sie können sie angeben, wenn Sie etwas zu Ihrem Beitrag fragen oder ihn entfernen lassen möchten. Es folgt keine E-Mail.</value></data>
   <data name="{0, plural, =0 {No photos are waiting for their previews.} one {One photo is waiting for its previews.} other {# photos are waiting for their previews.}}" xml:space="preserve"><value>{0, plural, =0 {Keine Fotos warten auf ihre Vorschau.} one {Ein Foto wartet auf seine Vorschau.} other {# Fotos warten auf ihre Vorschau.}}</value></data>
+  <data name="{0, plural, =0 {No tags were unused.} one {# unused tag deleted.} other {# unused tags deleted.}}" xml:space="preserve"><value>{0, plural, =0 {Es gab keine unbenutzten Schlagwörter.} one {# unbenutztes Schlagwort gelöscht.} other {# unbenutzte Schlagwörter gelöscht.}}</value></data>
   <data name="{0, plural, =0 {You have no recovery codes left. Create new ones, in case you lose your phone.} one {You have one recovery code left.} other {You have # recovery codes left.}}" xml:space="preserve"><value>{0, plural, =0 {Sie haben keine Wiederherstellungscodes mehr. Erstellen Sie neue, falls Sie Ihr Handy verlieren.} one {Sie haben noch einen Wiederherstellungscode.} other {Sie haben noch # Wiederherstellungscodes.}}</value></data>
+  <data name="{0, plural, one {# item} other {# items}}" xml:space="preserve"><value>{0, plural, one {# Eintrag} other {# Einträge}}</value></data>
+  <data name="{0, plural, one {Delete the unused tag} other {Delete the # unused tags}}" xml:space="preserve"><value>{0, plural, one {Das unbenutzte Schlagwort löschen} other {Die # unbenutzten Schlagwörter löschen}}</value></data>
   <data name="{0, plural, one {For # month after the decision} other {For # months after the decision}}" xml:space="preserve"><value>{0, plural, one {# Monat nach der Entscheidung} other {# Monate nach der Entscheidung}}</value></data>
   <data name="{0, plural, one {For # year} other {For # years}}" xml:space="preserve"><value>{0, plural, one {# Jahr} other {# Jahre}}</value></data>
   <data name="{0, plural, one {For one photo, no preview could be made.} other {For # photos, no preview could be made.}} Visitors do not see them. A file the archive cannot read will fail again; the original stays safe either way, and curators can download it from the item." xml:space="preserve"><value>{0, plural, one {Für ein Foto konnte keine Vorschau erstellt werden.} other {Für # Fotos konnte keine Vorschau erstellt werden.}} Besucher sehen sie nicht. Eine Datei, die das Archiv nicht lesen kann, schlägt wieder fehl; das Original bleibt so oder so erhalten, und Kuratoren können es beim Eintrag herunterladen.</value></data>
+  <data name="{0, plural, one {On one item} other {On # items}}" xml:space="preserve"><value>{0, plural, one {Bei einem Eintrag} other {Bei # Einträgen}}</value></data>
   <data name="{0, plural, one {One database change has not been made yet.} other {# database changes have not been made yet.}} They are made when the archive starts." xml:space="preserve"><value>{0, plural, one {Eine Änderung an der Datenbank ist noch nicht ausgeführt.} other {# Änderungen an der Datenbank sind noch nicht ausgeführt.}} Sie werden beim Start des Archivs ausgeführt.</value></data>
+  <data name="{0, plural, one {One more item in the bin has it.} other {# more items in the bin have it.}}" xml:space="preserve"><value>{0, plural, one {Ein weiterer Eintrag im Papierkorb hat es.} other {# weitere Einträge im Papierkorb haben es.}}</value></data>
+  <data name="{0, plural, one {One tag is not on any item, not even one in the bin.} other {# tags are not on any item, not even one in the bin.}}" xml:space="preserve"><value>{0, plural, one {Ein Schlagwort steht bei keinem Eintrag, auch bei keinem im Papierkorb.} other {# Schlagwörter stehen bei keinem Eintrag, auch bei keinem im Papierkorb.}}</value></data>
   <data name="{0, plural, one {The preview is being made again.} other {# previews are being made again.}}" xml:space="preserve"><value>{0, plural, one {Die Vorschau wird neu erstellt.} other {# Vorschauen werden neu erstellt.}}</value></data>
   <data name="{0} GB" xml:space="preserve"><value>{0} GB</value></data>
   <data name="{0} KB" xml:space="preserve"><value>{0} KB</value></data>
@@ -759,4 +811,5 @@
   <data name="{0}: {1, plural, one {# item} other {# items}}" xml:space="preserve"><value>{0}: {1, plural, one {# Eintrag} other {# Einträge}}</value></data>
   <data name="{0}s" xml:space="preserve"><value>{0}er</value></data>
   <data name="“{0}” also finds what is dated {1}." xml:space="preserve"><value>„{0}“ findet auch, was auf {1} datiert ist.</value></data>
+  <data name="“{1}” is merged into “{2}”, {0, plural, =0 {which no item had.} one {on one item.} other {on # items.}}" xml:space="preserve"><value>„{1}“ ist mit „{2}“ zusammengeführt, {0, plural, =0 {das kein Eintrag hatte.} one {bei einem Eintrag.} other {bei # Einträgen.}}</value></data>
 </root>

@@ -29,7 +29,7 @@ public class ArchiveExporter(
     ILogger<ArchiveExporter> logger)
 {
     public const string Format = "commonage-export";
-    public const int Version = 3;
+    public const int Version = 4;
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -91,6 +91,8 @@ public class ArchiveExporter(
         var document = new ExportDocument(
             Format, Version, clock.GetUtcNow().UtcDateTime, options.PublishedOnly, options.IncludePersonalData,
             collections.Select(c => new ExportCollection(c.Id, c.Title, c.Description, c.CreatedAt)).ToList(),
+            // The tags of what is exported only: an export of published items does not name what only drafts mention.
+            items.SelectMany(i => i.Tags).DistinctBy(t => t.Id).OrderBy(t => t.Name, StringComparer.Ordinal).Select(t => new ExportTag(t.Name, t.Kind)).ToList(),
             exportedItems,
             new ExportSettings(
                 settings.DefaultLanguage, settings.ContentLanguage, settings.OtherContentLanguages, settings.AccentColor, settings.TimeZone, settings.DefaultRightsUri, settings.AllowSearchEngines, settings.RequireTwoFactor, settings.LargePhotos, settings.PrivacyReviewed,
@@ -280,6 +282,7 @@ internal record ExportDocument(
     bool PublishedOnly,
     bool IncludesPersonalData,
     IReadOnlyList<ExportCollection> Collections,
+    IReadOnlyList<ExportTag> Tags,
     IReadOnlyList<ExportItem> Items,
     ExportSettings Settings);
 
@@ -304,6 +307,9 @@ internal record ExportSettings(
 internal record ExportText(string Language, ArchiveTextKind Kind, string Text);
 
 internal record ExportCollection(int Id, string Title, string? Description, DateTime CreatedAt);
+
+/// <summary>A tag and what it names. Items list their tags by name.</summary>
+internal record ExportTag(string Name, TagKind Kind);
 
 internal record ExportItem(
     int Id,

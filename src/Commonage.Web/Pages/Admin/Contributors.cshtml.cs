@@ -1,5 +1,6 @@
 using Commonage.Web.Data;
 using Commonage.Web.Domain;
+using Commonage.Web.Search;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -28,8 +29,7 @@ public class ContributorsModel(CommonageDbContext db) : PageModel
         if (string.IsNullOrEmpty(text))
             return;
 
-        // The typed text is matched literally, so % and _ are not wildcards.
-        var pattern = "%" + text.Replace(@"\", @"\\").Replace("%", @"\%").Replace("_", @"\_") + "%";
+        var pattern = LikePattern.Containing(text);
         // Items in the bin included: until they are gone for good, the archive still holds this person's data.
         Results = await db.Contributions
             .IgnoreQueryFilters()
