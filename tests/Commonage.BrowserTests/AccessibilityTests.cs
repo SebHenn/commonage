@@ -9,7 +9,7 @@ namespace Commonage.BrowserTests;
 public class AccessibilityTests(BrowserFixture app)
 {
     public static TheoryData<string, int> PublicPages() => Widths(
-        "/", "/collections", "/collections/1", "/items/1", "/items/6", "/search", "/search?q=flood", "/search?q=zzzznothing", "/items/99999",
+        "/", "/collections", "/collections/1", "/items/1", "/items/6", "/search", "/search?q=flood", "/search?q=1950s", "/search?q=zzzznothing", "/items/99999",
         "/Account/Login", "CONTRIBUTE", "/contribute/no-such-link", "/about", "/contact", "/privacy");
 
     public static TheoryData<string, int> CuratorPages() => Widths(

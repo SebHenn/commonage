@@ -1,0 +1,29 @@
+@model Commonage.Web.Search.DecadeTimelineView
+@* Each decade leads to its items, as the year filter finds them. A decade without any is shown too, as a gap, but leads nowhere. *@
+<ol class="decade-timeline">
+    @foreach (var decade in Model.Decades)
+    {
+        var label = T["{0}s", decade.Decade.ToString(System.Globalization.CultureInfo.InvariantCulture)].Value;
+        <li>
+            @if (decade.Count > 0)
+            {
+                var from = decade.Decade.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                var to = decade.LastYear.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                var href = Model.KeepSearch ? Context.Request.WithQueryValues(("from", from), ("to", to)) : Url.Page("/Search", new { from, to });
+                <a href="@href" class="decade-row" aria-label="@T.Plural("{0}: {1, plural, one {# item} other {# items}}", label, decade.Count)">
+                    <span class="decade-label">@label</span>
+                    <span class="decade-bar decade-bar-@decade.Width" aria-hidden="true"></span>
+                    <span class="decade-count" aria-hidden="true">@decade.Count</span>
+                </a>
+            }
+            else
+            {
+                <span class="decade-row text-muted">
+                    <span class="decade-label">@label</span>
+                    <span aria-hidden="true"></span>
+                    <span class="decade-count">0</span>
+                </span>
+            }
+        </li>
+    }
+</ol>

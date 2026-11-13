@@ -57,6 +57,10 @@ sich nicht ändern, ohne die Person zu fragen, und dafür gibt es noch keine Sch
 Öffnen Sie den ersten Eintrag und gehen Sie mit **Speichern und weiter** durch die Liste. Mit **Vorschau** sehen Sie einen
 Entwurf so, wie ihn Besucher sehen würden.
 
+Ein Jahr oder Jahrzehnt in der Suche, etwa „1958“, „1950er“ oder „März 1953“, findet auch, was auf diese Zeit datiert ist, nicht
+nur, was diese Wörter enthält. „Mühlenstraße 1950er“ findet die Straßenbahn von 1930–1955, wenn sie von der Mühlenstraße handelt.
+Deshalb lohnt sich ein Datum bei jedem Eintrag: Besucher finden ihn auch über die Jahrzehnte auf der Startseite.
+
 Um viele auf einmal zu ändern, kreuzen Sie sie an oder nehmen Sie alles, was der Filter gefunden hat. Wählen Sie, was geschehen
 soll: veröffentlichen, Schlagwörter hinzufügen, das Datum setzen, in eine Sammlung verschieben oder den Rechtehinweis setzen.
 Die nächste Seite sagt, um wie viele Einträge es geht und was mit ihnen geschähe, und es ändert sich nichts, bevor Sie

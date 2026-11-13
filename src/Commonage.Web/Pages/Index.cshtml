@@ -42,6 +42,17 @@
     }
 </section>
 
+@* A single decade is no timeline. *@
+@if (Model.Decades.Count > 1)
+{
+    <section class="home-section" aria-labelledby="decades-heading">
+        <h2 id="decades-heading">@T["Through the decades"]</h2>
+        <div class="col-lg-8">
+            <partial name="_DecadeTimeline" model="new Commonage.Web.Search.DecadeTimelineView(Model.Decades, KeepSearch: false)" />
+        </div>
+    </section>
+}
+
 @if (Model.Tags.Count > 0)
 {
     <section class="home-section" aria-labelledby="tags-heading">

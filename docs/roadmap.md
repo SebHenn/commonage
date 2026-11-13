@@ -409,6 +409,12 @@ every upload after it.
   living people stays a curator's decision.
 - Collections: order, date span, cover, default sort, delete when empty.
 
+**First part done (November 2026):** a year, decade, month or "circa 1950" typed into the search finds what is dated then, or
+what has the words, for visitors and curators alike, and the page says how it understood the date. The decades are on the
+start page and beside the results, each as a bar whose number is what tapping it finds; items with open ends such as "before
+1945" reach to the edge, as in the year filter. "1950er Jahre" is one decade, as Germans often write it. Tags
+and collections follow in pull requests of their own.
+
 **M20 Community knowledge**
 
 - "Do you know more about this?", off by default: information, correction or removal request, stored as a private note,

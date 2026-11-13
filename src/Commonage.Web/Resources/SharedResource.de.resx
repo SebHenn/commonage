@@ -56,6 +56,7 @@
   <data name="Database" xml:space="preserve"><value>Datenbank</value></data>
   <data name="Dates are always understood in the language above and in the language of whoever types them. In other languages, a month name can mean a different month: listopad is November in Polish, but October in Croatian." xml:space="preserve"><value>Datumsangaben werden immer in der Sprache oben und in der Sprache der Person verstanden, die sie eintippt. In anderen Sprachen kann ein Monatsname einen anderen Monat bedeuten: listopad ist auf Polnisch der November, auf Kroatisch aber der Oktober.</value></data>
   <data name="Dates can also be written in" xml:space="preserve"><value>Datumsangaben können auch in diesen Sprachen geschrieben sein</value></data>
+  <data name="Decades" xml:space="preserve"><value>Jahrzehnte</value></data>
   <data name="Deleted activity log entries older than the archive keeps them" xml:space="preserve"><value>Einträge im Aktivitätsprotokoll gelöscht, die älter sind, als das Archiv sie aufbewahrt</value></data>
   <data name="Deleted items and photos stay here for {0, plural, one {# day} other {# days}}, hidden from everyone but curators. You can restore them until then. After that they are deleted for good, with their original files." xml:space="preserve"><value>Gelöschte Einträge und Fotos bleiben {0, plural, one {# Tag} other {# Tage}} hier und sind nur für Kuratoren sichtbar. Bis dahin können Sie sie wiederherstellen. Danach werden sie mit ihren Originaldateien endgültig gelöscht.</value></data>
   <data name="Disk" xml:space="preserve"><value>Speicher</value></data>
@@ -146,6 +147,7 @@
   <data name="This person logs in with a code from an authenticator app as well as their password." xml:space="preserve"><value>Diese Person meldet sich mit ihrem Passwort und einem Code aus einer Authenticator-App an.</value></data>
   <data name="This person logs in with their password only." xml:space="preserve"><value>Diese Person meldet sich nur mit ihrem Passwort an.</value></data>
   <data name="This recovery code is not right, or it has been used already." xml:space="preserve"><value>Dieser Wiederherstellungscode stimmt nicht, oder er wurde schon benutzt.</value></data>
+  <data name="Through the decades" xml:space="preserve"><value>Durch die Jahrzehnte</value></data>
   <data name="Title or name" xml:space="preserve"><value>Titel oder Name</value></data>
   <data name="Try again" xml:space="preserve"><value>Erneut versuchen</value></data>
   <data name="Try them all again" xml:space="preserve"><value>Alle erneut versuchen</value></data>
@@ -754,4 +756,7 @@
   <data name="{0} was left out, because together the photos would be too large to send at once. You can send it afterwards." xml:space="preserve"><value>{0} wurde weggelassen, weil die Fotos zusammen zu groß wären, um sie auf einmal zu senden. Sie können es danach senden.</value></data>
   <data name="{0}, photo {1} of {2}" xml:space="preserve"><value>{0}, Foto {1} von {2}</value></data>
   <data name="{0}: the archive already has this file: {1}" xml:space="preserve"><value>{0}: Das Archiv hat diese Datei schon: {1}</value></data>
+  <data name="{0}: {1, plural, one {# item} other {# items}}" xml:space="preserve"><value>{0}: {1, plural, one {# Eintrag} other {# Einträge}}</value></data>
+  <data name="{0}s" xml:space="preserve"><value>{0}er</value></data>
+  <data name="“{0}” also finds what is dated {1}." xml:space="preserve"><value>„{0}“ findet auch, was auf {1} datiert ist.</value></data>
 </root>

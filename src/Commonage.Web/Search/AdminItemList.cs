@@ -53,8 +53,8 @@ public static class AdminItemList
         // Curators see every item, drafts included.
         // A reference number is not in the search index, on purpose, so it is looked up on its own. Whoever types one wants that item.
         var isReference = filter.Text is { Length: > 0 } text && await db.ArchiveItems.AnyAsync(i => i.ReferenceNumber == text.Trim(), cancellationToken);
-        var query = isReference ? null : await db.ToSearchQueryAsync(filter.Text, cancellationToken);
-        var items = db.ArchiveItems.Filter(new ItemFilter(query, filter.Tag, filter.CollectionId));
+        var search = isReference ? TextSearch.None : await db.ToSearchAsync(filter.Text, cancellationToken);
+        var items = db.ArchiveItems.Filter(new ItemFilter(search.Query, filter.Tag, filter.CollectionId, Dates: search.Dates));
         if (isReference)
             items = items.Where(i => i.ReferenceNumber == filter.Text!.Trim());
         if (filter.Status is { } status)
