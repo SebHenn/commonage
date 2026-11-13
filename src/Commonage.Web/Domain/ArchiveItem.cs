@@ -77,6 +77,12 @@ public class ArchiveItem
     /// </summary>
     public bool NeedsTranscription { get; set; }
 
+    /// <summary>
+    /// A curator hopes visitors know more about it, so it is listed on "Can you help?" while the archive asks visitors. Public, so it
+    /// is exported also in a copy of what is public.
+    /// </summary>
+    public bool HelpWanted { get; set; }
+
     /// <summary>Whether its picture and text may go along when a link is shared or in a feed. Needs <see cref="Contribution"/> to be loaded.</summary>
     public bool MayTravel => Contribution is null || Contribution.ConsentCoversSharing;
 

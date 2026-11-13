@@ -166,6 +166,9 @@ public class EditModel(
         [Display(Name = "Still needs a transcription")]
         public bool NeedsTranscription { get; set; }
 
+        [Display(Name = "Ask visitors for help with this item")]
+        public bool HelpWanted { get; set; }
+
         /// <summary>The item's version when the form was opened, to notice changes made by someone else since.</summary>
         public uint? Version { get; set; }
     }
@@ -201,6 +204,7 @@ public class EditModel(
                 ReceivedOn = item.ReceivedOn,
                 InternalNotes = item.InternalNotes,
                 NeedsTranscription = item.NeedsTranscription,
+                HelpWanted = item.HelpWanted,
             };
             RightsWereProposed = item.RightsUri is null && item.Contribution is not null;
             await ShowStateAsync(item);
@@ -316,6 +320,7 @@ public class EditModel(
         item.ReceivedOn = Clean(Input.ReceivedOn);
         item.InternalNotes = Clean(Input.InternalNotes);
         item.NeedsTranscription = Input.NeedsTranscription;
+        item.HelpWanted = Input.HelpWanted;
         if ((Input.AltTexts.Count > 0 || Input.Captions.Count > 0) && id is not null)
         {
             foreach (var file in await db.MediaFiles.Where(f => f.ArchiveItemId == id).ToListAsync())

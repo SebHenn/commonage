@@ -131,6 +131,13 @@ seen, ask yourself whether it should be public. When in doubt, ask them, or keep
 If someone says a phone photo was refused because of its format, it is probably HEIC, which the archive cannot read yet. They
 need to save it as a JPEG first. The form tells them so.
 
+## Asking visitors for help
+
+On an item, tick **Ask visitors for help with this item**. Once it is published, it appears on the page "Can you help?", which
+the start page links to, and its own page says the curators are looking for help. Both exist only while "Do you know more about
+this?" is switched on, because that is how visitors answer. Under "Still needs", choose **Help from visitors** to see them
+all; the cards at the top of Manage archive count them, and say how many are not published yet.
+
 ## Notes from visitors
 
 Under "Settings" you can switch on "Do you know more about this?". Each published item then has a link where a visitor can

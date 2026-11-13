@@ -26,6 +26,50 @@
     </div>
 }
 
+@if (!Model.HasFilters && (Model.OpenNotes > 0 || Model.NeedTranscription > 0 || Model.HelpWanted > 0))
+{
+    <section class="row g-3 mb-3" aria-label="@T["What needs attention"]">
+        @if (Model.OpenNotes > 0)
+        {
+            <div class="col-12 col-sm-6 col-lg-4">
+                <a asp-page="/Admin/Notes/Index" class="card h-100 text-decoration-none">
+                    <span class="card-body">
+                        <span class="d-block h5 mb-1">@T.Plural("{0, plural, one {# note from visitors to deal with} other {# notes from visitors to deal with}}", Model.OpenNotes)</span>
+                        @if (Model.OpenRemovalRequests > 0)
+                        {
+                            <span class="d-block small fw-semibold mt-1">@T.Plural("{0, plural, one {# asks for removal} other {# ask for removal}}", Model.OpenRemovalRequests)</span>
+                        }
+                    </span>
+                </a>
+            </div>
+        }
+        @if (Model.NeedTranscription > 0)
+        {
+            <div class="col-12 col-sm-6 col-lg-4">
+                <a asp-page="/Admin/Index" asp-route-needs="@ItemNeed.Transcription" class="card h-100 text-decoration-none">
+                    <span class="card-body">
+                        <span class="d-block h5 mb-1">@T.Plural("{0, plural, one {# item waits for a transcription} other {# items wait for a transcription}}", Model.NeedTranscription)</span>
+                    </span>
+                </a>
+            </div>
+        }
+        @if (Model.HelpWanted > 0)
+        {
+            <div class="col-12 col-sm-6 col-lg-4">
+                <a asp-page="/Admin/Index" asp-route-needs="@ItemNeed.HelpWanted" class="card h-100 text-decoration-none">
+                    <span class="card-body">
+                        <span class="d-block h5 mb-1">@T.Plural("{0, plural, one {# item asks visitors for help} other {# items ask visitors for help}}", Model.HelpWanted)</span>
+                        @if (Model.HelpWantedNotPublished > 0)
+                        {
+                            <span class="d-block small mt-1">@T.Plural("{0, plural, one {# of them is not published yet} other {# of them are not published yet}}", Model.HelpWantedNotPublished)</span>
+                        }
+                    </span>
+                </a>
+            </div>
+        }
+    </section>
+}
+
 @if (!Model.HasCollections)
 {
     <p>@T["Items belong to a collection."] <a asp-page="/Admin/Collections/Edit">@T["Create your first collection"]</a></p>
@@ -71,6 +115,7 @@ else
                 <option value="@ItemNeed.Rights" selected="@(Model.Needs == ItemNeed.Rights)">@T["A rights statement"]</option>
                 <option value="@ItemNeed.AltText" selected="@(Model.Needs == ItemNeed.AltText)">@T["Photo descriptions"]</option>
                 <option value="@ItemNeed.Transcription" selected="@(Model.Needs == ItemNeed.Transcription)">@T["A transcription"]</option>
+                <option value="@ItemNeed.HelpWanted" selected="@(Model.Needs == ItemNeed.HelpWanted)">@T["Help from visitors"]</option>
             </select>
         </div>
         <div class="col-6 col-md-2">

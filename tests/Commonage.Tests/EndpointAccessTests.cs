@@ -14,7 +14,7 @@ public class EndpointAccessTests(CommonageAppFactory app)
 {
     private static readonly string[] MeantForVisitors =
     [
-        "/", "/Index", "/search", "/items/{id:int}", "/items/{id:int}/tell", "/collections", "/collections/{id:int}",
+        "/", "/Index", "/search", "/items/{id:int}", "/items/{id:int}/tell", "/help", "/collections", "/collections/{id:int}",
         "/{kind:regex(^(places|people)$)}",
         "/{slug:regex(^(about|contact|privacy|imprint)$)}", "/SetLanguage", "/Error/{code:int?}",
         // Published pictures only, see MediaTests.

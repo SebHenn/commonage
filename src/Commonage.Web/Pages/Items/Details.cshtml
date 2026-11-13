@@ -37,6 +37,10 @@
 {
     <section class="mt-5 d-print-none" aria-labelledby="tell-heading">
         <h2 id="tell-heading" class="h4">@T["Do you know more about this?"]</h2>
+        @if (Model.Item.HelpWanted)
+        {
+            <p class="fw-semibold">@T["The curators are looking for help with this item."]</p>
+        }
         <p>@T["Who is in the picture, where was it, is something wrong? Tell the curators."]</p>
         <a asp-page="/Items/Tell" asp-route-id="@Model.Item.Id" class="btn btn-outline-primary">@T["Tell us"]</a>
     </section>

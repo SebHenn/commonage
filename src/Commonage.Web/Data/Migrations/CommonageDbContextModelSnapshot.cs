@@ -73,6 +73,9 @@ namespace Commonage.Web.Data.Migrations
                         .HasMaxLength(20000)
                         .HasColumnType("character varying(20000)");
 
+                    b.Property<bool>("HelpWanted")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("InternalNotes")
                         .HasMaxLength(20000)
                         .HasColumnType("character varying(20000)");
