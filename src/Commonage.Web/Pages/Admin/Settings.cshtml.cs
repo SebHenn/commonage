@@ -112,6 +112,9 @@ public class SettingsModel(
         [Display(Name = "Let visitors open photos at a large size")]
         public bool LargePhotos { get; set; } = true;
 
+        [Display(Name = "Ask visitors “Do you know more about this?” on each published item")]
+        public bool AcceptVisitorNotes { get; set; }
+
         /// <summary>0 keeps everything. Null is a form from before this field, which leaves the setting as it is.</summary>
         [Display(Name = "Keep the activity log")]
         public int? ActivityLogKeptYears { get; set; }
@@ -150,6 +153,7 @@ public class SettingsModel(
             AllowSearchEngines = settings.AllowSearchEngines,
             RequireTwoFactor = settings.RequireTwoFactor,
             LargePhotos = settings.LargePhotos,
+            AcceptVisitorNotes = settings.AcceptVisitorNotes,
             DefaultRightsUri = settings.DefaultRightsUri,
             ActivityLogKeptYears = settings.ActivityLogKeptYears ?? 0,
             RejectedKeptMonths = settings.RejectedKeptMonths ?? 0,
@@ -226,6 +230,7 @@ public class SettingsModel(
         settings.RequireTwoFactor = Input.RequireTwoFactor;
         var largePhotosSwitchedOn = Input.LargePhotos && !settings.LargePhotos;
         settings.LargePhotos = Input.LargePhotos;
+        settings.AcceptVisitorNotes = Input.AcceptVisitorNotes;
         settings.DefaultRightsUri = string.IsNullOrEmpty(Input.DefaultRightsUri) ? null : Input.DefaultRightsUri;
         settings.PrivacyReviewed = Input.PrivacyReviewed;
         settings.ImprintNotNeeded = Input.ImprintNotNeeded;

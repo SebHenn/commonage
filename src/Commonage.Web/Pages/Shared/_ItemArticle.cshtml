@@ -102,12 +102,31 @@
         @if (Model.Tags.Count > 0)
         {
             <h2 class="visually-hidden">@T["Tags"]</h2>
-            <ul class="list-unstyled d-flex flex-wrap gap-2" lang="@material">
-                @foreach (var tag in Model.Tags)
-                {
-                    <li><a asp-page="/Search" asp-route-tag="@tag.Name" class="badge rounded-pill text-bg-light border tag-link">@tag.Name</a></li>
-                }
-            </ul>
+            @* Places and people first, each kind led by a link to all of its kind. Topics alone need no label. *@
+            var kinds = Model.Tags.GroupBy(t => t.Kind).OrderBy(g => g.Key == TagKind.Topic ? 1 : 0).ThenBy(g => g.Key).ToList();
+            foreach (var kind in kinds)
+            {
+                var label = kinds.Count > 1 || kind.Key != TagKind.Topic ? TagKinds.Plural(T, kind.Key) : null;
+                <div class="d-flex flex-wrap gap-2 align-items-baseline mb-2">
+                    @if (label is not null)
+                    {
+                        @if (TagKinds.Slug(kind.Key) is { } slug)
+                        {
+                            <a asp-page="/TagIndex" asp-route-kind="@slug" class="small text-muted" id="tags-@kind.Key">@label</a>
+                        }
+                        else
+                        {
+                            <span class="small text-muted" id="tags-@kind.Key">@label</span>
+                        }
+                    }
+                    <ul class="list-unstyled d-flex flex-wrap gap-2 mb-0" lang="@material" aria-labelledby="@(label is null ? null : $"tags-{kind.Key}")">
+                        @foreach (var tag in kind)
+                        {
+                            <li><a asp-page="/Search" asp-route-tag="@tag.Name" class="badge rounded-pill text-bg-light border tag-link">@tag.Name</a></li>
+                        }
+                    </ul>
+                </div>
+            }
         }
         <section class="item-rights" aria-labelledby="reuse-heading">
             <h2 id="reuse-heading" class="h6 mb-1">@T["May I reuse this?"]</h2>

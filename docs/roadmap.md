@@ -174,7 +174,7 @@ real pace over M7 and M8 before promising dates. Each milestone is a minor relea
 | **M16 Rights and sharing** ✅ | 3 | Every item page says whether it may be reused, in plain language. "Cite this item" gives a line to copy. A link pasted into a messenger shows the picture and the archive's name. |
 | **M17 Language reach** ✅ | 5 | A translator without Git has tried Weblate on a few pages. Missing translations fail a test. Counts read correctly under Polish plural rules. Item text carries the right `lang`. Dates that are accepted today are still accepted. |
 | **M18 Accounts and system** ✅ | 4 | A curator logs in with an authenticator app. Login keys are encrypted with a key outside the database, and the backup test still passes. An admin sees version, disk use, failed previews (with retry) and backup age on one page. |
-| **M19 Discovery** | 3 | A visitor taps "1960s" and finds the flood, opens "Places" and picks "Mill Street". A curator merges "Mill St" into "Mill Street". |
+| **M19 Discovery** ✅ | 3 | A visitor taps "1960s" and finds the flood, opens "Places" and picks "Mill Street". A curator merges "Mill St" into "Mill Street". |
 | **M20 Community knowledge** | 4 | With the feature switched on, a visitor says "that's my aunt on the left" or asks for removal from an item page, and a curator handles it. A curator prints a poster with a QR code for a contribution link. |
 | **M21 Import and scale** | 4 | A group imports a spreadsheet and a ZIP of scans after a dry run that lists every problem. A 50,000-item archive on a small ARM server stays fast and exports without running out of memory. |
 
@@ -409,10 +409,30 @@ every upload after it.
   living people stays a curator's decision.
 - Collections: order, date span, cover, default sort, delete when empty.
 
+**First part done (November 2026):** a year, decade, month or "circa 1950" typed into the search finds what is dated then, or
+what has the words, for visitors and curators alike, and the page says how it understood the date. The decades are on the
+start page and beside the results, each as a bar whose number is what tapping it finds; items with open ends such as "before
+1945" reach to the edge, as in the year filter. "1950er Jahre" is one decade, as Germans often write it.
+
+**Second part done (November 2026):** each tag is a topic, place or person, set on the new Tags page, which also renames,
+merges and deletes unused tags. Every item with a changed tag is brought up to date for the search, items in the bin
+included, and a tag that only items in the bin have is not unused. `/places` and `/people` list from A to Z what published
+items are tagged with, so a name only drafts have stays unseen; whether to name living people stays the curators' decision,
+and the page and the handbook say that the People page lists names on their own. The export (version 4) has the tags with
+their kinds.
+
+**Third part done (November 2026):** curators put the collections in order and give each one an order for its items, which
+"previous" and "next" on an item follow, so the walk through a collection is the one its page shows. A cover is chosen from the
+collection's photos, also a draft's ahead of publishing, but visitors only see it while its item is published and in the
+collection. An empty collection can be deleted; one with an item in the bin or a contribution link cannot. Each collection
+shows the years of its published items. M19 is complete.
+
 **M20 Community knowledge**
 
-- "Do you know more about this?", off by default: information, correction or removal request, stored as a private note,
-  protected like the contribution form, and covered by the personal-data tools.
+- ✅ "Do you know more about this?", off by default: information, correction or removal request, stored as a private note,
+  protected like the contribution form, and covered by the personal-data tools. Notes sit in a curators' inbox (removal
+  requests first), can be dealt with, stripped of name and email, or deleted, appear in Contributors and in a full export, and
+  the activity log names only the item.
 - "Help wanted" flag and a "Can you help?" page. Dashboard cards for what needs attention.
 - Links: copy button, a printable poster with QR code (checked against the no-inline-style test), and an opt-in
   invitation on the collection page, which gives up being unlisted. A clear page for closed links.

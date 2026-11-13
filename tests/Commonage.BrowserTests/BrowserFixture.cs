@@ -56,6 +56,10 @@ public sealed class BrowserFixture : WebApplicationFactory<Program>, IAsyncLifet
             await connection.OpenAsync();
             await using var query = new NpgsqlCommand("""select "Token" from "ContributionLinks" limit 1""", connection);
             ContributionPath = $"/contribute/{await query.ExecuteScalarAsync()}";
+
+            // "Do you know more about this?" is off by default; its pages are tested here.
+            await using var notes = new NpgsqlCommand("""update "ArchiveSettings" set "AcceptVisitorNotes" = true""", connection);
+            await notes.ExecuteNonQueryAsync();
         }
 
         _playwright = await Playwright.CreateAsync();

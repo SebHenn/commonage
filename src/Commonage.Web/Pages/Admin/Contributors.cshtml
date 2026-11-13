@@ -40,6 +40,30 @@
         </ul>
     }
 
+    @if (Model.Notes.Count > 0)
+    {
+        <h2 class="h5">@T["Notes from visitors"]</h2>
+        <p class="form-text">@T["Sent through “Do you know more about this?”. Remove the name and email address, or delete the note, under “Notes from visitors”."]</p>
+        <ul class="mb-4">
+            @foreach (var note in Model.Notes)
+            {
+                <li class="text-break">
+                    @note.Name
+                    @if (note.Email is { } email)
+                    {
+                        <span class="text-muted small">@email</span>
+                    }
+                    · <a asp-page="/Admin/Notes/Index" asp-route-show="All" asp-route-item="@note.ArchiveItemId" asp-fragment="note-@note.Id">@ArchiveItem.ShownTitle(T, note.ArchiveItem.Title)</a>
+                    · <span class="text-muted small">@Dates.Day(note.ReceivedAt)</span>
+                    @if (note.ArchiveItem.DeletedAt is not null)
+                    {
+                        <span class="badge text-bg-dark">@T["In the bin"]</span>
+                    }
+                </li>
+            }
+        </ul>
+    }
+
     @if (Model.Results.Count == 0)
     {
         <p class="text-muted">@T["No contributions match."]</p>

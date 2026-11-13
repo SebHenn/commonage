@@ -1,0 +1,47 @@
+@page "/{kind:regex(^(places|people)$)}"
+@model Commonage.Web.Pages.TagIndexModel
+@{
+    ViewData["Title"] = TagKinds.Plural(T, Model.Kind);
+    // The names are in the material's language, which may not be the reader's.
+    var material = (await Profile.GetAsync()).MaterialLanguage;
+}
+@inject Commonage.Web.Operations.ArchiveProfile Profile
+
+<h1>@ViewData["Title"]</h1>
+
+@if (Model.Total == 0)
+{
+    <p class="text-muted">@(Model.Kind == TagKind.Place ? T["No places are named in the archive yet."] : T["No people are named in the archive yet."])</p>
+}
+else
+{
+    <p class="col-lg-8">@(Model.Kind == TagKind.Place ? T["Every place named in the archive, with how many items show it."] : T["Everyone named in the archive, with how many items they appear in."])</p>
+
+    @if (Model.Total >= TagIndexModel.LettersFrom && Model.Letters.Count > 1)
+    {
+        <nav aria-label="@T["Letters"]" class="mb-3">
+            <ul class="list-unstyled d-flex flex-wrap gap-1">
+                @for (var i = 0; i < Model.Letters.Count; i++)
+                {
+                    <li><a href="#letter-@i" class="btn btn-sm btn-outline-secondary">@Model.Letters[i].Initial</a></li>
+                }
+            </ul>
+        </nav>
+    }
+
+    <div class="tag-index" lang="@material">
+        @for (var i = 0; i < Model.Letters.Count; i++)
+        {
+            var letter = Model.Letters[i];
+            <section aria-labelledby="letter-@i" class="tag-index-letter">
+                <h2 id="letter-@i" class="h5">@letter.Initial</h2>
+                <ul class="list-unstyled">
+                    @foreach (var tag in letter.Tags)
+                    {
+                        <li><a asp-page="/Search" asp-route-tag="@tag.Name">@tag.Name</a> <span class="text-muted small" aria-label="@T.Plural("{0, plural, one {# item} other {# items}}", tag.Count)">(@tag.Count)</span></li>
+                    }
+                </ul>
+            </section>
+        }
+    </div>
+}

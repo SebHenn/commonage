@@ -24,7 +24,11 @@
             {
                 <p class="mb-1" lang="@material">@collection.Description</p>
             }
-            <small class="text-muted">@T["Items: {0}", collection.PublishedItemCount]</small>
+            @if (collection.Years.Describe(T) is { } years)
+            {
+                <small class="text-muted d-block">@years</small>
+            }
+            <small class="text-muted d-block">@T["Items: {0}", collection.PublishedItemCount]</small>
         </li>
     }
 </ul>

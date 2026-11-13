@@ -13,6 +13,39 @@ Für alle, die sich um den Bestand eines Archivs kümmern. Technische Kenntnisse
 - **Schlagwörter:** die Orte, Personen und Themen, nach denen jemand suchen könnte. Prüfen Sie vor einem neuen Schlagwort, ob
   es schon unter einem ähnlichen Namen existiert.
 
+## Schlagwörter aufräumen
+
+**Schlagwörter** listet jedes Schlagwort auf, mit der Zahl der Einträge, die es haben. Öffnen Sie eines, um:
+
+- **festzulegen, was es nennt:** einen Ort, eine Person oder ein Thema. Besucher finden alle Orte und alle Personen auf eigenen
+  Seiten, „Orte“ und „Personen“, von A bis Z, und ein Eintrag zeigt seine Orte und Personen zuerst. Es zählen nur
+  veröffentlichte Einträge, ein Name, den nur Entwürfe haben, bleibt also unsichtbar. Die Seite „Personen“ listet Namen für sich
+  auf, nennen Sie lebende Menschen also nur, wenn sie einverstanden sind.
+- **es umzubenennen:** der neue Name gilt sofort bei jedem Eintrag, auch in der Suche. Einen Namen, den schon ein anderes
+  Schlagwort hat, lehnt das Archiv ab; das wäre ein Zusammenführen.
+- **es mit einem anderen zusammenzuführen,** bei einem Tippfehler oder zwei Wörtern für dasselbe: Jeder Eintrag bekommt
+  stattdessen das andere Schlagwort, und dieses verschwindet. Das lässt sich nicht rückgängig machen, und das
+  Aktivitätsprotokoll hält es fest.
+- **es zu löschen,** sobald kein Eintrag es mehr hat, auch keiner im Papierkorb. „Die unbenutzten Schlagwörter löschen“ in der
+  Liste erledigt das für alle.
+
+## Sammlungen ordnen
+
+**Sammlungen** listet sie in der Reihenfolge, in der Besucher sie finden. „Nach vorne“ und „Nach hinten“ verschieben eine um
+einen Platz; eine neue Sammlung kommt ans Ende. Öffnen Sie eine, um:
+
+- **die Reihenfolge ihrer Einträge zu wählen:** zuletzt hinzugefügt, älteste zuerst oder neueste zuerst. „Vorheriger“ und
+  „Nächster“ bei einem Eintrag führen in derselben Reihenfolge durch die Sammlung. Einträge ohne Datum kommen zuletzt, wenn nach
+  Datum sortiert wird.
+- **ihr Titelbild zu wählen,** aus den Fotos ihrer Einträge. Besucher sehen dieses Foto nur, solange sein Eintrag veröffentlicht
+  ist und zu dieser Sammlung gehört; bis dahin und ohne Auswahl sehen sie das erste Foto. Das Foto eines Entwurfs lässt sich
+  schon vor der Veröffentlichung wählen.
+- **sie zu löschen,** sobald sie leer ist: keine Einträge, auch nicht im Papierkorb, und keine Beitragslinks, über die Material
+  in sie kommt.
+
+Besucher sehen auf der Seite und der Karte einer Sammlung, aus welchen Jahren ihre veröffentlichten Einträge stammen, etwa
+„1930–1965“. Dafür muss nichts eingetragen werden.
+
 ## Mehrere Fotos und Briefe
 
 - **Reihenfolge:** „Nach vorne“ und „Nach hinten“ verschieben ein Foto, und zwar sofort auch für Besucher. Das erste Foto ist das
@@ -56,6 +89,10 @@ sich nicht ändern, ohne die Person zu fragen, und dafür gibt es noch keine Sch
 Öffnen Sie die Liste der Einträge und filtern Sie sie: nach Sammlung oder danach, was noch fehlt, zum Beispiel ein Datum.
 Öffnen Sie den ersten Eintrag und gehen Sie mit **Speichern und weiter** durch die Liste. Mit **Vorschau** sehen Sie einen
 Entwurf so, wie ihn Besucher sehen würden.
+
+Ein Jahr oder Jahrzehnt in der Suche, etwa „1958“, „1950er“ oder „März 1953“, findet auch, was auf diese Zeit datiert ist, nicht
+nur, was diese Wörter enthält. „Mühlenstraße 1950er“ findet die Straßenbahn von 1930–1955, wenn sie von der Mühlenstraße handelt.
+Deshalb lohnt sich ein Datum bei jedem Eintrag: Besucher finden ihn auch über die Jahrzehnte auf der Startseite.
 
 Um viele auf einmal zu ändern, kreuzen Sie sie an oder nehmen Sie alles, was der Filter gefunden hat. Wählen Sie, was geschehen
 soll: veröffentlichen, Schlagwörter hinzufügen, das Datum setzen, in eine Sammlung verschieben oder den Rechtehinweis setzen.
@@ -109,6 +146,12 @@ Zweifel nach, oder lassen Sie es als Entwurf.
 
 Wenn jemand sagt, ein Handyfoto sei wegen seines Formats abgelehnt worden, ist es wahrscheinlich HEIC, das das Archiv noch nicht
 lesen kann. Es muss zuerst als JPEG gespeichert werden. Das Formular sagt das auch.
+
+## Hinweise von Besuchern
+
+Unter «Einstellungen» können Sie «Wissen Sie mehr darüber?» einschalten. Jeder veröffentlichte Eintrag hat dann einen Link, über den Besucher mitteilen können, was sie wissen, dass etwas nicht stimmt oder dass der Eintrag entfernt werden soll. Name und E-Mail-Adresse sind freiwillig.
+
+Unter **Hinweise von Besuchern** lesen Sie sie; Bitten um Entfernung stehen zuoberst, und ein Eintrag, den Sie bearbeiten, zeigt, wie viele Hinweise er hat. Nichts davon erscheint auf der Seite: Schreiben Sie, was sich lohnt, in den Eintrag, und wählen Sie dann **Als erledigt markieren**. Mit **Name und E-Mail-Adresse entfernen** bleibt nur die Nachricht, mit **Löschen** verschwindet der Hinweis ganz. Eine Bitte um Entfernung behandeln Sie wie jede andere, siehe unten.
 
 ## Wenn jemand um Entfernung bittet
 

@@ -46,6 +46,17 @@ public enum AuditAction
     ItemMovedToBinAfterKeptTime,
     ActivityLogShortened,
     PreviewRetried,
+    TagChanged,
+    TagsMerged,
+    TagDeleted,
+    UnusedTagsDeleted,
+    CollectionMoved,
+    CollectionDeleted,
+    VisitorNoteReceived,
+    VisitorNoteHandled,
+    VisitorNoteReopened,
+    VisitorNoteDetailsRemoved,
+    VisitorNoteDeleted,
 }
 
 /// <summary>

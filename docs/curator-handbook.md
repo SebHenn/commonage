@@ -13,6 +13,33 @@ For the people who look after what an archive holds. You need no technical knowl
 - **Tags:** the places, people and topics someone might look for. Before adding a new one, check whether it already
   exists under a slightly different name.
 
+## Tidying up tags
+
+**Tags** lists every tag with how many items have it. Open one to:
+
+- **Say what it names:** a place, a person or a topic. Visitors find every place and every person on pages of their own,
+  "Places" and "People", from A to Z, and an item shows its places and people first. Only published items count, so a name
+  that only drafts have stays unseen. The People page lists names on their own, so name living people only when they agree.
+- **Rename it:** the new name reaches every item at once, also in the search. A name another tag already has is refused;
+  that is a merge.
+- **Merge it into another tag,** for a misspelling or two words for the same thing: every item gets the other tag instead,
+  and this one is gone. This cannot be undone, and the activity log notes it.
+- **Delete it,** once no item has it, not even one in the bin. "Delete the unused tags" on the list does that for all of them.
+
+## Arranging collections
+
+**Collections** lists them in the order visitors find them. "Earlier" and "Later" move one a step; a new collection comes
+last. Open one to:
+
+- **Choose the order of its items:** recently added, oldest first or newest first. "Previous" and "Next" on an item lead
+  through the collection in the same order. Undated items come last when the order goes by date.
+- **Choose its cover** from the photos of its items. Visitors see that photo only while its item is published and in this
+  collection; until then, and without a choice, they see the first photo. A draft's photo can be chosen ahead of publishing.
+- **Delete it,** once it is empty: no items, not even in the bin, and no contribution links that send material to it.
+
+Visitors see the years a collection's published items are from, such as "1930–1965", on its page and its card. Nothing
+needs to be entered for that.
+
 ## Several photos, and letters
 
 - **Order:** "Earlier" and "Later" move a photo, and it happens at once for visitors too. The first photo is the cover, the one seen
@@ -53,6 +80,10 @@ and that is not something you can change without asking them, and there is no bu
 
 Open the item list and filter it: by collection, or by what is "still needed", such as a date. Open the first item and use
 **Save and next** to go through the list. Use **Preview** to see a draft as visitors will.
+
+A year or decade typed into the search, such as "1958", "1950s" or "March 1953", also finds what is dated then, not only what
+has those words. "Mill Street 1950s" finds the tram of 1930–1955 if it is about Mill Street. This is why a date on each item
+matters: visitors find it through the decades on the start page too.
 
 To change many at once, tick them, or take everything the filter found. Choose what to do: publish, add tags, set the date,
 move to a collection or set the rights statement. The next page says how many items it is about and what would happen to
@@ -100,12 +131,22 @@ seen, ask yourself whether it should be public. When in doubt, ask them, or keep
 If someone says a phone photo was refused because of its format, it is probably HEIC, which the archive cannot read yet. They
 need to save it as a JPEG first. The form tells them so.
 
+## Notes from visitors
+
+Under "Settings" you can switch on "Do you know more about this?". Each published item then has a link where a visitor can
+say what they know, that something is wrong, or that the item should be taken down. Name and email address are optional.
+
+Open **Notes from visitors** to read them; removal requests come first, and an item you are editing shows how many notes it
+has. Nothing a visitor sent is shown on the page: write what is worth keeping into the item, then choose **Mark as dealt
+with**. Choose **Remove name and email address** once you have answered (the message stays), or **Delete** to remove a note
+for good. A removal request is handled like any other, as described below.
+
 ## When someone asks for something to be removed
 
 Take every such request seriously, and answer it quickly. It does not matter whether the person sent the photo in or is
 only in the picture.
 
-1. Open **Contributors** and search for their name or email address, or for the reference they were given when they sent
+1. Open **Contributors** and search for their name or email address (it lists notes from visitors too), or for the reference they were given when they sent
    something in.
 2. Open each item they ask about, and choose what fits:
    - **Remove name and email address:** the material stays, but no longer names them.

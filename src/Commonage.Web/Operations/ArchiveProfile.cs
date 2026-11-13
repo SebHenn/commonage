@@ -45,6 +45,7 @@ public sealed class ArchiveIdentity(ArchiveSettings settings, IReadOnlyList<Arch
     public bool ImprintNotNeeded => settings.ImprintNotNeeded;
     public DateTime? RestoreTestedAt => settings.RestoreTestedAt;
     public int? RejectedKeptMonths => settings.RejectedKeptMonths;
+    public bool AcceptVisitorNotes => settings.AcceptVisitorNotes;
 
     public string Name => Text(ArchiveTextKind.Name) ?? SoftwareName;
 

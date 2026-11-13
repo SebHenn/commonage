@@ -56,6 +56,9 @@ public class ArchiveSettings
     /// </summary>
     public int? RejectedKeptMonths { get; set; }
 
+    /// <summary>Whether published items ask visitors "Do you know more about this?". Off until a curator turns it on.</summary>
+    public bool AcceptVisitorNotes { get; set; }
+
     public static readonly int[] ActivityLogYearChoices = [1, 2, 5, 10];
     public static readonly int[] RejectedMonthChoices = [3, 6, 12, 24];
 }

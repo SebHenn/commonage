@@ -1,0 +1,82 @@
+@page "{id:int}"
+@model Commonage.Web.Pages.Admin.Tags.EditModel
+@{
+    ViewData["Title"] = T["Tag “{0}”", Model.Tag.Name];
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="/Admin/Tags/Index">@T["Tags"]</a></li>
+    </ol>
+</nav>
+
+<h1 class="text-break">@ViewData["Title"]</h1>
+
+<p>
+    @if (Model.Use.Items > 0)
+    {
+        <a asp-page="/Admin/Index" asp-route-tag="@Model.Tag.Name">@T.Plural("{0, plural, one {On one item} other {On # items}}", Model.Use.Items)</a>
+    }
+    else
+    {
+        @T["Not on any item."]
+    }
+    @if (Model.Use.InBin > 0)
+    {
+        @T.Plural("{0, plural, one {One more item in the bin has it.} other {# more items in the bin have it.}}", Model.Use.InBin)
+    }
+</p>
+
+<form method="post" class="col-lg-8 mb-5" data-warn-unsaved="@(Model.NameUnsaved ? "dirty" : "")">
+    <partial name="_ErrorSummary" />
+    <div class="mb-3">
+        <label asp-for="Input.Name" class="form-label"></label>
+        <input asp-for="Input.Name" class="form-control" aria-describedby="name-help" />
+        <span asp-validation-for="Input.Name" class="text-danger"></span>
+        <div id="name-help" class="form-text">@T["A new name changes the tag on every item that has it, also in the search."]</div>
+    </div>
+    <fieldset class="mb-3">
+        <legend class="form-label fs-6">@T["Kind"]</legend>
+        @foreach (var kind in Enum.GetValues<TagKind>())
+        {
+            <div class="form-check">
+                <input type="radio" id="kind-@kind" name="Input.Kind" value="@kind" class="form-check-input" checked="@(Model.Input.Kind == kind)" />
+                <label for="kind-@kind" class="form-check-label">@TagKinds.Name(T, kind)</label>
+            </div>
+        }
+        <div class="form-text">@T["Visitors find all places and all people on pages of their own, once an item with the tag is published. That page lists every person's name, so name living people only when they agree."]</div>
+    </fieldset>
+    <button type="submit" class="btn btn-primary">@T["Save"]</button>
+</form>
+
+<section aria-labelledby="merge-heading" class="col-lg-8 mb-5">
+    <h2 id="merge-heading" class="h4">@T["Merge into another tag"]</h2>
+    <p>@T["For two tags that mean the same, such as a misspelling. Every item with “{0}” gets the other tag instead, and “{0}” is gone. This cannot be undone.", Model.Tag.Name]</p>
+    <form method="post" asp-page-handler="Merge" class="row g-2 align-items-end">
+        <div class="col-sm-8">
+            <label asp-for="MergeInto" class="form-label">@T["Merge into"]</label>
+            <input asp-for="MergeInto" class="form-control" list="other-tags" autocomplete="off" />
+            <span asp-validation-for="MergeInto" class="text-danger"></span>
+            <datalist id="other-tags">
+                @foreach (var name in Model.OtherNames)
+                {
+                    <option value="@name"></option>
+                }
+            </datalist>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-outline-primary">@T["Merge"]</button>
+        </div>
+    </form>
+</section>
+
+@if (Model.Use.IsUnused)
+{
+    <section aria-labelledby="delete-heading" class="col-lg-8">
+        <h2 id="delete-heading" class="h4">@T["Delete"]</h2>
+        <form method="post" asp-page-handler="Delete">
+            <p>@T["No item has this tag, so it can be deleted."]</p>
+            <button type="submit" class="btn btn-outline-danger">@T["Delete the tag"]</button>
+        </form>
+    </section>
+}

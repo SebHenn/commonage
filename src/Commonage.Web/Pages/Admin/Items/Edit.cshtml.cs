@@ -55,6 +55,9 @@ public class EditModel(
     /// <summary>Who sent the item in, for items that came through a contribution link.</summary>
     public Contribution? Contribution { get; private set; }
 
+    /// <summary>Notes from visitors about this item that no curator has dealt with yet.</summary>
+    public int OpenNotes { get; private set; }
+
     /// <summary>The latest entries of the activity log about this item, newest first.</summary>
     public IReadOnlyList<AuditEntry> History { get; private set; } = [];
 
@@ -659,6 +662,7 @@ public class EditModel(
         Contribution = item?.Contribution;
         if (item is not null)
         {
+            OpenNotes = await db.VisitorNotes.CountAsync(n => n.ArchiveItemId == item.Id && n.HandledAt == null);
             MediaFiles = await db.MediaFiles.Where(f => f.ArchiveItemId == item.Id).OrderBy(f => f.Position).ThenBy(f => f.Id).ToListAsync();
             IdenticalFiles = await FindIdenticalFilesAsync(MediaFiles);
             History = await db.AuditEntries

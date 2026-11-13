@@ -14,7 +14,8 @@ public class EndpointAccessTests(CommonageAppFactory app)
 {
     private static readonly string[] MeantForVisitors =
     [
-        "/", "/Index", "/search", "/items/{id:int}", "/collections", "/collections/{id:int}",
+        "/", "/Index", "/search", "/items/{id:int}", "/items/{id:int}/tell", "/collections", "/collections/{id:int}",
+        "/{kind:regex(^(places|people)$)}",
         "/{slug:regex(^(about|contact|privacy|imprint)$)}", "/SetLanguage", "/Error/{code:int?}",
         // Published pictures only, see MediaTests.
         "/media/{id:int}/{variant:regex(^(preview|thumbnail|card|large)$)}",
@@ -35,7 +36,8 @@ public class EndpointAccessTests(CommonageAppFactory app)
             .OfType<RouteEndpoint>()
             // The scripts, styles and fonts in wwwroot are for everyone.
             .Where(endpoint => endpoint.Metadata.GetMetadata<StaticAssetDescriptor>() is null)
-            .Where(endpoint => endpoint.Metadata.GetMetadata<IAuthorizeData>() is null)
+            // Open without a policy, or with one that [AllowAnonymous] sets aside.
+            .Where(endpoint => endpoint.Metadata.GetMetadata<IAuthorizeData>() is null || endpoint.Metadata.GetMetadata<IAllowAnonymous>() is not null)
             .Select(endpoint => "/" + endpoint.RoutePattern.RawText!.TrimStart('/'))
             .Distinct()
             .Order(StringComparer.Ordinal)
