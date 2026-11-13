@@ -14,6 +14,7 @@
     <a asp-page="/Admin/Collections/Index" class="nav-link" aria-current="@Current("/Admin/Collections")">@T["Collections"]</a>
     <a asp-page="/Admin/Tags/Index" class="nav-link" aria-current="@Current("/Admin/Tags")">@T["Tags"]</a>
     <a asp-page="/Admin/Contributions/Index" class="nav-link" aria-current="@Current("/Admin/Contributions")">@T["Contribution links"]</a>
+    <a asp-page="/Admin/Notes/Index" class="nav-link" aria-current="@Current("/Admin/Notes")">@T["Notes from visitors"]</a>
     <a asp-page="/Admin/Contributors" class="nav-link" aria-current="@Current("/Admin/Contributors")">@T["Contributors"]</a>
     <a asp-page="/Admin/Bin" class="nav-link" aria-current="@Current("/Admin/Bin")">@T["Bin"]</a>
     @if (User.IsInRole(Commonage.Web.Identity.Roles.Admin))

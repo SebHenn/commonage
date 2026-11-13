@@ -147,6 +147,12 @@ Zweifel nach, oder lassen Sie es als Entwurf.
 Wenn jemand sagt, ein Handyfoto sei wegen seines Formats abgelehnt worden, ist es wahrscheinlich HEIC, das das Archiv noch nicht
 lesen kann. Es muss zuerst als JPEG gespeichert werden. Das Formular sagt das auch.
 
+## Hinweise von Besuchern
+
+Unter «Einstellungen» können Sie «Wissen Sie mehr darüber?» einschalten. Jeder veröffentlichte Eintrag hat dann einen Link, über den Besucher mitteilen können, was sie wissen, dass etwas nicht stimmt oder dass der Eintrag entfernt werden soll. Name und E-Mail-Adresse sind freiwillig.
+
+Unter **Hinweise von Besuchern** lesen Sie sie; Bitten um Entfernung stehen zuoberst, und ein Eintrag, den Sie bearbeiten, zeigt, wie viele Hinweise er hat. Nichts davon erscheint auf der Seite: Schreiben Sie, was sich lohnt, in den Eintrag, und wählen Sie dann **Als erledigt markieren**. Mit **Name und E-Mail-Adresse entfernen** bleibt nur die Nachricht, mit **Löschen** verschwindet der Hinweis ganz. Eine Bitte um Entfernung behandeln Sie wie jede andere, siehe unten.
+
 ## Wenn jemand um Entfernung bittet
 
 Nehmen Sie jede solche Bitte ernst und antworten Sie schnell. Es ist egal, ob die Person das Foto eingesendet hat oder nur

@@ -53,6 +53,8 @@ public partial class SecurityHeaderTests(CommonageAppFactory app)
             return tag.Id;
         });
 
+        // "Do you know more about this?" is off by default and its page is not there then; the shared database is put back afterwards.
+        await SetVisitorNotesAsync(true);
         var results = new List<string>();
         foreach (var route in routes)
         {
@@ -68,8 +70,20 @@ public partial class SecurityHeaderTests(CommonageAppFactory app)
                 results.Add($"{url} answered {(int)response.StatusCode}, so it was not checked");
         }
 
+        await SetVisitorNotesAsync(false);
         Assert.True(results.Count == 0, string.Join("\n", results));
     }
+
+    private Task<int> SetVisitorNotesAsync(bool on) => app.WithDbAsync(async db =>
+    {
+        var settings = await db.ArchiveSettings.FirstOrDefaultAsync();
+        if (settings is null)
+            db.ArchiveSettings.Add(settings = new ArchiveSettings());
+        settings.AcceptVisitorNotes = on;
+        var saved = await db.SaveChangesAsync();
+        app.Services.GetRequiredService<Commonage.Web.Operations.ArchiveProfile>().Forget();
+        return saved;
+    });
 
     private static string FillIn(string route, ArchiveItem item, string token, int tagId)
     {

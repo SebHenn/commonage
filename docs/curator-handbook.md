@@ -131,12 +131,22 @@ seen, ask yourself whether it should be public. When in doubt, ask them, or keep
 If someone says a phone photo was refused because of its format, it is probably HEIC, which the archive cannot read yet. They
 need to save it as a JPEG first. The form tells them so.
 
+## Notes from visitors
+
+Under "Settings" you can switch on "Do you know more about this?". Each published item then has a link where a visitor can
+say what they know, that something is wrong, or that the item should be taken down. Name and email address are optional.
+
+Open **Notes from visitors** to read them; removal requests come first, and an item you are editing shows how many notes it
+has. Nothing a visitor sent is shown on the page: write what is worth keeping into the item, then choose **Mark as dealt
+with**. Choose **Remove name and email address** once you have answered (the message stays), or **Delete** to remove a note
+for good. A removal request is handled like any other, as described below.
+
 ## When someone asks for something to be removed
 
 Take every such request seriously, and answer it quickly. It does not matter whether the person sent the photo in or is
 only in the picture.
 
-1. Open **Contributors** and search for their name or email address, or for the reference they were given when they sent
+1. Open **Contributors** and search for their name or email address (it lists notes from visitors too), or for the reference they were given when they sent
    something in.
 2. Open each item they ask about, and choose what fits:
    - **Remove name and email address:** the material stays, but no longer names them.

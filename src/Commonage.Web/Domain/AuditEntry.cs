@@ -52,6 +52,11 @@ public enum AuditAction
     UnusedTagsDeleted,
     CollectionMoved,
     CollectionDeleted,
+    VisitorNoteReceived,
+    VisitorNoteHandled,
+    VisitorNoteReopened,
+    VisitorNoteDetailsRemoved,
+    VisitorNoteDeleted,
 }
 
 /// <summary>

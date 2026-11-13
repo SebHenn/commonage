@@ -98,18 +98,19 @@ public class ExportTests(CommonageAppFactory app)
     /// and nobody would notice until then. Names are as they appear in archive.json.
     /// </summary>
     [Theory]
-    [InlineData(typeof(ArchiveItem), "item", "id collectionId title description status createdAt updatedAt publishedAt rejectedOrWithdrawnAt contribution files tags rightsUri rightsHolder credit referenceNumber originalLocation receivedFrom receivedOn internalNotes needsTranscription",
+    [InlineData(typeof(ArchiveItem), "item", "id collectionId title description status createdAt updatedAt publishedAt rejectedOrWithdrawnAt contribution files tags rightsUri rightsHolder credit referenceNumber originalLocation receivedFrom receivedOn internalNotes needsTranscription notes",
         "Collection: by collectionId. MediaFiles: as files. DateText, DateFrom, DateTo: as date. TagNames: repeats tags. "
         + "CanBePublished: follows from status. IsUntitled: follows from the empty title. MayTravel: follows from the contribution. DeletedAt: the bin is not exported. Version: only for open forms.")]
     [InlineData(typeof(MediaFile), "file", "id originalFileName contentType sizeBytes sha256 uploadedAt altText caption position rotation",
         "ArchiveItemId, ArchiveItem: the file is listed under its item. StorageId, OriginalKey, PreviewKey, ThumbnailKey: storage details. "
         + "Status, ProcessingError, ProcessingAttempts, MaxProcessingAttempts, PreviewWidth, PreviewHeight, CardKey, LargeKey, HasLarge, RenderedRotation, IsBeingTurned, DerivativeVersion, CurrentDerivativeVersion, MaxCaptionLength: previews are made anew. DeletedAt: the bin is not exported.")]
-    [InlineData(typeof(ArchiveSettings), "settings", "defaultLanguage contentLanguage otherContentLanguages accentColor timeZone defaultRightsUri allowSearchEngines requireTwoFactor largePhotos privacyReviewed imprintNotNeeded restoreTestedAt activityLogKeptYears rejectedKeptMonths logo texts",
+    [InlineData(typeof(ArchiveSettings), "settings", "defaultLanguage contentLanguage otherContentLanguages accentColor timeZone defaultRightsUri allowSearchEngines requireTwoFactor largePhotos privacyReviewed imprintNotNeeded restoreTestedAt activityLogKeptYears rejectedKeptMonths acceptVisitorNotes logo texts",
         "Id, TheOnlyId: there is only one. LogoId: as logo.")]
     [InlineData(typeof(Contribution), "contribution", "contributorName contributorEmail showName rights rightsHolder consentText reuse consentCoversSharing referenceCode submittedAt reviewedAt personalDetailsRemovedAt contributionLink",
         "Id, ArchiveItemId, ArchiveItem: listed under its item. ContributionLinkId: the link is named. SendingFingerprint: only there to recognise a form sent twice.")]
     [InlineData(typeof(Collection), "collection", "id title description createdAt position sort coverFileId", "Items: each item names its collection. CoverMediaFileId: as coverFileId.")]
     [InlineData(typeof(Tag), "tag", "name kind", "Id: items name their tags. NormalizedName: follows from the name. Items: each item lists its tags.")]
+    [InlineData(typeof(VisitorNote), "note", "kind message name email receivedAt handledAt personalDetailsRemovedAt", "Id, ArchiveItemId, ArchiveItem: listed under its item. RemovePersonalDetails: a method.")]
     public async Task Every_field_is_exported_or_left_out_on_purpose(Type type, string part, string exported, string leftOut)
     {
         var item = await app.CreateContributionAsync(ItemStatus.Published);
@@ -121,6 +122,7 @@ public class ExportTests(CommonageAppFactory app)
             var tagged = await db.ArchiveItems.Include(i => i.Tags).SingleAsync(i => i.Id == item.Id);
             var name = TestData.Unique("place");
             tagged.SetTags([new Tag { Name = name, NormalizedName = Tag.Normalize(name), Kind = TagKind.Place }]);
+            db.VisitorNotes.Add(new VisitorNote { ArchiveItemId = item.Id, Kind = VisitorNoteKind.Information, Message = "A note", ReceivedAt = DateTime.UtcNow });
             return await db.SaveChangesAsync();
         });
         using var zip = await ExportAsync(admin, publishedOnly: false, includePersonalData: true);
@@ -131,6 +133,7 @@ public class ExportTests(CommonageAppFactory app)
             "file" => exportedItem.GetProperty("files")[0],
             "contribution" => exportedItem.GetProperty("contribution"),
             "settings" => JsonDocument.Parse(Read(zip, "archive.json")).RootElement.GetProperty("settings"),
+            "note" => exportedItem.GetProperty("notes")[0],
             "tag" => JsonDocument.Parse(Read(zip, "archive.json")).RootElement.GetProperty("tags")[0],
             _ => JsonDocument.Parse(Read(zip, "archive.json")).RootElement.GetProperty("collections")[0],
         };

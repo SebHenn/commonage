@@ -1,0 +1,77 @@
+@page "/items/{id:int}/tell"
+@model Commonage.Web.Pages.Items.TellModel
+@inject Commonage.Web.Operations.ArchiveProfile Profile
+@{
+    var material = (await Profile.GetAsync()).MaterialLanguage;
+    ViewData["Title"] = Model.Sent ? T["Thank you"] : T["Do you know more about this?"];
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="/Items/Details" asp-route-id="@Model.Item.Id" lang="@material">@Model.Item.Title</a></li>
+    </ol>
+</nav>
+
+<div class="col-lg-8">
+    @if (Model.Sent)
+    {
+        <h1>@T["Thank you"]</h1>
+        <p>@T["Your message has reached the archive's curators. Nothing of it is shown on the page; what they can use, they will write in themselves."]</p>
+        <p class="d-flex flex-wrap gap-3">
+            <a asp-page="/Items/Details" asp-route-id="@Model.Item.Id">@T["Back to the item"]</a>
+            <a asp-page="/Index">@T["Browse the archive"]</a>
+        </p>
+    }
+    else
+    {
+        <h1>@ViewData["Title"]</h1>
+        <p>@T["Who is in the picture, where was it, is something wrong? Tell the curators."] @T["Only they read what you send here."]</p>
+
+        <form method="post" data-warn-unsaved="@(ModelState.IsValid ? "" : "dirty")" data-send-once>
+            <partial name="_ErrorSummary" />
+            <input type="hidden" asp-for="FormStarted" />
+            <div class="contact-field" aria-hidden="true">
+                <label asp-for="Website">@T["Leave this field empty"]</label>
+                <input asp-for="Website" tabindex="-1" autocomplete="off" />
+            </div>
+
+            <fieldset class="mb-3">
+                <legend class="form-label fs-6">@T["What would you like to tell us?"]</legend>
+                @foreach (var (kind, label) in new[]
+                {
+                    (VisitorNoteKind.Information, T["I know more about it"]),
+                    (VisitorNoteKind.Correction, T["Something is wrong"]),
+                    (VisitorNoteKind.Removal, T["It should be taken down, for example because it shows me"]),
+                })
+                {
+                    <div class="form-check">
+                        <input type="radio" id="kind-@kind" name="Input.Kind" value="@kind" class="form-check-input" checked="@(Model.Input.Kind == kind)" />
+                        <label for="kind-@kind" class="form-check-label">@label</label>
+                    </div>
+                }
+                <span asp-validation-for="Input.Kind" class="text-danger"></span>
+            </fieldset>
+            <div class="mb-3">
+                <label asp-for="Input.Message" class="form-label"></label>
+                <textarea asp-for="Input.Message" class="form-control" rows="6" maxlength="@VisitorNote.MessageMaxLength"></textarea>
+                <span asp-validation-for="Input.Message" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.Name" class="form-label"></label>
+                <input asp-for="Input.Name" class="form-control" autocomplete="name" />
+                <span asp-validation-for="Input.Name" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.Email" class="form-label"></label>
+                <input asp-for="Input.Email" class="form-control" autocomplete="email" aria-describedby="email-help" />
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+                <div id="email-help" class="form-text">@T["Only if you would like an answer. Your name and email address are only used for that, and you can ask for them to be removed at any time."]</div>
+            </div>
+            <button type="submit" class="btn btn-primary">@T["Send"]</button>
+        </form>
+    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

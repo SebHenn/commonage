@@ -164,6 +164,9 @@ namespace Commonage.Web.Data.Migrations
                         .HasMaxLength(7)
                         .HasColumnType("character varying(7)");
 
+                    b.Property<bool>("AcceptVisitorNotes")
+                        .HasColumnType("boolean");
+
                     b.Property<int?>("ActivityLogKeptYears")
                         .HasColumnType("integer");
 
@@ -552,6 +555,51 @@ namespace Commonage.Web.Data.Migrations
                     b.ToTable("Tags");
                 });
 
+            modelBuilder.Entity("Commonage.Web.Domain.VisitorNote", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ArchiveItemId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(254)
+                        .HasColumnType("character varying(254)");
+
+                    b.Property<DateTime?>("HandledAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime?>("PersonalDetailsRemovedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("ReceivedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ArchiveItemId");
+
+                    b.HasIndex("HandledAt");
+
+                    b.ToTable("VisitorNotes");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.DataProtection.EntityFrameworkCore.DataProtectionKey", b =>
                 {
                     b.Property<int>("Id")
@@ -844,6 +892,17 @@ namespace Commonage.Web.Data.Migrations
                 {
                     b.HasOne("Commonage.Web.Domain.ArchiveItem", "ArchiveItem")
                         .WithMany("MediaFiles")
+                        .HasForeignKey("ArchiveItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ArchiveItem");
+                });
+
+            modelBuilder.Entity("Commonage.Web.Domain.VisitorNote", b =>
+                {
+                    b.HasOne("Commonage.Web.Domain.ArchiveItem", "ArchiveItem")
+                        .WithMany()
                         .HasForeignKey("ArchiveItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

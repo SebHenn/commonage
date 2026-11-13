@@ -16,6 +16,7 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options)
     public DbSet<Tag> Tags => Set<Tag>();
     public DbSet<ContributionLink> ContributionLinks => Set<ContributionLink>();
     public DbSet<Contribution> Contributions => Set<Contribution>();
+    public DbSet<VisitorNote> VisitorNotes => Set<VisitorNote>();
     public DbSet<AuditEntry> AuditEntries => Set<AuditEntry>();
     public DbSet<ArchiveSettings> ArchiveSettings => Set<ArchiveSettings>();
     public DbSet<ArchiveText> ArchiveTexts => Set<ArchiveText>();
@@ -115,6 +116,19 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options)
             link.HasOne(l => l.Collection)
                 .WithMany()
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        builder.Entity<VisitorNote>(note =>
+        {
+            // Goes and comes back with its item, like the item's contribution.
+            note.HasQueryFilter(n => n.ArchiveItem.DeletedAt == null);
+            note.Property(n => n.Message).HasMaxLength(VisitorNote.MessageMaxLength);
+            note.Property(n => n.Name).HasMaxLength(Contribution.NameMaxLength);
+            note.Property(n => n.Email).HasMaxLength(Contribution.EmailMaxLength);
+            note.HasIndex(n => n.HandledAt);
+            note.HasOne(n => n.ArchiveItem)
+                .WithMany()
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         builder.Entity<Contribution>(contribution =>

@@ -239,7 +239,9 @@ started for it.
 `archive.json` has `"format": "commonage-export"` and `"version": 4`. Version 4 added `tags`, each with its `name` and `kind`
 (`Topic`, `Place` or `Person`); items still list their tags by name. Each collection also has its `position` among the others,
 the `sort` of its items (`RecentlyAdded`, `OldestFirst` or `NewestFirst`) and `coverFileId`, the `id` of the file chosen as its
-cover, or null when none is chosen or that file is not in the export. Version 3 added each item's rights, credit and catalogue
+cover, or null when none is chosen or that file is not in the export. Items also have `notes`, the messages visitors sent through
+"Do you know more about this?" (kind, message, when received and dealt with); they are null in an export of published items, and
+a note's `message`, `name` and `email` are only there with personal data. `settings` has `acceptVisitorNotes`. Version 3 added each item's rights, credit and catalogue
 details and each photo's description; in `items.csv`, `rights` and `rights_holder` are now the item's own, and the contributor's
 answers moved to `contributor_rights` and `contributor_rights_holder`. An export of published items leaves out what only
 curators see. Without personal data, it also leaves out rights holders, credits, "received from" and internal notes. Version 2 added `settings` with the archive's name, pages and colours, and the logo under `branding/`. While exporting, every file is checked against

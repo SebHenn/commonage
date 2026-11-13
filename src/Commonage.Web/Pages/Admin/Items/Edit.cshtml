@@ -39,6 +39,13 @@
     <p class="alert alert-info col-lg-8">@T["This draft has no title yet, and cannot be published without one. Give it a title that says what the photo shows."]</p>
 }
 
+@if (Model.OpenNotes > 0)
+{
+    <p class="alert alert-info col-lg-8" role="status">
+        <a asp-page="/Admin/Notes/Index" asp-route-item="@Model.ItemId" class="alert-link">@T.Plural("{0, plural, one {A visitor sent a note about this item.} other {Visitors sent # notes about this item.}}", Model.OpenNotes)</a>
+    </p>
+}
+
 @* In a review, the material comes first: it is what the decision is about. It is also what a title is written from. *@
 @if (Model.CurrentStatus == ItemStatus.Submitted || Model.IsUntitled)
 {

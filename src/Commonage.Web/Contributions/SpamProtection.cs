@@ -56,6 +56,15 @@ public static class SpamProtection
                 if (!HttpMethods.IsPost(context.Request.Method))
                     return RateLimitPartition.GetNoLimiter("not limited");
 
+                // "Do you know more about this?" shares the contribution form's limit, but counts on its own.
+                if (context.Request.Path.StartsWithSegments("/items") && context.Request.Path.Value!.TrimEnd('/').EndsWith("/tell", StringComparison.OrdinalIgnoreCase))
+                {
+                    var limit = context.RequestServices.GetRequiredService<IOptions<ContributionOptions>>().Value.MaxSubmissionsPerHour;
+                    return RateLimitPartition.GetFixedWindowLimiter(
+                        "tell " + context.Connection.RemoteIpAddress,
+                        _ => new FixedWindowRateLimiterOptions { PermitLimit = limit, Window = TimeSpan.FromHours(1) });
+                }
+
                 if (context.Request.Path.StartsWithSegments("/contribute"))
                 {
                     var limit = context.RequestServices.GetRequiredService<IOptions<ContributionOptions>>().Value.MaxSubmissionsPerHour;
@@ -77,13 +86,16 @@ public static class SpamProtection
             options.OnRejected = async (rejected, cancellationToken) =>
             {
                 // A refused login gets the normal error page, because the response stays empty.
-                if (!rejected.HttpContext.Request.Path.StartsWithSegments("/contribute"))
+                var path = rejected.HttpContext.Request.Path;
+                var forContribution = path.StartsWithSegments("/contribute");
+                if (!forContribution && !path.StartsWithSegments("/items"))
                     return;
 
                 var localizer = rejected.HttpContext.RequestServices.GetRequiredService<IStringLocalizer<SharedResource>>();
                 rejected.HttpContext.Response.ContentType = "text/plain; charset=utf-8";
-                await rejected.HttpContext.Response.WriteAsync(
-                    localizer["Many contributions were sent from your network in the last hour. Please try again later."], cancellationToken);
+                await rejected.HttpContext.Response.WriteAsync(forContribution
+                    ? localizer["Many contributions were sent from your network in the last hour. Please try again later."]
+                    : localizer["Many notes were sent from your network in the last hour. Please try again later."], cancellationToken);
             };
         });
 }
