@@ -407,10 +407,16 @@ main:focus {
     display: none !important;
   }
 
-  .poster {
+  /* More specific than the screen rule for .poster, which comes later in this file. */
+  main .poster {
     border: 0;
     color: #000;
     background: #fff;
+  }
+
+  /* The address under a printed page is the curators' page, which a poster on a wall must not show. */
+  main:has(.poster)::after {
+    content: none;
   }
 
   .media-preview {
