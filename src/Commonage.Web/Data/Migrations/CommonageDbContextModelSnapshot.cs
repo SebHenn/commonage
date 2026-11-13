@@ -285,6 +285,9 @@ namespace Commonage.Web.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("CoverMediaFileId")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -292,12 +295,22 @@ namespace Commonage.Web.Data.Migrations
                         .HasMaxLength(4000)
                         .HasColumnType("character varying(4000)");
 
+                    b.Property<int>("Position")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Sort")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CoverMediaFileId");
+
+                    b.HasIndex("Position");
 
                     b.ToTable("Collections");
                 });
@@ -788,6 +801,14 @@ namespace Commonage.Web.Data.Migrations
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("ArchiveItem");
+                });
+
+            modelBuilder.Entity("Commonage.Web.Domain.Collection", b =>
+                {
+                    b.HasOne("Commonage.Web.Domain.MediaFile", null)
+                        .WithMany()
+                        .HasForeignKey("CoverMediaFileId")
+                        .OnDelete(DeleteBehavior.SetNull);
                 });
 
             modelBuilder.Entity("Commonage.Web.Domain.Contribution", b =>

@@ -26,6 +26,20 @@ For the people who look after what an archive holds. You need no technical knowl
   and this one is gone. This cannot be undone, and the activity log notes it.
 - **Delete it,** once no item has it, not even one in the bin. "Delete the unused tags" on the list does that for all of them.
 
+## Arranging collections
+
+**Collections** lists them in the order visitors find them. "Earlier" and "Later" move one a step; a new collection comes
+last. Open one to:
+
+- **Choose the order of its items:** recently added, oldest first or newest first. "Previous" and "Next" on an item lead
+  through the collection in the same order. Undated items come last when the order goes by date.
+- **Choose its cover** from the photos of its items. Visitors see that photo only while its item is published and in this
+  collection; until then, and without a choice, they see the first photo. A draft's photo can be chosen ahead of publishing.
+- **Delete it,** once it is empty: no items, not even in the bin, and no contribution links that send material to it.
+
+Visitors see the years a collection's published items are from, such as "1930–1965", on its page and its card. Nothing
+needs to be entered for that.
+
 ## Several photos, and letters
 
 - **Order:** "Earlier" and "Later" move a photo, and it happens at once for visitors too. The first photo is the cover, the one seen

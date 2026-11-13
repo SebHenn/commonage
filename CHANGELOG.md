@@ -12,15 +12,20 @@ version may change things that need attention when updating, and these notes say
 - The start page shows the archive through the decades, and the search shows the decades of what it found. Each decade opens
   what it counts.
 - "Places" and "People" list from A to Z what published items are tagged with, and an item shows its places and people first.
+- A collection shows which years its published items are from, such as "1930–1965", on its page and its card.
 
 ### For curators
 
 - A Tags page: say whether a tag names a place, a person or a topic, rename it on every item at once, merge two tags into one,
   and delete tags no item has.
+- Collections can be put in order, which is how visitors find them. Each collection has an order for its items (recently
+  added, oldest or newest first), which "previous" and "next" on an item follow, and a cover chosen from its photos. Visitors
+  only see the cover while its item is published. An empty collection can be deleted.
 
 ### For people who run an archive
 
-- The export is version 4: it lists the tags with their kinds. Items still list their tags by name.
+- The export is version 4: it lists the tags with their kinds, and each collection's position, order of items and cover. Items
+  still list their tags by name.
 
 ## 0.4.1 (2026-11-12)
 

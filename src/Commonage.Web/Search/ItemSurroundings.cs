@@ -15,22 +15,18 @@ public record ItemSurroundings(ItemLink? Previous, ItemLink? Next, IReadOnlyList
     public static async Task<ItemSurroundings> LoadAsync(CommonageDbContext db, ArchiveItem item, CancellationToken cancellationToken)
     {
         var inCollection = db.PublishedItems.Where(i => i.CollectionId == item.CollectionId && i.Id != item.Id);
+        var sort = await db.Collections.Where(c => c.Id == item.CollectionId).Select(c => c.Sort).FirstAsync(cancellationToken);
 
-        // The collection's page shows the most recently added first, with the id deciding between equals.
-        var at = item.PublishedAt;
-        var next = await inCollection
-            .Where(i => i.PublishedAt < at || (i.PublishedAt == at && i.Id < item.Id))
-            .OrderByDescending(i => i.PublishedAt).ThenByDescending(i => i.Id)
+        // In the order of the collection's page.
+        var next = await inCollection.After(item, sort)
             .Select(i => new ItemLink(i.Id, i.Title))
             .FirstOrDefaultAsync(cancellationToken);
-        var previous = await inCollection
-            .Where(i => i.PublishedAt > at || (i.PublishedAt == at && i.Id > item.Id))
-            .OrderBy(i => i.PublishedAt).ThenBy(i => i.Id)
+        var previous = await inCollection.Before(item, sort)
             .Select(i => new ItemLink(i.Id, i.Title))
             .FirstOrDefaultAsync(cancellationToken);
 
         var sameCollection = await inCollection
-            .OrderByDescending(i => i.PublishedAt).ThenByDescending(i => i.Id)
+            .Sort(sort.ToItemSort(), query: null)
             .Select(ItemSummary.FromItem)
             .Take(HowMany)
             .ToListAsync(cancellationToken);

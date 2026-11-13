@@ -13,7 +13,15 @@
 
 <h1>@ViewData["Title"]</h1>
 
-<form method="post" class="col-lg-8" data-warn-unsaved="@(ModelState.IsValid ? "" : "dirty")">
+@if (Model.CollectionId is { } collectionId)
+{
+    <p>
+        <a asp-page="/Admin/Index" asp-route-collection="@collectionId">@T["Items: {0}", Model.Use.Items]</a>
+        · <a asp-page="/Collections/Details" asp-route-id="@collectionId">@T["The collection's public page"]</a>
+    </p>
+}
+
+<form method="post" class="col-lg-8 mb-5" data-warn-unsaved="@(ModelState.IsValid ? "" : "dirty")">
     <partial name="_ErrorSummary" />
     <div class="mb-3">
         <label asp-for="Input.Title" class="form-label"></label>
@@ -25,8 +33,90 @@
         <textarea asp-for="Input.Description" class="form-control" rows="4"></textarea>
         <span asp-validation-for="Input.Description" class="text-danger"></span>
     </div>
+    <fieldset class="mb-3">
+        <legend class="form-label fs-6">@T["Order of the items"]</legend>
+        @foreach (var (sort, label) in new[]
+        {
+            (CollectionSort.RecentlyAdded, T["Recently added"]),
+            (CollectionSort.OldestFirst, T["Oldest first"]),
+            (CollectionSort.NewestFirst, T["Newest first"]),
+        })
+        {
+            <div class="form-check">
+                <input type="radio" id="sort-@sort" name="Input.Sort" value="@sort" class="form-check-input" checked="@(Model.Input.Sort == sort)" />
+                <label for="sort-@sort" class="form-check-label">@label</label>
+            </div>
+        }
+        <span asp-validation-for="Input.Sort" class="text-danger"></span>
+        <div class="form-text">@T["How visitors find the items on the collection's page, and where “previous” and “next” on an item lead. Undated items come last when the order goes by date."]</div>
+    </fieldset>
+
+    @if (Model.CollectionId is not null)
+    {
+        <fieldset class="mb-3">
+            <legend class="form-label fs-6">@T["Cover"]</legend>
+            <div class="form-text mb-2">@T["The photo visitors see for the collection. They only see a photo while its item is published; until then, and without a choice, they see the first photo of the collection."]</div>
+            <span asp-validation-for="Input.CoverMediaFileId" class="text-danger"></span>
+            <div class="form-check mb-2">
+                <input type="radio" id="cover-none" name="Input.CoverMediaFileId" value="" class="form-check-input" checked="@(Model.Input.CoverMediaFileId is null)" />
+                <label for="cover-none" class="form-check-label">@T["The first photo"]</label>
+            </div>
+            @if (Model.CoverChoices.Count > 0)
+            {
+                <ul class="list-unstyled cover-choices">
+                    @foreach (var choice in Model.CoverChoices)
+                    {
+                        <li>
+                            <label class="cover-choice">
+                                <img src="/admin/media/@choice.MediaFileId/thumbnail" alt="" class="media-thumbnail mb-1" loading="lazy" />
+                                <span class="d-flex gap-2 align-items-start">
+                                    <input type="radio" name="Input.CoverMediaFileId" value="@choice.MediaFileId" class="form-check-input flex-shrink-0"
+                                           checked="@(Model.Input.CoverMediaFileId == choice.MediaFileId)" />
+                                    <span class="small text-break">
+                                        @choice.ItemTitle
+                                        @if (!choice.Published)
+                                        {
+                                            <span class="d-block text-muted">@T["Not published"]</span>
+                                        }
+                                    </span>
+                                </span>
+                            </label>
+                        </li>
+                    }
+                </ul>
+                @if (Model.CoverChoices.Count == EditModel.MaxCoverChoices)
+                {
+                    <div class="form-text">@T.Plural("{0, plural, one {Only one photo is shown: the chosen one, or else that of the newest published item.} other {At most # photos are shown: the chosen one, then those of published items, the newest items first.}}", EditModel.MaxCoverChoices)</div>
+                }
+            }
+        </fieldset>
+    }
+
     <button type="submit" class="btn btn-primary">@T["Save"]</button>
 </form>
+
+@if (Model.CollectionId is not null)
+{
+    <section aria-labelledby="delete-heading" class="col-lg-8">
+        <h2 id="delete-heading" class="h4">@T["Delete"]</h2>
+        @if (Model.Use.IsUnused)
+        {
+            <form method="post" asp-page-handler="Delete">
+                <p>@T["The collection is empty, so it can be deleted."]</p>
+                <button type="submit" class="btn btn-outline-danger">@T["Delete the collection"]</button>
+            </form>
+        }
+        else
+        {
+            <p>@T["Only an empty collection can be deleted: without items, also in the bin, and without contribution links that send material to it."]</p>
+            <ul>
+                <li>@T["Items: {0}", Model.Use.Items]</li>
+                <li>@T["Items in the bin: {0}", Model.Use.InBin]</li>
+                <li>@T["Contribution links: {0}", Model.Use.Links]</li>
+            </ul>
+        }
+    </section>
+}
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

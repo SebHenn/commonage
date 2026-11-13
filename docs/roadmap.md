@@ -174,7 +174,7 @@ real pace over M7 and M8 before promising dates. Each milestone is a minor relea
 | **M16 Rights and sharing** ✅ | 3 | Every item page says whether it may be reused, in plain language. "Cite this item" gives a line to copy. A link pasted into a messenger shows the picture and the archive's name. |
 | **M17 Language reach** ✅ | 5 | A translator without Git has tried Weblate on a few pages. Missing translations fail a test. Counts read correctly under Polish plural rules. Item text carries the right `lang`. Dates that are accepted today are still accepted. |
 | **M18 Accounts and system** ✅ | 4 | A curator logs in with an authenticator app. Login keys are encrypted with a key outside the database, and the backup test still passes. An admin sees version, disk use, failed previews (with retry) and backup age on one page. |
-| **M19 Discovery** | 3 | A visitor taps "1960s" and finds the flood, opens "Places" and picks "Mill Street". A curator merges "Mill St" into "Mill Street". |
+| **M19 Discovery** ✅ | 3 | A visitor taps "1960s" and finds the flood, opens "Places" and picks "Mill Street". A curator merges "Mill St" into "Mill Street". |
 | **M20 Community knowledge** | 4 | With the feature switched on, a visitor says "that's my aunt on the left" or asks for removal from an item page, and a curator handles it. A curator prints a poster with a QR code for a contribution link. |
 | **M21 Import and scale** | 4 | A group imports a spreadsheet and a ZIP of scans after a dry run that lists every problem. A 50,000-item archive on a small ARM server stays fast and exports without running out of memory. |
 
@@ -419,7 +419,13 @@ merges and deletes unused tags. Every item with a changed tag is brought up to d
 included, and a tag that only items in the bin have is not unused. `/places` and `/people` list from A to Z what published
 items are tagged with, so a name only drafts have stays unseen; whether to name living people stays the curators' decision,
 and the page and the handbook say that the People page lists names on their own. The export (version 4) has the tags with
-their kinds. Collections follow in a pull request of their own.
+their kinds.
+
+**Third part done (November 2026):** curators put the collections in order and give each one an order for its items, which
+"previous" and "next" on an item follow, so the walk through a collection is the one its page shows. A cover is chosen from the
+collection's photos, also a draft's ahead of publishing, but visitors only see it while its item is published and in the
+collection. An empty collection can be deleted; one with an item in the bin or a contribution link cannot. Each collection
+shows the years of its published items. M19 is complete.
 
 **M20 Community knowledge**
 

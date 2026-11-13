@@ -50,6 +50,8 @@ public enum AuditAction
     TagsMerged,
     TagDeleted,
     UnusedTagsDeleted,
+    CollectionMoved,
+    CollectionDeleted,
 }
 
 /// <summary>

@@ -108,7 +108,7 @@ public class ExportTests(CommonageAppFactory app)
         "Id, TheOnlyId: there is only one. LogoId: as logo.")]
     [InlineData(typeof(Contribution), "contribution", "contributorName contributorEmail showName rights rightsHolder consentText reuse consentCoversSharing referenceCode submittedAt reviewedAt personalDetailsRemovedAt contributionLink",
         "Id, ArchiveItemId, ArchiveItem: listed under its item. ContributionLinkId: the link is named. SendingFingerprint: only there to recognise a form sent twice.")]
-    [InlineData(typeof(Collection), "collection", "id title description createdAt", "Items: each item names its collection.")]
+    [InlineData(typeof(Collection), "collection", "id title description createdAt position sort coverFileId", "Items: each item names its collection. CoverMediaFileId: as coverFileId.")]
     [InlineData(typeof(Tag), "tag", "name kind", "Id: items name their tags. NormalizedName: follows from the name. Items: each item lists its tags.")]
     public async Task Every_field_is_exported_or_left_out_on_purpose(Type type, string part, string exported, string leftOut)
     {

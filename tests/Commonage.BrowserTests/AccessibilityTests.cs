@@ -13,7 +13,7 @@ public class AccessibilityTests(BrowserFixture app)
         "/Account/Login", "CONTRIBUTE", "/contribute/no-such-link", "/about", "/contact", "/privacy");
 
     public static TheoryData<string, int> CuratorPages() => Widths(
-        "/Admin", "/Admin?status=Submitted", "/Admin/Items/Edit/11", "/Admin/Items/Edit", "/Admin/Items/AddMany", "/Admin/Items/Edit/1", "/Admin/Items/Preview/1", "/Admin/Collections", "/Admin/Tags", "/Admin/Tags/Edit/1", "/Admin/Contributions",
+        "/Admin", "/Admin?status=Submitted", "/Admin/Items/Edit/11", "/Admin/Items/Edit", "/Admin/Items/AddMany", "/Admin/Items/Edit/1", "/Admin/Items/Preview/1", "/Admin/Collections", "/Admin/Collections/Edit/1", "/Admin/Collections/Edit", "/Admin/Tags", "/Admin/Tags/Edit/1", "/Admin/Contributions",
         "/Admin/Contributors?q=a", "/Admin/Bin", "/Admin/Settings", "/Admin/Users", "/Admin/Activity", "/Admin/Activity?what=Items", "/Admin/Export", "/Admin/System", "/Account/Password", "/Account/TwoFactor");
 
     private static TheoryData<string, int> Widths(params string[] paths)

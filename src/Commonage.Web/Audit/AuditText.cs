@@ -41,6 +41,8 @@ public static class AuditText
         AuditAction.ContributorDetailsRemoved => localizer["Removed the contributor's name and email address"],
         AuditAction.CollectionCreated => localizer["Created the collection"],
         AuditAction.CollectionChanged => localizer["Changed the collection"],
+        AuditAction.CollectionMoved => localizer["Changed the order of the collections"],
+        AuditAction.CollectionDeleted => localizer["Deleted the empty collection"],
         AuditAction.ContributionLinkCreated => localizer["Created the contribution link"],
         AuditAction.ContributionLinkChanged => localizer["Changed the contribution link"],
         AuditAction.AccountCreated => localizer["Created the account"],
@@ -80,7 +82,8 @@ public static class AuditText
         AuditAction.ContributionReceived or AuditAction.ContributionAccepted or AuditAction.ContributionRejected
             or AuditAction.ContributionWithdrawn or AuditAction.ContributorDetailsRemoved or AuditAction.ContributorDetailsChanged
             or AuditAction.ContributionLinkCreated or AuditAction.ContributionLinkChanged => AuditKind.Contributions,
-        AuditAction.CollectionCreated or AuditAction.CollectionChanged => AuditKind.Collections,
+        AuditAction.CollectionCreated or AuditAction.CollectionChanged or AuditAction.CollectionMoved
+            or AuditAction.CollectionDeleted => AuditKind.Collections,
         AuditAction.TagChanged or AuditAction.TagsMerged or AuditAction.TagDeleted or AuditAction.UnusedTagsDeleted => AuditKind.Tags,
         AuditAction.AccountCreated or AuditAction.AccountRoleChanged or AuditAction.AccountDisabled or AuditAction.AccountEnabled
             or AuditAction.AccountDeleted or AuditAction.SetupLinkCreated or AuditAction.PasswordChanged
