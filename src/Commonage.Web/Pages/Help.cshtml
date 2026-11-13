@@ -1,0 +1,18 @@
+@page "/help"
+@model Commonage.Web.Pages.HelpModel
+@{
+    ViewData["Title"] = T["Can you help?"];
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@if (Model.Items.TotalCount == 0)
+{
+    <p class="text-muted">@T["Nothing is waiting for help right now. Thank you for looking."]</p>
+}
+else
+{
+    <p class="col-lg-8">@T["The curators hope you know more about these. Open one and tell them what you know: who is in the picture, where it was taken, when."]</p>
+    <partial name="_ItemCards" model="Model.Items.Items" view-data='new ViewDataDictionary(ViewData) { ["ShowCollection"] = true }' />
+    <partial name="_Pager" model="Model.Items" />
+}

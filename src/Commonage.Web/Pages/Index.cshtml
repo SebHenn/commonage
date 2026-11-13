@@ -53,6 +53,14 @@
     </section>
 }
 
+@if (Model.HelpWanted)
+{
+    <section class="home-section" aria-labelledby="help-heading">
+        <h2 id="help-heading">@T["Can you help?"]</h2>
+        <p>@T["Some items wait for someone who knows more about them."] <a asp-page="/Help">@T["See what the curators ask about"]</a></p>
+    </section>
+}
+
 @if (Model.Tags.Count > 0)
 {
     <section class="home-section" aria-labelledby="tags-heading">

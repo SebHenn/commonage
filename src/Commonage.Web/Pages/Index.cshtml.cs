@@ -26,9 +26,13 @@ public class IndexModel(CommonageDbContext db, Commonage.Web.Operations.ArchiveP
     /// <summary>The kinds with a page of their own, places and people, that published items have tags of.</summary>
     public IReadOnlyList<Domain.TagKind> TagKinds { get; private set; } = [];
 
+    /// <summary>Whether to invite visitors to "Can you help?": only while the archive asks them, and only if an item waits.</summary>
+    public bool HelpWanted { get; private set; }
+
     public async Task OnGetAsync()
     {
         Identity = await profile.GetAsync();
+        HelpWanted = Identity.AcceptVisitorNotes && await db.PublishedItems.AnyAsync(i => i.HelpWanted);
         Collections = await db.LoadCollectionCardsAsync(HttpContext.RequestAborted);
         Recent = await db.PublishedItems
             .OrderByDescending(i => i.PublishedAt)

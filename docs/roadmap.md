@@ -433,7 +433,9 @@ shows the years of its published items. M19 is complete.
   protected like the contribution form, and covered by the personal-data tools. Notes sit in a curators' inbox (removal
   requests first), can be dealt with, stripped of name and email, or deleted, appear in Contributors and in a full export, and
   the activity log names only the item.
-- "Help wanted" flag and a "Can you help?" page. Dashboard cards for what needs attention.
+- ✅ "Help wanted" flag and a "Can you help?" page (only while visitors are asked; unpublished items are not listed, and the
+  export, version 5, carries the flag). Dashboard cards for what needs attention: notes (removal requests counted), items
+  waiting for a transcription, help wanted.
 - Links: copy button, a printable poster with QR code (checked against the no-inline-style test), and an opt-in
   invitation on the collection page, which gives up being unlisted. A clear page for closed links.
 

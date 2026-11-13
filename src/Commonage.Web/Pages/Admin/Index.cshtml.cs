@@ -24,6 +24,18 @@ public class IndexModel(CommonageDbContext db, ArchiveHealth health, ArchiveProf
     /// <summary>Contributions nobody has reviewed yet.</summary>
     public int WaitingCount { get; private set; }
 
+    /// <summary>Notes from visitors nobody has dealt with yet, and how many of them ask for something to be taken down.</summary>
+    public int OpenNotes { get; private set; }
+
+    public int OpenRemovalRequests { get; private set; }
+
+    public int NeedTranscription { get; private set; }
+
+    /// <summary>Items asking visitors for help that are not published yet, so nobody can answer.</summary>
+    public int HelpWantedNotPublished { get; private set; }
+
+    public int HelpWanted { get; private set; }
+
     public ArchiveHealth Health => health;
 
     public GettingStarted GettingStarted { get; private set; } = new([], false);
@@ -82,6 +94,11 @@ public class IndexModel(CommonageDbContext db, ArchiveHealth health, ArchiveProf
         CollectionOptions = new SelectList(collections, nameof(Collection.Id), nameof(Collection.Title), CollectionId);
         WaitingCount = await db.ArchiveItems.CountAsync(i => i.Status == ItemStatus.Submitted, cancellationToken);
         GettingStarted = await LoadGettingStartedAsync(cancellationToken);
+        OpenNotes = await db.VisitorNotes.CountAsync(n => n.HandledAt == null, cancellationToken);
+        OpenRemovalRequests = await db.VisitorNotes.CountAsync(n => n.HandledAt == null && n.Kind == VisitorNoteKind.Removal, cancellationToken);
+        NeedTranscription = await db.ArchiveItems.CountAsync(i => i.NeedsTranscription, cancellationToken);
+        HelpWanted = await db.ArchiveItems.CountAsync(i => i.HelpWanted, cancellationToken);
+        HelpWantedNotPublished = await db.ArchiveItems.CountAsync(i => i.HelpWanted && (i.Status == ItemStatus.Draft || i.Status == ItemStatus.Submitted), cancellationToken);
 
         var items = await db.QueryAsync(Filter, cancellationToken);
         Items = await items

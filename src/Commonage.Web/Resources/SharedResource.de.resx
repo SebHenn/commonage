@@ -882,4 +882,19 @@
   <data name="{0}–{1}" xml:space="preserve"><value>{0}–{1}</value></data>
   <data name="“{0}” also finds what is dated {1}." xml:space="preserve"><value>„{0}“ findet auch, was auf {1} datiert ist.</value></data>
   <data name="“{1}” is merged into “{2}”, {0, plural, =0 {which no item had.} one {on one item.} other {on # items.}}" xml:space="preserve"><value>„{1}“ ist mit „{2}“ zusammengeführt, {0, plural, =0 {das kein Eintrag hatte.} one {bei einem Eintrag.} other {bei # Einträgen.}}</value></data>
+  <data name="Ask visitors for help with this item" xml:space="preserve"><value>Besucher um Hilfe zu diesem Eintrag bitten</value></data>
+  <data name="Can you help?" xml:space="preserve"><value>Können Sie helfen?</value></data>
+  <data name="Help from visitors" xml:space="preserve"><value>Hilfe von Besuchern</value></data>
+  <data name="Lists the item on the page that asks visitors for help, once it is published and the archive asks visitors." xml:space="preserve"><value>Führt den Eintrag auf der Seite auf, die Besucher um Hilfe bittet, sobald er veröffentlicht ist und das Archiv Besucher fragt.</value></data>
+  <data name="Nothing is waiting for help right now. Thank you for looking." xml:space="preserve"><value>Im Moment wartet nichts auf Hilfe. Danke fürs Vorbeischauen.</value></data>
+  <data name="See what the curators ask about" xml:space="preserve"><value>Sehen, wonach die Kuratoren fragen</value></data>
+  <data name="Some items wait for someone who knows more about them." xml:space="preserve"><value>Manche Einträge warten auf jemanden, der mehr darüber weiß.</value></data>
+  <data name="The curators are looking for help with this item." xml:space="preserve"><value>Die Kuratoren suchen Hilfe zu diesem Eintrag.</value></data>
+  <data name="The curators hope you know more about these. Open one and tell them what you know: who is in the picture, where it was taken, when." xml:space="preserve"><value>Die Kuratoren hoffen, dass Sie mehr dazu wissen. Öffnen Sie einen Eintrag und sagen Sie ihnen, was Sie wissen: wer auf dem Bild zu sehen ist, wo es entstand, wann.</value></data>
+  <data name="What needs attention" xml:space="preserve"><value>Was Aufmerksamkeit braucht</value></data>
+  <data name="{0, plural, one {# asks for removal} other {# ask for removal}}" xml:space="preserve"><value>{0, plural, one {# bittet um Entfernung} other {# bitten um Entfernung}}</value></data>
+  <data name="{0, plural, one {# of them is not published yet} other {# of them are not published yet}}" xml:space="preserve"><value>{0, plural, one {# davon ist noch nicht veröffentlicht} other {# davon sind noch nicht veröffentlicht}}</value></data>
+  <data name="{0, plural, one {# item asks visitors for help} other {# items ask visitors for help}}" xml:space="preserve"><value>{0, plural, one {# Eintrag bittet Besucher um Hilfe} other {# Einträge bitten Besucher um Hilfe}}</value></data>
+  <data name="{0, plural, one {# item waits for a transcription} other {# items wait for a transcription}}" xml:space="preserve"><value>{0, plural, one {# Eintrag wartet auf eine Abschrift} other {# Einträge warten auf eine Abschrift}}</value></data>
+  <data name="{0, plural, one {# note from visitors to deal with} other {# notes from visitors to deal with}}" xml:space="preserve"><value>{0, plural, one {# Hinweis von Besuchern zu bearbeiten} other {# Hinweise von Besuchern zu bearbeiten}}</value></data>
 </root>

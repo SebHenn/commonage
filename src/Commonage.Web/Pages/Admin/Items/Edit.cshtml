@@ -248,6 +248,11 @@
             <input asp-for="Input.NeedsTranscription" class="form-check-input" />
             <label asp-for="Input.NeedsTranscription" class="form-check-label"></label>
         </div>
+        <div class="form-check mt-2">
+            <input asp-for="Input.HelpWanted" class="form-check-input" aria-describedby="help-wanted-help" />
+            <label asp-for="Input.HelpWanted" class="form-check-label"></label>
+            <div id="help-wanted-help" class="form-text">@T["Lists the item on the page that asks visitors for help, once it is published and the archive asks visitors."]</div>
+        </div>
     </div>
 
     <partial name="_Catalogue" model="Model" />

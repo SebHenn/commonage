@@ -17,8 +17,13 @@ version may change things that need attention when updating, and these notes say
 - With "Do you know more about this?" switched on under Settings, a visitor can tell the curators what they know about a
   published item, that something is wrong, or ask for it to be taken down, with an optional name and email address. Nothing is
   shown publicly.
+- A curator can ask visitors for help with an item. Those items are listed on a "Can you help?" page, linked from the start
+  page, and say so on their own page. It exists only while "Do you know more about this?" is switched on.
 
 ### For curators
+
+- The first page of Manage archive shows what needs attention: notes from visitors to deal with (and how many ask for removal),
+  items waiting for a transcription, and items that ask visitors for help, each opening that list.
 
 - A Notes from visitors page lists them, removal requests first. Mark them as dealt with, remove the name and email address,
   or delete them; items and Contributors show them too, and the activity log records them without the visitor.

@@ -98,7 +98,7 @@ public class ExportTests(CommonageAppFactory app)
     /// and nobody would notice until then. Names are as they appear in archive.json.
     /// </summary>
     [Theory]
-    [InlineData(typeof(ArchiveItem), "item", "id collectionId title description status createdAt updatedAt publishedAt rejectedOrWithdrawnAt contribution files tags rightsUri rightsHolder credit referenceNumber originalLocation receivedFrom receivedOn internalNotes needsTranscription notes",
+    [InlineData(typeof(ArchiveItem), "item", "id collectionId title description status createdAt updatedAt publishedAt rejectedOrWithdrawnAt contribution files tags rightsUri rightsHolder credit referenceNumber originalLocation receivedFrom receivedOn internalNotes needsTranscription helpWanted notes",
         "Collection: by collectionId. MediaFiles: as files. DateText, DateFrom, DateTo: as date. TagNames: repeats tags. "
         + "CanBePublished: follows from status. IsUntitled: follows from the empty title. MayTravel: follows from the contribution. DeletedAt: the bin is not exported. Version: only for open forms.")]
     [InlineData(typeof(MediaFile), "file", "id originalFileName contentType sizeBytes sha256 uploadedAt altText caption position rotation",
@@ -180,7 +180,7 @@ public class ExportTests(CommonageAppFactory app)
         Assert.Contains(published.Id, ids);
         Assert.DoesNotContain(waiting.Id, ids);
         Assert.Equal(["Published"], statuses);
-        Assert.Equal(4, document.GetProperty("version").GetInt32());
+        Assert.Equal(5, document.GetProperty("version").GetInt32());
     }
 
     [Fact]

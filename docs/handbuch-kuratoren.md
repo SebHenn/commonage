@@ -147,6 +147,10 @@ Zweifel nach, oder lassen Sie es als Entwurf.
 Wenn jemand sagt, ein Handyfoto sei wegen seines Formats abgelehnt worden, ist es wahrscheinlich HEIC, das das Archiv noch nicht
 lesen kann. Es muss zuerst als JPEG gespeichert werden. Das Formular sagt das auch.
 
+## Besucher um Hilfe bitten
+
+Haken Sie bei einem Eintrag **Besucher um Hilfe zu diesem Eintrag bitten** an. Sobald er veröffentlicht ist, steht er auf der Seite «Können Sie helfen?», auf die die Startseite verweist, und seine eigene Seite sagt, dass die Kuratoren Hilfe suchen. Beides gibt es nur, solange «Wissen Sie mehr darüber?» eingeschaltet ist, weil Besucher so antworten. Unter «Fehlt noch» zeigt **Hilfe von Besuchern** alle; die Karten oben in der Verwaltung zählen sie und sagen, wie viele noch nicht veröffentlicht sind.
+
 ## Hinweise von Besuchern
 
 Unter «Einstellungen» können Sie «Wissen Sie mehr darüber?» einschalten. Jeder veröffentlichte Eintrag hat dann einen Link, über den Besucher mitteilen können, was sie wissen, dass etwas nicht stimmt oder dass der Eintrag entfernt werden soll. Name und E-Mail-Adresse sind freiwillig.
