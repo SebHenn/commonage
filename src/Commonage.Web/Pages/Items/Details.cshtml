@@ -1,5 +1,6 @@
 @page "/items/{id:int}"
 @model Commonage.Web.Pages.Items.DetailsModel
+@inject Commonage.Web.Operations.ArchiveProfile Profile
 @{
     ViewData["Title"] = Model.Item.Title;
     ViewData["Canonical"] = Model.Address;
@@ -31,6 +32,14 @@
             <a asp-page="/Items/Details" asp-route-id="@next.Id" rel="next" class="item-next">@T["Next: {0}", next.Title]</a>
         }
     </nav>
+}
+@if ((await Profile.GetAsync()).AcceptVisitorNotes)
+{
+    <section class="mt-5 d-print-none" aria-labelledby="tell-heading">
+        <h2 id="tell-heading" class="h4">@T["Do you know more about this?"]</h2>
+        <p>@T["Who is in the picture, where was it, is something wrong? Tell the curators."]</p>
+        <a asp-page="/Items/Tell" asp-route-id="@Model.Item.Id" class="btn btn-outline-primary">@T["Tell us"]</a>
+    </section>
 }
 @if (around.SameCollection.Count > 0)
 {

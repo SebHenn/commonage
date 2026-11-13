@@ -59,6 +59,11 @@ public class ArchiveExporter(
             collections = collections.Where(c => used.Contains(c.Id)).ToList();
         }
 
+        // Notes from visitors are for curators, so a copy of what is public has none.
+        var notes = options.PublishedOnly
+            ? null
+            : (await db.VisitorNotes.AsNoTracking().OrderBy(n => n.Id).ToListAsync(cancellationToken)).ToLookup(n => n.ArchiveItemId);
+
         await using var zip = await ZipArchive.CreateAsync(output, ZipArchiveMode.Create, leaveOpen: true, entryNameEncoding: Encoding.UTF8, cancellationToken);
 
         // Files first, so the descriptions written afterwards can say which files could not be read.
@@ -68,7 +73,7 @@ public class ArchiveExporter(
             var files = new List<ExportFile>();
             foreach (var file in item.MediaFiles.OrderBy(f => f.Position).ThenBy(f => f.Id))
                 files.Add(await WriteFileAsync(zip, item, file, cancellationToken));
-            exportedItems.Add(Describe(item, files, options));
+            exportedItems.Add(Describe(item, files, notes?[item.Id], options));
         }
 
         var exportedFiles = exportedItems.SelectMany(i => i.Files).Select(f => f.Id).ToHashSet();
@@ -100,7 +105,7 @@ public class ArchiveExporter(
             exportedItems,
             new ExportSettings(
                 settings.DefaultLanguage, settings.ContentLanguage, settings.OtherContentLanguages, settings.AccentColor, settings.TimeZone, settings.DefaultRightsUri, settings.AllowSearchEngines, settings.RequireTwoFactor, settings.LargePhotos, settings.PrivacyReviewed,
-                settings.ImprintNotNeeded, settings.RestoreTestedAt, settings.ActivityLogKeptYears, settings.RejectedKeptMonths, logoPath,
+                settings.ImprintNotNeeded, settings.RestoreTestedAt, settings.ActivityLogKeptYears, settings.RejectedKeptMonths, settings.AcceptVisitorNotes, logoPath,
                 texts.Select(t => new ExportText(t.Language, t.Kind, t.Text)).ToList()));
 
         await WriteEntryAsync(zip, "archive.json", CompressionLevel.Optimal,
@@ -162,7 +167,7 @@ public class ArchiveExporter(
     private static ExportFile Describe(MediaFile file, string? path, string? problem) =>
         new(file.Id, path, file.OriginalFileName, file.ContentType, file.SizeBytes, file.Sha256, file.UploadedAt, file.AltText, file.Caption, file.Position, file.Rotation, problem);
 
-    private static ExportItem Describe(ArchiveItem item, List<ExportFile> files, ExportOptions options) => new(
+    private static ExportItem Describe(ArchiveItem item, List<ExportFile> files, IEnumerable<VisitorNote>? notes, ExportOptions options) => new(
         item.Id,
         item.CollectionId,
         item.Title,
@@ -198,6 +203,15 @@ public class ArchiveExporter(
             contribution.ReviewedAt,
             contribution.PersonalDetailsRemovedAt,
             contribution.ContributionLink?.Title),
+        notes?.Select(n => new ExportNote(
+            n.Kind,
+            // What a visitor wrote may name people, so it is personal data like the curators' internal notes.
+            options.IncludePersonalData ? n.Message : null,
+            options.IncludePersonalData ? n.Name : null,
+            options.IncludePersonalData ? n.Email : null,
+            n.ReceivedAt,
+            n.HandledAt,
+            n.PersonalDetailsRemovedAt)).ToList(),
         files);
 
     private static async Task WriteEntryAsync(
@@ -305,6 +319,7 @@ internal record ExportSettings(
     DateTime? RestoreTestedAt,
     int? ActivityLogKeptYears,
     int? RejectedKeptMonths,
+    bool AcceptVisitorNotes,
     string? Logo,
     IReadOnlyList<ExportText> Texts);
 
@@ -337,7 +352,18 @@ internal record ExportItem(
     string? InternalNotes,
     bool? NeedsTranscription,
     ExportContribution? Contribution,
+    IReadOnlyList<ExportNote>? Notes,
     IReadOnlyList<ExportFile> Files);
+
+/// <summary>A note from a visitor. Not in a copy of what is public; message, name and email address only with personal data.</summary>
+internal record ExportNote(
+    VisitorNoteKind Kind,
+    string? Message,
+    string? Name,
+    string? Email,
+    DateTime ReceivedAt,
+    DateTime? HandledAt,
+    DateTime? PersonalDetailsRemovedAt);
 
 /// <summary>The date as written, and the earliest and latest day it can stand for.</summary>
 internal record ExportDate(string Text, DateOnly? From, DateOnly? To);

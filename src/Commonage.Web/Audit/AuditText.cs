@@ -43,6 +43,11 @@ public static class AuditText
         AuditAction.CollectionChanged => localizer["Changed the collection"],
         AuditAction.CollectionMoved => localizer["Changed the order of the collections"],
         AuditAction.CollectionDeleted => localizer["Deleted the empty collection"],
+        AuditAction.VisitorNoteReceived => localizer["A visitor sent a note about the item"],
+        AuditAction.VisitorNoteHandled => localizer["Marked a visitor's note as dealt with"],
+        AuditAction.VisitorNoteReopened => localizer["Opened a visitor's note again"],
+        AuditAction.VisitorNoteDetailsRemoved => localizer["Removed the name and email address from a visitor's note"],
+        AuditAction.VisitorNoteDeleted => localizer["Deleted a visitor's note"],
         AuditAction.ContributionLinkCreated => localizer["Created the contribution link"],
         AuditAction.ContributionLinkChanged => localizer["Changed the contribution link"],
         AuditAction.AccountCreated => localizer["Created the account"],
@@ -81,7 +86,9 @@ public static class AuditText
             or AuditAction.PhotoRestored or AuditAction.PhotoPurged or AuditAction.PreviewRetried => AuditKind.Photos,
         AuditAction.ContributionReceived or AuditAction.ContributionAccepted or AuditAction.ContributionRejected
             or AuditAction.ContributionWithdrawn or AuditAction.ContributorDetailsRemoved or AuditAction.ContributorDetailsChanged
-            or AuditAction.ContributionLinkCreated or AuditAction.ContributionLinkChanged => AuditKind.Contributions,
+            or AuditAction.ContributionLinkCreated or AuditAction.ContributionLinkChanged
+            or AuditAction.VisitorNoteReceived or AuditAction.VisitorNoteHandled or AuditAction.VisitorNoteReopened
+            or AuditAction.VisitorNoteDetailsRemoved or AuditAction.VisitorNoteDeleted => AuditKind.Contributions,
         AuditAction.CollectionCreated or AuditAction.CollectionChanged or AuditAction.CollectionMoved
             or AuditAction.CollectionDeleted => AuditKind.Collections,
         AuditAction.TagChanged or AuditAction.TagsMerged or AuditAction.TagDeleted or AuditAction.UnusedTagsDeleted => AuditKind.Tags,
@@ -98,7 +105,7 @@ public static class AuditText
     {
         AuditKind.Items => localizer["Items"],
         AuditKind.Photos => localizer["Photos"],
-        AuditKind.Contributions => localizer["Contributions and links"],
+        AuditKind.Contributions => localizer["Contributions, links and notes from visitors"],
         AuditKind.Collections => localizer["Collections"],
         AuditKind.Tags => localizer["Tags"],
         AuditKind.Accounts => localizer["Accounts and logins"],
@@ -108,5 +115,10 @@ public static class AuditText
 
     /// <summary>Who did it: the account's name, a contributor, or the archive itself.</summary>
     public static string Who(IStringLocalizer localizer, AuditEntry entry) =>
-        entry.UserName ?? (entry.Action == AuditAction.ContributionReceived ? localizer["Contributor"] : localizer["Automatic"]);
+        entry.UserName ?? entry.Action switch
+        {
+            AuditAction.ContributionReceived => localizer["Contributor"],
+            AuditAction.VisitorNoteReceived => localizer["Visitor"],
+            _ => localizer["Automatic"],
+        };
 }

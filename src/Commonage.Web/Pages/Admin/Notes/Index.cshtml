@@ -1,0 +1,104 @@
+@page
+@model Commonage.Web.Pages.Admin.Notes.IndexModel
+@using Commonage.Web.Pages.Admin.Notes
+@{
+    ViewData["Title"] = T["Notes from visitors"];
+    string KindName(VisitorNoteKind kind) => kind switch
+    {
+        VisitorNoteKind.Correction => T["Correction"],
+        VisitorNoteKind.Removal => T["Request to take it down"],
+        _ => T["More about it"],
+    };
+}
+
+<h1>@ViewData["Title"]</h1>
+<div class="col-lg-8">
+    <p>@T["What visitors sent through “Do you know more about this?” on an item. It is not shown publicly: write what is worth keeping into the item, then mark the note as dealt with."]</p>
+    @if (Model.ItemTitle is { } itemTitle)
+    {
+        <p>
+            @T["About {0}", ArchiveItem.ShownTitle(T, itemTitle)]
+            · <a asp-page="/Admin/Notes/Index" asp-route-show="@(Model.Show == NoteFilter.Open ? null : Model.Show.ToString())">@T["All items"]</a>
+        </p>
+    }
+</div>
+
+<nav aria-label="@T["Show"]" class="nav nav-underline mb-3">
+    @foreach (var (filter, label) in new[] { (NoteFilter.Open, (Model.OpenCount == 0 ? T["Open"] : T["Open ({0})", Model.OpenCount])), (NoteFilter.Handled, T["Dealt with"]), (NoteFilter.All, T["All"]) })
+    {
+        <a asp-page="/Admin/Notes/Index" asp-route-show="@(filter == NoteFilter.Open ? null : filter.ToString())" asp-route-item="@Model.Item"
+           class="nav-link" aria-current="@(Model.Show == filter ? "page" : null)">@label</a>
+    }
+</nav>
+
+@if (Model.Notes.TotalCount == 0)
+{
+    <p class="text-muted">@(Model.Show == NoteFilter.Open ? T["No open notes."] : T["No notes."])</p>
+}
+else
+{
+    <ul class="list-unstyled">
+        @foreach (var note in Model.Notes.Items)
+        {
+            var handlerRoute = new Dictionary<string, string?> { ["noteId"] = note.Id.ToString(), ["show"] = Model.Show == NoteFilter.Open ? null : Model.Show.ToString(), ["item"] = Model.Item?.ToString() };
+            <li class="card mb-3" id="note-@note.Id">
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-2 align-items-baseline mb-2">
+                        <span class="badge @(note.Kind == VisitorNoteKind.Removal && note.HandledAt is null ? "text-bg-danger" : "text-bg-secondary")">@KindName(note.Kind)</span>
+                        <a asp-page="/Admin/Items/Edit" asp-route-id="@note.ArchiveItemId" class="fw-semibold text-break">@ArchiveItem.ShownTitle(T, note.ArchiveItem.Title)</a>
+                        <small class="text-muted">@Dates.Moment(note.ReceivedAt)</small>
+                        @if (note.HandledAt is { } handled)
+                        {
+                            <small class="text-muted">@T["Dealt with on {0}", Dates.Day(handled)]</small>
+                        }
+                    </div>
+                    <p class="text-preserve-lines text-break">@note.Message</p>
+                    <p class="small text-break mb-2">
+                        @if (note.PersonalDetailsRemovedAt is { } removed)
+                        {
+                            <span class="text-muted">@T["Name and email address removed on {0}.", Dates.Day(removed)]</span>
+                        }
+                        else if (note.Name is null && note.Email is null)
+                        {
+                            <span class="text-muted">@T["No name or email address given."]</span>
+                        }
+                        else
+                        {
+                            @note.Name
+                            @if (note.Email is { } email)
+                            {
+                                <a href="mailto:@email" class="ms-1">@email</a>
+                            }
+                        }
+                    </p>
+                    <div class="d-flex flex-wrap gap-2">
+                        @if (note.HandledAt is null)
+                        {
+                            <form method="post" asp-page-handler="Handled" asp-all-route-data="handlerRoute">
+                                <button type="submit" class="btn btn-sm btn-primary">@T["Mark as dealt with"]</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form method="post" asp-page-handler="Reopen" asp-all-route-data="handlerRoute">
+                                <button type="submit" class="btn btn-sm btn-outline-secondary">@T["Open again"]</button>
+                            </form>
+                        }
+                        @if (note.PersonalDetailsRemovedAt is null && (note.Name is not null || note.Email is not null))
+                        {
+                            <form method="post" asp-page-handler="RemoveDetails" asp-all-route-data="handlerRoute"
+                                  data-confirm="@T["Remove the name and email address from this note? The message stays. This cannot be undone."]">
+                                <button type="submit" class="btn btn-sm btn-outline-secondary">@T["Remove name and email address"]</button>
+                            </form>
+                        }
+                        <form method="post" asp-page-handler="Delete" asp-all-route-data="handlerRoute"
+                              data-confirm="@T["Delete this note for good? This cannot be undone."]">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">@T["Delete"]</button>
+                        </form>
+                    </div>
+                </div>
+            </li>
+        }
+    </ul>
+    <partial name="_Pager" model="Model.Notes" />
+}

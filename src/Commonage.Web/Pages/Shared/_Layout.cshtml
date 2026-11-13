@@ -6,7 +6,7 @@
     var rightToLeft = culture.TextInfo.IsRightToLeft;
     var pageTitle = ViewData["Title"] as string ?? ViewData["Title"]?.ToString();
     var identity = await Profile.GetAsync();
-    var isPrivatePage = new[] { "/Admin", "/Account", "/Contribute" }.Any(p => (ViewContext.RouteData.Values["page"]?.ToString() ?? "").StartsWith(p, StringComparison.OrdinalIgnoreCase));
+    var isPrivatePage = new[] { "/Admin", "/Account", "/Contribute", "/Items/Tell" }.Any(p => (ViewContext.RouteData.Values["page"]?.ToString() ?? "").StartsWith(p, StringComparison.OrdinalIgnoreCase));
     var currentPage = ViewContext.RouteData.Values["page"]?.ToString() ?? "";
     var canManage = User.IsInRole(Commonage.Web.Identity.Roles.Admin) || User.IsInRole(Commonage.Web.Identity.Roles.Curator);
     string? Current(params string[] pages) => pages.Any(p => currentPage.StartsWith(p, StringComparison.OrdinalIgnoreCase)) ? "page" : null;
