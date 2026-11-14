@@ -38,7 +38,7 @@ The database and the app itself are never exposed; only Caddy, the HTTPS front, 
 ```sh
 git clone https://github.com/SebHenn/commonage.git
 cd commonage
-git checkout v0.4.1        # a released version, not the development branch
+git checkout v0.5.0        # a released version, not the development branch
 ```
 
 This gives you the Compose files and the backup scripts. The app itself comes as a ready-made Docker image,
@@ -72,8 +72,8 @@ apps. Without it, a stolen copy of the database, such as a backup, would be enou
 `.env` somewhere safe, apart from the backups**, for example in a password manager: a restore needs the same key, or everyone
 has to log in again and set up their authenticator apps again ([operations.md](operations.md#login-keys)).
 
-`COMMONAGE_VERSION=0.4` follows the bug-fix releases of 0.4 (0.4.1, 0.4.2, ...) whenever you update; a new minor
-version such as 0.5 only comes when you change this line, or with `scripts/update.sh`.
+`COMMONAGE_VERSION=0.5` follows the bug-fix releases of 0.5 (0.5.1, 0.5.2, ...) whenever you update; a new minor
+version such as 0.6 only comes when you change this line, or with `scripts/update.sh`.
 
 The `COMPOSE_FILE` line adds `compose.production.yaml`, so every `docker compose` command, and the backup scripts,
 use the production setup: HTTPS through Caddy, automatic restarts, and no ports open except 80 and 443. (On Windows
@@ -140,7 +140,7 @@ The script is part of Commonage from version 0.3. To get from 0.2 to it once, by
 
 ```sh
 scripts/backup.sh
-git fetch --tags && git checkout v0.4.1
+git fetch --tags && git checkout v0.5.0
 ```
 
 Add a login key to `.env` as described above, set `COMMONAGE_VERSION=0.4`, then run `docker compose pull` and `docker compose up -d`.
