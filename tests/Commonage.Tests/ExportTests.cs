@@ -4,7 +4,11 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using Commonage.Web.Domain;
+using Commonage.Web.Export;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging;
 
 namespace Commonage.Tests;
 
@@ -181,6 +185,61 @@ public class ExportTests(CommonageAppFactory app)
         Assert.DoesNotContain(waiting.Id, ids);
         Assert.Equal(["Published"], statuses);
         Assert.Equal(5, document.GetProperty("version").GetInt32());
+    }
+
+    [Fact]
+    public async Task A_copy_of_what_is_public_holds_nothing_of_drafts_however_many_batches_it_takes()
+    {
+        var first = await app.CreateContributionAsync(ItemStatus.Published);
+        var second = await app.CreateContributionAsync(ItemStatus.Published);
+        var third = await app.CreateContributionAsync(ItemStatus.Published);
+        var draft = await app.CreateContributionAsync(ItemStatus.Submitted);
+        using var admin = app.CreateClient();
+        await Browser.LogInAsCuratorAsync(admin);
+        foreach (var item in new[] { first, second, third, draft })
+            await Browser.UploadAsync(admin, $"/Admin/Items/Edit/{item.Id}", "Upload", "photo.jpg", TestData.Photo);
+        var tagName = TestData.Unique("only-in-a-draft");
+        await app.WithDbAsync(async db =>
+        {
+            var stored = await db.ArchiveItems.Include(i => i.Tags).SingleAsync(i => i.Id == draft.Id);
+            stored.SetTags([new Tag { Name = tagName, NormalizedName = Tag.Normalize(tagName) }]);
+            var draftFile = await db.MediaFiles.SingleAsync(f => f.ArchiveItemId == draft.Id);
+            (await db.Collections.SingleAsync(c => c.Id == draft.CollectionId)).CoverMediaFileId = draftFile.Id;
+            return await db.SaveChangesAsync();
+        });
+
+        // Two items at a time, so that the files and the descriptions each take several rounds.
+        var zip = await app.WithDbAsync(async db =>
+        {
+            var exporter = new ArchiveExporter(
+                db, app.Services.GetRequiredService<Commonage.Web.Media.IFileStorage>(), TimeProvider.System,
+                app.Services.GetRequiredService<IStringLocalizer<Commonage.Web.SharedResource>>(),
+                app.Services.GetRequiredService<ILogger<ArchiveExporter>>()) { BatchSize = 2 };
+            var stream = new MemoryStream();
+            await exporter.WriteAsync(stream, new ExportOptions(PublishedOnly: true, IncludePersonalData: false));
+            stream.Position = 0;
+            return new ZipArchive(stream);
+        });
+
+        var document = JsonDocument.Parse(Read(zip, "archive.json")).RootElement;
+        var ids = document.GetProperty("items").EnumerateArray().Select(i => i.GetProperty("id").GetInt32()).ToList();
+        Assert.Equal(ids.Count, ids.Distinct().Count());
+        Assert.Equal(ids.Order(), ids);
+        Assert.All(new[] { first, second, third }, item =>
+        {
+            Assert.Contains(item.Id, ids);
+            Assert.Single(zip.Entries, e => e.FullName.StartsWith($"files/{item.Id}/"));
+        });
+        Assert.DoesNotContain(draft.Id, ids);
+        Assert.DoesNotContain(zip.Entries, e => e.FullName.StartsWith($"files/{draft.Id}/"));
+        var csv = Encoding.UTF8.GetString(Read(zip, "items.csv"));
+        Assert.All(new[] { first, second, third }, item => Assert.Contains($"\n{item.Id},", csv));
+        Assert.DoesNotContain($"\n{draft.Id},", csv);
+        Assert.DoesNotContain(tagName, document.GetProperty("tags").EnumerateArray().Select(t => t.GetProperty("name").GetString()));
+        // The draft's collection may or may not be in the copy, but never with a cover that is a draft's photo.
+        Assert.All(
+            document.GetProperty("collections").EnumerateArray().Where(c => c.GetProperty("id").GetInt32() == draft.CollectionId),
+            collection => Assert.Equal(JsonValueKind.Null, collection.GetProperty("coverFileId").ValueKind));
     }
 
     [Fact]

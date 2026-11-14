@@ -5,6 +5,11 @@ version may change things that need attention when updating, and these notes say
 
 ## Unreleased
 
+### For people running an archive
+
+- The export is written a batch of items at a time, so a very large archive no longer has to fit in memory. The files
+  inside do not change.
+
 ### For visitors and curators
 
 - A year, decade, month or period typed into the search, such as "Mill Street 1950s", "circa 1960" or "before 1945", also finds

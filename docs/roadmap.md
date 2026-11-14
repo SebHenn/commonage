@@ -447,8 +447,15 @@ shows the years of its published items. M19 is complete.
   missing files and duplicates.
 - **Done (first part):** the import, as described in `development.md`. A language column was left out: the archive's language is
   one setting, and a language per item stays unwanted until a mixed archive asks.
-- A 50,000-item benchmark on a small ARM container. Expected fixes: a composite index, cached counts, capped deep
-  paging, and export streaming the JSON as well as the query, since today the whole document stays in memory.
+- **Done (second part):** the export streams its JSON and CSV and reads items 500 at a time. A benchmark,
+  `COMMONAGE_SCALE_ITEMS=50000 dotnet test tests/Commonage.Tests --filter ScaleTests`, fills the test database with that many
+  items and times the pages and the export. On the maintainer's PC against PostgreSQL in Docker, every public page answered in
+  under 0.5 s (start page and tag lists slowest, about 0.35 s; search 0.1-0.2 s; curator list under 0.1 s) and the export
+  of 50,000 items took 8 s, with memory use growing by 20-40 MB. It was **not** run on an ARM server. The expected fixes were
+  measured and left out: a composite index on status and publication date changed nothing, a deep page costs no more than
+  the first (the page number is clamped), and cached counts would let a just-unpublished or binned item's tags stay public
+  for the length of the cache. Counting tags over 45,000 items is the slowest remaining step; revisit it if a real server
+  is slow.
 
 ### Rules for every milestone
 
