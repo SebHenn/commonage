@@ -1,0 +1,34 @@
+name: Scale benchmark (ARM)
+
+# Started by hand from the Actions tab. Not a required check and not run on pull requests: it fills a test database with
+# many items and prints how long the main pages and the export take on an ARM machine. A hosted runner is faster than a
+# small home server, so read the numbers as "ARM works and where the time goes", not as a promise for a Raspberry Pi.
+on:
+  workflow_dispatch:
+    inputs:
+      items:
+        description: Number of items to create
+        default: "50000"
+
+permissions:
+  contents: read
+
+jobs:
+  scale-arm:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          dotnet-version: 10.0.x
+      - run: dotnet restore --locked-mode
+      - run: dotnet build --no-restore -c Release
+      - name: Run the benchmark
+        env:
+          COMMONAGE_SCALE_ITEMS: ${{ inputs.items }}
+        run: >
+          dotnet test tests/Commonage.Tests --no-build -c Release --filter ScaleTests
+          --logger "console;verbosity=detailed"
