@@ -3,9 +3,11 @@
 All notable changes to Commonage. Versions follow [Semantic Versioning](https://semver.org/); before 1.0, a minor
 version may change things that need attention when updating, and these notes say so.
 
-## Unreleased
+## 0.5.0 (2026-11-14)
 
 ### For people running an archive
+
+Updating needs no picture regeneration. Migrations run by themselves at start.
 
 - The export is written a batch of items at a time, so a very large archive no longer has to fit in memory. The files
   inside do not change.
