@@ -179,6 +179,8 @@ How these work for the people running an archive is in [operations.md](operation
   `RequireAuthorization`. `EndpointAccessTests` lists what is meant for visitors and fails for anything else that is open.
 - `Export/ArchiveExporter.cs` writes the export. If you change its format, raise `ArchiveExporter.Version` and
   update operations.md.
+  It reads items 500 at a time and writes `archive.json` and `items.csv` as it goes; keep it that way, nothing may collect
+  all items in a list. `ScaleTests` (see the roadmap, M21) times pages and the export with `COMMONAGE_SCALE_ITEMS=50000`.
 - `scripts/backup.sh`, `scripts/restore.sh`, `scripts/update.sh` and their tests are POSIX `sh` and must keep working
   in Git Bash on Windows (`MSYS_NO_PATHCONV=1`, and paths through `cygpath -m` for native programs such as curl).
   Run the restore test with `sh scripts/test-backup-restore.sh`; it uses its own Compose project and ports.
