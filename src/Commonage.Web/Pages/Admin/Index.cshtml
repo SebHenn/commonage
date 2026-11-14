@@ -14,6 +14,7 @@
     <h1 class="me-auto mb-0">@T["Items"]</h1>
     @if (Model.HasCollections)
     {
+        <a asp-page="/Admin/Items/Import" class="btn btn-outline-primary">@T["Import a spreadsheet"]</a>
         <a asp-page="/Admin/Items/AddMany" class="btn btn-outline-primary">@T["Add many photos"]</a>
         <a asp-page="/Admin/Items/Edit" class="btn btn-primary">@T["New item"]</a>
     }

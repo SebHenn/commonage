@@ -445,6 +445,8 @@ shows the years of its published items. M19 is complete.
 - CSV with its own template, without id or status columns, with defined handling of the apostrophe that exports add
   for spreadsheet safety. ZIP or a folder on the media volume. A dry run lists unreadable dates, unknown collections,
   missing files and duplicates.
+- **Done (first part):** the import, as described in `development.md`. A language column was left out: the archive's language is
+  one setting, and a language per item stays unwanted until a mixed archive asks.
 - A 50,000-item benchmark on a small ARM container. Expected fixes: a composite index, cached counts, capped deep
   paging, and export streaming the JSON as well as the query, since today the whole document stays in memory.
 

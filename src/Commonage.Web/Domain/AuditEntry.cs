@@ -57,6 +57,7 @@ public enum AuditAction
     VisitorNoteReopened,
     VisitorNoteDetailsRemoved,
     VisitorNoteDeleted,
+    ItemsImported,
 }
 
 /// <summary>

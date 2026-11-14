@@ -22,6 +22,10 @@ version may change things that need attention when updating, and these notes say
 
 ### For curators
 
+- **Import a spreadsheet** (on Manage archive): a CSV with a ZIP file of scans, or a folder on the server for more than a web page
+  can send, becomes drafts with their photos and tags. A dry run comes first and changes nothing: it lists unreadable dates,
+  unknown collections, missing files and what would be there twice, and only then are the rows that are in order imported. A
+  template can be downloaded. After a break, run it again: what is already there is left out.
 - Contribution links have a **Copy the link** button and a **Poster to print**: the heading, introduction, a QR code and the address
   in words. A curator can tick "Invite visitors on the collection's page" for a link, so that its heading and a button to it show
   on the collection's public page; off by default. Someone who opens a closed link is now told it is closed (before: "not found").

@@ -184,6 +184,17 @@ keyword `Healthy` in the answer (most monitors, such as Uptime Kuma, call this a
 in the container, or that a database was restored without its files. Check `docker compose config` and the restore. If only
 that one file is lost, its item shows it; delete the photo there, or upload it again, and the check looks at the next one.
 
+## Importing from a spreadsheet
+
+Curators can import a CSV and a ZIP file on the page **Import a spreadsheet**. For more scans than a web page can send (a ZIP is
+accepted up to 4 GB), put a folder into the `import` folder of the media volume, for example `import/shoebox-1/`; it then shows in
+a list on that page. Remove it afterwards: the app never deletes it.
+
+What curators send waits in `import-staging` on the media volume until the import is done, or a day, and then it is removed. An
+import of thousands of rows takes minutes and runs inside one web request, so a reverse proxy in front needs a long timeout (an
+hour is plenty), and the page must stay open. If it breaks off, running it again leaves out what is already there. Importing is
+refused while the disk is nearly full, like any upload. Imported items are always drafts and are recorded in the activity log.
+
 ## Disk space and limits
 
 A full disk also stops the database, so the archive stops taking in files before that happens:

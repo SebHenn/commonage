@@ -74,6 +74,7 @@ public static class AuditText
         AuditAction.TagsMerged => localizer["Merged two tags into one"],
         AuditAction.TagDeleted => localizer["Deleted the unused tag"],
         AuditAction.UnusedTagsDeleted => localizer["Deleted all unused tags"],
+        AuditAction.ItemsImported => localizer["Imported items from a spreadsheet"],
         _ => action.ToString(),
     };
 
@@ -81,7 +82,7 @@ public static class AuditText
     {
         AuditAction.ItemCreated or AuditAction.ItemChanged or AuditAction.ItemPublished or AuditAction.ItemUnpublished
             or AuditAction.ItemDeleted or AuditAction.ItemMovedToBin or AuditAction.ItemRestored or AuditAction.ItemPurged
-            or AuditAction.ItemMovedToBinAfterKeptTime => AuditKind.Items,
+            or AuditAction.ItemMovedToBinAfterKeptTime or AuditAction.ItemsImported => AuditKind.Items,
         AuditAction.PhotosAdded or AuditAction.PhotosArranged or AuditAction.PhotoDeleted or AuditAction.PhotoMovedToBin
             or AuditAction.PhotoRestored or AuditAction.PhotoPurged or AuditAction.PreviewRetried => AuditKind.Photos,
         AuditAction.ContributionReceived or AuditAction.ContributionAccepted or AuditAction.ContributionRejected

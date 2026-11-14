@@ -911,4 +911,74 @@
   <data name="This link is closed" xml:space="preserve"><value>Dieser Link ist geschlossen</value></data>
   <data name="This link is closed. The poster would send people to a page that says so. Open the link first." xml:space="preserve"><value>Dieser Link ist geschlossen. Das Plakat würde die Leute auf eine Seite schicken, die das sagt. Öffnen Sie zuerst den Link.</value></data>
   <data name="To the archive" xml:space="preserve"><value>Zum Archiv</value></data>
+  <data name="An item with this title and date is already in this collection." xml:space="preserve"><value>Ein Objekt mit diesem Titel und Datum ist in dieser Sammlung schon vorhanden.</value></data>
+  <data name="Another import is running. Please wait until it has finished." xml:space="preserve"><value>Es läuft gerade ein anderer Import. Bitte warten Sie, bis er fertig ist.</value></data>
+  <data name="As elsewhere: 1953, 12.03.1953, circa 1950, 1950s, 1950–1955." xml:space="preserve"><value>Wie sonst auch: 1953, 12.03.1953, um 1950, 1950er, 1950–1955.</value></data>
+  <data name="Check the spreadsheet" xml:space="preserve"><value>Tabelle prüfen</value></data>
+  <data name="Collection for rows that name none" xml:space="preserve"><value>Sammlung für Zeilen ohne Sammlung</value></data>
+  <data name="Column" xml:space="preserve"><value>Spalte</value></data>
+  <data name="Columns that are not imported: {0}" xml:space="preserve"><value>Spalten, die nicht importiert werden: {0}</value></data>
+  <data name="Columns that are not in this list, such as id or status, are not imported. A cell that starts with an apostrophe before =, +, - or @ is read without it, as exports write them." xml:space="preserve"><value>Spalten, die nicht in dieser Liste stehen, etwa id oder status, werden nicht importiert. Eine Zelle, die mit einem Apostroph vor =, +, - oder @ beginnt, wird ohne ihn gelesen, so wie Exporte sie schreiben.</value></data>
+  <data name="Do not import" xml:space="preserve"><value>Nicht importieren</value></data>
+  <data name="Download the template" xml:space="preserve"><value>Vorlage herunterladen</value></data>
+  <data name="Drafts created: {0}. Photos added: {1}. Previews are being created." xml:space="preserve"><value>Entwürfe angelegt: {0}. Fotos hinzugefügt: {1}. Die Vorschaubilder werden erstellt.</value></data>
+  <data name="Each row of a spreadsheet becomes a draft, and the files it names are added to it as photos. Nothing is published, and nothing is imported before you have seen a dry run that lists what is wrong." xml:space="preserve"><value>Jede Zeile einer Tabelle wird ein Entwurf, und die Dateien, die sie nennt, kommen als Fotos dazu. Nichts wird veröffentlicht, und nichts wird importiert, bevor Sie einen Probelauf gesehen haben, der auflistet, was nicht stimmt.</value></data>
+  <data name="File names in the ZIP file or folder, separated by semicolons. A name is enough when it is only there once; otherwise write the path." xml:space="preserve"><value>Dateinamen aus der ZIP-Datei oder dem Ordner, durch Semikolons getrennt. Der Name genügt, wenn es ihn nur einmal gibt; sonst schreiben Sie den Pfad.</value></data>
+  <data name="Files in the ZIP file or folder that no row names: {0}" xml:space="preserve"><value>Dateien in der ZIP-Datei oder im Ordner, die keine Zeile nennt: {0}</value></data>
+  <data name="For more scans than a web page can send. Whoever runs the server puts a folder into the &quot;import&quot; folder of the media volume." xml:space="preserve"><value>Für mehr Scans, als eine Webseite senden kann. Wer den Server betreibt, legt einen Ordner in den Ordner "import" des Medienlaufwerks.</value></data>
+  <data name="Import a spreadsheet" xml:space="preserve"><value>Tabelle importieren</value></data>
+  <data name="Import from a spreadsheet" xml:space="preserve"><value>Aus einer Tabelle importieren</value></data>
+  <data name="Imported items from a spreadsheet" xml:space="preserve"><value>Objekte aus einer Tabelle importiert</value></data>
+  <data name="Imported rows become drafts, whatever the spreadsheet says. A large import takes a while: keep this page open. If it breaks off, run it again: what is already there is left out." xml:space="preserve"><value>Importierte Zeilen werden Entwürfe, egal was in der Tabelle steht. Ein großer Import dauert eine Weile: Lassen Sie diese Seite geöffnet. Bricht er ab, starten Sie ihn erneut: Was schon da ist, wird ausgelassen.</value></data>
+  <data name="Left out, because they would be there twice" xml:space="preserve"><value>Ausgelassen, weil sie doppelt da wären</value></data>
+  <data name="May be empty: the draft then waits for a title." xml:space="preserve"><value>Darf leer sein: Der Entwurf wartet dann auf einen Titel.</value></data>
+  <data name="More problems than are listed here: {0}" xml:space="preserve"><value>Weitere Probleme, die hier nicht aufgelistet sind: {0}</value></data>
+  <data name="More than one collection has this name. Rename one of them first." xml:space="preserve"><value>Mehr als eine Sammlung hat diesen Namen. Benennen Sie zuerst eine davon um.</value></data>
+  <data name="No collection is named, and none was chosen for rows without one." xml:space="preserve"><value>Es ist keine Sammlung genannt, und für Zeilen ohne Sammlung wurde keine gewählt.</value></data>
+  <data name="No folder" xml:space="preserve"><value>Kein Ordner</value></data>
+  <data name="None" xml:space="preserve"><value>Keine</value></data>
+  <data name="Nothing has been imported yet. This is what would happen." xml:space="preserve"><value>Es wurde noch nichts importiert. So würde es ablaufen.</value></data>
+  <data name="Or a folder on the server" xml:space="preserve"><value>Oder ein Ordner auf dem Server</value></data>
+  <data name="Photos that could not be added, because the files had changed: {0}" xml:space="preserve"><value>Fotos, die nicht hinzugefügt werden konnten, weil sich die Dateien geändert hatten: {0}</value></data>
+  <data name="Photos that would be added: {0}" xml:space="preserve"><value>Fotos, die hinzugefügt würden: {0}</value></data>
+  <data name="Please choose either a ZIP file or a folder, not both." xml:space="preserve"><value>Bitte wählen Sie entweder eine ZIP-Datei oder einen Ordner, nicht beides.</value></data>
+  <data name="Please choose the spreadsheet, saved as CSV." xml:space="preserve"><value>Bitte wählen Sie die Tabelle, als CSV gespeichert.</value></data>
+  <data name="Problems" xml:space="preserve"><value>Probleme</value></data>
+  <data name="Row" xml:space="preserve"><value>Zeile</value></data>
+  <data name="Rows left out because they would be there twice: {0}" xml:space="preserve"><value>Zeilen, die ausgelassen werden, weil sie doppelt da wären: {0}</value></data>
+  <data name="Rows read: {0}" xml:space="preserve"><value>Gelesene Zeilen: {0}</value></data>
+  <data name="Rows that can be imported: {0}" xml:space="preserve"><value>Zeilen, die importiert werden können: {0}</value></data>
+  <data name="Rows with problems, which are left out: {0}" xml:space="preserve"><value>Zeilen mit Problemen, die ausgelassen werden: {0}</value></data>
+  <data name="Separated by semicolons or commas." xml:space="preserve"><value>Durch Semikolons oder Kommas getrennt.</value></data>
+  <data name="Several files have this name. Write the path with its folder." xml:space="preserve"><value>Mehrere Dateien haben diesen Namen. Schreiben Sie den Pfad mit dem Ordner.</value></data>
+  <data name="Spreadsheet, saved as CSV (UTF-8)" xml:space="preserve"><value>Tabelle, als CSV (UTF-8) gespeichert</value></data>
+  <data name="Start again" xml:space="preserve"><value>Von vorn beginnen</value></data>
+  <data name="Text." xml:space="preserve"><value>Text.</value></data>
+  <data name="The columns" xml:space="preserve"><value>Die Spalten</value></data>
+  <data name="The dry run" xml:space="preserve"><value>Der Probelauf</value></data>
+  <data name="The files for this import are no longer there. Please choose them again." xml:space="preserve"><value>Die Dateien für diesen Import sind nicht mehr da. Bitte wählen Sie sie erneut.</value></data>
+  <data name="The first row of the spreadsheet must name the columns. None of them is one this import knows. Download the template to see them." xml:space="preserve"><value>Die erste Zeile der Tabelle muss die Spalten benennen. Keine davon kennt dieser Import. Laden Sie die Vorlage herunter, um sie zu sehen.</value></data>
+  <data name="The name of an existing collection. May be left out when you choose one below." xml:space="preserve"><value>Der Name einer vorhandenen Sammlung. Kann entfallen, wenn Sie unten eine wählen.</value></data>
+  <data name="The same file as in row {0}." xml:space="preserve"><value>Dieselbe Datei wie in Zeile {0}.</value></data>
+  <data name="The same title and date as row {0}, in the same collection." xml:space="preserve"><value>Derselbe Titel und dasselbe Datum wie in Zeile {0}, in derselben Sammlung.</value></data>
+  <data name="The spreadsheet could not be read: a quotation mark is never closed." xml:space="preserve"><value>Die Tabelle konnte nicht gelesen werden: Ein Anführungszeichen wird nie geschlossen.</value></data>
+  <data name="The spreadsheet has no collection column, and no collection was chosen. Every row would be left out." xml:space="preserve"><value>Die Tabelle hat keine Spalte collection, und es wurde keine Sammlung gewählt. Jede Zeile würde ausgelassen.</value></data>
+  <data name="The spreadsheet has no rows." xml:space="preserve"><value>Die Tabelle hat keine Zeilen.</value></data>
+  <data name="The spreadsheet has too many rows for one import. Split it into several files." xml:space="preserve"><value>Die Tabelle hat zu viele Zeilen für einen Import. Teilen Sie sie auf mehrere Dateien auf.</value></data>
+  <data name="The spreadsheet is not saved as UTF-8, so letters such as ä or ł would be wrong. In the spreadsheet program, save it again as &quot;CSV UTF-8&quot;." xml:space="preserve"><value>Die Tabelle ist nicht als UTF-8 gespeichert, Buchstaben wie ä oder ł wären daher falsch. Speichern Sie sie im Tabellenprogramm erneut als "CSV UTF-8".</value></data>
+  <data name="The spreadsheet is too large." xml:space="preserve"><value>Die Tabelle ist zu groß.</value></data>
+  <data name="The spreadsheet names files, but no ZIP file or folder was given to find them in." xml:space="preserve"><value>Die Tabelle nennt Dateien, aber es wurde keine ZIP-Datei und kein Ordner angegeben, in dem sie zu finden wären.</value></data>
+  <data name="The web address of one of the rights statements, as an export writes it. Empty means the archive's default." xml:space="preserve"><value>Die Webadresse einer der Rechteangaben, wie ein Export sie schreibt. Leer bedeutet die Voreinstellung des Archivs.</value></data>
+  <data name="There is no collection with this name. Create it first, or correct the name." xml:space="preserve"><value>Es gibt keine Sammlung mit diesem Namen. Legen Sie sie zuerst an oder korrigieren Sie den Namen.</value></data>
+  <data name="There is nothing left to import." xml:space="preserve"><value>Es gibt nichts mehr zu importieren.</value></data>
+  <data name="This file is not in the ZIP file or the folder." xml:space="preserve"><value>Diese Datei ist weder in der ZIP-Datei noch im Ordner.</value></data>
+  <data name="This file is too large." xml:space="preserve"><value>Diese Datei ist zu groß.</value></data>
+  <data name="This folder is not there any more." xml:space="preserve"><value>Dieser Ordner ist nicht mehr da.</value></data>
+  <data name="This is not a ZIP file, or it holds too many files." xml:space="preserve"><value>Das ist keine ZIP-Datei, oder sie enthält zu viele Dateien.</value></data>
+  <data name="This is not one of the archive's rights statements. Write its web address as an export does, or leave the cell empty." xml:space="preserve"><value>Das ist keine der Rechteangaben des Archivs. Schreiben Sie ihre Webadresse wie ein Export oder lassen Sie die Zelle leer.</value></data>
+  <data name="What is wrong" xml:space="preserve"><value>Was nicht stimmt</value></data>
+  <data name="What the cell says" xml:space="preserve"><value>Was in der Zelle steht</value></data>
+  <data name="Why" xml:space="preserve"><value>Warum</value></data>
+  <data name="ZIP file with the scans (optional)" xml:space="preserve"><value>ZIP-Datei mit den Scans (optional)</value></data>
+  <data name="{0, plural, one {Import the one row that is in order} other {Import the # rows that are in order}}" xml:space="preserve"><value>{0, plural, one {Die eine Zeile importieren, die in Ordnung ist} other {Die # Zeilen importieren, die in Ordnung sind}}</value></data>
 </root>
