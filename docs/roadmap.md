@@ -175,8 +175,20 @@ real pace over M7 and M8 before promising dates. Each milestone is a minor relea
 | **M17 Language reach** ✅ | 5 | A translator without Git has tried Weblate on a few pages. Missing translations fail a test. Counts read correctly under Polish plural rules. Item text carries the right `lang`. Dates that are accepted today are still accepted. |
 | **M18 Accounts and system** ✅ | 4 | A curator logs in with an authenticator app. Login keys are encrypted with a key outside the database, and the backup test still passes. An admin sees version, disk use, failed previews (with retry) and backup age on one page. |
 | **M19 Discovery** ✅ | 3 | A visitor taps "1960s" and finds the flood, opens "Places" and picks "Mill Street". A curator merges "Mill St" into "Mill Street". |
-| **M20 Community knowledge** | 4 | With the feature switched on, a visitor says "that's my aunt on the left" or asks for removal from an item page, and a curator handles it. A curator prints a poster with a QR code for a contribution link. |
-| **M21 Import and scale** | 4 | A group imports a spreadsheet and a ZIP of scans after a dry run that lists every problem. A 50,000-item archive on a small ARM server stays fast and exports without running out of memory. |
+| **M20 Community knowledge** ✅ | 4 | With the feature switched on, a visitor says "that's my aunt on the left" or asks for removal from an item page, and a curator handles it. A curator prints a poster with a QR code for a contribution link. |
+| **M21 Import and scale** ✅ | 4 | A group imports a spreadsheet and a ZIP of scans after a dry run that lists every problem. A 50,000-item archive on a small ARM server stays fast and exports without running out of memory. |
+| **M22 Release and ARM** | 1 | v0.5.0 is tagged with M19 to M21. The scale benchmark has run on an ARM machine and its numbers are written down here. |
+| **M23 Documents** | 5 | A curator uploads a 20-page PDF. Visitors page through it as images and search finds its text. AVIF and GIF are accepted. |
+| **M24 Helpers and accounts** | 3 | A helper describes and uploads but cannot publish, delete or see contributors' email addresses. Accounts have display names and a last login. |
+| **M25 Oral histories** | 4 | A curator uploads an interview. Visitors play it with its transcript beside it, and the file carries no metadata. |
+| **M26 Description history** | 3 | A curator sees who changed which field and when, and restores an earlier description. |
+| **M27 Visibility levels** | 5 | An item can be public as a record without its media, or embargoed until a date. Every public query goes through `VisibleItems`. |
+| **M28 Toward 1.0** | 3 | Commonage reads its own export, so archives can be merged. Dublin Core and a JSON alternate exist. A 1.0 checklist is met. |
+
+M22 to M28 were planned in November 2026, after M21, from the "Later" list. There are still no reports from groups or
+testers, so the order is a judgement again: documents are the largest gap between what groups hold and what the app takes,
+the helper role is cheap and makes volunteer evenings possible, and visibility levels come last because they rewrite the rule
+that only published items are public and need the most careful review.
 
 The review after M14 also decides what comes next. PDF documents, audio or an earlier import may well replace M15
 onwards, depending on what the groups say. **Review, November 2026:** no group or tester has asked for any of those so far, and
@@ -457,6 +469,54 @@ shows the years of its published items. M19 is complete.
   for the length of the cache. Counting tags over 45,000 items is the slowest remaining step; revisit it if a real server
   is slow.
 
+**M22 Release and ARM**
+
+- Release v0.5.0 with `/release`, after the changelog is checked against M19 to M21. The notes say the export is version 5 and
+  that nothing needs regenerating.
+- `scale-arm.yml` runs the benchmark by hand on GitHub's ARM runner. It is not a required check. A hosted runner is not a small
+  home server, and the numbers are recorded as that. **Not run yet.**
+- Weblate (open since M17) is set up once the maintainer's application is through.
+
+**M23 Documents**
+
+- A spike first: can the bundled NetVips read AVIF and GIF, and what do `poppler-utils` add to the image on x86 and ARM?
+- PDFs are recognised by content. `pdftoppm` and `pdftotext` run as separate processes with a timeout, a page limit and a size
+  limit, driven by the existing background queue; a failure shows as a failed file with the existing retry. The parser risk
+  gets its row in `security.md`.
+- Pages are previews stored next to the file and served through `MediaEndpoints` with the published check. The PDF itself
+  stays with curators, as every original does. The text goes into the search through the item, never for drafts.
+- The export carries the page count (version 6) and leaves the text out, because it can be rebuilt.
+
+**M24 Helpers and accounts**
+
+- A `Helper` role: describes and uploads. Publishing, the bin, contributors, notes, export and settings stay with curators,
+  and contributors' names and email addresses are not shown. `EndpointAccessTests` checks every role against every admin
+  address. Display names and a last login for accounts.
+
+**M25 Oral histories**
+
+- Audio is recognised by content, stripped of metadata without re-encoding and served with range requests through the same
+  permission check, in the browser's own player. An item with audio needs a transcript before it is published, or the
+  "transcript to follow" flag. A local whisper.cpp workflow is documented, as "Not planned" promises.
+
+**M26 Description history**
+
+- A revision holds the changed fields only, written in the same save as the activity log. A curator can restore one. No
+  contributor details in revisions, and the personal-data tools reach them. The export leaves them out, with the reason.
+
+**M27 Visibility levels**
+
+- First a record without its media, then an embargo date. `PublishedItems` becomes `VisibleItems(viewer)`. Members-only waits
+  for a group to ask, because visitor accounts are not planned. A separate plan and an adversarial privacy review come before
+  any code, and every public page, the feed, the sitemap, link previews and the published-only export get a test with such
+  an item.
+
+**M28 Toward 1.0**
+
+- Reading Commonage's own export (versions 4 and later) with the import's dry run. Dublin Core and `/items/{id}.json` as an
+  alternate link. A 1.0 checklist: a real group running it, the upgrade tested from every 0.x minor version, a support policy,
+  and a second release approver or a written handover.
+
 ### Rules for every milestone
 
 - A change to the data model updates the export, its format version and `operations.md`.
@@ -469,27 +529,19 @@ shows the years of its published items. M19 is complete.
 
 ### Later, roughly by value
 
-1. **PDF documents.** The bundled libvips has neither PDFium nor poppler, so this means a separate poppler step, with
-   its parser risk, image size and ARM build to weigh. Text goes into search. AVIF and GIF in the same pass.
-2. **Oral histories.** Audio through ffmpeg, range requests, native player, metadata stripped, and a transcript as part
-   of the feature, because accessibility requires it.
-3. **Visibility levels.** Record without media first, then members only and embargo dates. `PublishedItems` becomes
-   `VisibleItems(viewer)`.
-4. **Stories and exhibitions.** Ordered text and item blocks, plain text, one layout.
-5. **Helper role.** Describes and uploads, but cannot publish, delete or see contributors' email addresses.
-6. **Description history** with restore, and changed field names in the activity log.
-7. **Display names** and "last login" for accounts.
-8. **People as entities.** Name variants and person pages, hidden by default for people who may be living.
-9. **Dublin Core**, and `/items/{id}.json` through `rel=alternate` (inline JSON-LD would break the security policy).
-10. **IIIF** manifests with static tiles and a vendored viewer, once alt text and rights exist.
-11. **OAI-PMH**, off by default, limited by consent and rights.
-12. **Optional email** with the group's own mailbox: digest, password reset, receipt. The app must work without it.
-13. **Places with coordinates and a self-hosted map** (vendored MapLibre and one regional PMTiles file).
-14. **Short video** without re-encoding. **S3-compatible storage**, always through the permission-checking endpoint.
-    **OCR for typed documents** as an opt-in container. **Near-duplicates** through a perceptual hash.
-15. **Reading Commonage's own export**, for merging archives. Moving a server already works through backup and restore.
-16. **"Move to a new item"**, for a contribution that turns out to be two things, **photo descriptions from contributors**, and
-    **captions in the search**, which only looks at an item's own fields so far.
+PDF documents, oral histories, visibility levels, the helper role, description history, display names, Dublin Core and
+reading Commonage's own export moved into M23 to M28 above. What is left, in this order:
+
+1. **Stories and exhibitions.** Ordered text and item blocks, plain text, one layout.
+2. **People as entities.** Name variants and person pages, hidden by default for people who may be living.
+3. **IIIF** manifests with static tiles and a vendored viewer, once alt text and rights exist.
+4. **OAI-PMH**, off by default, limited by consent and rights.
+5. **Optional email** with the group's own mailbox: digest, password reset, receipt. The app must work without it.
+6. **Places with coordinates and a self-hosted map** (vendored MapLibre and one regional PMTiles file).
+7. **Short video** without re-encoding. **S3-compatible storage**, always through the permission-checking endpoint.
+   **OCR for typed documents** as an opt-in container. **Near-duplicates** through a perceptual hash.
+8. **"Move to a new item"**, for a contribution that turns out to be two things, **photo descriptions from contributors**, and
+   **captions in the search**, which only looks at an item's own fields so far.
 
 ### Not planned
 

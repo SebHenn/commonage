@@ -9,6 +9,9 @@ version may change things that need attention when updating, and these notes say
 
 - The export is written a batch of items at a time, so a very large archive no longer has to fit in memory. The files
   inside do not change.
+- The export is version 5: it lists the tags with their kinds, each collection's position, order of items and cover, the
+  visitors' notes on each item (message, name and email address only with personal data), and the "help wanted" flag. The
+  settings say whether notes are switched on. Items still list their tags by name. Nothing needs regenerating.
 
 ### For visitors and curators
 
@@ -45,12 +48,6 @@ version may change things that need attention when updating, and these notes say
 - Collections can be put in order, which is how visitors find them. Each collection has an order for its items (recently
   added, oldest or newest first), which "previous" and "next" on an item follow, and a cover chosen from its photos. Visitors
   only see the cover while its item is published. An empty collection can be deleted.
-
-### For people who run an archive
-
-- The export is version 4: it lists the tags with their kinds, and each collection's position, order of items and cover. Items
-  still list their tags by name. Items also list their visitors' notes (message, name and email address only with personal data), and
-  the settings say whether notes are switched on.
 
 ## 0.4.1 (2026-11-12)
 
