@@ -42,41 +42,45 @@ public class ArchiveExporter(
 
     public string FileName => $"commonage-export-{clock.GetUtcNow():yyyy-MM-dd}.zip";
 
+    /// <summary>How many items are held in memory at a time. Memory use stays the same for 500 items or 500,000.</summary>
+    public int BatchSize { get; set; } = 500;
+
     public async Task WriteAsync(Stream output, ExportOptions options, CancellationToken cancellationToken = default)
     {
+        // One snapshot for every query below, so that the files, descriptions and lists agree even when someone
+        // changes the archive while a large export is being written. Nothing is written to the database.
+        await using var snapshot = await db.Database.BeginTransactionAsync(System.Data.IsolationLevel.RepeatableRead, cancellationToken);
         var collections = await db.Collections.AsNoTracking().OrderBy(c => c.Id).ToListAsync(cancellationToken);
-        var items = await (options.PublishedOnly ? db.PublishedItems : db.ArchiveItems)
-            .AsNoTracking()
-            .Include(i => i.Tags)
-            .Include(i => i.MediaFiles)
-            .Include(i => i.Contribution).ThenInclude(c => c!.ContributionLink)
-            .AsSplitQuery()
-            .OrderBy(i => i.Id)
-            .ToListAsync(cancellationToken);
+        var source = (options.PublishedOnly ? db.PublishedItems : db.ArchiveItems).AsNoTracking();
         if (options.PublishedOnly)
         {
-            var used = items.Select(i => i.CollectionId).ToHashSet();
+            var used = await source.Select(i => i.CollectionId).Distinct().ToListAsync(cancellationToken);
             collections = collections.Where(c => used.Contains(c.Id)).ToList();
         }
 
-        // Notes from visitors are for curators, so a copy of what is public has none.
-        var notes = options.PublishedOnly
-            ? null
-            : (await db.VisitorNotes.AsNoTracking().OrderBy(n => n.Id).ToListAsync(cancellationToken)).ToLookup(n => n.ArchiveItemId);
-
         await using var zip = await ZipArchive.CreateAsync(output, ZipArchiveMode.Create, leaveOpen: true, entryNameEncoding: Encoding.UTF8, cancellationToken);
 
-        // Files first, so the descriptions written afterwards can say which files could not be read.
-        var exportedItems = new List<ExportItem>();
-        foreach (var item in items)
+        // Files first, so the descriptions written afterwards can say which files could not be read. Only the problems
+        // and the covers are remembered; the descriptions are read again from the database, a batch at a time.
+        var problems = new Dictionary<int, string>();
+        var coverIds = collections.Where(c => c.CoverMediaFileId is not null).Select(c => c.CoverMediaFileId!.Value).ToHashSet();
+        var exportedCovers = new HashSet<int>();
+        await foreach (var batch in ItemBatchesAsync(source.Select(i => i.Id), cancellationToken))
         {
-            var files = new List<ExportFile>();
-            foreach (var file in item.MediaFiles.OrderBy(f => f.Position).ThenBy(f => f.Id))
-                files.Add(await WriteFileAsync(zip, item, file, cancellationToken));
-            exportedItems.Add(Describe(item, files, notes?[item.Id], options));
+            var files = await db.MediaFiles.AsNoTracking()
+                .Where(f => batch.Contains(f.ArchiveItemId))
+                .OrderBy(f => f.ArchiveItemId).ThenBy(f => f.Position).ThenBy(f => f.Id)
+                .ToListAsync(cancellationToken);
+            foreach (var file in files)
+            {
+                var (problem, _) = await WriteFileAsync(zip, file, cancellationToken);
+                if (problem is not null)
+                    problems[file.Id] = problem;
+                if (coverIds.Contains(file.Id))
+                    exportedCovers.Add(file.Id);
+            }
         }
 
-        var exportedFiles = exportedItems.SelectMany(i => i.Files).Select(f => f.Id).ToHashSet();
         var settings = await db.ArchiveSettings.AsNoTracking().FirstOrDefaultAsync(cancellationToken) ?? new ArchiveSettings();
         var texts = await db.ArchiveTexts.AsNoTracking().OrderBy(t => t.Language).ThenBy(t => t.Kind).ToListAsync(cancellationToken);
         string? logoPath = null;
@@ -94,24 +98,43 @@ public class ArchiveExporter(
             }
         }
 
-        var document = new ExportDocument(
-            Format, Version, clock.GetUtcNow().UtcDateTime, options.PublishedOnly, options.IncludePersonalData,
-            collections.Select(c => new ExportCollection(
-                c.Id, c.Title, c.Description, c.CreatedAt, c.Position, c.Sort,
-                // The cover is named by the id of its file, and only when that file is in this export.
-                exportedFiles.Contains(c.CoverMediaFileId ?? 0) ? c.CoverMediaFileId : null)).ToList(),
-            // The tags of what is exported only: an export of published items does not name what only drafts mention.
-            items.SelectMany(i => i.Tags).DistinctBy(t => t.Id).OrderBy(t => t.Name, StringComparer.Ordinal).Select(t => new ExportTag(t.Name, t.Kind)).ToList(),
-            exportedItems,
-            new ExportSettings(
+        // The tags of what is exported only: an export of published items does not name what only drafts mention.
+        var tags = (await source.SelectMany(i => i.Tags).Select(t => new { t.Id, t.Name, t.Kind }).Distinct().ToListAsync(cancellationToken))
+            .OrderBy(t => t.Name, StringComparer.Ordinal).Select(t => new ExportTag(t.Name, t.Kind)).ToList();
+        var exportedCollections = collections.Select(c => new ExportCollection(
+            c.Id, c.Title, c.Description, c.CreatedAt, c.Position, c.Sort,
+            // The cover is named by the id of its file, and only when that file is in this export.
+            exportedCovers.Contains(c.CoverMediaFileId ?? 0) ? c.CoverMediaFileId : null)).ToList();
+
+        await WriteEntryAsync(zip, "archive.json", CompressionLevel.Optimal, async stream =>
+        {
+            await using var json = new Utf8JsonWriter(stream, new JsonWriterOptions { Indented = true, Encoder = JsonOptions.Encoder });
+            json.WriteStartObject();
+            Property(json, "format", Format);
+            Property(json, "version", Version);
+            Property(json, "exportedAt", clock.GetUtcNow().UtcDateTime);
+            Property(json, "publishedOnly", options.PublishedOnly);
+            Property(json, "includesPersonalData", options.IncludePersonalData);
+            Property(json, "collections", exportedCollections);
+            Property(json, "tags", tags);
+            json.WritePropertyName("items");
+            json.WriteStartArray();
+            await foreach (var item in DescribeItemsAsync(source, options, problems, cancellationToken))
+            {
+                JsonSerializer.Serialize(json, item, JsonOptions);
+                if (json.BytesPending > 64 * 1024)
+                    await json.FlushAsync(cancellationToken);
+            }
+
+            json.WriteEndArray();
+            Property(json, "settings", new ExportSettings(
                 settings.DefaultLanguage, settings.ContentLanguage, settings.OtherContentLanguages, settings.AccentColor, settings.TimeZone, settings.DefaultRightsUri, settings.AllowSearchEngines, settings.RequireTwoFactor, settings.LargePhotos, settings.PrivacyReviewed,
                 settings.ImprintNotNeeded, settings.RestoreTestedAt, settings.ActivityLogKeptYears, settings.RejectedKeptMonths, settings.AcceptVisitorNotes, logoPath,
                 texts.Select(t => new ExportText(t.Language, t.Kind, t.Text)).ToList()));
-
-        await WriteEntryAsync(zip, "archive.json", CompressionLevel.Optimal,
-            stream => JsonSerializer.SerializeAsync(stream, document, JsonOptions, cancellationToken), cancellationToken);
+            json.WriteEndObject();
+        }, cancellationToken);
         await WriteEntryAsync(zip, "items.csv", CompressionLevel.Optimal,
-            stream => ItemsCsv.WriteAsync(stream, document, cancellationToken), cancellationToken);
+            stream => ItemsCsv.WriteAsync(stream, exportedCollections.ToDictionary(c => c.Id, c => c.Title), DescribeItemsAsync(source, options, problems, cancellationToken), cancellationToken), cancellationToken);
         var readme = Readme(localizer);
         await WriteEntryAsync(zip, "README.txt", CompressionLevel.Optimal,
             stream => stream.WriteAsync(Encoding.UTF8.GetBytes(readme), cancellationToken).AsTask(), cancellationToken);
@@ -122,10 +145,65 @@ public class ArchiveExporter(
                 stream => stream.WriteAsync(Encoding.UTF8.GetBytes(english), cancellationToken).AsTask(), cancellationToken);
     }
 
-    /// <summary>Copies the original into the ZIP and checks it against the checksum taken at upload.</summary>
-    private async Task<ExportFile> WriteFileAsync(ZipArchive zip, ArchiveItem item, MediaFile file, CancellationToken cancellationToken)
+    private static void Property<T>(Utf8JsonWriter json, string name, T value)
     {
-        var path = $"files/{item.Id}/{file.Id}-{SafeFileName(file.OriginalFileName)}";
+        json.WritePropertyName(name);
+        JsonSerializer.Serialize(json, value, JsonOptions);
+    }
+
+    /// <summary>The ids of the items in ascending order, a batch at a time.</summary>
+    private async IAsyncEnumerable<List<int>> ItemBatchesAsync(
+        IQueryable<int> ids, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken)
+    {
+        var last = 0;
+        while (true)
+        {
+            var after = last;
+            var batch = await ids.Where(id => id > after).OrderBy(id => id).Take(BatchSize).ToListAsync(cancellationToken);
+            if (batch.Count == 0)
+                yield break;
+            last = batch[^1];
+            yield return batch;
+        }
+    }
+
+    /// <summary>The items in the order of their ids, read a batch at a time.</summary>
+    private async IAsyncEnumerable<ExportItem> DescribeItemsAsync(
+        IQueryable<ArchiveItem> source, ExportOptions options, Dictionary<int, string> problems,
+        [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken)
+    {
+        await foreach (var ids in ItemBatchesAsync(source.Select(i => i.Id), cancellationToken))
+        {
+            var items = await source
+                .Where(i => ids.Contains(i.Id))
+                .Include(i => i.Tags)
+                .Include(i => i.MediaFiles)
+                .Include(i => i.Contribution).ThenInclude(c => c!.ContributionLink)
+                .AsSplitQuery()
+                .OrderBy(i => i.Id)
+                .ToListAsync(cancellationToken);
+            // Notes from visitors are for curators, so a copy of what is public has none.
+            var notes = options.PublishedOnly
+                ? null
+                : (await db.VisitorNotes.AsNoTracking().Where(n => ids.Contains(n.ArchiveItemId)).OrderBy(n => n.Id).ToListAsync(cancellationToken)).ToLookup(n => n.ArchiveItemId);
+            foreach (var item in items)
+            {
+                var files = item.MediaFiles.OrderBy(f => f.Position).ThenBy(f => f.Id).Select(file =>
+                {
+                    var problem = problems.GetValueOrDefault(file.Id);
+                    return Describe(file, problem == "missing" ? null : PathOf(item.Id, file), problem);
+                }).ToList();
+                yield return Describe(item, files, notes?[item.Id], options);
+            }
+        }
+    }
+
+    private static string PathOf(int itemId, MediaFile file) => $"files/{itemId}/{file.Id}-{SafeFileName(file.OriginalFileName)}";
+
+    /// <summary>Copies the original into the ZIP and checks it against the checksum taken at upload.</summary>
+    private async Task<(string? Problem, string? Path)> WriteFileAsync(ZipArchive zip, MediaFile file, CancellationToken cancellationToken)
+    {
+        var path = PathOf(file.ArchiveItemId, file);
         string? problem = null;
         Stream source;
         try
@@ -135,7 +213,7 @@ public class ArchiveExporter(
         catch (Exception exception) when (exception is FileNotFoundException or DirectoryNotFoundException)
         {
             logger.LogWarning("The original of media file {MediaFileId} is missing from storage.", file.Id);
-            return Describe(file, path: null, problem: "missing");
+            return ("missing", null);
         }
 
         await using (source)
@@ -161,7 +239,7 @@ public class ArchiveExporter(
             }
         }
 
-        return Describe(file, path, problem);
+        return (problem, path);
     }
 
     private static ExportFile Describe(MediaFile file, string? path, string? problem) =>
@@ -294,17 +372,6 @@ public class ArchiveExporter(
     }
 }
 
-internal record ExportDocument(
-    string Format,
-    int Version,
-    DateTime ExportedAt,
-    bool PublishedOnly,
-    bool IncludesPersonalData,
-    IReadOnlyList<ExportCollection> Collections,
-    IReadOnlyList<ExportTag> Tags,
-    IReadOnlyList<ExportItem> Items,
-    ExportSettings Settings);
-
 internal record ExportSettings(
     string DefaultLanguage,
     string? ContentLanguage,
@@ -408,15 +475,14 @@ internal static class ItemsCsv
         "contributor_name", "contributor_email", "files",
     ];
 
-    public static async Task WriteAsync(Stream stream, ExportDocument document, CancellationToken cancellationToken)
+    public static async Task WriteAsync(
+        Stream stream, IReadOnlyDictionary<int, string> collections, IAsyncEnumerable<ExportItem> items, CancellationToken cancellationToken)
     {
         // The byte order mark tells spreadsheet programs that the file is UTF-8.
         await using var writer = new StreamWriter(stream, new UTF8Encoding(encoderShouldEmitUTF8Identifier: true), leaveOpen: true);
-        var collections = document.Collections.ToDictionary(c => c.Id, c => c.Title);
         await WriteRowAsync(writer, Header);
-        foreach (var item in document.Items)
+        await foreach (var item in items.WithCancellation(cancellationToken))
         {
-            cancellationToken.ThrowIfCancellationRequested();
             await WriteRowAsync(writer,
             [
                 item.Id.ToString(CultureInfo.InvariantCulture),
