@@ -1,3 +1,4 @@
+using Commonage.Web.Identity;
 using System.ComponentModel.DataAnnotations;
 using Commonage.Web.Audit;
 using Commonage.Web.Data;
@@ -100,7 +101,7 @@ public class AddManyModel(
             var examined = await uploads.ExamineAsync(files[0], documents: true, cancellationToken);
             if (examined.Error != UploadError.None)
                 return new JsonResult(UploadReply.Refused(UploadErrorMessages.Describe(localizer, examined.Error, files[0].FileName)));
-            if (!addIdentical && await uploads.FindIdenticalAsync(examined, cancellationToken) is { } same)
+            if (!addIdentical && await uploads.FindIdenticalAsync(examined, !User.MayManage(), cancellationToken) is { } same)
                 return new JsonResult(UploadReply.Identical(localizer, same, ItemUrl(same.ItemId)));
 
             var (item, file) = await AddDraftAsync(files[0], examined, tags, cancellationToken);
@@ -115,7 +116,7 @@ public class AddManyModel(
             var examined = await uploads.ExamineAsync(upload, documents: true, cancellationToken);
             if (examined.Error != UploadError.None)
                 refused.Add(UploadErrorMessages.Describe(localizer, examined.Error, upload.FileName));
-            else if (!addIdentical && await uploads.FindIdenticalAsync(examined, cancellationToken) is not null)
+            else if (!addIdentical && await uploads.FindIdenticalAsync(examined, !User.MayManage(), cancellationToken) is not null)
                 left.Add(upload.FileName);
             else
             {

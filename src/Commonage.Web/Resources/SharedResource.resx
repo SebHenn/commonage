@@ -176,7 +176,6 @@
   <data name="Curator" xml:space="preserve"><value>Curator</value></data>
   <data name="Curator login" xml:space="preserve"><value>Curator login</value></data>
   <data name="Curators may have turned a photo: archive.json gives its &quot;rotation&quot; in degrees clockwise, and its &quot;position&quot; among the photos of the item." xml:space="preserve"><value>Curators may have turned a photo: archive.json gives its "rotation" in degrees clockwise, and its "position" among the photos of the item.</value></data>
-  <data name="Curators review contributions and look after the archive. Admins can also manage accounts, export the archive and read the activity log." xml:space="preserve"><value>Curators review contributions and look after the archive. Admins can also manage accounts, export the archive and read the activity log.</value></data>
   <data name="Current password" xml:space="preserve"><value>Current password</value></data>
   <data name="Data protection laws such as the GDPR ask that personal data is kept no longer than it is needed. Backups keep older copies until they are replaced." xml:space="preserve"><value>Data protection laws such as the GDPR ask that personal data is kept no longer than it is needed. Backups keep older copies until they are replaced.</value></data>
   <data name="Database" xml:space="preserve"><value>Database</value></data>
@@ -208,6 +207,7 @@
   <data name="Deleted the item for good" xml:space="preserve"><value>Deleted the item for good</value></data>
   <data name="Deleted the item for good after its time in the bin" xml:space="preserve"><value>Deleted the item for good after its time in the bin</value></data>
   <data name="Deleted the unused tag" xml:space="preserve"><value>Deleted the unused tag</value></data>
+  <data name="Describes items and adds photos. Cannot publish, delete, review contributions or see contributors' details." xml:space="preserve"><value>Describes items and adds photos. Cannot publish, delete, review contributions or see contributors' details.</value></data>
   <data name="Description" xml:space="preserve"><value>Description</value></data>
   <data name="Disable account" xml:space="preserve"><value>Disable account</value></data>
   <data name="Disabled" xml:space="preserve"><value>Disabled</value></data>
@@ -291,6 +291,8 @@
   <data name="Go to the start page" xml:space="preserve"><value>Go to the start page</value></data>
   <data name="Handbook" xml:space="preserve"><value>Handbook</value></data>
   <data name="Help from visitors" xml:space="preserve"><value>Help from visitors</value></data>
+  <data name="Helper" xml:space="preserve"><value>Helper</value></data>
+  <data name="Helpers describe items and add photos. Curators review contributions and look after the archive. Admins can also manage accounts, export the archive and read the activity log." xml:space="preserve"><value>Helpers describe items and add photos. Curators review contributions and look after the archive. Admins can also manage accounts, export the archive and read the activity log.</value></data>
   <data name="History" xml:space="preserve"><value>History</value></data>
   <data name="How long records are kept" xml:space="preserve"><value>How long records are kept</value></data>
   <data name="How to reach the archive" xml:space="preserve"><value>How to reach the archive</value></data>
@@ -825,6 +827,7 @@
   <data name="This person logs in with a code from an authenticator app as well as their password." xml:space="preserve"><value>This person logs in with a code from an authenticator app as well as their password.</value></data>
   <data name="This person logs in with their password only." xml:space="preserve"><value>This person logs in with their password only.</value></data>
   <data name="This recovery code is not right, or it has been used already." xml:space="preserve"><value>This recovery code is not right, or it has been used already.</value></data>
+  <data name="This reference number is already used by another item." xml:space="preserve"><value>This reference number is already used by another item.</value></data>
   <data name="This reference number is already used by: {0}" xml:space="preserve"><value>This reference number is already used by: {0}</value></data>
   <data name="This site only sets the cookies it needs: one for the chosen language, one to protect forms, and one to keep curators logged in. There are no analytics and no third-party services. Visitors' addresses are held in memory for a short time, to limit abuse of forms and logins." xml:space="preserve"><value>This site only sets the cookies it needs: one for the chosen language, one to protect forms, and one to keep curators logged in. There are no analytics and no third-party services. Visitors' addresses are held in memory for a short time, to limit abuse of forms and logins.</value><comment>Part of the privacy text an archive starts with. Please have a second translator review it.</comment></data>
   <data name="This text can be at most {1} characters long." xml:space="preserve"><value>This text can be at most {1} characters long.</value></data>

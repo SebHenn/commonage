@@ -381,7 +381,7 @@
   <data name="Credit" xml:space="preserve"><value>Nennung</value></data>
   <data name="Curator" xml:space="preserve"><value>Kuratorin/Kurator</value></data>
   <data name="Curator login" xml:space="preserve"><value>Anmeldung für Kuratoren</value></data>
-  <data name="Curators review contributions and look after the archive. Admins can also manage accounts, export the archive and read the activity log." xml:space="preserve"><value>Kuratorinnen und Kuratoren prüfen Beiträge und pflegen das Archiv. Admins können außerdem Konten verwalten, das Archiv exportieren und das Aktivitätsprotokoll lesen.</value></data>
+  <data name="Helpers describe items and add photos. Curators review contributions and look after the archive. Admins can also manage accounts, export the archive and read the activity log." xml:space="preserve"><value>Helferinnen und Helfer beschreiben Einträge und fügen Fotos hinzu. Kuratorinnen und Kuratoren prüfen Beiträge und pflegen das Archiv. Admins können außerdem Konten verwalten, das Archiv exportieren und das Aktivitätsprotokoll lesen.</value></data>
   <data name="Current password" xml:space="preserve"><value>Aktuelles Passwort</value></data>
   <data name="Date" xml:space="preserve"><value>Datierung</value></data>
   <data name="Days since the last backup: {0}. Whoever runs the server should check that the nightly backup still works." xml:space="preserve"><value>Tage seit der letzten Sicherung: {0}. Wer den Server betreut, sollte prüfen, ob die nächtliche Sicherung noch läuft.</value></data>
@@ -984,4 +984,7 @@
   <data name="Why" xml:space="preserve"><value>Warum</value></data>
   <data name="ZIP file with the scans (optional)" xml:space="preserve"><value>ZIP-Datei mit den Scans (optional)</value></data>
   <data name="{0, plural, one {Import the one row that is in order} other {Import the # rows that are in order}}" xml:space="preserve"><value>{0, plural, one {Die eine Zeile importieren, die in Ordnung ist} other {Die # Zeilen importieren, die in Ordnung sind}}</value></data>
+  <data name="Helper" xml:space="preserve"><value>Helferin/Helfer</value></data>
+  <data name="Describes items and adds photos. Cannot publish, delete, review contributions or see contributors' details." xml:space="preserve"><value>Beschreibt Einträge und fügt Fotos hinzu. Kann nichts veröffentlichen oder löschen, keine Beiträge prüfen und keine Angaben zu Beitragenden sehen.</value></data>
+  <data name="This reference number is already used by another item." xml:space="preserve"><value>Diese Signatur wird bereits von einem anderen Eintrag verwendet.</value></data>
 </root>

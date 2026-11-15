@@ -208,6 +208,20 @@ Für einen Schuhkarton, den Ihnen jemand persönlich gibt: Legen Sie die Einträ
 in der Beschreibung, wer ihn Ihnen wann gegeben hat und was vereinbart wurde. Lassen Sie sich die Erlaubnis möglichst
 schriftlich geben und bewahren Sie sie bei den Unterlagen Ihrer Gruppe auf.
 
+## Ein Scan-Abend mit Helferinnen und Helfern
+
+Freiwillige können Einträge hinzufügen und beschreiben, ohne etwas veröffentlichen oder löschen zu können. Ein Admin legt für
+jede Person unter **Konten** ein Konto mit der Rolle **Helferin/Helfer** an. Sie sehen die Entwürfe in der Liste der Einträge, das
+Formular für einen Eintrag und **Viele Fotos hinzufügen**; bereits veröffentlichte Einträge ändern Kuratoren. Sie können beschreiben, Fotos hinzufügen und drehen. Sie können
+nichts veröffentlichen, zurücknehmen oder in den Papierkorb legen, keine noch ungeprüften Beiträge öffnen und nicht sehen,
+wer etwas beigetragen hat. Was Helfende speichern, bleibt ein Entwurf, bis ein Kurator oder eine Kuratorin es veröffentlicht.
+
+Vor dem Abend: Sammlung anlegen und jeder Person ein Konto geben (der Einrichtungslink gilt einmal, jede Person wählt ihr
+eigenes Passwort). Am Abend fügen die Helfenden Fotos mit **Viele Fotos hinzufügen** hinzu und benennen sie nacheinander in der
+Liste der Einträge ohne Titel. Danach geht ein Kurator oder eine Kuratorin die Entwürfe durch und veröffentlicht. Sperren oder
+löschen Sie die Konten nach dem Abend, wenn die Leute nicht wiederkommen. Helfende können „Erhalten von“ und die internen
+Notizen der Einträge lesen, die sie öffnen; schreiben Sie dort nichts hinein, was Freiwillige nicht lesen sollen.
+
 ## Ihre Anmeldung
 
 Unter **Passwort ändern** → **Mit einer Authenticator-App anmelden** können Sie Ihrer Anmeldung einen Code von Ihrem Handy

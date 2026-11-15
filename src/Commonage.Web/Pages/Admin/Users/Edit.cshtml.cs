@@ -207,6 +207,6 @@ public class EditModel(
     private async Task<string> RoleOfAsync(IdentityUser account)
     {
         var roles = await users.GetRolesAsync(account);
-        return roles.Contains(Roles.Admin) ? Roles.Admin : Roles.Curator;
+        return roles.Contains(Roles.Admin) ? Roles.Admin : roles.Contains(Roles.Helper) ? Roles.Helper : Roles.Curator;
     }
 }

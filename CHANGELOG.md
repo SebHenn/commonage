@@ -19,6 +19,10 @@ version may change things that need attention when updating, and these notes say
 
 ### For people running an archive
 
+- A new account type, **Helper**, for volunteers: they describe items and add photos, but cannot publish, unpublish, delete,
+  open contributions that are still to be reviewed, or see who contributed something. Admins choose the type under
+  Accounts. The handbook has a section on a scanning evening with helpers.
+
 - The image now contains `poppler-utils` (about 83 MB on x86) to read PDFs. A smaller image that refuses PDFs is built with
   `--build-arg WITH_PDF=false`. Each call of poppler is a separate process with a time limit (`Uploads:PdfTimeoutSeconds`).
 - The export is version 6: each file lists its `pageCount`. Nothing needs regenerating; pages of earlier PDFs do not exist yet.

@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Commonage.Web.Audit;
 using Commonage.Web.Data;
 using Commonage.Web.Domain;
+using Commonage.Web.Identity;
 using Commonage.Web.Media;
 using Commonage.Web.Operations;
 using Commonage.Web.Search;
@@ -224,6 +225,10 @@ public class EditModel(
     /// <param name="files">Photos chosen on the form for a new item.</param>
     public async Task<IActionResult> OnPostAsync(int? id, string? command, string? then, List<IFormFile> files)
     {
+        // A helper describes; deciding what visitors see is for curators.
+        if (command is "publish" or "unpublish" or "accept" or "reject" && !User.MayManage())
+            return Forbid();
+
         ArchiveItem? item = null;
         if (id is not null)
         {
@@ -246,9 +251,12 @@ public class EditModel(
         if (!string.IsNullOrWhiteSpace(Input.ReferenceNumber))
         {
             var number = Input.ReferenceNumber.Trim();
-            var usedBy = await db.ArchiveItems.IgnoreQueryFilters().Where(i => i.ReferenceNumber == number && i.Id != id).Select(i => i.Title).FirstOrDefaultAsync();
+            var usedBy = await db.ArchiveItems.IgnoreQueryFilters().Where(i => i.ReferenceNumber == number && i.Id != id).Select(i => new { i.Title, i.Status, i.DeletedAt }).FirstOrDefaultAsync();
             if (usedBy is not null)
-                ModelState.AddModelError("Input.ReferenceNumber", localizer["This reference number is already used by: {0}", ArchiveItem.ShownTitle(localizer, usedBy)]);
+                ModelState.AddModelError("Input.ReferenceNumber", User.MayManage() || (usedBy.Status == ItemStatus.Draft && usedBy.DeletedAt is null)
+                    ? localizer["This reference number is already used by: {0}", ArchiveItem.ShownTitle(localizer, usedBy.Title)]
+                    // A helper is not told about what they may not see.
+                    : localizer["This reference number is already used by another item."]);
         }
         foreach (var (photo, text) in Input.AltTexts)
         {
@@ -378,7 +386,7 @@ public class EditModel(
             var identical = new List<string>();
             foreach (var (file, examined) in newPhotos)
             {
-                if (await uploads.FindIdenticalAsync(examined) is { } same)
+                if (await uploads.FindIdenticalAsync(examined, forHelper: !User.MayManage()) is { } same)
                     identical.Add(localizer["{0}: the archive already has this file: {1}", file.FileName, ArchiveItem.ShownTitle(localizer, same.ItemTitle)]);
                 await uploads.StoreAsync(item, file, examined);
             }
@@ -415,7 +423,7 @@ public class EditModel(
     private async Task LoadNeighboursAsync(int? id)
     {
         if (id is { } itemId && AdminItemList.FilterFrom(Back) is { } filter)
-            (PreviousId, NextId) = await db.NeighboursAsync(filter, itemId, HttpContext.RequestAborted);
+            (PreviousId, NextId) = await db.NeighboursAsync(filter with { ForHelper = !User.MayManage() }, itemId, HttpContext.RequestAborted);
     }
 
     /// <summary>Nothing was saved. Shows what the others saved, and keeps what this person typed in the form.</summary>
@@ -443,7 +451,7 @@ public class EditModel(
     public async Task<IActionResult> OnPostUploadAsync(int id, List<IFormFile> files, bool addIdentical, CancellationToken cancellationToken)
     {
         var item = await db.ArchiveItems.FindAsync([id], cancellationToken);
-        if (item is null)
+        if (item is null || IsOutOfReach(item))
             return NotFound();
 
         if (Request.Headers.Accept.ToString().Contains("application/json", StringComparison.OrdinalIgnoreCase))
@@ -453,7 +461,7 @@ public class EditModel(
             var examined = await uploads.ExamineAsync(files[0], documents: true, cancellationToken);
             if (examined.Error != UploadError.None)
                 return new JsonResult(UploadReply.Refused(UploadErrorMessages.Describe(localizer, examined.Error, files[0].FileName)));
-            if (!addIdentical && await uploads.FindIdenticalAsync(examined, cancellationToken) is { } same)
+            if (!addIdentical && await uploads.FindIdenticalAsync(examined, !User.MayManage(), cancellationToken) is { } same)
                 return new JsonResult(UploadReply.Identical(localizer, same, Url.Page("/Admin/Items/Edit", new { id = same.ItemId })!));
 
             await audit.RecordPhotosAddedAsync(item, cancellationToken);
@@ -472,7 +480,7 @@ public class EditModel(
                 errors.Add(UploadErrorMessages.Describe(localizer, examined.Error, file.FileName));
                 continue;
             }
-            if (await uploads.FindIdenticalAsync(examined, cancellationToken) is { } same)
+            if (await uploads.FindIdenticalAsync(examined, !User.MayManage(), cancellationToken) is { } same)
                 identical.Add(localizer["{0}: the archive already has this file: {1}", file.FileName, ArchiveItem.ShownTitle(localizer, same.ItemTitle)]);
             await uploads.StoreAsync(item, file, examined, cancellationToken);
             uploaded++;
@@ -496,8 +504,8 @@ public class EditModel(
     /// <summary>The card of one photo, for a page that just sent it and should not have to reload to show it.</summary>
     public async Task<IActionResult> OnGetPhotoCardAsync(int id, int mediaFileId, CancellationToken cancellationToken)
     {
-        var file = await db.MediaFiles.FirstOrDefaultAsync(f => f.Id == mediaFileId && f.ArchiveItemId == id, cancellationToken);
-        if (file is null)
+        var file = await db.MediaFiles.Include(f => f.ArchiveItem).FirstOrDefaultAsync(f => f.Id == mediaFileId && f.ArchiveItemId == id, cancellationToken);
+        if (file is null || IsOutOfReach(file.ArchiveItem))
             return NotFound();
 
         var identical = await FindIdenticalFilesAsync([file]);
@@ -511,7 +519,7 @@ public class EditModel(
     public async Task<IActionResult> OnPostMovePhotoAsync(int id, int mediaFileId, string? direction, CancellationToken cancellationToken)
     {
         var item = await db.ArchiveItems.FindAsync([id], cancellationToken);
-        if (item is null)
+        if (item is null || IsOutOfReach(item))
             return NotFound();
 
         var photos = await db.MediaFiles.Where(f => f.ArchiveItemId == id).OrderBy(f => f.Position).ThenBy(f => f.Id).ToListAsync(cancellationToken);
@@ -541,7 +549,7 @@ public class EditModel(
     public async Task<IActionResult> OnPostTurnPhotoAsync(int id, int mediaFileId, CancellationToken cancellationToken)
     {
         var file = await db.MediaFiles.Include(f => f.ArchiveItem).FirstOrDefaultAsync(f => f.Id == mediaFileId && f.ArchiveItemId == id, cancellationToken);
-        if (file is null)
+        if (file is null || IsOutOfReach(file.ArchiveItem))
             return NotFound();
         if (file.Status != ProcessingStatus.Ready)
             return BadRequest();
@@ -562,6 +570,9 @@ public class EditModel(
     /// <summary>Moves the item to the bin, where it can be restored or deleted for good, see <see cref="ArchiveBin"/>.</summary>
     public async Task<IActionResult> OnPostDeleteAsync(int id, CancellationToken cancellationToken)
     {
+        if (!User.MayManage())
+            return Forbid();
+
         var item = await db.ArchiveItems.FirstOrDefaultAsync(i => i.Id == id, cancellationToken);
         if (item is null)
             return NotFound();
@@ -577,6 +588,9 @@ public class EditModel(
     /// <summary>Hides a contribution for good because the contributor withdrew their consent.</summary>
     public async Task<IActionResult> OnPostWithdrawAsync(int id, CancellationToken cancellationToken)
     {
+        if (!User.MayManage())
+            return Forbid();
+
         var item = await db.ArchiveItems.Include(i => i.Contribution).FirstOrDefaultAsync(i => i.Id == id, cancellationToken);
         if (item is null)
             return NotFound();
@@ -597,6 +611,9 @@ public class EditModel(
     public async Task<IActionResult> OnPostContributorDetailsAsync(
         int id, string? contributorName, string? contributorEmail, bool showName, string? contributorRightsHolder, CancellationToken cancellationToken)
     {
+        if (!User.MayManage())
+            return Forbid();
+
         var item = await db.ArchiveItems.Include(i => i.Contribution).FirstOrDefaultAsync(i => i.Id == id, cancellationToken);
         if (item is null)
             return NotFound();
@@ -629,6 +646,9 @@ public class EditModel(
     /// <summary>Removes the contributor's name and email address, for example because they asked for it.</summary>
     public async Task<IActionResult> OnPostRemoveContributorDetailsAsync(int id, CancellationToken cancellationToken)
     {
+        if (!User.MayManage())
+            return Forbid();
+
         var item = await db.ArchiveItems.Include(i => i.Contribution).FirstOrDefaultAsync(i => i.Id == id, cancellationToken);
         if (item is null)
             return NotFound();
@@ -645,6 +665,9 @@ public class EditModel(
 
     public async Task<IActionResult> OnPostDeleteMediaAsync(int id, int mediaFileId, CancellationToken cancellationToken)
     {
+        if (!User.MayManage())
+            return Forbid();
+
         var file = await db.MediaFiles.Include(f => f.ArchiveItem).FirstOrDefaultAsync(f => f.Id == mediaFileId && f.ArchiveItemId == id, cancellationToken);
         if (file is null)
             return NotFound();
@@ -689,7 +712,7 @@ public class EditModel(
     {
         var fingerprints = photos.Select(f => f.Sha256).Distinct().ToList();
         var candidates = await db.MediaFiles
-            .Where(f => fingerprints.Contains(f.Sha256))
+            .Where(f => fingerprints.Contains(f.Sha256) && (User.MayManage() || f.ArchiveItem.Status == ItemStatus.Draft))
             .OrderBy(f => f.Id)
             .Select(f => new { f.Id, f.Sha256, f.ArchiveItemId, f.ArchiveItem.Title })
             .ToListAsync();
@@ -703,10 +726,19 @@ public class EditModel(
     }
 
     private Task<ArchiveItem?> FindItemAsync(int id) =>
-        db.ArchiveItems
-            .Include(i => i.Tags)
-            .Include(i => i.Contribution).ThenInclude(c => c!.ContributionLink)
-            .FirstOrDefaultAsync(i => i.Id == id);
+        User.MayManage()
+            ? db.ArchiveItems
+                .Include(i => i.Tags)
+                .Include(i => i.Contribution).ThenInclude(c => c!.ContributionLink)
+                .FirstOrDefaultAsync(i => i.Id == id)
+            // A helper only works on drafts: what is published is for curators to change, and a helper never gets a contribution's details.
+            : db.ArchiveItems
+                .Include(i => i.Tags)
+                .Where(i => i.Status == ItemStatus.Draft)
+                .FirstOrDefaultAsync(i => i.Id == id);
+
+    /// <summary>Whether this person must not touch the item: a helper has no part in a contribution that is not accepted.</summary>
+    private bool IsOutOfReach(ArchiveItem item) => !User.MayManage() && item.Status != ItemStatus.Draft;
 
     private async Task LoadCollectionsAsync()
     {

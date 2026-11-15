@@ -22,11 +22,13 @@ public static class MediaEndpoints
         app.MapGet($"/media/{{id:int}}/{VariantPattern}", ServePublicDerivativeAsync);
         app.MapGet("/media/{id:int}/page/{page:int}", ServePublicPageAsync);
 
-        var curator = app.MapGroup("/admin/media").RequireAuthorization(Policies.ManageArchive);
-        curator.MapGet($"/{{id:int}}/{VariantPattern}", ServeDerivativeAsync);
-        curator.MapGet("/{id:int}/page/{page:int}", ServePageAsync);
-        curator.MapGet("/{id:int}/original", ServeOriginalAsync);
-        curator.MapGet("/status", PreviewStatusAsync);
+        // Pictures made for the screen and the state of their making are for everyone who may describe items. The original, which
+        // may hold what the pictures do not, is for curators.
+        var describers = app.MapGroup("/admin/media").RequireAuthorization(Policies.Describe);
+        describers.MapGet($"/{{id:int}}/{VariantPattern}", ServeDerivativeAsync);
+        describers.MapGet("/{id:int}/page/{page:int}", ServePageAsync);
+        describers.MapGet("/status", PreviewStatusAsync);
+        app.MapGroup("/admin/media").RequireAuthorization(Policies.ManageArchive).MapGet("/{id:int}/original", ServeOriginalAsync);
     }
 
     /// <summary>Which previews are done, so a page can show them without a reload, and how many the archive still has to make.</summary>
@@ -81,9 +83,22 @@ public static class MediaEndpoints
             entityTag: new EntityTagHeaderValue($"\"{file.StorageId:N}-page{page}\""));
     }
 
+    /// <summary>
+    /// A file that is ready. Curators also see what is in the bin, to decide whether to restore it. A helper only sees the files of
+    /// drafts and published items that are not in the bin: contributions nobody has reviewed yet are not theirs to look at.
+    /// </summary>
+    private static async Task<MediaFile?> FindForStaffAsync(CommonageDbContext db, int id, System.Security.Claims.ClaimsPrincipal user)
+    {
+        var files = db.MediaFiles.IgnoreQueryFilters().Where(f => f.Id == id && f.Status == ProcessingStatus.Ready);
+        if (!user.MayManage())
+            files = files.Where(f => f.DeletedAt == null && f.ArchiveItem.DeletedAt == null
+                && f.ArchiveItem.Status == ItemStatus.Draft);
+        return await files.FirstOrDefaultAsync();
+    }
+
     private static async Task<IResult> ServePageAsync(int id, int page, CommonageDbContext db, IFileStorage storage, HttpContext context)
     {
-        var file = await db.MediaFiles.IgnoreQueryFilters().FirstOrDefaultAsync(f => f.Id == id && f.Status == ProcessingStatus.Ready);
+        var file = await FindForStaffAsync(db, id, context.User);
         if (file is null || page < 1 || page > (file.PageCount ?? 0))
             return Results.NotFound();
 
@@ -95,7 +110,7 @@ public static class MediaEndpoints
         int id, string variant, CommonageDbContext db, IFileStorage storage, HttpContext context)
     {
         // Curators also see what is in the bin, to decide whether to restore it.
-        var file = await db.MediaFiles.IgnoreQueryFilters().FirstOrDefaultAsync(f => f.Id == id && f.Status == ProcessingStatus.Ready);
+        var file = await FindForStaffAsync(db, id, context.User);
         if (file is null)
             return Results.NotFound();
 

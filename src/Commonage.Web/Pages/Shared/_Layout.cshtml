@@ -8,7 +8,7 @@
     var identity = await Profile.GetAsync();
     var isPrivatePage = new[] { "/Admin", "/Account", "/Contribute", "/Items/Tell" }.Any(p => (ViewContext.RouteData.Values["page"]?.ToString() ?? "").StartsWith(p, StringComparison.OrdinalIgnoreCase));
     var currentPage = ViewContext.RouteData.Values["page"]?.ToString() ?? "";
-    var canManage = User.IsInRole(Commonage.Web.Identity.Roles.Admin) || User.IsInRole(Commonage.Web.Identity.Roles.Curator);
+    var canManage = Commonage.Web.Identity.Roles.MayManage(User) || User.IsInRole(Commonage.Web.Identity.Roles.Helper);
     string? Current(params string[] pages) => pages.Any(p => currentPage.StartsWith(p, StringComparison.OrdinalIgnoreCase)) ? "page" : null;
 }
 <!DOCTYPE html>

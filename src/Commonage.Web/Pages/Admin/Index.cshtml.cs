@@ -1,5 +1,6 @@
 using Commonage.Web.Data;
 using Commonage.Web.Domain;
+using Commonage.Web.Identity;
 using Commonage.Web.Operations;
 using Commonage.Web.Search;
 using Microsoft.AspNetCore.Mvc;
@@ -66,7 +67,7 @@ public class IndexModel(CommonageDbContext db, ArchiveHealth health, ArchiveProf
     [BindProperty(SupportsGet = true, Name = QueryUrls.PageKey)]
     public int PageNumber { get; set; } = 1;
 
-    public AdminItemFilter Filter => new(Text, Status, CollectionId, Tag, Needs, Sort);
+    public AdminItemFilter Filter => new(Text, Status, CollectionId, Tag, Needs, Sort, ForHelper: !User.MayManage());
 
     private async Task<GettingStarted> LoadGettingStartedAsync(CancellationToken cancellationToken)
     {
@@ -92,13 +93,16 @@ public class IndexModel(CommonageDbContext db, ArchiveHealth health, ArchiveProf
         var collections = await db.Collections.OrderBy(c => c.Title).ToListAsync(cancellationToken);
         HasCollections = collections.Count > 0;
         CollectionOptions = new SelectList(collections, nameof(Collection.Id), nameof(Collection.Title), CollectionId);
-        WaitingCount = await db.ArchiveItems.CountAsync(i => i.Status == ItemStatus.Submitted, cancellationToken);
+        var mayManage = User.MayManage();
+        // What a helper cannot act on is not counted for them.
+        WaitingCount = mayManage ? await db.ArchiveItems.CountAsync(i => i.Status == ItemStatus.Submitted, cancellationToken) : 0;
         GettingStarted = await LoadGettingStartedAsync(cancellationToken);
-        OpenNotes = await db.VisitorNotes.CountAsync(n => n.HandledAt == null, cancellationToken);
-        OpenRemovalRequests = await db.VisitorNotes.CountAsync(n => n.HandledAt == null && n.Kind == VisitorNoteKind.Removal, cancellationToken);
-        NeedTranscription = await db.ArchiveItems.CountAsync(i => i.NeedsTranscription, cancellationToken);
-        HelpWanted = await db.ArchiveItems.CountAsync(i => i.HelpWanted, cancellationToken);
-        HelpWantedNotPublished = await db.ArchiveItems.CountAsync(i => i.HelpWanted && (i.Status == ItemStatus.Draft || i.Status == ItemStatus.Submitted), cancellationToken);
+        OpenNotes = mayManage ? await db.VisitorNotes.CountAsync(n => n.HandledAt == null, cancellationToken) : 0;
+        OpenRemovalRequests = mayManage ? await db.VisitorNotes.CountAsync(n => n.HandledAt == null && n.Kind == VisitorNoteKind.Removal, cancellationToken) : 0;
+        var visible = mayManage ? db.ArchiveItems : db.ArchiveItems.Where(i => i.Status == ItemStatus.Draft);
+        NeedTranscription = await visible.CountAsync(i => i.NeedsTranscription, cancellationToken);
+        HelpWanted = await visible.CountAsync(i => i.HelpWanted, cancellationToken);
+        HelpWantedNotPublished = await visible.CountAsync(i => i.HelpWanted && (i.Status == ItemStatus.Draft || i.Status == ItemStatus.Submitted), cancellationToken);
 
         var items = await db.QueryAsync(Filter, cancellationToken);
         Items = await items
