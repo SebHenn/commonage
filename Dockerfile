@@ -11,6 +11,9 @@ RUN dotnet publish src/Commonage.Web/Commonage.Web.csproj -c Release -a $TARGETA
 
 FROM mcr.microsoft.com/dotnet/aspnet:10.0@sha256:bfd912c83295ce66d4b706ebb8541b9f14259b0e76fbb88b2751f58ce2399d2e
 WORKDIR /app
+# poppler reads PDFs (M23). Build with --build-arg WITH_PDF=false for a smaller image that refuses PDFs.
+ARG WITH_PDF=true
+RUN if [ "$WITH_PDF" = "true" ]; then       apt-get update && apt-get install -y --no-install-recommends poppler-utils && rm -rf /var/lib/apt/lists/*;     fi
 COPY --from=build /app .
 # Uploaded files live here; Compose mounts a volume so they survive container updates.
 RUN mkdir -p /app/App_Data/media && chown -R $APP_UID /app/App_Data

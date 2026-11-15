@@ -489,6 +489,7 @@ shows the years of its published items. M19 is complete.
   fontconfig, nss and curl libraries). The ARM size was not measured (no ARM machine here); the first part measures it in CI.
   Because of the size and the parser risk, the Dockerfile gets a build argument and Compose a documented way to leave poppler
   out: a PDF is then refused with a clear message, and every other format works as before.
+- **Second part, done.** PDF page previews, `MediaFile.PageCount`, the public route `/media/{id}/page/{n}`, export version 6, the `WITH_PDF` build argument. PDF tests need poppler and are skipped without it (CI installs it).
 - **Parts.** First: AVIF and GIF (magic bytes in `ImageFormats`, accepted by upload and contribution links, a GIF becomes one
   still picture; no animation is kept). Second: PDF page previews and page count, with the migration and export version 6.
   Third: the text from PDFs into search, and the page strip on the item page.

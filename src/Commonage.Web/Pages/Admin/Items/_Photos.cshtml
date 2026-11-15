@@ -38,13 +38,13 @@
     {
         <form method="post" asp-page-handler="Upload" asp-route-id="@Model.ItemId" asp-route-back="@Model.Back" enctype="multipart/form-data" class="d-flex flex-wrap gap-2 align-items-center" data-upload-queue>
             <label for="photo-upload" class="visually-hidden">@T["Choose photos"]</label>
-            <input id="photo-upload" type="file" name="files" accept="@Commonage.Web.Media.ImageFormats.AcceptAttribute" multiple class="form-control w-auto"
+            <input id="photo-upload" type="file" name="files" accept="@Commonage.Web.Media.ImageFormats.AcceptWithDocumentsAttribute" multiple class="form-control w-auto"
                    data-val="true" data-val-required="@T["Please choose at least one photo."]"
                    data-choose-text="@T["Choose photos"]" data-none-text="@T["No photos chosen"]" data-count-text="@T["Photos chosen: {0}"]" />
             <button type="submit" class="btn btn-outline-primary">@T["Upload"]</button>
             <span data-valmsg-for="files" data-valmsg-replace="true" class="text-danger w-100"></span>
         </form>
-        <p class="form-text">@T["JPEG, PNG, TIFF, WebP, AVIF or GIF. The original file is kept unchanged and is only visible to curators."]</p>
+        <p class="form-text">@T["JPEG, PNG, TIFF, WebP, AVIF, GIF or PDF. The original file is kept unchanged and is only visible to curators."]</p>
     }
     else
     {

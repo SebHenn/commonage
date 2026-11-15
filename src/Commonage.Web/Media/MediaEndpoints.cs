@@ -20,9 +20,11 @@ public static class MediaEndpoints
     public static void MapMediaEndpoints(this WebApplication app)
     {
         app.MapGet($"/media/{{id:int}}/{VariantPattern}", ServePublicDerivativeAsync);
+        app.MapGet("/media/{id:int}/page/{page:int}", ServePublicPageAsync);
 
         var curator = app.MapGroup("/admin/media").RequireAuthorization(Policies.ManageArchive);
         curator.MapGet($"/{{id:int}}/{VariantPattern}", ServeDerivativeAsync);
+        curator.MapGet("/{id:int}/page/{page:int}", ServePageAsync);
         curator.MapGet("/{id:int}/original", ServeOriginalAsync);
         curator.MapGet("/status", PreviewStatusAsync);
     }
@@ -62,6 +64,31 @@ public static class MediaEndpoints
         return Results.Stream(storage.OpenRead(KeyFor(file, variant)), "image/jpeg",
             lastModified: file.UploadedAt,
             entityTag: new EntityTagHeaderValue($"\"{file.StorageId:N}-{variant}-{file.DerivativeVersion}-{file.RenderedRotation}\""));
+    }
+
+    /// <summary>One page of a published PDF, drawn as a picture. The PDF itself is never served to visitors.</summary>
+    private static async Task<IResult> ServePublicPageAsync(int id, int page, CommonageDbContext db, IFileStorage storage, HttpContext context)
+    {
+        var file = await db.PublishedItems
+            .SelectMany(i => i.MediaFiles)
+            .FirstOrDefaultAsync(f => f.Id == id && f.Status == ProcessingStatus.Ready);
+        if (file is null || page < 1 || page > (file.PageCount ?? 0))
+            return Results.NotFound();
+
+        context.Response.Headers.CacheControl = "public, max-age=600";
+        return Results.Stream(storage.OpenRead(file.PageKey(page)), "image/jpeg",
+            lastModified: file.UploadedAt,
+            entityTag: new EntityTagHeaderValue($"\"{file.StorageId:N}-page{page}\""));
+    }
+
+    private static async Task<IResult> ServePageAsync(int id, int page, CommonageDbContext db, IFileStorage storage, HttpContext context)
+    {
+        var file = await db.MediaFiles.IgnoreQueryFilters().FirstOrDefaultAsync(f => f.Id == id && f.Status == ProcessingStatus.Ready);
+        if (file is null || page < 1 || page > (file.PageCount ?? 0))
+            return Results.NotFound();
+
+        context.Response.Headers.CacheControl = "private, no-store";
+        return Results.Stream(storage.OpenRead(file.PageKey(page)), "image/jpeg");
     }
 
     private static async Task<IResult> ServeDerivativeAsync(

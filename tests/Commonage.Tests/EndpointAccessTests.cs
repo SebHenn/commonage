@@ -18,7 +18,7 @@ public class EndpointAccessTests(CommonageAppFactory app)
         "/{kind:regex(^(places|people)$)}",
         "/{slug:regex(^(about|contact|privacy|imprint)$)}", "/SetLanguage", "/Error/{code:int?}",
         // Published pictures only, see MediaTests.
-        "/media/{id:int}/{variant:regex(^(preview|thumbnail|card|large)$)}",
+        "/media/{id:int}/{variant:regex(^(preview|thumbnail|card|large)$)}", "/media/{id:int}/page/{page:int}",
         "/branding.css", "/branding/{id:guid}/{variant}", "/robots.txt", "/feed.xml", "/sitemap.xml", "/health", "/date-check",
         // Open to whoever has the link.
         "/contribute/{token}", "/contribute/{token}/thanks", "/Account/SetPassword",

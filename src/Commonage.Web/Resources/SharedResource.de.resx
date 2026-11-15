@@ -477,7 +477,7 @@
   <data name="Items that already have one, which is then replaced: {0}." xml:space="preserve"><value>Einträge, die schon eine Angabe haben, die dann ersetzt wird: {0}.</value></data>
   <data name="Items: {0}" xml:space="preserve"><value>Einträge: {0}</value></data>
   <data name="JPEG, PNG, TIFF, WebP, AVIF or GIF, at most {0} MB. It is also used as the browser tab's icon." xml:space="preserve"><value>JPEG, PNG, TIFF, WebP, AVIF oder GIF, höchstens {0} MB. Es wird auch als Symbol im Browser-Tab verwendet.</value></data>
-  <data name="JPEG, PNG, TIFF, WebP, AVIF or GIF. The original file is kept unchanged and is only visible to curators." xml:space="preserve"><value>JPEG, PNG, TIFF, WebP, AVIF oder GIF. Die Originaldatei bleibt unverändert erhalten und ist nur für Kuratoren sichtbar.</value></data>
+  <data name="JPEG, PNG, TIFF, WebP, AVIF, GIF or PDF. The original file is kept unchanged and is only visible to curators." xml:space="preserve"><value>JPEG, PNG, TIFF, WebP, AVIF, GIF oder PDF. Die Originaldatei bleibt unverändert erhalten und ist nur für Kuratoren sichtbar.</value></data>
   <data name="Language" xml:space="preserve"><value>Sprache</value></data>
   <data name="Language of the archive" xml:space="preserve"><value>Sprache des Archivs</value></data>
   <data name="Language, time and visibility" xml:space="preserve"><value>Sprache, Zeit und Sichtbarkeit</value></data>
@@ -871,6 +871,7 @@
   <data name="{0} in {1, plural, one {# file} other {# files}}" xml:space="preserve"><value>{0} in {1, plural, one {# Datei} other {# Dateien}}</value></data>
   <data name="{0} is empty." xml:space="preserve"><value>{0} ist leer.</value></data>
   <data name="{0} is in the HEIC format, which this archive cannot read yet. Please save it as a JPEG and choose it again." xml:space="preserve"><value>{0} ist im HEIC-Format, das dieses Archiv noch nicht lesen kann. Bitte speichern Sie es als JPEG und wählen Sie es erneut aus.</value></data>
+  <data name="{0} is a PDF, and this archive was set up without the program that reads PDFs." xml:space="preserve"><value>{0} ist ein PDF, und dieses Archiv wurde ohne das Programm eingerichtet, das PDFs liest.</value></data>
   <data name="{0} is not a supported photo format. Please use JPEG, PNG, TIFF, WebP, AVIF or GIF." xml:space="preserve"><value>{0} ist kein unterstütztes Fotoformat. Bitte verwenden Sie JPEG, PNG, TIFF, WebP, AVIF oder GIF.</value></data>
   <data name="{0} is too large." xml:space="preserve"><value>{0} ist zu groß.</value></data>
   <data name="{0} was left out, because together the photos would be too large to send at once. You can send it afterwards." xml:space="preserve"><value>{0} wurde weggelassen, weil die Fotos zusammen zu groß wären, um sie auf einmal zu senden. Sie können es danach senden.</value></data>

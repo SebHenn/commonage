@@ -329,7 +329,7 @@
   <data name="Items that already have one, which is then replaced: {0}." xml:space="preserve"><value>Items that already have one, which is then replaced: {0}.</value></data>
   <data name="Items: {0}" xml:space="preserve"><value>Items: {0}</value></data>
   <data name="JPEG, PNG, TIFF, WebP, AVIF or GIF, at most {0} MB. It is also used as the browser tab's icon." xml:space="preserve"><value>JPEG, PNG, TIFF, WebP, AVIF or GIF, at most {0} MB. It is also used as the browser tab's icon.</value></data>
-  <data name="JPEG, PNG, TIFF, WebP, AVIF or GIF. The original file is kept unchanged and is only visible to curators." xml:space="preserve"><value>JPEG, PNG, TIFF, WebP, AVIF or GIF. The original file is kept unchanged and is only visible to curators.</value></data>
+  <data name="JPEG, PNG, TIFF, WebP, AVIF, GIF or PDF. The original file is kept unchanged and is only visible to curators." xml:space="preserve"><value>JPEG, PNG, TIFF, WebP, AVIF, GIF or PDF. The original file is kept unchanged and is only visible to curators.</value></data>
   <data name="Keep rejected and withdrawn contributions" xml:space="preserve"><value>Keep rejected and withdrawn contributions</value></data>
   <data name="Keep the activity log" xml:space="preserve"><value>Keep the activity log</value></data>
   <data name="Kind" xml:space="preserve"><value>Kind</value></data>
@@ -970,6 +970,7 @@
   <data name="{0} KB" xml:space="preserve"><value>{0} KB</value></data>
   <data name="{0} MB" xml:space="preserve"><value>{0} MB</value></data>
   <data name="{0} in {1, plural, one {# file} other {# files}}" xml:space="preserve"><value>{0} in {1, plural, one {# file} other {# files}}</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
+  <data name="{0} is a PDF, and this archive was set up without the program that reads PDFs." xml:space="preserve"><value>{0} is a PDF, and this archive was set up without the program that reads PDFs.</value></data>
   <data name="{0} is empty." xml:space="preserve"><value>{0} is empty.</value></data>
   <data name="{0} is in the HEIC format, which this archive cannot read yet. Please save it as a JPEG and choose it again." xml:space="preserve"><value>{0} is in the HEIC format, which this archive cannot read yet. Please save it as a JPEG and choose it again.</value></data>
   <data name="{0} is not a supported photo format. Please use JPEG, PNG, TIFF, WebP, AVIF or GIF." xml:space="preserve"><value>{0} is not a supported photo format. Please use JPEG, PNG, TIFF, WebP, AVIF or GIF.</value></data>

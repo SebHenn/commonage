@@ -96,6 +96,18 @@ public class ContributionTests(CommonageAppFactory app)
     }
 
     [Fact]
+    public async Task A_PDF_is_not_taken_from_a_stranger()
+    {
+        var token = await CreateLinkAsync();
+        using var visitor = app.CreateClient();
+
+        var sent = await Browser.SendFormWithFilesAsync(visitor, $"/contribute/{token}", ValidFields("Programme"), ("programme.pdf", PdfTests.MakePdf(1)));
+
+        Assert.DoesNotContain("Thank you", await sent.Content.ReadAsStringAsync());
+        Assert.Equal(0, await CountContributionsAsync(token));
+    }
+
+    [Fact]
     public async Task Name_rights_and_consent_are_required()
     {
         var token = await CreateLinkAsync();

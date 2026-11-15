@@ -10,6 +10,11 @@ public static class ImageFormats
 
     public const string AcceptAttribute = "image/jpeg,image/png,image/tiff,image/webp,image/avif,image/gif";
 
+    /// <summary>For the curators' forms, which also take PDFs.</summary>
+    public const string AcceptWithDocumentsAttribute = AcceptAttribute + ",application/pdf";
+
+    public static bool IsPdf(ReadOnlySpan<byte> header) => header.StartsWith("%PDF-"u8);
+
     public static string? DetectContentType(ReadOnlySpan<byte> header)
     {
         if (header.StartsWith((ReadOnlySpan<byte>)[0xFF, 0xD8, 0xFF]))
