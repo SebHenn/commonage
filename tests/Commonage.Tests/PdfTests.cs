@@ -194,7 +194,8 @@ public class PdfTests(CommonageAppFactory app)
             await Task.Delay(100);
 
         using var visitor = app.CreateClient();
-        Assert.Contains("Items found: 1", await visitor.GetStringAsync($"/search?q={word}"));
+        var found = await visitor.GetStringAsync($"/search?q={word}");
+        Assert.True(found.Contains("Items found: 1"), "TEMP " + System.Text.RegularExpressions.Regex.Replace(found[found.IndexOf("<main", StringComparison.Ordinal)..], @"\s+", " ")[..1500] + " TEXTS " + string.Join(" | ", await app.WithDbAsync(db => db.ItemFileTexts.Where(t => t.ArchiveItemId == item.Id).Select(t => t.Text).ToListAsync())));
         var itemPage = await visitor.GetStringAsync($"/items/{item.Id}");
         Assert.Contains($"/media/{file.Id}/page/3", itemPage);
         Assert.Contains("Page 2 of 3", itemPage);
