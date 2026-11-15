@@ -83,7 +83,7 @@ public class EditModel(CommonageDbContext db, AuditLog audit, IStringLocalizer<S
 
         // Only a photo of one of the collection's own items. A new collection has none yet.
         if (Input.CoverMediaFileId is { } cover && cover != collection?.CoverMediaFileId
-            && (id is null || !await db.MediaFiles.AnyAsync(f => f.Id == cover && f.ArchiveItem.CollectionId == id, cancellationToken)))
+            && (id is null || !await db.MediaFiles.AnyAsync(f => f.Id == cover && f.ArchiveItem.CollectionId == id && !f.ContentType.StartsWith("audio/"), cancellationToken)))
             ModelState.AddModelError("Input.CoverMediaFileId", localizer["Please choose one of the photos shown."]);
 
         if (!ModelState.IsValid)
@@ -165,7 +165,7 @@ public class EditModel(CommonageDbContext db, AuditLog audit, IStringLocalizer<S
         // The chosen one first, so it is always offered, then published items' photos, newest item first, each item's in order.
         var current = collection.CoverMediaFileId;
         CoverChoices = await db.MediaFiles
-            .Where(f => f.ArchiveItem.CollectionId == id && f.Status == ProcessingStatus.Ready)
+            .Where(f => f.ArchiveItem.CollectionId == id && f.Status == ProcessingStatus.Ready && !f.ContentType.StartsWith("audio/"))
             .OrderByDescending(f => f.Id == current)
             .ThenByDescending(f => f.ArchiveItem.Status == ItemStatus.Published)
             .ThenByDescending(f => f.ArchiveItemId).ThenBy(f => f.Position).ThenBy(f => f.Id)

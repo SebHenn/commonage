@@ -72,7 +72,7 @@ public static class AdminItemList
             ItemNeed.Tags => items.Where(i => i.TagNames == null),
             ItemNeed.Photos => items.Where(i => !i.MediaFiles.Any()),
             ItemNeed.PreviewFailed => items.Where(i => i.MediaFiles.Any(f => f.Status == ProcessingStatus.Failed)),
-            ItemNeed.AltText => items.Where(i => i.MediaFiles.Any(f => f.AltText == null)),
+            ItemNeed.AltText => items.Where(i => i.MediaFiles.Any(f => f.AltText == null && !f.ContentType.StartsWith("audio/"))),
             ItemNeed.Title => items.Where(i => i.Title == ""),
             ItemNeed.Transcription => items.Where(i => i.NeedsTranscription),
             ItemNeed.HelpWanted => items.Where(i => i.HelpWanted),

@@ -66,7 +66,7 @@ public static class PublicFeeds
         // What people agreed to before this existed was "this website". A feed is copied to other places, so those stay out of it.
         var items = await db.PublishedItems
             .Where(i => i.Contribution == null || i.Contribution.ConsentCoversSharing)
-            .Include(i => i.MediaFiles.Where(f => f.Status == ProcessingStatus.Ready).OrderBy(f => f.Position).ThenBy(f => f.Id).Take(1))
+            .Include(i => i.MediaFiles.Where(f => f.Status == ProcessingStatus.Ready && !f.ContentType.StartsWith("audio/")).OrderBy(f => f.Position).ThenBy(f => f.Id).Take(1))
             .OrderByDescending(i => i.PublishedAt).ThenByDescending(i => i.Id)
             .Take(FeedLength)
             .AsNoTracking()
@@ -102,7 +102,7 @@ public static class PublicFeeds
             new XElement(Atom + "rights", XmlText(rights)));
 
         var content = new StringBuilder();
-        if (item.MediaFiles.FirstOrDefault() is { } photo)
+        if (item.MediaFiles.FirstOrDefault(f => !f.IsAudio) is { } photo)
         {
             var alt = photo.AltText ?? item.Title;
             content.Append(CultureInfo.InvariantCulture, $"""<p><img src="{address}/media/{photo.Id}/card" alt="{WebUtility.HtmlEncode(alt)}"></p>""");

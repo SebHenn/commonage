@@ -27,7 +27,7 @@ public class BinModel(
         Items = await db.BinnedItems
             .AsNoTracking()
             .Include(i => i.Collection)
-            .Include(i => i.MediaFiles.Where(f => f.Status == ProcessingStatus.Ready && f.DeletedAt == null).OrderBy(f => f.Position).ThenBy(f => f.Id).Take(1))
+            .Include(i => i.MediaFiles.Where(f => f.Status == ProcessingStatus.Ready && f.DeletedAt == null && !f.ContentType.StartsWith("audio/")).OrderBy(f => f.Position).ThenBy(f => f.Id).Take(1))
             .OrderByDescending(i => i.DeletedAt)
             .Take(MaxShown)
             .ToListAsync(cancellationToken);

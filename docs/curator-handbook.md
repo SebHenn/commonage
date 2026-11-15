@@ -53,6 +53,18 @@ needs to be entered for that.
 
 Visitors can open a photo at about 3000 pixels. Whether they can is a setting for the whole archive, under "Settings".
 
+## Recordings
+
+A recording (MP3, M4A from a phone's voice recorder, WAV or FLAC) is added like a photo, on the item's page, by a curator or helper;
+not through a contribution link. Visitors hear it with the player on the item page once the item is published. They get a copy
+that has everything cut out that the file carries besides the sound: names, places, dates, the device and cover pictures. The
+sound itself is exactly the original's. The original stays with curators ("Original" on the card). If the archive cannot make
+sense of a file, it says "No preview could be created" and offers nothing to visitors: try saving it again from the recorder
+or converting it to MP3 or WAV. OGG and Opus are not accepted yet.
+
+A recording cannot be searched. Write down in the description what is said, or at least who and where, and tick "Still needs a
+transcription" until there is a transcript.
+
 ## Rights, credit and what only you see
 
 Open **Rights and credit** on an item:

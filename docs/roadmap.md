@@ -522,6 +522,8 @@ shows the years of its published items. M19 is complete.
   understand fails with the retry button, and is never served unstripped. The item page shows the player; the curator
   form accepts audio. Ogg/Opus is left for later: its comment lives inside pages with checksums, so it needs a rewriter
   of its own and is not worth holding the rest up.
+  *Built:* a recording is a `MediaFile` with an `audio/*` type and no picture sizes, so every query that picks a cover skips
+  it; its stripped copy is `audio/{StorageId}`. No new column, so no migration and no change to the export.
 - **Part 2: the transcript.** An item with audio needs a transcript before it is published, or the "transcript to follow"
   flag (the existing "needs transcription" flag). The transcript is searched and shown beside the player. The handbook
   documents a local whisper.cpp workflow, as "Not planned" promises.

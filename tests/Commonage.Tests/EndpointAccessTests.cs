@@ -19,6 +19,8 @@ public class EndpointAccessTests(CommonageAppFactory app)
         "/{slug:regex(^(about|contact|privacy|imprint)$)}", "/SetLanguage", "/Error/{code:int?}",
         // Published pictures only, see MediaTests.
         "/media/{id:int}/{variant:regex(^(preview|thumbnail|card|large)$)}", "/media/{id:int}/page/{page:int}",
+        // The tag-free copy of a recording, published items only, see AudioTests.
+        "/media/{id:int}/audio",
         "/branding.css", "/branding/{id:guid}/{variant}", "/robots.txt", "/feed.xml", "/sitemap.xml", "/health", "/date-check",
         // Open to whoever has the link.
         "/contribute/{token}", "/contribute/{token}/thanks", "/Account/SetPassword",

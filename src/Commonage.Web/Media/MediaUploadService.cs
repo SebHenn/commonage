@@ -167,6 +167,8 @@ public class MediaUploadService(
             return (UploadError.None, contentType);
         if (documents && ImageFormats.IsPdf(header.AsSpan(0, headerLength)))
             return pdf.IsAvailable ? (UploadError.None, MediaFile.PdfContentType) : (UploadError.PdfUnavailable, null);
+        if (documents && AudioTools.DetectContentType(header.AsSpan(0, headerLength)) is { } audio)
+            return (UploadError.None, audio);
         return (ImageFormats.IsHeic(header.AsSpan(0, headerLength)) ? UploadError.Heic : UploadError.UnsupportedFormat, null);
     }
 

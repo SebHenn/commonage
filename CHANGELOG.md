@@ -16,6 +16,11 @@ version may change things that need attention when updating, and these notes say
   itself is never shown. A PDF in the bin is not searched until it is restored. PDFs added before this version have no
   text; upload them again to make them searchable.
 - The item page shows a PDF as its pages, one under the other, each with "Page 3 of 20".
+- Recordings can be uploaded by curators (not through contribution links): MP3, M4A (the voice recorders of phones), WAV and
+  FLAC. Visitors hear a copy in the item page's own player, which can jump about. Names, places, dates, cover pictures
+  and everything else the file carries in tags are cut out of that copy; the sound itself is not re-encoded. The original
+  stays with curators. A file whose structure the archive cannot follow is refused rather than served. OGG/Opus is not
+  accepted yet. Recordings are not yet searched or transcribed.
 
 ### For people running an archive
 

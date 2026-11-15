@@ -48,6 +48,26 @@ public class ReadableItemBrowserTests(BrowserFixture app)
         return page;
     }
 
+    [Fact]
+    public async Task A_recording_gets_a_player_where_a_photo_gets_its_picture()
+    {
+        var page = await app.LogInAsync();
+        await page.GotoAsync("/Admin/Items/Edit");
+        await page.FillAsync("[name='Input.Title']", "An interview");
+        await page.SelectOptionAsync("[name='Input.CollectionId']", new SelectOptionValue { Index = 1 });
+        await page.ClickAsync("#item-form button[type=submit]:text-is('Save as draft')");
+        await page.WaitForSelectorAsync(".alert-success");
+
+        byte[] recording = [.. "ID3"u8, 4, 0, 0, 0, 0, 0, 0, 0xFF, 0xFB, 0x90, 0, .. Guid.NewGuid().ToByteArray(), .. new byte[400]];
+        await page.SetInputFilesAsync("#photo-upload", new FilePayload { Name = "interview.mp3", MimeType = "audio/mpeg", Buffer = recording });
+        await page.ClickAsync("form[data-upload-queue] button[type=submit]");
+
+        await page.WaitForSelectorAsync("[data-photo-card] audio[src^='/admin/media/']", new PageWaitForSelectorOptions { Timeout = 30000 });
+        Assert.Equal(0, await page.Locator("[data-photo-card] img").CountAsync());
+        Assert.Equal(0, await page.Locator("[data-photo-turn]").CountAsync());
+        Assert.Contains("Recording 1 of 1", await page.InnerTextAsync("[data-photo-card]"));
+    }
+
     private static Task<string[]> OrderAsync(IPage page) =>
         page.EvaluateAsync<string[]>("[...document.querySelectorAll('[data-photo-card] .text-truncate')].map(name => name.textContent.trim())");
 
