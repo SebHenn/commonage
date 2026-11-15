@@ -71,6 +71,7 @@ public class BulkModel(
 
     public int WithoutTitle { get; private set; }
     public int NotDrafts { get; private set; }
+    public int NoTranscript { get; private set; }
 
     /// <summary>Items that already hold a date or a statement, which would be replaced.</summary>
     public int WouldBeReplaced { get; private set; }
@@ -150,6 +151,9 @@ public class BulkModel(
             .Where(i => ids.Contains(i.Id))
             .OrderBy(i => i.Id)
             .ToListAsync(cancellationToken);
+        // A recording nobody can read needs its transcript first, as on the item's own page.
+        if (Action == BulkAction.Publish)
+            withoutTranscript = await WithoutTranscript(db.ArchiveItems.Where(i => ids.Contains(i.Id))).Select(i => i.Id).ToHashSetAsync(cancellationToken);
         var tags = Action == BulkAction.AddTags ? await db.FindOrCreateTagsAsync(tagNames, cancellationToken) : [];
 
         var now = DateTime.UtcNow;
@@ -215,7 +219,13 @@ public class BulkModel(
         }
     }
 
-    private static bool IsPublishable(ArchiveItem item) => item.Status == ItemStatus.Draft && item.CanBePublished;
+    private HashSet<int> withoutTranscript = [];
+
+    private bool IsPublishable(ArchiveItem item) => item.Status == ItemStatus.Draft && item.CanBePublished && !withoutTranscript.Contains(item.Id);
+
+    private static IQueryable<ArchiveItem> WithoutTranscript(IQueryable<ArchiveItem> items) =>
+        items.Where(i => i.Status == ItemStatus.Draft && (i.Description == null || i.Description.Trim() == "") && !i.NeedsTranscription
+            && i.MediaFiles.Any(f => f.ContentType.StartsWith("audio/")));
 
     private List<int> ParseIds() =>
         Ids.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(id => int.TryParse(id, out var number) ? number : 0).Where(id => id > 0).ToList();
@@ -226,7 +236,8 @@ public class BulkModel(
         Count = await items.CountAsync(cancellationToken);
         WithoutTitle = await items.CountAsync(i => i.Status == ItemStatus.Draft && i.Title == "", cancellationToken);
         NotDrafts = await items.CountAsync(i => i.Status != ItemStatus.Draft, cancellationToken);
-        WillChange = Action == BulkAction.Publish ? Count - WithoutTitle - NotDrafts : Count;
+        NoTranscript = Action == BulkAction.Publish ? await WithoutTranscript(items).CountAsync(i => i.Title != "", cancellationToken) : 0;
+        WillChange = Action == BulkAction.Publish ? Count - WithoutTitle - NotDrafts - NoTranscript : Count;
         WouldBeReplaced = Action switch
         {
             BulkAction.SetDate => await items.CountAsync(i => i.DateText != null, cancellationToken),

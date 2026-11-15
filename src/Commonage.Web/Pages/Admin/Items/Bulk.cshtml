@@ -51,6 +51,10 @@
         {
             <p class="alert alert-warning">@T["Left out, because they have no title yet: {0}.", Model.WithoutTitle]</p>
         }
+        @if (Model.NoTranscript > 0)
+        {
+            <p class="alert alert-warning">@T["Left out, because a recording has no transcript yet: {0}.", Model.NoTranscript]</p>
+        }
         @if (Model.NotDrafts > 0)
         {
             <p class="alert alert-info">@T["Left out, because they are not drafts: {0}. A contribution needs a decision of its own, on its own page.", Model.NotDrafts]</p>

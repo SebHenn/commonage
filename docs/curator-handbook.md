@@ -62,8 +62,15 @@ sound itself is exactly the original's. The original stays with curators ("Origi
 sense of a file, it says "No preview could be created" and offers nothing to visitors: try saving it again from the recorder
 or converting it to MP3 or WAV. OGG and Opus are not accepted yet.
 
-A recording cannot be searched. Write down in the description what is said, or at least who and where, and tick "Still needs a
-transcription" until there is a transcript.
+Sound cannot be searched, and not everyone can listen. So an item with a recording is published only when its description holds
+the transcript, or when "Still needs a transcription" is ticked. Visitors then read the description beside the player, and
+search finds the words in it.
+
+**Making a transcript on your own computer.** Nothing is sent anywhere. Install [whisper.cpp](https://github.com/ggml-org/whisper.cpp),
+download one of its models (the "small" model is a good start) and run, for example,
+`whisper-cli -m ggml-small.bin -l de -f interview.wav -otxt`. It needs a WAV file at 16 kHz; `ffmpeg -i interview.mp3 -ar 16000
+-ac 1 interview.wav` makes one. Read the result through while listening: names and dialect words are often wrong. Paste it into the
+description and untick the box once it is checked.
 
 ## Rights, credit and what only you see
 

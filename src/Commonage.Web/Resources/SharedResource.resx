@@ -22,6 +22,7 @@
   <data name="A new name changes the tag on every item that has it, also in the search." xml:space="preserve"><value>A new name changes the tag on every item that has it, also in the search.</value></data>
   <data name="A new setup link lets the person choose a new password, for example when they forgot theirs. Earlier links stop working. A disabled account cannot log in, but its history stays in the activity log." xml:space="preserve"><value>A new setup link lets the person choose a new password, for example when they forgot theirs. Earlier links stop working. A disabled account cannot log in, but its history stays in the activity log.</value></data>
   <data name="A photo description can be at most {0, plural, one {# character} other {# characters}} long." xml:space="preserve"><value>A photo description can be at most {0, plural, one {# character} other {# characters}} long.</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
+  <data name="A recording needs its transcript in the description before it is published, or tick that a transcript will follow." xml:space="preserve"><value>A recording needs its transcript in the description before it is published, or tick that a transcript will follow.</value></data>
   <data name="A rights statement" xml:space="preserve"><value>A rights statement</value></data>
   <data name="A tag can be at most {0, plural, one {# character} other {# characters}} long." xml:space="preserve"><value>A tag can be at most {0, plural, one {# character} other {# characters}} long.</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="A tag can be at most {1} characters long." xml:space="preserve"><value>A tag can be at most {1} characters long.</value></data>
@@ -349,6 +350,7 @@
   <data name="Later" xml:space="preserve"><value>Later</value></data>
   <data name="Later: {0}" xml:space="preserve"><value>Later: {0}</value></data>
   <data name="Leave this field empty" xml:space="preserve"><value>Leave this field empty</value></data>
+  <data name="Left out, because a recording has no transcript yet: {0}." xml:space="preserve"><value>Left out, because a recording has no transcript yet: {0}.</value></data>
   <data name="Left out, because the archive already has them: {0}" xml:space="preserve"><value>Left out, because the archive already has them: {0}</value></data>
   <data name="Left out, because they are not drafts: {0}. A contribution needs a decision of its own, on its own page." xml:space="preserve"><value>Left out, because they are not drafts: {0}. A contribution needs a decision of its own, on its own page.</value></data>
   <data name="Left out, because they have no title yet: {0}." xml:space="preserve"><value>Left out, because they have no title yet: {0}.</value></data>
