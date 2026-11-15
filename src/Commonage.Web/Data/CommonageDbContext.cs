@@ -20,6 +20,7 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options)
     public DbSet<Contribution> Contributions => Set<Contribution>();
     public DbSet<VisitorNote> VisitorNotes => Set<VisitorNote>();
     public DbSet<AuditEntry> AuditEntries => Set<AuditEntry>();
+    public DbSet<ItemRevision> ItemRevisions => Set<ItemRevision>();
     public DbSet<ArchiveSettings> ArchiveSettings => Set<ArchiveSettings>();
     public DbSet<ArchiveText> ArchiveTexts => Set<ArchiveText>();
 
@@ -193,6 +194,19 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options)
             text.Property(t => t.Language).HasMaxLength(20);
             text.Property(t => t.Kind).HasConversion<string>().HasMaxLength(30);
             text.Property(t => t.Text).HasMaxLength(ArchiveText.MaxLength);
+        });
+
+        builder.Entity<ItemRevision>(revision =>
+        {
+            // Goes and comes back with its item, like the item's contribution.
+            revision.HasQueryFilter(r => r.ArchiveItem.DeletedAt == null);
+            revision.Property(r => r.UserId).HasMaxLength(450);
+            revision.Property(r => r.UserName).HasMaxLength(256);
+            revision.Property(r => r.Field).HasConversion<string>().HasMaxLength(30);
+            revision.HasIndex(r => new { r.ArchiveItemId, r.At });
+            revision.HasOne(r => r.ArchiveItem)
+                .WithMany()
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         builder.Entity<AuditEntry>(entry =>

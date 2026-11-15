@@ -13,6 +13,11 @@ For the people who look after what an archive holds. You need no technical knowl
 - **Tags:** the places, people and topics someone might look for. Before adding a new one, check whether it already
   exists under a slightly different name.
 
+**Going back to an earlier text.** Under the form, "Earlier texts" lists each change to the title, description, date, credit,
+original location and reference number: when, by whom, and what it said before ("Show the text before this change"). "Restore
+this text" puts it back, and the text it replaces is kept in turn, so you can change your mind. A helper can read the list
+but not restore. Nothing is listed for changes made before this version.
+
 ## Tidying up tags
 
 **Tags** lists every tag with how many items have it. Open one to:

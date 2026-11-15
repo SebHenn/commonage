@@ -204,6 +204,27 @@ public class RetentionTests(CommonageAppFactory app)
     }
 
     [Fact]
+    public async Task Who_changed_an_earlier_text_is_forgotten_with_the_log_but_the_text_stays()
+    {
+        await using var archive = await app.NewArchiveAsync();
+        using var admin = await AdminAsync(archive);
+        await SaveSettingsAsync(admin, new() { ["Input.ActivityLogKeptYears"] = "1" });
+        var item = await archive.CreateContributionAsync(ItemStatus.Draft);
+        await archive.WithDbAsync(async db =>
+        {
+            db.ItemRevisions.Add(new ItemRevision { ArchiveItemId = item.Id, At = DateTime.UtcNow.AddYears(-2), UserId = "a", UserName = "old@example.org", Field = RevisionField.Description, OldValue = "Old words" });
+            db.ItemRevisions.Add(new ItemRevision { ArchiveItemId = item.Id, At = DateTime.UtcNow.AddMonths(-1), UserId = "b", UserName = "new@example.org", Field = RevisionField.Description, OldValue = "Newer words" });
+            return await db.SaveChangesAsync();
+        });
+
+        await ApplyAsync(archive);
+
+        var revisions = await archive.WithDbAsync(db => db.ItemRevisions.OrderBy(r => r.At).ToListAsync());
+        Assert.Equal(["Old words", "Newer words"], revisions.Select(r => r.OldValue));
+        Assert.Equal([null, "new@example.org"], revisions.Select(r => r.UserName));
+    }
+
+    [Fact]
     public async Task The_settings_take_only_the_offered_times_and_an_old_form_changes_nothing()
     {
         await using var archive = await app.NewArchiveAsync();

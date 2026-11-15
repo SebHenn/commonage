@@ -316,6 +316,41 @@
 
 @if (Model.ItemId is not null)
 {
+    @if (Model.Revisions.Count > 0)
+    {
+        <section class="mt-5 col-lg-8" aria-labelledby="revisions-heading">
+            <h2 id="revisions-heading" class="h4">@T["Earlier texts"]</h2>
+            <ul class="list-unstyled small">
+                @foreach (var revision in Model.Revisions)
+                {
+                    <li class="mb-3">
+                        <time datetime="@revision.At.ToString("O")" class="text-muted">@Dates.Moment(revision.At)</time>
+                        · @(revision.Field switch
+                        {
+                            RevisionField.Title => T["Title"],
+                            RevisionField.Description => T["Description"],
+                            RevisionField.Date => T["Date"],
+                            RevisionField.Credit => T["Credit"],
+                            RevisionField.OriginalLocation => T["Original location"],
+                            _ => T["Reference number"],
+                        })
+                        · @(revision.UserName ?? T["Unknown"].Value)
+                        <details>
+                            <summary>@T["Show the text before this change"]</summary>
+                            <p class="text-preserve-lines text-break mb-2">@(string.IsNullOrEmpty(revision.OldValue) ? T["Empty"].Value : revision.OldValue)</p>
+                        </details>
+                        @if (mayManage)
+                        {
+                            <form method="post" asp-page-handler="RestoreText" asp-route-id="@Model.ItemId" asp-route-revisionId="@revision.Id">
+                                <button type="submit" class="btn btn-sm btn-outline-secondary">@T["Restore this text"]</button>
+                            </form>
+                        }
+                    </li>
+                }
+            </ul>
+        </section>
+    }
+
     @if (Model.History.Count > 0)
     {
         <section class="mt-5 col-lg-8" aria-labelledby="history-heading">

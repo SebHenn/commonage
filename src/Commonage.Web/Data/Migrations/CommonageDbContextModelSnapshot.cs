@@ -464,6 +464,43 @@ namespace Commonage.Web.Data.Migrations
                     b.ToTable("ItemFileTexts");
                 });
 
+            modelBuilder.Entity("Commonage.Web.Domain.ItemRevision", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("ArchiveItemId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("At")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Field")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<string>("OldValue")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
+                        .HasMaxLength(450)
+                        .HasColumnType("character varying(450)");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ArchiveItemId", "At");
+
+                    b.ToTable("ItemRevisions");
+                });
+
             modelBuilder.Entity("Commonage.Web.Domain.MediaFile", b =>
                 {
                     b.Property<int>("Id")
@@ -945,6 +982,17 @@ namespace Commonage.Web.Data.Migrations
                     b.HasOne("Commonage.Web.Domain.ArchiveItem", "ArchiveItem")
                         .WithOne("FileText")
                         .HasForeignKey("Commonage.Web.Domain.ItemFileText", "ArchiveItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ArchiveItem");
+                });
+
+            modelBuilder.Entity("Commonage.Web.Domain.ItemRevision", b =>
+                {
+                    b.HasOne("Commonage.Web.Domain.ArchiveItem", "ArchiveItem")
+                        .WithMany()
+                        .HasForeignKey("ArchiveItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

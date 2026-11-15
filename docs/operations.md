@@ -16,6 +16,9 @@ their own email, a message, or in person), and the person chooses their own pass
 and for seven days. If someone forgets their password, an admin creates a new setup link; earlier links stop
 working then.
 
+Earlier texts of items (table `ItemRevisions`) are kept as long as the item is, and go when it is deleted for good. They are not
+part of the export, which holds what is true now; a restore from a backup brings them back with the rest of the database.
+
 An account can have a display name, and Commonage remembers when it last logged in (table `StaffProfiles`). Both are shown to
 admins on the Accounts pages only, and are not part of the export, which holds no accounts. The activity log names the account
 by the email address it had when something was done, so it stays true after a rename or a deleted account.

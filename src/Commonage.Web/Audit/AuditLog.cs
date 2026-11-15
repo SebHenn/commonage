@@ -27,6 +27,22 @@ public class AuditLog(CommonageDbContext db, IHttpContextAccessor httpContextAcc
             Record(action, item.Title, item);
     }
 
+    /// <summary>Keeps what a field said before it was changed, in the same save as the change itself.</summary>
+    public void RecordRevision(ArchiveItem item, RevisionField field, string? oldValue)
+    {
+        var user = httpContextAccessor.HttpContext?.User;
+        var signedIn = user?.Identity?.IsAuthenticated == true;
+        db.ItemRevisions.Add(new ItemRevision
+        {
+            ArchiveItem = item,
+            At = clock.GetUtcNow().UtcDateTime,
+            UserId = signedIn ? user!.FindFirstValue(ClaimTypes.NameIdentifier) : null,
+            UserName = signedIn ? user!.Identity!.Name : null,
+            Field = field,
+            OldValue = oldValue,
+        });
+    }
+
     public void Record(AuditAction action, string? subject, ArchiveItem? item = null)
     {
         var user = httpContextAccessor.HttpContext?.User;

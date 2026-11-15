@@ -36,6 +36,9 @@ public class ArchiveRetention(CommonageDbContext db, AuditLog audit, TimeProvide
         {
             var cutoff = now.AddYears(-years);
             var deleted = await db.AuditEntries.Where(e => e.At < cutoff).ExecuteDeleteAsync(cancellationToken);
+            // The earlier texts stay with their item, but who changed them is forgotten on the same schedule as the log.
+            await db.ItemRevisions.IgnoreQueryFilters().Where(r => r.At < cutoff && (r.UserId != null || r.UserName != null))
+                .ExecuteUpdateAsync(s => s.SetProperty(r => r.UserId, (string?)null).SetProperty(r => r.UserName, (string?)null), cancellationToken);
             // The log says that it was shortened, and that entry is the newest, so it stays for the whole time again.
             if (deleted > 0)
             {
