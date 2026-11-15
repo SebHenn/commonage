@@ -483,7 +483,15 @@ shows the years of its published items. M19 is complete.
 
 **M23 Documents**
 
-- A spike first: can the bundled NetVips read AVIF and GIF, and what do `poppler-utils` add to the image on x86 and ARM?
+- **Spike, done.** The bundled NetVips (libvips 8.18) reads and writes GIF and AVIF, tested on Windows x64 with a round trip;
+  the Linux build in the image is checked by a test in the first part. It has no PDF loader, so PDFs need `poppler-utils`:
+  on the x86 base image, `apt install --no-install-recommends poppler-utils` adds about 83 MB (48 packages, including cairo,
+  fontconfig, nss and curl libraries). The ARM size was not measured (no ARM machine here); the first part measures it in CI.
+  Because of the size and the parser risk, the Dockerfile gets a build argument and Compose a documented way to leave poppler
+  out: a PDF is then refused with a clear message, and every other format works as before.
+- **Parts.** First: AVIF and GIF (magic bytes in `ImageFormats`, accepted by upload and contribution links, a GIF becomes one
+  still picture; no animation is kept). Second: PDF page previews and page count, with the migration and export version 6.
+  Third: the text from PDFs into search, and the page strip on the item page.
 - PDFs are recognised by content. `pdftoppm` and `pdftotext` run as separate processes with a timeout, a page limit and a size
   limit, driven by the existing background queue; a failure shows as a failed file with the existing retry. The parser risk
   gets its row in `security.md`.
