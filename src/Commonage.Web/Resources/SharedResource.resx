@@ -328,8 +328,8 @@
   <data name="Items in the bin: {0}" xml:space="preserve"><value>Items in the bin: {0}</value></data>
   <data name="Items that already have one, which is then replaced: {0}." xml:space="preserve"><value>Items that already have one, which is then replaced: {0}.</value></data>
   <data name="Items: {0}" xml:space="preserve"><value>Items: {0}</value></data>
-  <data name="JPEG, PNG, TIFF or WebP, at most {0} MB. It is also used as the browser tab's icon." xml:space="preserve"><value>JPEG, PNG, TIFF or WebP, at most {0} MB. It is also used as the browser tab's icon.</value></data>
-  <data name="JPEG, PNG, TIFF or WebP. The original file is kept unchanged and is only visible to curators." xml:space="preserve"><value>JPEG, PNG, TIFF or WebP. The original file is kept unchanged and is only visible to curators.</value></data>
+  <data name="JPEG, PNG, TIFF, WebP, AVIF or GIF, at most {0} MB. It is also used as the browser tab's icon." xml:space="preserve"><value>JPEG, PNG, TIFF, WebP, AVIF or GIF, at most {0} MB. It is also used as the browser tab's icon.</value></data>
+  <data name="JPEG, PNG, TIFF, WebP, AVIF or GIF. The original file is kept unchanged and is only visible to curators." xml:space="preserve"><value>JPEG, PNG, TIFF, WebP, AVIF or GIF. The original file is kept unchanged and is only visible to curators.</value></data>
   <data name="Keep rejected and withdrawn contributions" xml:space="preserve"><value>Keep rejected and withdrawn contributions</value></data>
   <data name="Keep the activity log" xml:space="preserve"><value>Keep the activity log</value></data>
   <data name="Kind" xml:space="preserve"><value>Kind</value></data>
@@ -741,7 +741,7 @@
   <data name="The keys that keep people logged in are stored in the database without encryption, so a copy of the database, such as a backup, could be used to log in. Whoever runs the server should set COMMONAGE_LOGIN_KEY, as docs/deployment.md describes." xml:space="preserve"><value>The keys that keep people logged in are stored in the database without encryption, so a copy of the database, such as a backup, could be used to log in. Whoever runs the server should set COMMONAGE_LOGIN_KEY, as docs/deployment.md describes.</value></data>
   <data name="The language most items are described in. Item pages tell browsers and screen readers which language their text is in, so that it is read aloud correctly, and dates written in it are understood." xml:space="preserve"><value>The language most items are described in. Item pages tell browsers and screen readers which language their text is in, so that it is read aloud correctly, and dates written in it are understood.</value></data>
   <data name="The log names the accounts that changed something. Older entries are deleted, and the log notes that it was shortened." xml:space="preserve"><value>The log names the accounts that changed something. Older entries are deleted, and the log notes that it was shortened.</value></data>
-  <data name="The logo must be a JPEG, PNG, TIFF or WebP image of at most {0} MB." xml:space="preserve"><value>The logo must be a JPEG, PNG, TIFF or WebP image of at most {0} MB.</value></data>
+  <data name="The logo must be a JPEG, PNG, TIFF, WebP, AVIF or GIF image of at most {0} MB." xml:space="preserve"><value>The logo must be a JPEG, PNG, TIFF, WebP, AVIF or GIF image of at most {0} MB.</value></data>
   <data name="The media folder cannot be written to, or the newest original is missing from it. Is the media volume mounted?" xml:space="preserve"><value>The media folder cannot be written to, or the newest original is missing from it. Is the media volume mounted?</value></data>
   <data name="The message can be at most {1} characters long." xml:space="preserve"><value>The message can be at most {1} characters long.</value></data>
   <data name="The name and email address are removed from the note." xml:space="preserve"><value>The name and email address are removed from the note.</value></data>
@@ -862,7 +862,7 @@
   <data name="Until a curator deletes them" xml:space="preserve"><value>Until a curator deletes them</value></data>
   <data name="Untitled" xml:space="preserve"><value>Untitled</value></data>
   <data name="Unused only" xml:space="preserve"><value>Unused only</value></data>
-  <data name="Up to {0, plural, one {# photo} other {# photos}}: JPEG, PNG, TIFF or WebP." xml:space="preserve"><value>Up to {0, plural, one {# photo} other {# photos}}: JPEG, PNG, TIFF or WebP.</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
+  <data name="Up to {0, plural, one {# photo} other {# photos}}: JPEG, PNG, TIFF, WebP, AVIF or GIF." xml:space="preserve"><value>Up to {0, plural, one {# photo} other {# photos}}: JPEG, PNG, TIFF, WebP, AVIF or GIF.</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="Upload" xml:space="preserve"><value>Upload</value></data>
   <data name="Uploaded" xml:space="preserve"><value>Uploaded</value></data>
   <data name="Use as cover" xml:space="preserve"><value>Use as cover</value></data>
@@ -972,7 +972,7 @@
   <data name="{0} in {1, plural, one {# file} other {# files}}" xml:space="preserve"><value>{0} in {1, plural, one {# file} other {# files}}</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="{0} is empty." xml:space="preserve"><value>{0} is empty.</value></data>
   <data name="{0} is in the HEIC format, which this archive cannot read yet. Please save it as a JPEG and choose it again." xml:space="preserve"><value>{0} is in the HEIC format, which this archive cannot read yet. Please save it as a JPEG and choose it again.</value></data>
-  <data name="{0} is not a supported photo format. Please use JPEG, PNG, TIFF or WebP." xml:space="preserve"><value>{0} is not a supported photo format. Please use JPEG, PNG, TIFF or WebP.</value></data>
+  <data name="{0} is not a supported photo format. Please use JPEG, PNG, TIFF, WebP, AVIF or GIF." xml:space="preserve"><value>{0} is not a supported photo format. Please use JPEG, PNG, TIFF, WebP, AVIF or GIF.</value></data>
   <data name="{0} is too large." xml:space="preserve"><value>{0} is too large.</value></data>
   <data name="{0} was left out, because together the photos would be too large to send at once. You can send it afterwards." xml:space="preserve"><value>{0} was left out, because together the photos would be too large to send at once. You can send it afterwards.</value></data>
   <data name="{0}, photo {1} of {2}" xml:space="preserve"><value>{0}, photo {1} of {2}</value></data>

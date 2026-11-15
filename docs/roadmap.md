@@ -135,7 +135,7 @@ Estimates assume about 10 hours a week. Every milestone ends with something demo
   endpoint that checks permissions. Only curators can download originals; visitors see previews of
   published items. (The per-file `IsPublic` flag is postponed until a group needs it.)
 - Uploads are identified by their content (magic bytes), never by file name or browser content type.
-  Accepted for now: JPEG, PNG, TIFF, WebP.
+  Accepted: JPEG, PNG, TIFF, WebP, AVIF and GIF (a GIF becomes one still picture; AVIF and GIF since 0.6).
 - Previews and thumbnails are generated one at a time by a background service (`Channel<T>`), with the
   state in the database so unfinished work resumes after a restart.
 

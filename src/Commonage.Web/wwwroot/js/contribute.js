@@ -141,7 +141,9 @@
             || starts(0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A)
             || starts(0x49, 0x49, 0x2A, 0x00)
             || starts(0x4D, 0x4D, 0x00, 0x2A)
-            || (text(0, 4) === 'RIFF' && text(8, 12) === 'WEBP'))
+            || (text(0, 4) === 'RIFF' && text(8, 12) === 'WEBP')
+            || text(0, 6) === 'GIF87a' || text(0, 6) === 'GIF89a'
+            || (text(4, 8) === 'ftyp' && ['avif', 'avis'].includes(text(8, 12))))
             return 'photo';
         if (text(4, 8) === 'ftyp' && ['heic', 'heix', 'hevc', 'hevx', 'mif1', 'msf1'].includes(text(8, 12)))
             return 'heic';

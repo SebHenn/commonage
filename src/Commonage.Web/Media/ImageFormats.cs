@@ -8,7 +8,7 @@ public static class ImageFormats
 {
     public const int HeaderLength = 12;
 
-    public const string AcceptAttribute = "image/jpeg,image/png,image/tiff,image/webp";
+    public const string AcceptAttribute = "image/jpeg,image/png,image/tiff,image/webp,image/avif,image/gif";
 
     public static string? DetectContentType(ReadOnlySpan<byte> header)
     {
@@ -20,6 +20,11 @@ public static class ImageFormats
             return "image/tiff";
         if (header.Length >= 12 && header[..4].SequenceEqual("RIFF"u8) && header[8..12].SequenceEqual("WEBP"u8))
             return "image/webp";
+        if (header.StartsWith("GIF87a"u8) || header.StartsWith("GIF89a"u8))
+            return "image/gif";
+        if (header.Length >= 12 && header[4..8].SequenceEqual("ftyp"u8)
+            && (header[8..12].SequenceEqual("avif"u8) || header[8..12].SequenceEqual("avis"u8)))
+            return "image/avif";
         return null;
     }
 

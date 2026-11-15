@@ -48,7 +48,7 @@ public static class UploadErrorMessages
         UploadError.Empty => localizer["{0} is empty.", fileName],
         UploadError.TooLarge => localizer["{0} is too large.", fileName],
         UploadError.Heic => localizer["{0} is in the HEIC format, which this archive cannot read yet. Please save it as a JPEG and choose it again.", fileName],
-        _ => localizer["{0} is not a supported photo format. Please use JPEG, PNG, TIFF or WebP.", fileName],
+        _ => localizer["{0} is not a supported photo format. Please use JPEG, PNG, TIFF, WebP, AVIF or GIF.", fileName],
     };
 }
 

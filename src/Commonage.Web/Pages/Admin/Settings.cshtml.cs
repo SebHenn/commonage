@@ -204,7 +204,7 @@ public class SettingsModel(
         {
             newLogo = await logos.SaveAsync(Logo, cancellationToken);
             if (newLogo is null)
-                ModelState.AddModelError("Logo", localizer["The logo must be a JPEG, PNG, TIFF or WebP image of at most {0} MB.", LogoImages.MaxBytes / 1024 / 1024]);
+                ModelState.AddModelError("Logo", localizer["The logo must be a JPEG, PNG, TIFF, WebP, AVIF or GIF image of at most {0} MB.", LogoImages.MaxBytes / 1024 / 1024]);
         }
 
         if (!ModelState.IsValid)

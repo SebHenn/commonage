@@ -71,7 +71,8 @@ public class PhoneSendingTests(BrowserFixture app)
         // It was about 1,900 px long before, and that was a reason to come back to it.
         var length = await page.EvaluateAsync<int>("document.querySelector('main form').offsetHeight");
         // Fonts differ between systems, so one long line more on a Linux runner than on Windows already shows.
-        Assert.True(length < 1500, $"The form is {length} px long on a phone.");
+        // The list of accepted formats (now with AVIF and GIF) wraps to one more line on a phone: 1500 became 1550.
+        Assert.True(length < 1550, $"The form is {length} px long on a phone.");
 
         // Once, on its own, with no introduction saying the same before it.
         Assert.Single(await page.Locator("main :text('A curator looks at everything')").AllAsync());
