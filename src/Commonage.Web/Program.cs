@@ -66,6 +66,7 @@ builder.Services.Configure<SecurityStampValidatorOptions>(options => options.Val
 // Setup links for new accounts are handed over in person or by the admin's own email, so they stay valid for a week.
 builder.Services.Configure<DataProtectionTokenProviderOptions>(options => options.TokenLifespan = TimeSpan.FromDays(7));
 builder.Services.AddAuthorizationBuilder()
+    .AddPolicy(Policies.Describe, policy => policy.RequireRole(Roles.Admin, Roles.Curator, Roles.Helper).AddRequirements(new TwoFactorIfRequired()))
     .AddPolicy(Policies.ManageArchive, policy => policy.RequireRole(Roles.Admin, Roles.Curator).AddRequirements(new TwoFactorIfRequired()))
     .AddPolicy(Policies.Administer, policy => policy.RequireRole(Roles.Admin).AddRequirements(new TwoFactorIfRequired()));
 builder.Services.AddScoped<IAuthorizationHandler, TwoFactorIfRequiredHandler>();
@@ -119,7 +120,13 @@ builder.Services.AddLocalization(options => options.ResourcesPath = "Resources")
 builder.Services.Configure<WebEncoderOptions>(options => options.TextEncoderSettings = new TextEncoderSettings(UnicodeRanges.All));
 builder.Services.AddRazorPages(options =>
     {
-        options.Conventions.AuthorizeFolder("/Admin", Policies.ManageArchive);
+        // A helper reaches the item list, the item form, adding many photos and the preview, and nothing else: EndpointAccessTests
+        // lists what a helper may reach, so a new page under /Admin stays closed to them until that list says otherwise.
+        options.Conventions.AuthorizeFolder("/Admin", Policies.Describe);
+        foreach (var folder in new[] { "/Admin/Collections", "/Admin/Tags", "/Admin/Contributions", "/Admin/Notes" })
+            options.Conventions.AuthorizeFolder(folder, Policies.ManageArchive);
+        foreach (var page in new[] { "/Admin/Contributors", "/Admin/Bin", "/Admin/Items/Bulk", "/Admin/Items/Import" })
+            options.Conventions.AuthorizePage(page, Policies.ManageArchive);
         options.Conventions.AuthorizeFolder("/Admin/Users", Policies.Administer);
         options.Conventions.AuthorizePage("/Admin/Export", Policies.Administer);
         options.Conventions.AuthorizePage("/Admin/Activity", Policies.Administer);

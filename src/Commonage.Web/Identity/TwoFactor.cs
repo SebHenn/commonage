@@ -120,7 +120,7 @@ public sealed class TwoFactorIfRequiredHandler(ArchiveProfile profile, UserManag
     public static async Task<bool> OnlyNeedsSetupAsync(ArchiveProfile profile, UserManager<IdentityUser> users, System.Security.Claims.ClaimsPrincipal user) =>
         (await profile.GetAsync()).RequireTwoFactor
         && await users.GetUserAsync(user) is { TwoFactorEnabled: false } account
-        && (await users.IsInRoleAsync(account, Roles.Admin) || await users.IsInRoleAsync(account, Roles.Curator));
+        && (await users.IsInRoleAsync(account, Roles.Admin) || await users.IsInRoleAsync(account, Roles.Curator) || await users.IsInRoleAsync(account, Roles.Helper));
 }
 
 /// <summary>QR codes, drawn as SVG in the page itself, so they need no image address and no script.</summary>

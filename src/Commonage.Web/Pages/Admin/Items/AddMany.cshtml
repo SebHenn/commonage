@@ -19,7 +19,7 @@
 }
 else if (!Model.CollectionOptions.Any())
 {
-    <p>@T["Items belong to a collection."] <a asp-page="/Admin/Collections/Edit">@T["Create your first collection"]</a></p>
+    <p>@T["Items belong to a collection."] @if (Commonage.Web.Identity.Roles.MayManage(User)) { <text> <a asp-page="/Admin/Collections/Edit">@T["Create your first collection"]</a></text> }</p>
 }
 else
 {

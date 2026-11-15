@@ -104,9 +104,10 @@ public class MediaUploadService(
     }
 
     /// <summary>An item with the same file, if there is one. What is in the bin does not count: someone chose to throw that away.</summary>
-    public async Task<IdenticalFile?> FindIdenticalAsync(ExaminedUpload examined, CancellationToken cancellationToken = default) =>
+    public async Task<IdenticalFile?> FindIdenticalAsync(ExaminedUpload examined, bool forHelper = false, CancellationToken cancellationToken = default) =>
         await db.MediaFiles
-            .Where(f => f.Sha256 == examined.Sha256)
+            // A helper is only told about drafts, never about what is being reviewed or was turned down.
+            .Where(f => f.Sha256 == examined.Sha256 && (!forHelper || f.ArchiveItem.Status == ItemStatus.Draft))
             .OrderBy(f => f.Id)
             .Select(f => new IdenticalFile(f.ArchiveItemId, f.ArchiveItem.Title))
             .FirstOrDefaultAsync(cancellationToken);

@@ -33,7 +33,8 @@ public record AdminItemFilter(
     int? CollectionId = null,
     string? Tag = null,
     ItemNeed? Needs = null,
-    AdminItemSort? Sort = null)
+    AdminItemSort? Sort = null,
+    bool ForHelper = false)
 {
     /// <summary>Waiting contributions are handled oldest first, so nobody waits longest.</summary>
     public AdminItemSort EffectiveSort => Sort ?? (Status == ItemStatus.Submitted ? AdminItemSort.OldestFirst : AdminItemSort.LastChanged);
@@ -60,6 +61,9 @@ public static class AdminItemList
             items = items.Where(i => i.ReferenceNumber == filter.Text!.Trim());
         if (filter.Status is { } status)
             items = items.Where(i => i.Status == status);
+        // A helper has no business with contributions nobody has reviewed, or with what was rejected or withdrawn.
+        if (filter.ForHelper)
+            items = items.Where(i => i.Status == ItemStatus.Draft);
 
         items = filter.Needs switch
         {

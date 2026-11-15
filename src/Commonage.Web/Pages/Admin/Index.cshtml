@@ -1,6 +1,8 @@
 @page
 @model Commonage.Web.Pages.Admin.IndexModel
+@using Commonage.Web.Identity
 @{
+    var mayManage = User.MayManage();
     ViewData["Title"] = T["Manage archive"];
 }
 
@@ -14,7 +16,10 @@
     <h1 class="me-auto mb-0">@T["Items"]</h1>
     @if (Model.HasCollections)
     {
-        <a asp-page="/Admin/Items/Import" class="btn btn-outline-primary">@T["Import a spreadsheet"]</a>
+        @if (mayManage)
+        {
+            <a asp-page="/Admin/Items/Import" class="btn btn-outline-primary">@T["Import a spreadsheet"]</a>
+        }
         <a asp-page="/Admin/Items/AddMany" class="btn btn-outline-primary">@T["Add many photos"]</a>
         <a asp-page="/Admin/Items/Edit" class="btn btn-primary">@T["New item"]</a>
     }
@@ -73,7 +78,7 @@
 
 @if (!Model.HasCollections)
 {
-    <p>@T["Items belong to a collection."] <a asp-page="/Admin/Collections/Edit">@T["Create your first collection"]</a></p>
+    <p>@T["Items belong to a collection."]@if (mayManage) { <text> <a asp-page="/Admin/Collections/Edit">@T["Create your first collection"]</a></text> }</p>
 }
 else
 {
@@ -88,9 +93,12 @@ else
                 <option value="">@T["All statuses"]</option>
                 <option value="@ItemStatus.Draft" selected="@(Model.Status == ItemStatus.Draft)">@T["Draft"]</option>
                 <option value="@ItemStatus.Published" selected="@(Model.Status == ItemStatus.Published)">@T["Published"]</option>
-                <option value="@ItemStatus.Submitted" selected="@(Model.Status == ItemStatus.Submitted)">@T["Submitted"]</option>
-                <option value="@ItemStatus.Rejected" selected="@(Model.Status == ItemStatus.Rejected)">@T["Rejected"]</option>
-                <option value="@ItemStatus.Withdrawn" selected="@(Model.Status == ItemStatus.Withdrawn)">@T["Withdrawn"]</option>
+                @if (mayManage)
+                {
+                    <option value="@ItemStatus.Submitted" selected="@(Model.Status == ItemStatus.Submitted)">@T["Submitted"]</option>
+                    <option value="@ItemStatus.Rejected" selected="@(Model.Status == ItemStatus.Rejected)">@T["Rejected"]</option>
+                    <option value="@ItemStatus.Withdrawn" selected="@(Model.Status == ItemStatus.Withdrawn)">@T["Withdrawn"]</option>
+                }
             </select>
         </div>
         <div class="col-6 col-md-4">
@@ -143,6 +151,8 @@ else
     else
     {
         @* The table is not inside this form, because each row's checkbox joins it by name, and the search form stays what it is. *@
+        @if (mayManage)
+        {
         <form method="post" id="bulk-form" asp-page="/Admin/Items/Bulk" class="bulk-bar d-flex flex-wrap gap-2 align-items-end mb-3">
             <input type="hidden" name="back" value="@Model.ListUrl" />
             <div>
@@ -158,14 +168,18 @@ else
             <button type="submit" name="scope" value="selected" class="btn btn-outline-primary">@T["For the ticked items"]</button>
             <button type="submit" name="scope" value="all" class="btn btn-outline-primary">@T["For all in this list: {0}", Model.Items.TotalCount]</button>
         </form>
+        }
         <div class="table-responsive">
             <table class="table align-middle">
                 <thead>
                     <tr>
-                        <th scope="col">
-                            <span class="visually-hidden">@T["Choose"]</span>
-                            <input type="checkbox" class="form-check-input" data-tick-all="selected" aria-label="@T["Tick all on this page"]" hidden />
-                        </th>
+                        @if (mayManage)
+                        {
+                            <th scope="col">
+                                <span class="visually-hidden">@T["Choose"]</span>
+                                <input type="checkbox" class="form-check-input" data-tick-all="selected" aria-label="@T["Tick all on this page"]" hidden />
+                            </th>
+                        }
                         <th scope="col"><span class="visually-hidden">@T["Photos"]</span></th>
                         <th scope="col">@T["Title"]</th>
                         <th scope="col" class="d-none d-md-table-cell">@T["Collection"]</th>
@@ -177,9 +191,12 @@ else
                     @foreach (var item in Model.Items.Items)
                     {
                         <tr>
-                            <td>
-                                <input type="checkbox" class="form-check-input" name="selected" value="@item.Id" form="bulk-form" aria-label="@T["Choose: {0}", ArchiveItem.ShownTitle(T, item.Title)]" />
-                            </td>
+                            @if (mayManage)
+                            {
+                                <td>
+                                    <input type="checkbox" class="form-check-input" name="selected" value="@item.Id" form="bulk-form" aria-label="@T["Choose: {0}", ArchiveItem.ShownTitle(T, item.Title)]" />
+                                </td>
+                            }
                             <td class="admin-list-picture">
                                 @if (item.ThumbnailMediaFileId is { } thumbnail)
                                 {

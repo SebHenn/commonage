@@ -193,6 +193,20 @@ For a shoebox someone hands you in person: create the items yourself with **New 
 to you and when, and what they agreed to. Ask for their permission in writing if you can, and keep it with your group's
 papers.
 
+## A scanning evening with helpers
+
+Volunteers can add and describe items without being able to publish or delete anything. An admin gives each of them an
+account under **Accounts**, with the role **Helper**. A helper sees the drafts in the item list, the item form and **Add many photos**; items that are already published are for curators to change.
+They can describe, add photos, turn them and mark items as needing help. They cannot publish, unpublish, move anything to
+the bin, open contributions that are still to be reviewed, or see who contributed something. Everything a helper saves is a
+draft until a curator publishes it.
+
+For an evening: before, create the collection and give each helper an account (the setup link works once, and each helper
+sets their own password). On the evening, let helpers add photos with **Add many photos**, then name them one after another
+from the list of items without a title. Afterwards, a curator goes through the drafts, looks at what the helpers wrote, and
+publishes. Disable or delete the accounts when the evening is over if the people will not come back. Helpers can still read
+"received from" and the internal notes of the items they open, so do not write anything there that a volunteer should not read.
+
 ## Your login
 
 Under **Change password** → **Log in with an authenticator app**, you can add a code from your phone to your login. Install an

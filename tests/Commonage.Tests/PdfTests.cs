@@ -189,9 +189,16 @@ public class PdfTests(CommonageAppFactory app)
         await Browser.UploadAsync(curator, $"/Admin/Items/Edit/{item.Id}", "Upload", "minutes.pdf", MakePdf(3, word));
         var file = await WaitForProcessingAsync(item.Id);
         Assert.Equal(ProcessingStatus.Ready, file.Status);
-
         using var visitor = app.CreateClient();
-        Assert.Contains("Items found: 1", await visitor.GetStringAsync($"/search?q={word}"));
+        // The text is indexed just after the file is marked ready, so search until it is found.
+        var found = "";
+        for (var attempt = 0; attempt < 100 && !found.Contains("Items found: 1"); attempt++)
+        {
+            found = await visitor.GetStringAsync($"/search?q={word}");
+            if (!found.Contains("Items found: 1"))
+                await Task.Delay(100);
+        }
+        Assert.Contains("Items found: 1", found);
         var itemPage = await visitor.GetStringAsync($"/items/{item.Id}");
         Assert.Contains($"/media/{file.Id}/page/3", itemPage);
         Assert.Contains("Page 2 of 3", itemPage);

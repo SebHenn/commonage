@@ -1,6 +1,8 @@
 @page "{id:int?}"
 @model Commonage.Web.Pages.Admin.Items.EditModel
+@using Commonage.Web.Identity
 @{
+    var mayManage = User.MayManage();
     ViewData["Title"] = Model.ItemId is null ? T["New item"] : T["Edit: {0}", ArchiveItem.ShownTitle(T, Model.SavedTitle ?? "")];
 }
 
@@ -39,7 +41,7 @@
     <p class="alert alert-info col-lg-8">@T["This draft has no title yet, and cannot be published without one. Give it a title that says what the photo shows."]</p>
 }
 
-@if (Model.OpenNotes > 0)
+@if (mayManage && Model.OpenNotes > 0)
 {
     <p class="alert alert-info col-lg-8" role="status">
         <a asp-page="/Admin/Notes/Index" asp-route-item="@Model.ItemId" class="alert-link">@T.Plural("{0, plural, one {A visitor sent a note about this item.} other {Visitors sent # notes about this item.}}", Model.OpenNotes)</a>
@@ -266,7 +268,10 @@
                 {
                     <button type="submit" name="then" value="next" class="btn btn-outline-primary">@T["Save and next"]</button>
                 }
-                <button type="submit" name="command" value="unpublish" class="btn btn-outline-danger">@T["Unpublish"]</button>
+                @if (mayManage)
+                {
+                    <button type="submit" name="command" value="unpublish" class="btn btn-outline-danger">@T["Unpublish"]</button>
+                }
                 break;
             case ItemStatus.Submitted:
                 <button type="submit" name="command" value="publish" class="btn btn-primary">@T["Save and publish"]</button>
@@ -295,7 +300,10 @@
                 {
                     <button type="submit" name="then" value="another" class="btn btn-outline-primary">@T["Save and add another"]</button>
                 }
-                <button type="submit" name="command" value="publish" class="btn @(Model.ItemId is null || Model.NamingOneAfterAnother ? "btn-outline-primary" : "btn-primary")">@T["Save and publish"]</button>
+                @if (mayManage)
+                {
+                    <button type="submit" name="command" value="publish" class="btn @(Model.ItemId is null || Model.NamingOneAfterAnother ? "btn-outline-primary" : "btn-primary")">@T["Save and publish"]</button>
+                }
                 break;
         }
     </div>
@@ -325,10 +333,13 @@
         </section>
     }
 
+    @if (mayManage)
+    {
     <form method="post" asp-page-handler="Delete" asp-route-id="@Model.ItemId" class="mt-5"
           data-confirm="@T.Plural("Move this item to the bin? It disappears from the archive at once. You can restore it there for {0, plural, one {# day} other {# days}}.", Commonage.Web.Data.ArchiveBin.RetentionDays)">
         <button type="submit" class="btn btn-outline-danger">@T["Move to bin"]</button>
     </form>
+    }
 }
 
 <partial name="_UploadTexts" />

@@ -18,7 +18,7 @@ public class IndexModel(UserManager<IdentityUser> users) : PageModel
         {
             var roles = await users.GetRolesAsync(user);
             list.Add(new Account(user.Id, user.Email ?? user.UserName ?? user.Id,
-                roles.Contains(Roles.Admin) ? Roles.Admin : roles.FirstOrDefault(),
+                roles.Contains(Roles.Admin) ? Roles.Admin : roles.Contains(Roles.Curator) ? Roles.Curator : roles.FirstOrDefault(),
                 AccountStates.Of(user), user.TwoFactorEnabled));
         }
         Accounts = list;

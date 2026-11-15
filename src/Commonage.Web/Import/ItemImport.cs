@@ -295,7 +295,7 @@ public class ItemImport(
         }
 
         rowOfFile[entry.Path] = row.Number;
-        if (await uploads.FindIdenticalAsync(examined, cancellationToken) is { } same)
+        if (await uploads.FindIdenticalAsync(examined, cancellationToken: cancellationToken) is { } same)
             row.Issues.Add(new ImportIssue("files", Shorten(reference), LeftOut: ImportLeftOut.FileAlreadyThere, Detail: ArchiveItem.ShownTitle(localizer, same.ItemTitle)));
         else
             row.Files.Add(new PlannedFile(entry, examined));
