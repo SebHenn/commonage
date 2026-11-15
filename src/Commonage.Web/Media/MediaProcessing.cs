@@ -213,6 +213,17 @@ public class MediaProcessor(
             throw;
         }
         file.PageCount = pages;
+
+        // The text is an extra: a file whose text cannot be read still has its pictures.
+        try
+        {
+            file.ExtractedText = pdf.ExtractText(copy, pages, ItemFileText.MaxLength) is { Length: > 0 } text ? text : null;
+        }
+        catch (Exception exception) when (exception is InvalidDataException or IOException)
+        {
+            logger.LogInformation("No text from media file {MediaFileId}: {Reason}", file.Id, exception.Message);
+            file.ExtractedText = null;
+        }
     }
 
     /// <summary>
@@ -344,11 +355,26 @@ public class MediaProcessor(
         {
             await db.SaveChangesAsync(cancellationToken);
         }
-        catch (DbUpdateConcurrencyException)
+        catch (DbUpdateException)
         {
             // A curator deleted the file, or its whole contribution, while the previews were being made.
             // An exception here would stop the app, so the new previews are removed instead.
             DeleteDerivatives(file);
+            return;
+        }
+
+        if (file is { IsPdf: true, Status: ProcessingStatus.Ready })
+        {
+            // After the save, because the index is made from what the database holds. Only the search suffers if it fails.
+            try
+            {
+                await FileTextIndex.RebuildAsync(db, file.ArchiveItemId, cancellationToken);
+                await db.SaveChangesAsync(cancellationToken);
+            }
+            catch (Exception exception) when (!cancellationToken.IsCancellationRequested)
+            {
+                logger.LogWarning(exception, "Could not index the text of media file {MediaFileId}", file.Id);
+            }
         }
     }
 

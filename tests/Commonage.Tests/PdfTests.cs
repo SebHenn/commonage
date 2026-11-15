@@ -42,7 +42,7 @@ public sealed class PdfFactAttribute : FactAttribute
 public class PdfTests(CommonageAppFactory app)
 {
     /// <summary>A small valid PDF with one line of text on each page.</summary>
-    internal static byte[] MakePdf(int pages)
+    internal static byte[] MakePdf(int pages, string word = "")
     {
         var objects = new List<string>
         {
@@ -52,7 +52,7 @@ public class PdfTests(CommonageAppFactory app)
         };
         for (var page = 1; page <= pages; page++)
         {
-            var content = $"BT /F1 24 Tf 50 700 Td (Page {page}) Tj ET";
+            var content = $"BT /F1 24 Tf 50 700 Td (Page {page} {word}) Tj ET";
             objects.Add($"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents {5 + (page - 1) * 2} 0 R >>");
             objects.Add($"<< /Length {content.Length} >>\nstream\n{content}\nendstream");
         }
@@ -151,6 +151,68 @@ public class PdfTests(CommonageAppFactory app)
 
         Assert.Contains("this archive was set up without the program that reads PDFs", await response.Content.ReadAsStringAsync());
         Assert.Empty(await app.WithDbAsync(db => db.MediaFiles.Where(f => f.ArchiveItemId == item.Id).ToListAsync()));
+    }
+
+    [Fact]
+    public async Task Text_read_from_documents_is_found_for_published_items_only()
+    {
+        var word = TestData.UniqueWord("Pdfword");
+        var published = await app.CreateContributionAsync(ItemStatus.Published);
+        var draft = await app.CreateContributionAsync(ItemStatus.Draft);
+        var binned = await app.CreateContributionAsync(ItemStatus.Published);
+        await app.WithDbAsync(async db =>
+        {
+            foreach (var item in new[] { published, draft, binned })
+                db.ItemFileTexts.Add(new ItemFileText { ArchiveItemId = item.Id, Text = "minutes of the meeting " + word });
+            await db.SaveChangesAsync();
+            (await db.ArchiveItems.SingleAsync(i => i.Id == binned.Id)).MoveToBin(DateTime.UtcNow);
+            return await db.SaveChangesAsync();
+        });
+
+        using var visitor = app.CreateClient();
+        var page = await visitor.GetStringAsync($"/search?q={word}");
+
+        Assert.Contains("Items found: 1", page);
+        Assert.Contains($"/items/{published.Id}", page);
+        Assert.DoesNotContain($"/items/{draft.Id}\"", page);
+        Assert.DoesNotContain($"/items/{binned.Id}\"", page);
+    }
+
+    [PdfFact]
+    public async Task A_PDF_is_found_by_its_text_until_it_goes_to_the_bin_and_again_after_it_comes_back()
+    {
+        var word = TestData.UniqueWord("Scanword");
+        using var curator = app.CreateClient();
+        await Browser.LogInAsCuratorAsync(curator);
+        var item = await app.CreateContributionAsync(ItemStatus.Published);
+
+        await Browser.UploadAsync(curator, $"/Admin/Items/Edit/{item.Id}", "Upload", "minutes.pdf", MakePdf(3, word));
+        var file = await WaitForProcessingAsync(item.Id);
+        Assert.Equal(ProcessingStatus.Ready, file.Status);
+
+        using var visitor = app.CreateClient();
+        Assert.Contains("Items found: 1", await visitor.GetStringAsync($"/search?q={word}"));
+        var itemPage = await visitor.GetStringAsync($"/items/{item.Id}");
+        Assert.Contains($"/media/{file.Id}/page/3", itemPage);
+        Assert.Contains("Page 2 of 3", itemPage);
+
+        await app.WithDbAsync(async db =>
+        {
+            (await db.MediaFiles.SingleAsync(f => f.Id == file.Id)).DeletedAt = DateTime.UtcNow;
+            await db.SaveChangesAsync();
+            await FileTextIndex.RebuildAsync(db, item.Id, default);
+            return await db.SaveChangesAsync();
+        });
+        Assert.Contains("Items found: 0", await visitor.GetStringAsync($"/search?q={word}"));
+
+        await app.WithDbAsync(async db =>
+        {
+            (await db.MediaFiles.IgnoreQueryFilters().SingleAsync(f => f.Id == file.Id)).DeletedAt = null;
+            await db.SaveChangesAsync();
+            await FileTextIndex.RebuildAsync(db, item.Id, default);
+            return await db.SaveChangesAsync();
+        });
+        Assert.Contains("Items found: 1", await visitor.GetStringAsync($"/search?q={word}"));
     }
 
     private async Task<MediaFile> WaitForProcessingAsync(int itemId, int seconds = 60)

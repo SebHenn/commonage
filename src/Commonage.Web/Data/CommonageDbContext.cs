@@ -13,6 +13,7 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options)
     public DbSet<Collection> Collections => Set<Collection>();
     public DbSet<ArchiveItem> ArchiveItems => Set<ArchiveItem>();
     public DbSet<MediaFile> MediaFiles => Set<MediaFile>();
+    public DbSet<ItemFileText> ItemFileTexts => Set<ItemFileText>();
     public DbSet<Tag> Tags => Set<Tag>();
     public DbSet<ContributionLink> ContributionLinks => Set<ContributionLink>();
     public DbSet<Contribution> Contributions => Set<Contribution>();
@@ -129,6 +130,21 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options)
             note.HasOne(n => n.ArchiveItem)
                 .WithMany()
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<ItemFileText>(text =>
+        {
+            text.HasKey(t => t.ArchiveItemId);
+            text.HasQueryFilter(t => t.ArchiveItem.DeletedAt == null);
+            text.HasOne(t => t.ArchiveItem)
+                .WithOne(i => i.FileText)
+                .HasForeignKey<ItemFileText>(t => t.ArchiveItemId)
+                .OnDelete(DeleteBehavior.Cascade);
+            // The least weight: what a document says counts for less than what a curator wrote about it.
+            text.Property<NpgsqlTsVector>(SearchVector).HasComputedColumnSql(
+                $"""setweight(to_tsvector('{SearchConfiguration}', {FoldFunction}(coalesce("Text", ''))), 'D')""",
+                stored: true);
+            text.HasIndex(SearchVector).HasMethod("GIN");
         });
 
         builder.Entity<Contribution>(contribution =>

@@ -19,6 +19,9 @@ public class ArchiveItem
 
     public List<MediaFile> MediaFiles { get; set; } = [];
 
+    /// <summary>What the item's PDF files say, for search only. Null when there is none.</summary>
+    public ItemFileText? FileText { get; set; }
+
     /// <summary>Who contributed the item and what they agreed to. Null for items curators created.</summary>
     public Contribution? Contribution { get; set; }
 

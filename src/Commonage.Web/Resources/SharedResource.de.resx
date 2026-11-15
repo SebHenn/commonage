@@ -563,6 +563,8 @@
   <data name="Other items in {0}" xml:space="preserve"><value>Weitere Einträge in {0}</value></data>
   <data name="Our archive needs no imprint." xml:space="preserve"><value>Unser Archiv braucht kein Impressum.</value></data>
   <data name="Page not found" xml:space="preserve"><value>Seite nicht gefunden</value></data>
+  <data name="Document of {0, plural, one {# page} other {# pages}}" xml:space="preserve"><value>Dokument mit {0, plural, one {# Seite} other {# Seiten}}</value></data>
+  <data name="{0}, page {1} of {2}" xml:space="preserve"><value>{0}, Seite {1} von {2}</value></data>
   <data name="Page {0} of {1}" xml:space="preserve"><value>Seite {0} von {1}</value></data>
   <data name="Pages" xml:space="preserve"><value>Seiten</value></data>
   <data name="Pages about your archive" xml:space="preserve"><value>Seiten über Ihr Archiv</value></data>

@@ -11,7 +11,11 @@ version may change things that need attention when updating, and these notes say
   the first frame. The original file is kept as it was sent.
 - PDF files can be uploaded by curators (not through contribution links). The first page becomes the file's cover and
   thumbnail, and every page up to 300 gets a preview picture that visitors can page through once the item is published.
-  The PDF itself stays with curators, like every original. Searching inside PDFs follows in a later part.
+  The PDF itself stays with curators, like every original.
+- The text of a PDF is found by search (the first 300 pages, up to 200,000 characters), for published items only. The text
+  itself is never shown. A PDF in the bin is not searched until it is restored. PDFs added before this version have no
+  text; upload them again to make them searchable.
+- The item page shows a PDF as its pages, one under the other, each with "Page 3 of 20".
 
 ### For people running an archive
 

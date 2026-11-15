@@ -441,6 +441,29 @@ namespace Commonage.Web.Data.Migrations
                     b.ToTable("ContributionLinks");
                 });
 
+            modelBuilder.Entity("Commonage.Web.Domain.ItemFileText", b =>
+                {
+                    b.Property<int>("ArchiveItemId")
+                        .HasColumnType("integer");
+
+                    b.Property<NpgsqlTsVector>("SearchVector")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("tsvector")
+                        .HasComputedColumnSql("setweight(to_tsvector('simple', commonage_fold(coalesce(\"Text\", ''))), 'D')", true);
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("ArchiveItemId");
+
+                    b.HasIndex("SearchVector");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("SearchVector"), "GIN");
+
+                    b.ToTable("ItemFileTexts");
+                });
+
             modelBuilder.Entity("Commonage.Web.Domain.MediaFile", b =>
                 {
                     b.Property<int>("Id")
@@ -469,6 +492,9 @@ namespace Commonage.Web.Data.Migrations
 
                     b.Property<int>("DerivativeVersion")
                         .HasColumnType("integer");
+
+                    b.Property<string>("ExtractedText")
+                        .HasColumnType("text");
 
                     b.Property<bool>("HasLarge")
                         .HasColumnType("boolean");
@@ -897,6 +923,17 @@ namespace Commonage.Web.Data.Migrations
                     b.Navigation("Collection");
                 });
 
+            modelBuilder.Entity("Commonage.Web.Domain.ItemFileText", b =>
+                {
+                    b.HasOne("Commonage.Web.Domain.ArchiveItem", "ArchiveItem")
+                        .WithOne("FileText")
+                        .HasForeignKey("Commonage.Web.Domain.ItemFileText", "ArchiveItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ArchiveItem");
+                });
+
             modelBuilder.Entity("Commonage.Web.Domain.MediaFile", b =>
                 {
                     b.HasOne("Commonage.Web.Domain.ArchiveItem", "ArchiveItem")
@@ -973,6 +1010,8 @@ namespace Commonage.Web.Data.Migrations
             modelBuilder.Entity("Commonage.Web.Domain.ArchiveItem", b =>
                 {
                     b.Navigation("Contribution");
+
+                    b.Navigation("FileText");
 
                     b.Navigation("MediaFiles");
                 });

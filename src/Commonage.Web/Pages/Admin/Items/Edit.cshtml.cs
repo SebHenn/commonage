@@ -652,6 +652,11 @@ public class EditModel(
         file.DeletedAt = DateTime.UtcNow;
         audit.Record(AuditAction.PhotoMovedToBin, file.ArchiveItem.Title, file.ArchiveItem);
         await db.SaveChangesAsync(cancellationToken);
+        if (file.IsPdf)
+        {
+            await FileTextIndex.RebuildAsync(db, id, cancellationToken);
+            await db.SaveChangesAsync(cancellationToken);
+        }
         TempData["Message"] = localizer.Plural("The photo is in the bin. You can restore it there for {0, plural, one {# day} other {# days}}.", ArchiveBin.RetentionDays);
         return BackToItem(id);
     }
