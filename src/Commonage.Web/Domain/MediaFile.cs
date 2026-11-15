@@ -53,6 +53,9 @@ public class MediaFile
 
     public bool IsPdf => ContentType == PdfContentType;
 
+    /// <summary>The text read from a PDF, for search only. Never shown. Null for pictures and for PDFs without text.</summary>
+    public string? ExtractedText { get; set; }
+
     public int? PreviewWidth { get; set; }
     public int? PreviewHeight { get; set; }
 

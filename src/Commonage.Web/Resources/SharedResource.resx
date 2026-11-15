@@ -217,6 +217,7 @@
   <data name="Do not import" xml:space="preserve"><value>Do not import</value></data>
   <data name="Do you have photos or stories that belong here? You can send them in. Curators look at everything before it is published." xml:space="preserve"><value>Do you have photos or stories that belong here? You can send them in. Curators look at everything before it is published.</value></data>
   <data name="Do you know more about this?" xml:space="preserve"><value>Do you know more about this?</value></data>
+  <data name="Document of {0, plural, one {# page} other {# pages}}" xml:space="preserve"><value>Document of {0, plural, one {# page} other {# pages}}</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="Done:" xml:space="preserve"><value>Done:</value></data>
   <data name="Download everything in the archive as one ZIP file: all original files, and all descriptions as a JSON file and as a table for spreadsheet programs. The export needs no Commonage to read, so the archive's material is never locked in." xml:space="preserve"><value>Download everything in the archive as one ZIP file: all original files, and all descriptions as a JSON file and as a table for spreadsheet programs. The export needs no Commonage to read, so the archive's material is never locked in.</value></data>
   <data name="Download export" xml:space="preserve"><value>Download export</value></data>
@@ -976,6 +977,7 @@
   <data name="{0} is not a supported photo format. Please use JPEG, PNG, TIFF, WebP, AVIF or GIF." xml:space="preserve"><value>{0} is not a supported photo format. Please use JPEG, PNG, TIFF, WebP, AVIF or GIF.</value></data>
   <data name="{0} is too large." xml:space="preserve"><value>{0} is too large.</value></data>
   <data name="{0} was left out, because together the photos would be too large to send at once. You can send it afterwards." xml:space="preserve"><value>{0} was left out, because together the photos would be too large to send at once. You can send it afterwards.</value></data>
+  <data name="{0}, page {1} of {2}" xml:space="preserve"><value>{0}, page {1} of {2}</value></data>
   <data name="{0}, photo {1} of {2}" xml:space="preserve"><value>{0}, photo {1} of {2}</value></data>
   <data name="{0}: the archive already has this file: {1}" xml:space="preserve"><value>{0}: the archive already has this file: {1}</value></data>
   <data name="{0}: {1, plural, one {# item} other {# items}}" xml:space="preserve"><value>{0}: {1, plural, one {# item} other {# items}}</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>

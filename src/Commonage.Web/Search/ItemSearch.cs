@@ -45,7 +45,10 @@ public static class ItemSearch
         if (filter.Query is { } query)
         {
             items = items.Where(i => EF.Property<NpgsqlTsVector>(i, CommonageDbContext.SearchVector)
-                .Matches(EF.Functions.ToTsQuery(CommonageDbContext.SearchConfiguration, query)));
+                .Matches(EF.Functions.ToTsQuery(CommonageDbContext.SearchConfiguration, query))
+                // What the item's PDFs say. All words must be in the item's own text or all in the documents, not split between them.
+                || (i.FileText != null && EF.Property<NpgsqlTsVector>(i.FileText, CommonageDbContext.SearchVector)
+                    .Matches(EF.Functions.ToTsQuery(CommonageDbContext.SearchConfiguration, query))));
         }
 
         if (!string.IsNullOrWhiteSpace(filter.Tag))
@@ -65,7 +68,9 @@ public static class ItemSearch
                     && (from == null || i.DateTo == null || i.DateTo >= from)
                     && (to == null || i.DateFrom == null || i.DateFrom <= to))
                 || EF.Property<NpgsqlTsVector>(i, CommonageDbContext.SearchVector)
-                    .Matches(EF.Functions.ToTsQuery(CommonageDbContext.SearchConfiguration, words)));
+                    .Matches(EF.Functions.ToTsQuery(CommonageDbContext.SearchConfiguration, words))
+                || (i.FileText != null && EF.Property<NpgsqlTsVector>(i.FileText, CommonageDbContext.SearchVector)
+                    .Matches(EF.Functions.ToTsQuery(CommonageDbContext.SearchConfiguration, words))));
         }
 
         // An item matches a period when its possible dates overlap it. Undated items never match.

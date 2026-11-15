@@ -117,7 +117,22 @@ public class PdfTools(IOptions<UploadOptions> options)
         }
     }
 
-    private int Run(string tool, IReadOnlyList<string> arguments, out string output, out string error)
+    /// <summary>
+    /// The text of the first pages, for search. A PDF of scans has none, and that is no error. Throws
+    /// <see cref="InvalidDataException"/> only when poppler fails, which the caller may ignore: the text is an extra.
+    /// </summary>
+    public string ExtractText(Copy copy, int lastPage, int maxLength)
+    {
+        var exit = Run("pdftotext",
+            ["-enc", "UTF-8", "-nopgbrk", "-f", "1", "-l", lastPage.ToString(CultureInfo.InvariantCulture), copy.PdfPath, "-"],
+            out var output, out var error, maxLength);
+        if (exit != 0)
+            throw new InvalidDataException(Short("The text of the PDF could not be read: " + (error.Length > 0 ? error : "exit code " + exit)));
+        // Control characters, and the NUL that PostgreSQL refuses, never reach the index.
+        return FileTextIndex.Cut(string.Concat(output.Select(c => char.IsControl(c) && c is not ('\n' or '\t') ? ' ' : c)).Trim(), maxLength);
+    }
+
+    private int Run(string tool, IReadOnlyList<string> arguments, out string output, out string error, int outputLimit = 20_000)
     {
         var directory = options.Value.PdfToolsDirectory;
         var start = new ProcessStartInfo(string.IsNullOrEmpty(directory) ? tool : Path.Combine(directory, tool))
@@ -156,7 +171,7 @@ public class PdfTools(IOptions<UploadOptions> options)
                 return -2;
             }
             // The error text can come from the file, so only a little of it is kept.
-            output = Limit(outputTask.GetAwaiter().GetResult(), 20_000);
+            output = Limit(outputTask.GetAwaiter().GetResult(), outputLimit);
             error = Limit(errorTask.GetAwaiter().GetResult(), 300).Trim();
             return process.ExitCode;
         }

@@ -1,6 +1,7 @@
 using Commonage.Web.Audit;
 using Commonage.Web.Data;
 using Commonage.Web.Domain;
+using Commonage.Web.Media;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -74,6 +75,11 @@ public class BinModel(
         file.DeletedAt = null;
         audit.Record(AuditAction.PhotoRestored, file.ArchiveItem.Title, file.ArchiveItem);
         await db.SaveChangesAsync(cancellationToken);
+        if (file.IsPdf)
+        {
+            await FileTextIndex.RebuildAsync(db, file.ArchiveItemId, cancellationToken);
+            await db.SaveChangesAsync(cancellationToken);
+        }
 
         TempData["Message"] = localizer["The photo is restored."].Value;
         return RedirectToPage("/Admin/Items/Edit", new { id = file.ArchiveItemId });

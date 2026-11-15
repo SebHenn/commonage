@@ -58,6 +58,22 @@
                 var picture = number == 1 ? "eager" : "lazy";
                 var altLanguage = file.AltText is not null || Model.Title.Length > 0 && count == 1 ? material : null;
                 @* The first picture is what the page is about, so it does not wait. *@
+                @if (file.IsPdf && file.PageCount is > 0)
+                {
+                    @* A document: every page is a picture of its own, in order. The PDF itself is for curators. *@
+                    var pages = file.PageCount.Value;
+                    <div id="photo-@number" class="pdf-pages" role="group" aria-label="@T.Plural("Document of {0, plural, one {# page} other {# pages}}", pages)">
+                        @for (var n = 1; n <= pages; n++)
+                        {
+                            <figure class="pdf-page">
+                                <img src="@mediaAddress/@file.Id/page/@n" alt="@T["{0}, page {1} of {2}", title, n, pages]" lang="@(Model.Title.Length > 0 ? material : null)"
+                                     class="media-preview rounded border" loading="@(number == 1 && n == 1 ? "eager" : "lazy")" />
+                                <figcaption><span class="photo-number">@T["Page {0} of {1}", n, pages]</span></figcaption>
+                            </figure>
+                        }
+                    </div>
+                    continue;
+                }
                 <figure id="photo-@number">
                     @if (largePhotos && file.HasLarge)
                     {

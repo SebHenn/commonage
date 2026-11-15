@@ -490,6 +490,7 @@ shows the years of its published items. M19 is complete.
   Because of the size and the parser risk, the Dockerfile gets a build argument and Compose a documented way to leave poppler
   out: a PDF is then refused with a clear message, and every other format works as before.
 - **Second part, done.** PDF page previews, `MediaFile.PageCount`, the public route `/media/{id}/page/{n}`, export version 6, the `WITH_PDF` build argument. PDF tests need poppler and are skipped without it (CI installs it).
+- **Third part, done.** The text of PDFs (`pdftotext`, first 300 pages, 200,000 characters) goes into the side table `ItemFileTexts`, matched by search for published items only and never shown; the item page shows PDF pages with "Page n of m". Left out: ranking by file text, and text for PDFs processed before this part.
 - **Parts.** First: AVIF and GIF (magic bytes in `ImageFormats`, accepted by upload and contribution links, a GIF becomes one
   still picture; no animation is kept). Second: PDF page previews and page count, with the migration and export version 6.
   Third: the text from PDFs into search, and the page strip on the item page.
