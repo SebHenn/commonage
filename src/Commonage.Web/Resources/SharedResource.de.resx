@@ -997,4 +997,12 @@
   <data name="Recording {0} of {1}" xml:space="preserve"><value>Aufnahme {0} von {1}</value></data>
   <data name="A recording needs its transcript in the description before it is published, or tick that a transcript will follow." xml:space="preserve"><value>Eine Aufnahme braucht vor der Veröffentlichung ihre Abschrift in der Beschreibung, oder setzen Sie den Haken, dass eine Abschrift folgt.</value></data>
   <data name="Left out, because a recording has no transcript yet: {0}." xml:space="preserve"><value>Ausgelassen, weil eine Aufnahme noch keine Abschrift hat: {0}.</value></data>
+  <data name="Restored an earlier text of the item" xml:space="preserve"><value>Einen früheren Text des Eintrags wiederhergestellt</value></data>
+  <data name="Earlier texts" xml:space="preserve"><value>Frühere Texte</value></data>
+  <data name="Show the text before this change" xml:space="preserve"><value>Den Text vor dieser Änderung zeigen</value></data>
+  <data name="Empty" xml:space="preserve"><value>Leer</value></data>
+  <data name="Restore this text" xml:space="preserve"><value>Diesen Text wiederherstellen</value></data>
+  <data name="The earlier text is back." xml:space="preserve"><value>Der frühere Text ist wieder da.</value></data>
+  <data name="Original location" xml:space="preserve"><value>Ursprünglicher Ort</value></data>
+  <data name="This text cannot be put back: the field would be empty or no longer reads as valid." xml:space="preserve"><value>Dieser Text kann nicht zurückgesetzt werden: Das Feld wäre leer oder ließe sich nicht mehr lesen.</value></data>
 </root>

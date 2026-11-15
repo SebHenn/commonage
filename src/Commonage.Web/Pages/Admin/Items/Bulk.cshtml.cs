@@ -202,7 +202,11 @@ public class BulkModel(
             case BulkAction.SetDate:
                 if (item.DateText == Date!.Trim())
                     return false;
-                return item.TrySetDate(Date);
+                var earlier = item.DateText;
+                if (!item.TrySetDate(Date))
+                    return false;
+                audit.RecordRevision(item, RevisionField.Date, earlier);
+                return true;
             case BulkAction.MoveToCollection:
                 if (item.CollectionId == CollectionId)
                     return false;

@@ -59,6 +59,7 @@ public enum AuditAction
     VisitorNoteDeleted,
     ItemsImported,
     AccountNameChanged,
+    ItemFieldRestored,
 }
 
 /// <summary>

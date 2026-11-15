@@ -879,6 +879,10 @@ shows the years of its published items. M19 is complete.
 
 **M26 Description history**
 
+- *Built (part 1):* `ItemRevisions` holds one row per changed field (title, description, date, credit, original location,
+  reference number) with the text before, the account's name at the time and when; written by `AuditLog.RecordRevision` in the
+  save of the change. "Restore this text" (curators) puts it back and keeps the replaced text. The item's admin page lists
+  them. Left out of the export, with a test. Not yet: tags, a side-by-side comparison, a history page across items.
 - A revision holds the changed fields only, written in the same save as the activity log. A curator can restore one. No
   contributor details in revisions, and the personal-data tools reach them. The export leaves them out, with the reason.
 

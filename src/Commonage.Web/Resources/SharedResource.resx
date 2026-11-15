@@ -232,12 +232,14 @@
   <data name="Each row of a spreadsheet becomes a draft, and the files it names are added to it as photos. Nothing is published, and nothing is imported before you have seen a dry run that lists what is wrong." xml:space="preserve"><value>Each row of a spreadsheet becomes a draft, and the files it names are added to it as photos. Nothing is published, and nothing is imported before you have seen a dry run that lists what is wrong.</value></data>
   <data name="Each tag can say whether it names a place, a person or a topic. Visitors find all places and all people on pages of their own. Renaming or merging a tag changes it on every item at once." xml:space="preserve"><value>Each tag can say whether it names a place, a person or a topic. Visitors find all places and all people on pages of their own. Renaming or merging a tag changes it on every item at once.</value></data>
   <data name="Earlier" xml:space="preserve"><value>Earlier</value></data>
+  <data name="Earlier texts" xml:space="preserve"><value>Earlier texts</value></data>
   <data name="Earlier: {0}" xml:space="preserve"><value>Earlier: {0}</value></data>
   <data name="Edit collection" xml:space="preserve"><value>Edit collection</value></data>
   <data name="Edit contribution link" xml:space="preserve"><value>Edit contribution link</value></data>
   <data name="Edit: {0}" xml:space="preserve"><value>Edit: {0}</value></data>
   <data name="Email" xml:space="preserve"><value>Email</value></data>
   <data name="Email address" xml:space="preserve"><value>Email address</value></data>
+  <data name="Empty" xml:space="preserve"><value>Empty</value></data>
   <data name="Enable account" xml:space="preserve"><value>Enable account</value></data>
   <data name="Enabled the account" xml:space="preserve"><value>Enabled the account</value></data>
   <data name="Encrypted with COMMONAGE_LOGIN_KEY" xml:space="preserve"><value>Encrypted with COMMONAGE_LOGIN_KEY</value></data>
@@ -485,6 +487,7 @@
   <data name="Or type this key into the app:" xml:space="preserve"><value>Or type this key into the app:</value></data>
   <data name="Order of the items" xml:space="preserve"><value>Order of the items</value></data>
   <data name="Original" xml:space="preserve"><value>Original</value></data>
+  <data name="Original location" xml:space="preserve"><value>Original location</value></data>
   <data name="Other items in {0}" xml:space="preserve"><value>Other items in {0}</value></data>
   <data name="Our archive needs no imprint." xml:space="preserve"><value>Our archive needs no imprint.</value></data>
   <data name="Page not found" xml:space="preserve"><value>Page not found</value></data>
@@ -597,7 +600,9 @@
   <data name="Request to take it down" xml:space="preserve"><value>Request to take it down</value></data>
   <data name="Restore" xml:space="preserve"><value>Restore</value></data>
   <data name="Restore last tested" xml:space="preserve"><value>Restore last tested</value></data>
+  <data name="Restore this text" xml:space="preserve"><value>Restore this text</value></data>
   <data name="Restored a photo from the bin" xml:space="preserve"><value>Restored a photo from the bin</value></data>
+  <data name="Restored an earlier text of the item" xml:space="preserve"><value>Restored an earlier text of the item</value></data>
   <data name="Restored the item from the bin" xml:space="preserve"><value>Restored the item from the bin</value></data>
   <data name="Results" xml:space="preserve"><value>Results</value></data>
   <data name="Reviews contributions, describes, publishes and deletes items, manages collections and contribution links." xml:space="preserve"><value>Reviews contributions, describes, publishes and deletes items, manages collections and contribution links.</value></data>
@@ -652,6 +657,7 @@
   <data name="Show all tags" xml:space="preserve"><value>Show all tags</value></data>
   <data name="Show everything" xml:space="preserve"><value>Show everything</value></data>
   <data name="Show my name with what I send in" xml:space="preserve"><value>Show my name with what I send in</value></data>
+  <data name="Show the text before this change" xml:space="preserve"><value>Show the text before this change</value></data>
   <data name="Showing the newest {0}." xml:space="preserve"><value>Showing the newest {0}.</value></data>
   <data name="Shown to admins on this page and in the list of accounts. Never to visitors." xml:space="preserve"><value>Shown to admins on this page and in the list of accounts. Never to visitors.</value></data>
   <data name="Six digits. Without your phone, type one of your recovery codes instead. Each one works once." xml:space="preserve"><value>Six digits. Without your phone, type one of your recovery codes instead. Each one works once.</value></data>
@@ -737,6 +743,7 @@
   <data name="The disk is nearly full, so no photos can be added at the moment. Tell the person who runs the server." xml:space="preserve"><value>The disk is nearly full, so no photos can be added at the moment. Tell the person who runs the server.</value></data>
   <data name="The disk is nearly full, so the archive has stopped accepting uploads and contributions. Free disk space (GB): {0}. Whoever runs the server should make room." xml:space="preserve"><value>The disk is nearly full, so the archive has stopped accepting uploads and contributions. Free disk space (GB): {0}. Whoever runs the server should make room.</value></data>
   <data name="The dry run" xml:space="preserve"><value>The dry run</value></data>
+  <data name="The earlier text is back." xml:space="preserve"><value>The earlier text is back.</value></data>
   <data name="The email address can be at most {1} characters long." xml:space="preserve"><value>The email address can be at most {1} characters long.</value></data>
   <data name="The email address or password is incorrect." xml:space="preserve"><value>The email address or password is incorrect.</value></data>
   <data name="The files for this import are no longer there. Please choose them again." xml:space="preserve"><value>The files for this import are no longer there. Please choose them again.</value></data>
@@ -841,6 +848,7 @@
   <data name="This reference number is already used by: {0}" xml:space="preserve"><value>This reference number is already used by: {0}</value></data>
   <data name="This site only sets the cookies it needs: one for the chosen language, one to protect forms, and one to keep curators logged in. There are no analytics and no third-party services. Visitors' addresses are held in memory for a short time, to limit abuse of forms and logins." xml:space="preserve"><value>This site only sets the cookies it needs: one for the chosen language, one to protect forms, and one to keep curators logged in. There are no analytics and no third-party services. Visitors' addresses are held in memory for a short time, to limit abuse of forms and logins.</value><comment>Part of the privacy text an archive starts with. Please have a second translator review it.</comment></data>
   <data name="This text can be at most {1} characters long." xml:space="preserve"><value>This text can be at most {1} characters long.</value></data>
+  <data name="This text cannot be put back: the field would be empty or no longer reads as valid." xml:space="preserve"><value>This text cannot be put back: the field would be empty or no longer reads as valid.</value></data>
   <data name="This text was started on this device earlier. If it is not yours, clear it." xml:space="preserve"><value>This text was started on this device earlier. If it is not yours, clear it.</value></data>
   <data name="Through the decades" xml:space="preserve"><value>Through the decades</value></data>
   <data name="Tick all on this page" xml:space="preserve"><value>Tick all on this page</value></data>

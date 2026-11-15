@@ -61,6 +61,7 @@ public class EditModel(
 
     /// <summary>The latest entries of the activity log about this item, newest first.</summary>
     public IReadOnlyList<AuditEntry> History { get; private set; } = [];
+    public IReadOnlyList<ItemRevision> Revisions { get; private set; } = [];
 
     /// <summary>When the disk is nearly full, curators are told so instead of being offered the upload form.</summary>
     public bool CanUpload => health.CanAcceptUploads();
@@ -319,6 +320,7 @@ public class EditModel(
             db.ArchiveItems.Add(item);
         }
 
+        var before = isNew ? null : Enum.GetValues<RevisionField>().ToDictionary(f => f, f => RevisionFields.Get(item, f));
         item.Title = Input.Title.Trim();
         item.Description = string.IsNullOrWhiteSpace(Input.Description) ? null : Input.Description.Trim();
         item.CollectionId = Input.CollectionId!.Value;
@@ -330,6 +332,9 @@ public class EditModel(
         item.Credit = Clean(Input.Credit);
         item.ReferenceNumber = Clean(Input.ReferenceNumber);
         item.OriginalLocation = Clean(Input.OriginalLocation);
+        foreach (var (field, old) in before ?? [])
+            if (RevisionFields.Differ(old, RevisionFields.Get(item, field)))
+                audit.RecordRevision(item, field, old);
         item.ReceivedFrom = Clean(Input.ReceivedFrom);
         item.ReceivedOn = Clean(Input.ReceivedOn);
         item.InternalNotes = Clean(Input.InternalNotes);
@@ -592,6 +597,35 @@ public class EditModel(
     }
 
     /// <summary>Hides a contribution for good because the contributor withdrew their consent.</summary>
+    /// <summary>Puts a field back to what it said before a change. The text it has now is kept as a revision in turn.</summary>
+    public async Task<IActionResult> OnPostRestoreTextAsync(int id, long revisionId, CancellationToken cancellationToken)
+    {
+        if (!User.MayManage())
+            return Forbid();
+
+        var revision = await db.ItemRevisions.Include(r => r.ArchiveItem).FirstOrDefaultAsync(r => r.Id == revisionId && r.ArchiveItemId == id, cancellationToken);
+        if (revision is null)
+            return NotFound();
+        var item = revision.ArchiveItem;
+        if (item.Status == ItemStatus.Withdrawn)
+            return BadRequest();
+
+        var current = RevisionFields.Get(item, revision.Field);
+        if (!RevisionFields.TrySet(item, revision.Field, revision.OldValue))
+        {
+            TempData["Error"] = localizer["This text cannot be put back: the field would be empty or no longer reads as valid."].Value;
+            return BackToItem(id);
+        }
+        if (RevisionFields.Differ(current, RevisionFields.Get(item, revision.Field)))
+            audit.RecordRevision(item, revision.Field, current);
+        item.UpdatedAt = DateTime.UtcNow;
+        audit.Record(AuditAction.ItemFieldRestored, item.Title, item);
+        await db.SaveChangesAsync(cancellationToken);
+
+        TempData["Message"] = localizer["The earlier text is back."].Value;
+        return BackToItem(id);
+    }
+
     public async Task<IActionResult> OnPostWithdrawAsync(int id, CancellationToken cancellationToken)
     {
         if (!User.MayManage())
@@ -704,6 +738,11 @@ public class EditModel(
             OpenNotes = await db.VisitorNotes.CountAsync(n => n.ArchiveItemId == item.Id && n.HandledAt == null);
             MediaFiles = await db.MediaFiles.Where(f => f.ArchiveItemId == item.Id).OrderBy(f => f.Position).ThenBy(f => f.Id).ToListAsync();
             IdenticalFiles = await FindIdenticalFilesAsync(MediaFiles);
+            Revisions = await db.ItemRevisions
+                .Where(r => r.ArchiveItemId == item.Id)
+                .OrderByDescending(r => r.At).ThenByDescending(r => r.Id)
+                .Take(HistoryLength)
+                .ToListAsync();
             History = await db.AuditEntries
                 .Where(e => e.ArchiveItemId == item.Id)
                 .OrderByDescending(e => e.At).ThenByDescending(e => e.Id)

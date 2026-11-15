@@ -168,6 +168,25 @@ public class ExportTests(CommonageAppFactory app)
         Assert.DoesNotContain(binned.Title, Encoding.UTF8.GetString(Read(zip, "archive.json")));
     }
 
+    /// <summary>The earlier texts of an item are left out on purpose: the archive moves with what is true now.</summary>
+    [Fact]
+    public async Task Earlier_texts_are_not_exported()
+    {
+        var item = await app.CreateContributionAsync(ItemStatus.Published);
+        var earlier = $"EARLIER-{Guid.NewGuid():N}";
+        await app.WithDbAsync(async db =>
+        {
+            db.ItemRevisions.Add(new ItemRevision { ArchiveItemId = item.Id, At = DateTime.UtcNow, Field = RevisionField.Description, OldValue = earlier });
+            return await db.SaveChangesAsync();
+        });
+        using var admin = app.CreateClient();
+        await Browser.LogInAsCuratorAsync(admin);
+
+        using var zip = await ExportAsync(admin, publishedOnly: false, includePersonalData: true);
+
+        Assert.DoesNotContain(earlier, Encoding.UTF8.GetString(Read(zip, "archive.json")));
+    }
+
     [Fact]
     public async Task A_published_only_export_leaves_out_drafts_and_contributions()
     {
