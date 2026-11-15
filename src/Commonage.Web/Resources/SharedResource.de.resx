@@ -992,4 +992,7 @@
   <data name="Last login" xml:space="preserve"><value>Letzte Anmeldung</value></data>
   <data name="Save name" xml:space="preserve"><value>Namen speichern</value></data>
   <data name="Shown to admins on this page and in the list of accounts. Never to visitors." xml:space="preserve"><value>Wird Admins auf dieser Seite und in der Liste der Konten gezeigt, nie Besucherinnen und Besuchern.</value></data>
+  <data name="Recording of {0}" xml:space="preserve"><value>Aufnahme: {0}</value></data>
+  <data name="Preparing the recording…" xml:space="preserve"><value>Aufnahme wird vorbereitet…</value></data>
+  <data name="Recording {0} of {1}" xml:space="preserve"><value>Aufnahme {0} von {1}</value></data>
 </root>

@@ -267,6 +267,11 @@ main:focus {
   padding: .5rem .25rem .25rem;
 }
 
+.item-recording audio {
+  display: block;
+  inline-size: 100%;
+}
+
 /* The pages of a PDF, one under the other, each as wide as the column. */
 .pdf-page img {
   display: block;

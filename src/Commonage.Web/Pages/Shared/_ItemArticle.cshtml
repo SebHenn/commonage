@@ -5,7 +5,10 @@
 @{
     var mediaAddress = ViewData["MediaAddress"] as string ?? "/media";
     var title = ArchiveItem.ShownTitle(T, Model.Title);
-    var count = Model.MediaFiles.Count;
+    // Recordings are heard, not looked at: they have no pictures to count, number or put in the strip.
+    var pictures = Model.MediaFiles.Where(f => !f.IsAudio).ToList();
+    var recordings = Model.MediaFiles.Where(f => f.IsAudio).ToList();
+    var count = pictures.Count;
     var number = 0;
     var identity = await Profile.GetAsync();
     var largePhotos = identity.LargePhotos;
@@ -38,7 +41,7 @@
                 <nav class="photo-strip d-print-none" aria-label="@T["Photos of this item"]">
                     <ol>
                         @{ var inStrip = 0; }
-                        @foreach (var file in Model.MediaFiles)
+                        @foreach (var file in pictures)
                         {
                             inStrip++;
                             <li>
@@ -51,7 +54,17 @@
                     </ol>
                 </nav>
             }
-            @foreach (var file in Model.MediaFiles)
+            @foreach (var file in recordings)
+            {
+                <figure class="item-recording">
+                    <audio controls preload="none" src="@mediaAddress/@file.Id/audio" aria-label="@T["Recording of {0}", title]"></audio>
+                    @if (file.Caption is not null)
+                    {
+                        <figcaption><span lang="@material">@file.Caption</span></figcaption>
+                    }
+                </figure>
+            }
+            @foreach (var file in pictures)
             {
                 number++;
                 var alt = file.AltText ?? (count > 1 ? T["{0}, photo {1} of {2}", title, number, count].Value : title);

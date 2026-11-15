@@ -112,7 +112,7 @@ public class IndexModel(CommonageDbContext db, ArchiveHealth health, ArchiveProf
                 i.Collection.Title,
                 i.Status,
                 i.UpdatedAt,
-                i.MediaFiles.Where(f => f.Status == ProcessingStatus.Ready).OrderBy(f => f.Id).Select(f => (int?)f.Id).FirstOrDefault(),
+                i.MediaFiles.Where(f => f.Status == ProcessingStatus.Ready && !f.ContentType.StartsWith("audio/")).OrderBy(f => f.Id).Select(f => (int?)f.Id).FirstOrDefault(),
                 i.MediaFiles.Count,
                 i.Title == "" ? i.MediaFiles.OrderBy(f => f.Id).Select(f => f.OriginalFileName).FirstOrDefault() : null,
                 // Worth a look before a decision on a contribution. Contributors are never told.

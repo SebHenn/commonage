@@ -549,6 +549,7 @@
   <data name="Please write your message." xml:space="preserve"><value>Please write your message.</value></data>
   <data name="Poster to print" xml:space="preserve"><value>Poster to print</value></data>
   <data name="Poster: {0}" xml:space="preserve"><value>Poster: {0}</value></data>
+  <data name="Preparing the recording…" xml:space="preserve"><value>Preparing the recording…</value></data>
   <data name="Preview" xml:space="preserve"><value>Preview</value></data>
   <data name="Preview. This item is public." xml:space="preserve"><value>Preview. This item is public.</value></data>
   <data name="Preview. Visitors cannot see this item." xml:space="preserve"><value>Preview. Visitors cannot see this item.</value></data>
@@ -574,6 +575,8 @@
   <data name="Received from" xml:space="preserve"><value>Received from</value></data>
   <data name="Received when" xml:space="preserve"><value>Received when</value></data>
   <data name="Recently added" xml:space="preserve"><value>Recently added</value></data>
+  <data name="Recording of {0}" xml:space="preserve"><value>Recording of {0}</value></data>
+  <data name="Recording {0} of {1}" xml:space="preserve"><value>Recording {0} of {1}</value></data>
   <data name="Reference" xml:space="preserve"><value>Reference</value></data>
   <data name="Reference for them: {0}" xml:space="preserve"><value>Reference for them: {0}</value></data>
   <data name="Reference number" xml:space="preserve"><value>Reference number</value></data>

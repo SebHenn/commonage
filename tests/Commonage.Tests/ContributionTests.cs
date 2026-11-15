@@ -108,6 +108,19 @@ public class ContributionTests(CommonageAppFactory app)
     }
 
     [Fact]
+    public async Task A_recording_is_not_taken_from_a_stranger()
+    {
+        var token = await CreateLinkAsync();
+        using var visitor = app.CreateClient();
+        var recording = new byte[] { (byte)'I', (byte)'D', (byte)'3', 4, 0, 0, 0, 0, 0, 0, 0xFF, 0xFB, 0x90, 0 };
+
+        var sent = await Browser.SendFormWithFilesAsync(visitor, $"/contribute/{token}", ValidFields("Interview"), ("interview.mp3", recording));
+
+        Assert.DoesNotContain("Thank you", await sent.Content.ReadAsStringAsync());
+        Assert.Equal(0, await CountContributionsAsync(token));
+    }
+
+    [Fact]
     public async Task Name_rights_and_consent_are_required()
     {
         var token = await CreateLinkAsync();

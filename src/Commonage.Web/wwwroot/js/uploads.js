@@ -310,7 +310,21 @@
             const answer = await response.json();
             for (const placeholder of asked) {
                 const id = Number(placeholder.dataset.previewPending);
-                if (answer.ready.includes(id)) {
+                if (answer.ready.includes(id) && answer.audio?.includes(id)) {
+                    // A recording has no picture: the card gets its player, and a row in the upload list just loses its placeholder.
+                    if (placeholder.closest('[data-photo-card]')) {
+                        const player = document.createElement('audio');
+                        player.controls = true;
+                        player.preload = 'none';
+                        player.src = `/admin/media/${id}/audio`;
+                        player.className = placeholder.dataset.previewClass;
+                        player.setAttribute('aria-label', placeholder.dataset.previewAlt ?? '');
+                        placeholder.replaceWith(player);
+                        numberPhotos();
+                    } else {
+                        placeholder.remove();
+                    }
+                } else if (answer.ready.includes(id)) {
                     const picture = new Image();
                     // A new address, because a photo that was turned has the same one as before.
                     picture.src = `/admin/media/${id}/thumbnail?shown=${Date.now()}`;
@@ -344,7 +358,7 @@
     function numberPhotos() {
         const cards = [...document.querySelectorAll('[data-photo-card]')];
         cards.forEach((card, index) => {
-            card.querySelector('[data-photo-number]').textContent = say(texts.photoNumber, index + 1, cards.length);
+            card.querySelector('[data-photo-number]').textContent = say(card.querySelector('audio') ? texts.recordingNumber : texts.photoNumber, index + 1, cards.length);
             card.querySelector('[data-photo-cover]').hidden = index !== 0;
             card.querySelector('button[value=earlier]').disabled = index === 0;
             card.querySelector('button[value=later]').disabled = index === cards.length - 1;

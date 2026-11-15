@@ -21,12 +21,14 @@ public static class MediaEndpoints
     {
         app.MapGet($"/media/{{id:int}}/{VariantPattern}", ServePublicDerivativeAsync);
         app.MapGet("/media/{id:int}/page/{page:int}", ServePublicPageAsync);
+        app.MapGet("/media/{id:int}/audio", ServePublicAudioAsync);
 
         // Pictures made for the screen and the state of their making are for everyone who may describe items. The original, which
         // may hold what the pictures do not, is for curators.
         var describers = app.MapGroup("/admin/media").RequireAuthorization(Policies.Describe);
         describers.MapGet($"/{{id:int}}/{VariantPattern}", ServeDerivativeAsync);
         describers.MapGet("/{id:int}/page/{page:int}", ServePageAsync);
+        describers.MapGet("/{id:int}/audio", ServeAudioAsync);
         describers.MapGet("/status", PreviewStatusAsync);
         app.MapGroup("/admin/media").RequireAuthorization(Policies.ManageArchive).MapGet("/{id:int}/original", ServeOriginalAsync);
     }
@@ -37,12 +39,13 @@ public static class MediaEndpoints
         var wanted = (ids ?? "").Split(',').Take(MaxStatusQuestions).Select(id => int.TryParse(id, out var number) ? number : 0).Where(id => id > 0).ToList();
         var files = await db.MediaFiles
             .Where(f => wanted.Contains(f.Id))
-            .Select(f => new { f.Id, f.Status, Turning = f.Rotation != f.RenderedRotation })
+            .Select(f => new { f.Id, f.Status, Turning = f.Rotation != f.RenderedRotation, Audio = f.ContentType.StartsWith("audio/") })
             .ToListAsync();
         var waiting = await db.MediaFiles.CountAsync(f => f.Status == ProcessingStatus.Pending || (f.Status == ProcessingStatus.Ready && f.Rotation != f.RenderedRotation));
         return Results.Json(new
         {
             ready = files.Where(f => f.Status == ProcessingStatus.Ready && !f.Turning).Select(f => f.Id),
+            audio = files.Where(f => f.Audio).Select(f => f.Id),
             failed = files.Where(f => f.Status == ProcessingStatus.Failed).Select(f => f.Id),
             waiting = files.Where(f => f.Status == ProcessingStatus.Pending || (f.Status == ProcessingStatus.Ready && f.Turning)).Select(f => f.Id),
             message = waiting == 0 ? "" : localizer["Previews still to be created: {0}", waiting].Value,
@@ -55,7 +58,7 @@ public static class MediaEndpoints
         var file = await db.PublishedItems
             .SelectMany(i => i.MediaFiles)
             .FirstOrDefaultAsync(f => f.Id == id && f.Status == ProcessingStatus.Ready);
-        if (file is null)
+        if (file is null || file.IsAudio)
             return Results.NotFound();
         if (variant == "large" && !(file.HasLarge && (await profile.GetAsync()).LargePhotos))
             return Results.NotFound();
@@ -66,6 +69,33 @@ public static class MediaEndpoints
         return Results.Stream(storage.OpenRead(KeyFor(file, variant)), "image/jpeg",
             lastModified: file.UploadedAt,
             entityTag: new EntityTagHeaderValue($"\"{file.StorageId:N}-{variant}-{file.DerivativeVersion}-{file.RenderedRotation}\""));
+    }
+
+    /// <summary>
+    /// The copy of a published recording without its tags, in parts if the player asks, so that it can jump about. The original is
+    /// never served here.
+    /// </summary>
+    private static async Task<IResult> ServePublicAudioAsync(int id, CommonageDbContext db, IFileStorage storage, HttpContext context)
+    {
+        var file = await db.PublishedItems
+            .SelectMany(i => i.MediaFiles)
+            .FirstOrDefaultAsync(f => f.Id == id && f.Status == ProcessingStatus.Ready && f.ContentType.StartsWith("audio/"));
+        if (file is null || !storage.Exists(file.AudioKey))
+            return Results.NotFound();
+
+        context.Response.Headers.CacheControl = "public, max-age=600";
+        return Results.Stream(storage.OpenRead(file.AudioKey), file.ContentType, lastModified: file.UploadedAt,
+            entityTag: new EntityTagHeaderValue($"\"{file.StorageId:N}-audio\""), enableRangeProcessing: true);
+    }
+
+    private static async Task<IResult> ServeAudioAsync(int id, CommonageDbContext db, IFileStorage storage, HttpContext context)
+    {
+        var file = await FindForStaffAsync(db, id, context.User);
+        if (file is null || !file.IsAudio || !storage.Exists(file.AudioKey))
+            return Results.NotFound();
+
+        context.Response.Headers.CacheControl = "private, no-store";
+        return Results.Stream(storage.OpenRead(file.AudioKey), file.ContentType, enableRangeProcessing: true);
     }
 
     /// <summary>One page of a published PDF, drawn as a picture. The PDF itself is never served to visitors.</summary>
@@ -111,7 +141,7 @@ public static class MediaEndpoints
     {
         // Curators also see what is in the bin, to decide whether to restore it.
         var file = await FindForStaffAsync(db, id, context.User);
-        if (file is null)
+        if (file is null || file.IsAudio)
             return Results.NotFound();
 
         context.Response.Headers.CacheControl = "private, no-store";

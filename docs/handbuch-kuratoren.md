@@ -60,6 +60,18 @@ Besucher sehen auf der Seite und der Karte einer Sammlung, aus welchen Jahren ih
 
 Besucher können ein Foto mit etwa 3000 Pixeln öffnen. Ob das möglich ist, gilt für das ganze Archiv und steht unter „Einstellungen“.
 
+## Aufnahmen
+
+Eine Aufnahme (MP3, M4A vom Diktiergerät des Telefons, WAV oder FLAC) fügen Kuratoren und Helfer auf der Seite des Eintrags hinzu wie ein
+Foto, nicht über einen Einsendelink. Besucher hören sie im Player auf der Seite des Eintrags, sobald er veröffentlicht ist. Sie bekommen
+eine Kopie, aus der alles entfernt ist, was die Datei außer dem Ton enthält: Namen, Orte, Daten, das Gerät und Titelbilder. Der Ton selbst
+ist genau der des Originals. Das Original bleibt bei den Kuratoren („Original“ auf der Karte). Kann das Archiv mit einer Datei nichts
+anfangen, steht dort „Es konnte keine Vorschau erstellt werden“, und Besucher bekommen nichts: speichern Sie sie noch einmal aus dem
+Aufnahmegerät oder wandeln Sie sie in MP3 oder WAV um. OGG und Opus werden noch nicht angenommen.
+
+Eine Aufnahme lässt sich nicht durchsuchen. Schreiben Sie in die Beschreibung, was gesagt wird, oder wenigstens wer und wo, und setzen Sie
+den Haken bei „Muss noch abgeschrieben werden“, bis es eine Abschrift gibt.
+
 ## Rechte, Nennung und was nur Sie sehen
 
 Öffnen Sie bei einem Eintrag **Rechte und Nennung**:

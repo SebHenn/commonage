@@ -551,7 +551,7 @@ public class EditModel(
         var file = await db.MediaFiles.Include(f => f.ArchiveItem).FirstOrDefaultAsync(f => f.Id == mediaFileId && f.ArchiveItemId == id, cancellationToken);
         if (file is null || IsOutOfReach(file.ArchiveItem))
             return NotFound();
-        if (file.Status != ProcessingStatus.Ready)
+        if (file.Status != ProcessingStatus.Ready || file.IsAudio)
             return BadRequest();
 
         file.Rotation = (file.Rotation + 90) % 360;

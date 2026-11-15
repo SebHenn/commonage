@@ -53,6 +53,9 @@ public class MediaFile
 
     public bool IsPdf => ContentType == PdfContentType;
 
+    /// <summary>A recording. It has no pictures; visitors hear a copy without tags, and the original stays with curators.</summary>
+    public bool IsAudio => ContentType.StartsWith("audio/", StringComparison.Ordinal);
+
     /// <summary>The text read from a PDF, for search only. Never shown. Null for pictures and for PDFs without text.</summary>
     public string? ExtractedText { get; set; }
 
@@ -87,6 +90,8 @@ public class MediaFile
     public DateTime? DeletedAt { get; set; }
 
     public string OriginalKey => $"originals/{StorageId:N}";
+    /// <summary>The copy of a recording without its tags, the only one visitors can reach.</summary>
+    public string AudioKey => $"audio/{StorageId:N}";
     public string PreviewKey => $"previews/{StorageId:N}.jpg";
     public string ThumbnailKey => $"thumbnails/{StorageId:N}.jpg";
     public string CardKey => $"cards/{StorageId:N}.jpg";
@@ -100,7 +105,7 @@ public class MediaFile
 
     /// <summary>Everything made from the original: the sizes of the picture and the pages of a PDF.</summary>
     public IEnumerable<string> DerivativeKeys() =>
-        new[] { PreviewKey, ThumbnailKey, CardKey, LargeKey }.Concat(Enumerable.Range(1, PageCount ?? 0).Select(PageKey));
+        IsAudio ? [AudioKey] : new[] { PreviewKey, ThumbnailKey, CardKey, LargeKey }.Concat(Enumerable.Range(1, PageCount ?? 0).Select(PageKey));
 
     /// <summary>Which picture sizes exist. Raising it makes the archive add the new ones in the background.</summary>
     public const int CurrentDerivativeVersion = 3;

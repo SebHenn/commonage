@@ -325,7 +325,13 @@ public class MediaProcessor(
 
         try
         {
-            if (file.IsPdf)
+            if (file.IsAudio)
+            {
+                await MakeAudioCopyAsync(file, cancellationToken);
+                // Nothing to draw, and nothing for the later passes over older files to do.
+                file.DerivativeVersion = MediaFile.CurrentDerivativeVersion;
+            }
+            else if (file.IsPdf)
             {
                 // The size of what poppler draws is set by us, whatever size the pages claim to have.
                 await RenderPagesAsync(file, cancellationToken);
@@ -339,7 +345,8 @@ public class MediaProcessor(
                     throw new VipsException($"The image has {header.Width} × {header.Height} pixels, more than the limit of {options.Value.MaxPreviewMegapixels} megapixels.");
             }
 
-            await RenderAllAsync(file, await LargeIsWantedAsync(db, cancellationToken), cancellationToken);
+            if (!file.IsAudio)
+                await RenderAllAsync(file, await LargeIsWantedAsync(db, cancellationToken), cancellationToken);
             file.Status = ProcessingStatus.Ready;
             file.ProcessingError = null;
         }
@@ -375,6 +382,32 @@ public class MediaProcessor(
             {
                 logger.LogWarning(exception, "Could not index the text of media file {MediaFileId}", file.Id);
             }
+        }
+    }
+
+    /// <summary>
+    /// Writes the copy of a recording that visitors hear, without its tags. It goes through a temporary file, because a recording
+    /// can be hundreds of megabytes and the copy is only stored once it is whole.
+    /// </summary>
+    private async Task MakeAudioCopyAsync(MediaFile file, CancellationToken cancellationToken)
+    {
+        var temporary = Path.GetTempFileName();
+        try
+        {
+            await using (var original = storage.OpenRead(file.OriginalKey))
+            await using (var target = new FileStream(temporary, FileMode.Create, FileAccess.Write, FileShare.None))
+            {
+                // The stripper jumps about, so the stream has to allow that. Files in the local storage do.
+                if (!original.CanSeek)
+                    throw new InvalidOperationException("The storage does not allow reading a recording in parts.");
+                AudioTools.Strip(file.ContentType, original, target);
+            }
+            await using var done = File.OpenRead(temporary);
+            await storage.SaveAsync(file.AudioKey, done, cancellationToken);
+        }
+        finally
+        {
+            File.Delete(temporary);
         }
     }
 

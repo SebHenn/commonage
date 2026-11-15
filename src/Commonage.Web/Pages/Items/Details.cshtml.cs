@@ -41,7 +41,7 @@ public class DetailsModel(CommonageDbContext db, ArchiveProfile profile, IString
         Citation = string.Join(". ", new[] { item.Credit, item.Title, item.DateText, identity.Name }.Where(part => !string.IsNullOrWhiteSpace(part)))
             + $". {Address} ({localizer["accessed {0}", Dates.Day(DateTime.UtcNow)]})";
         // A title is what the link itself says already. The rest depends on what the contributor agreed to.
-        var photo = item.MayTravel ? item.MediaFiles.FirstOrDefault() : null;
+        var photo = item.MayTravel ? item.MediaFiles.FirstOrDefault(f => !f.IsAudio) : null;
         Preview = new LinkPreview(
             item.Title,
             item.MayTravel ? LinkPreview.Shorten(item.Description) : null,

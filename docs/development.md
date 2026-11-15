@@ -75,6 +75,11 @@ Originals and their previews are stored under `Storage:RootPath`. It defaults to
 `Media/MediaEndpoints.cs`, which checks permissions. The per-file limit is
 `Uploads:MaxFileSizeMegabytes` (default 200).
 
+Recordings (`Media/AudioTools.cs`) have no pictures: `MediaProcessor` writes a copy without tags under `audio/{StorageId}` by
+cutting tags out of the file's structure and copying the sound unchanged (no ffmpeg, which would add about 400 MB to the image).
+Only that copy is served to visitors, from `/media/{id}/audio` with range requests. Every query that picks a cover skips
+`audio/*` files.
+
 Previews are generated in the background with [NetVips](https://github.com/kleisauke/net-vips)
 (libvips). They are rotated upright and contain no EXIF, so GPS coordinates stay in the private
 original. `MediaProcessor` works through them one at a time. Nothing a single file does may leave its loop, because an
