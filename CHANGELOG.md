@@ -20,7 +20,7 @@ version may change things that need attention when updating, and these notes say
   FLAC. Visitors hear a copy in the item page's own player, which can jump about. Names, places, dates, cover pictures
   and everything else the file carries in tags are cut out of that copy; the sound itself is not re-encoded. The original
   stays with curators. A file whose structure the archive cannot follow is refused rather than served. OGG/Opus is not
-  accepted yet. Recordings are not yet searched or transcribed.
+  accepted yet. An item with a recording is published only when its description holds the transcript or "Still needs a transcription" is ticked; the handbook shows how to make one on your own computer with whisper.cpp.
 
 ### For people running an archive
 

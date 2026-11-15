@@ -69,8 +69,15 @@ ist genau der des Originals. Das Original bleibt bei den Kuratoren („Original�
 anfangen, steht dort „Es konnte keine Vorschau erstellt werden“, und Besucher bekommen nichts: speichern Sie sie noch einmal aus dem
 Aufnahmegerät oder wandeln Sie sie in MP3 oder WAV um. OGG und Opus werden noch nicht angenommen.
 
-Eine Aufnahme lässt sich nicht durchsuchen. Schreiben Sie in die Beschreibung, was gesagt wird, oder wenigstens wer und wo, und setzen Sie
-den Haken bei „Muss noch abgeschrieben werden“, bis es eine Abschrift gibt.
+Ton lässt sich nicht durchsuchen, und nicht jeder kann zuhören. Darum wird ein Eintrag mit einer Aufnahme nur veröffentlicht, wenn die
+Beschreibung die Abschrift enthält oder „Muss noch abgeschrieben werden“ angehakt ist. Besucher lesen die Beschreibung neben dem Player,
+und die Suche findet die Wörter darin.
+
+**Eine Abschrift auf dem eigenen Computer erstellen.** Nichts wird irgendwohin gesendet. Installieren Sie
+[whisper.cpp](https://github.com/ggml-org/whisper.cpp), laden Sie eines seiner Modelle herunter (das Modell „small“ ist ein guter Anfang) und
+starten Sie zum Beispiel `whisper-cli -m ggml-small.bin -l de -f gespraech.wav -otxt`. Es braucht eine WAV-Datei mit 16 kHz;
+`ffmpeg -i gespraech.mp3 -ar 16000 -ac 1 gespraech.wav` erzeugt eine. Lesen Sie das Ergebnis beim Zuhören durch: Namen und Mundartwörter
+sind oft falsch. Fügen Sie es in die Beschreibung ein und nehmen Sie den Haken heraus, sobald es geprüft ist.
 
 ## Rechte, Nennung und was nur Sie sehen
 

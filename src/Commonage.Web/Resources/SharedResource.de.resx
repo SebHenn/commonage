@@ -995,4 +995,6 @@
   <data name="Recording of {0}" xml:space="preserve"><value>Aufnahme: {0}</value></data>
   <data name="Preparing the recording…" xml:space="preserve"><value>Aufnahme wird vorbereitet…</value></data>
   <data name="Recording {0} of {1}" xml:space="preserve"><value>Aufnahme {0} von {1}</value></data>
+  <data name="A recording needs its transcript in the description before it is published, or tick that a transcript will follow." xml:space="preserve"><value>Eine Aufnahme braucht vor der Veröffentlichung ihre Abschrift in der Beschreibung, oder setzen Sie den Haken, dass eine Abschrift folgt.</value></data>
+  <data name="Left out, because a recording has no transcript yet: {0}." xml:space="preserve"><value>Ausgelassen, weil eine Aufnahme noch keine Abschrift hat: {0}.</value></data>
 </root>

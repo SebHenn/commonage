@@ -283,6 +283,12 @@ public class EditModel(
             }
         }
 
+        // A recording nobody can read is not found by search and is closed to anyone who cannot listen: it needs a
+        // transcript in the description, or the promise of one.
+        if (command == "publish" && id is not null && string.IsNullOrWhiteSpace(Input.Description) && !Input.NeedsTranscription
+            && await db.MediaFiles.AnyAsync(f => f.ArchiveItemId == id && f.ContentType.StartsWith("audio/")))
+            ModelState.AddModelError("Input.Description", localizer["A recording needs its transcript in the description before it is published, or tick that a transcript will follow."]);
+
         if (!ModelState.IsValid)
         {
             // A browser cannot fill in chosen files again when a form comes back, so it has to be said.

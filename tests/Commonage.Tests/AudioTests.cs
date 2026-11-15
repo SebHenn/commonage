@@ -4,6 +4,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using Commonage.Web.Domain;
 using Commonage.Web.Media;
+using Commonage.Web.Pages.Admin.Items;
 using Microsoft.EntityFrameworkCore;
 
 namespace Commonage.Tests;
@@ -232,6 +233,86 @@ public class AudioTests(CommonageAppFactory app)
             return await db.SaveChangesAsync();
         });
         Assert.Equal(HttpStatusCode.NotFound, (await visitor.GetAsync($"/media/{file.Id}/audio")).StatusCode);
+    }
+
+    [Fact]
+    public async Task A_recording_is_published_only_with_a_transcript_or_the_promise_of_one()
+    {
+        using var curator = app.CreateClient();
+        await Browser.LogInAsCuratorAsync(curator);
+        var (itemId, _) = await UploadAsync(curator, "interview.mp3", RecordingWithTags());
+        await app.WithDbAsync(async db => { (await db.ArchiveItems.SingleAsync(i => i.Id == itemId)).Status = ItemStatus.Draft; return await db.SaveChangesAsync(); });
+        var item = await app.WithDbAsync(db => db.ArchiveItems.AsNoTracking().SingleAsync(i => i.Id == itemId));
+
+        async Task<HttpResponseMessage> PublishAsync(string description, bool transcriptToFollow)
+        {
+            var fields = new Dictionary<string, string>
+            {
+                ["Input.Title"] = item.Title, ["Input.CollectionId"] = item.CollectionId.ToString(),
+                ["Input.Description"] = description, ["command"] = "publish",
+            };
+            if (transcriptToFollow)
+                fields["Input.NeedsTranscription"] = "true";
+            return await Browser.SendFormAsync(curator, $"/Admin/Items/Edit/{itemId}", fields);
+        }
+
+        async Task<ItemStatus> StatusAsync() => (await app.WithDbAsync(db => db.ArchiveItems.AsNoTracking().SingleAsync(i => i.Id == itemId))).Status;
+
+        await PublishAsync("  ", false);
+        Assert.Equal(ItemStatus.Draft, await StatusAsync());
+
+        await PublishAsync("", true);
+        Assert.Equal(ItemStatus.Published, await StatusAsync());
+    }
+
+    [Fact]
+    public async Task Publishing_many_leaves_out_a_recording_that_has_no_transcript()
+    {
+        using var curator = app.CreateClient();
+        await Browser.LogInAsCuratorAsync(curator);
+        var (bare, _) = await UploadAsync(curator, "one.mp3", RecordingWithTags());
+        var (promised, _) = await UploadAsync(curator, "two.mp3", RecordingWithTags());
+        await app.WithDbAsync(async db =>
+        {
+            foreach (var item in await db.ArchiveItems.Where(i => i.Id == bare || i.Id == promised).ToListAsync())
+            {
+                item.Status = ItemStatus.Draft;
+                item.Description = null;
+                item.NeedsTranscription = item.Id == promised;
+            }
+            return await db.SaveChangesAsync();
+        });
+
+        var page = await curator.GetStringAsync("/Admin");
+        var response = await curator.PostAsync("/Admin/Items/Bulk?handler=Apply", new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["__RequestVerificationToken"] = Browser.Token(page), ["Action"] = nameof(BulkAction.Publish), ["Ids"] = $"{bare},{promised}",
+        }));
+        response.EnsureSuccessStatusCode();
+
+        var after = await app.WithDbAsync(db => db.ArchiveItems.AsNoTracking().Where(i => i.Id == bare || i.Id == promised).ToDictionaryAsync(i => i.Id, i => i.Status));
+        Assert.Equal(ItemStatus.Draft, after[bare]);
+        Assert.Equal(ItemStatus.Published, after[promised]);
+    }
+
+    [Fact]
+    public async Task A_recording_with_a_transcript_in_the_description_is_published_and_found_by_its_words()
+    {
+        using var curator = app.CreateClient();
+        await Browser.LogInAsCuratorAsync(curator);
+        var (itemId, _) = await UploadAsync(curator, "interview.mp3", RecordingWithTags());
+        await app.WithDbAsync(async db => { (await db.ArchiveItems.SingleAsync(i => i.Id == itemId)).Status = ItemStatus.Draft; return await db.SaveChangesAsync(); });
+        var item = await app.WithDbAsync(db => db.ArchiveItems.AsNoTracking().SingleAsync(i => i.Id == itemId));
+        var word = $"smithy{Guid.NewGuid():N}";
+
+        await Browser.SendFormAsync(curator, $"/Admin/Items/Edit/{itemId}", new()
+        {
+            ["Input.Title"] = item.Title, ["Input.CollectionId"] = item.CollectionId.ToString(),
+            ["Input.Description"] = $"We walked past the {word} every morning.", ["command"] = "publish",
+        });
+
+        using var visitor = app.CreateClient();
+        Assert.Contains($"/items/{itemId}", await visitor.GetStringAsync($"/search?q={word}"));
     }
 
     [Fact]
