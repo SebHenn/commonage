@@ -97,7 +97,7 @@ public class AddManyModel(
         {
             if (files.Count != 1)
                 return BadRequest();
-            var examined = await uploads.ExamineAsync(files[0], cancellationToken);
+            var examined = await uploads.ExamineAsync(files[0], documents: true, cancellationToken);
             if (examined.Error != UploadError.None)
                 return new JsonResult(UploadReply.Refused(UploadErrorMessages.Describe(localizer, examined.Error, files[0].FileName)));
             if (!addIdentical && await uploads.FindIdenticalAsync(examined, cancellationToken) is { } same)
@@ -112,7 +112,7 @@ public class AddManyModel(
         var left = new List<string>();
         foreach (var upload in files)
         {
-            var examined = await uploads.ExamineAsync(upload, cancellationToken);
+            var examined = await uploads.ExamineAsync(upload, documents: true, cancellationToken);
             if (examined.Error != UploadError.None)
                 refused.Add(UploadErrorMessages.Describe(localizer, examined.Error, upload.FileName));
             else if (!addIdentical && await uploads.FindIdenticalAsync(examined, cancellationToken) is not null)

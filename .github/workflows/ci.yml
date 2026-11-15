@@ -28,6 +28,8 @@ jobs:
           dotnet-version: 10.0.x
       - run: dotnet restore --locked-mode
       - run: dotnet build --no-restore -c Release
+      # poppler reads PDFs; the PDF tests are skipped without it.
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends poppler-utils
       # The tests start PostgreSQL in Docker through Testcontainers.
       - run: dotnet test tests/Commonage.Tests --no-build -c Release
 

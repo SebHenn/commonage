@@ -231,7 +231,7 @@ public class IndexModel(
         try
         {
             foreach (var file in Files)
-                await uploads.AddAsync(item, file, CancellationToken.None);
+                await uploads.AddAsync(item, file, documents: false, CancellationToken.None);
         }
         catch
         {

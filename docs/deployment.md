@@ -160,6 +160,9 @@ If you change the code, build and publish your own image (for example with this 
 fork), set `COMMONAGE_IMAGE` to it in `.env`, and set `COMMONAGE_SOURCE_URL` to your fork, as the AGPL requires.
 Without `compose.production.yaml`, `docker compose up -d --build` builds the image from the checked-out code.
 
+The image includes poppler, the program that reads PDFs (about 83 MB on x86). If you do not need PDFs, build with
+`--build-arg WITH_PDF=false`: the image is smaller, a PDF is refused with a clear message, and everything else works.
+
 ## Behind an existing web server
 
 If the server already runs nginx, Apache or Traefik for other sites, leave out `compose.production.yaml` and let that

@@ -85,6 +85,8 @@ builder.Services.AddSingleton<IFileStorage>(new LocalFileStorage(storageRoot));
 builder.Services.AddSingleton(new ImportStaging(storageRoot));
 builder.Services.AddScoped<ItemImport>();
 builder.Services.Configure<UploadOptions>(builder.Configuration.GetSection("Uploads"));
+builder.Services.AddSingleton<PdfTools>();
+PdfTools.RemoveStaleCopies();
 builder.Services.AddScoped<MediaUploadService>();
 builder.Services.AddSingleton<MediaProcessingQueue>();
 builder.Services.AddHostedService<MediaProcessor>();

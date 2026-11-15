@@ -9,6 +9,15 @@ version may change things that need attention when updating, and these notes say
 
 - AVIF and GIF photos can be uploaded, also through contribution links and as the logo. A GIF becomes one still picture:
   the first frame. The original file is kept as it was sent.
+- PDF files can be uploaded by curators (not through contribution links). The first page becomes the file's cover and
+  thumbnail, and every page up to 300 gets a preview picture that visitors can page through once the item is published.
+  The PDF itself stays with curators, like every original. Searching inside PDFs follows in a later part.
+
+### For people running an archive
+
+- The image now contains `poppler-utils` (about 83 MB on x86) to read PDFs. A smaller image that refuses PDFs is built with
+  `--build-arg WITH_PDF=false`. Each call of poppler is a separate process with a time limit (`Uploads:PdfTimeoutSeconds`).
+- The export is version 6: each file lists its `pageCount`. Nothing needs regenerating; pages of earlier PDFs do not exist yet.
 
 ## 0.5.0 (2026-11-14)
 

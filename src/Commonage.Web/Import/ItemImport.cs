@@ -275,7 +275,7 @@ public class ItemImport(
         try
         {
             await using var content = await source!.OpenSeekableAsync(entry, uploadOptions.Value.MaxFileSizeBytes, cancellationToken);
-            examined = await uploads.ExamineAsync(content, content.Length, cancellationToken);
+            examined = await uploads.ExamineAsync(content, content.Length, documents: true, cancellationToken);
         }
         catch (EntryTooLargeException)
         {
@@ -363,7 +363,7 @@ public class ItemImport(
                 try
                 {
                     await using var content = await source!.OpenSeekableAsync(planned.Entry, uploadOptions.Value.MaxFileSizeBytes, cancellationToken);
-                    var examined = await uploads.ExamineAsync(content, content.Length, cancellationToken);
+                    var examined = await uploads.ExamineAsync(content, content.Length, documents: true, cancellationToken);
                     if (examined.Error != UploadError.None || examined.Sha256 != planned.Examined.Sha256)
                     {
                         failed++;

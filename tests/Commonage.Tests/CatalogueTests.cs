@@ -36,7 +36,7 @@ public class CatalogueTests(CommonageAppFactory app)
     public async Task Catalogue_details_are_saved_and_stay_away_from_visitors_and_the_public_search()
     {
         var item = await app.CreateContributionAsync(ItemStatus.Published);
-        var secret = "Secretword" + Guid.NewGuid().ToString("N");
+        var secret = TestData.UniqueWord("Secretword");
         using var curator = await CuratorAsync();
 
         await Browser.PostFormAsync(curator, $"/Admin/Items/Edit/{item.Id}", Fields(item,

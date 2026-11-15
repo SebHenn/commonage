@@ -247,7 +247,7 @@ none of them most, and null if never chosen), and `otherContentLanguages`, separ
 `rejectedKeptMonths` are how long records are kept (null for always), and each item's `rejectedOrWithdrawnAt` is when that time
 started for it.
 
-`archive.json` has `"format": "commonage-export"` and `"version": 5`. Version 5 added `helpWanted` to each item, also in an export of published items, because the page "Can you help?" shows it. Version 4 added `tags`, each with its `name` and `kind`
+`archive.json` has `"format": "commonage-export"` and `"version": 6`. Version 6 added `pageCount` to each file (for a PDF, how many pages have a preview; the page pictures and any text are left out, because they can be made again from the file). Version 5 added `helpWanted` to each item, also in an export of published items, because the page "Can you help?" shows it. Version 4 added `tags`, each with its `name` and `kind`
 (`Topic`, `Place` or `Person`); items still list their tags by name. Each collection also has its `position` among the others,
 the `sort` of its items (`RecentlyAdded`, `OldestFirst` or `NewestFirst`) and `coverFileId`, the `id` of the file chosen as its
 cover, or null when none is chosen or that file is not in the export. Items also have `notes`, the messages visitors sent through

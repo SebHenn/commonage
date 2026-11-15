@@ -44,6 +44,15 @@ public class MediaFile
 
     public const int MaxProcessingAttempts = 3;
 
+    /// <summary>For a PDF: how many pages have a preview. At most <see cref="MaxPdfPages"/>, though the file may have more.</summary>
+    public int? PageCount { get; set; }
+
+    public const int MaxPdfPages = 300;
+
+    public const string PdfContentType = "application/pdf";
+
+    public bool IsPdf => ContentType == PdfContentType;
+
     public int? PreviewWidth { get; set; }
     public int? PreviewHeight { get; set; }
 
@@ -79,6 +88,16 @@ public class MediaFile
     public string ThumbnailKey => $"thumbnails/{StorageId:N}.jpg";
     public string CardKey => $"cards/{StorageId:N}.jpg";
     public string LargeKey => $"large/{StorageId:N}.jpg";
+
+    /// <summary>The preview of one page of a PDF, from 1.</summary>
+    public string PageKey(int page) => $"pages/{StorageId:N}-{page}.jpg";
+
+    /// <summary>Everything stored for this file, the original included.</summary>
+    public IEnumerable<string> StoredKeys() => new[] { OriginalKey }.Concat(DerivativeKeys());
+
+    /// <summary>Everything made from the original: the sizes of the picture and the pages of a PDF.</summary>
+    public IEnumerable<string> DerivativeKeys() =>
+        new[] { PreviewKey, ThumbnailKey, CardKey, LargeKey }.Concat(Enumerable.Range(1, PageCount ?? 0).Select(PageKey));
 
     /// <summary>Which picture sizes exist. Raising it makes the archive add the new ones in the background.</summary>
     public const int CurrentDerivativeVersion = 3;

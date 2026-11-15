@@ -40,6 +40,7 @@ public class MediaProcessor(
     MediaProcessingQueue queue,
     IServiceScopeFactory scopeFactory,
     IFileStorage storage,
+    PdfTools pdf,
     IOptions<UploadOptions> options,
     ILogger<MediaProcessor> logger) : BackgroundService
 {
@@ -127,7 +128,7 @@ public class MediaProcessor(
             else if (large && !file.HasLarge && (file.PreviewWidth >= PreviewSize || file.PreviewHeight >= PreviewSize))
             {
                 // Only the large size is missing, so the sizes people are looking at are left alone.
-                await using var original = storage.OpenRead(file.OriginalKey);
+                await using var original = OpenSource(file, LargeSize);
                 var picture = Resize(original, LargeSize, file.Rotation, out var width, out var height);
                 if (Math.Max(width, height) > PreviewSize)
                 {
@@ -139,7 +140,7 @@ public class MediaProcessor(
             file.DerivativeVersion = MediaFile.CurrentDerivativeVersion;
             await db.SaveChangesAsync(cancellationToken);
         }
-        catch (Exception exception) when (exception is VipsException or IOException)
+        catch (Exception exception) when (exception is VipsException or IOException or InvalidDataException)
         {
             // It keeps its old sizes, which is all a visitor would notice. A turn that cannot be done is given up, so that nobody waits for it.
             logger.LogWarning(exception, "Could not add new picture sizes for media file {MediaFileId}", mediaFileId);
@@ -161,8 +162,57 @@ public class MediaProcessor(
 
     private void DeleteDerivatives(MediaFile file)
     {
-        foreach (var key in new[] { file.PreviewKey, file.ThumbnailKey, file.CardKey, file.LargeKey })
+        foreach (var key in file.DerivativeKeys())
             storage.Delete(key);
+    }
+
+    /// <summary>
+    /// What the sizes are made from: the file itself, or for a PDF its first page drawn at the given size. Drawing a
+    /// page is a call of poppler, which has a time limit of its own.
+    /// </summary>
+    private Stream OpenSource(MediaFile file, int size)
+    {
+        var original = storage.OpenRead(file.OriginalKey);
+        if (!file.IsPdf)
+            return original;
+        using (original)
+        {
+            using var copy = new PdfTools.Copy(original);
+            return new MemoryStream(pdf.RenderPage(copy, 1, size));
+        }
+    }
+
+    /// <summary>
+    /// Draws each page of a PDF, up to the limit, as a preview of its own, and counts them. The file's own sizes (cover,
+    /// thumbnail) are made afterwards from its first page like those of a photo. Pages already made are removed again if
+    /// a later one fails, because the file is then given up and nothing would know about them.
+    /// </summary>
+    private async Task RenderPagesAsync(MediaFile file, CancellationToken cancellationToken)
+    {
+        if (!pdf.IsAvailable)
+            throw new InvalidDataException("This archive was set up without the program that reads PDFs.");
+        await using var original = storage.OpenRead(file.OriginalKey);
+        using var copy = new PdfTools.Copy(original);
+        var pages = Math.Min(pdf.PageCount(copy), MediaFile.MaxPdfPages);
+        var written = new List<string>();
+        try
+        {
+            for (var page = 1; page <= pages; page++)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var drawn = pdf.RenderPage(copy, page, PreviewSize);
+                var picture = Resize(new MemoryStream(drawn), PreviewSize, 0, out _, out _);
+                await storage.SaveAsync(file.PageKey(page), new MemoryStream(picture), cancellationToken);
+                written.Add(file.PageKey(page));
+            }
+        }
+        catch
+        {
+            foreach (var key in written)
+                storage.Delete(key);
+            throw;
+        }
+        file.PageCount = pages;
     }
 
     /// <summary>
@@ -175,7 +225,7 @@ public class MediaProcessor(
         byte[]? largePicture = null;
         if (large)
         {
-            await using var original = storage.OpenRead(file.OriginalKey);
+            await using var original = OpenSource(file, LargeSize);
             largePicture = Resize(original, LargeSize, turnedTo, out var width, out var height);
             if (Math.Max(width, height) <= PreviewSize)
                 largePicture = null;
@@ -189,7 +239,7 @@ public class MediaProcessor(
         }
         else
         {
-            await using var original = storage.OpenRead(file.OriginalKey);
+            await using var original = OpenSource(file, PreviewSize);
             preview = Resize(original, PreviewSize, turnedTo, out previewWidth, out previewHeight);
         }
 
@@ -264,8 +314,14 @@ public class MediaProcessor(
 
         try
         {
-            await using (var original = storage.OpenRead(file.OriginalKey))
+            if (file.IsPdf)
             {
+                // The size of what poppler draws is set by us, whatever size the pages claim to have.
+                await RenderPagesAsync(file, cancellationToken);
+            }
+            else
+            {
+                await using var original = storage.OpenRead(file.OriginalKey);
                 // Only the header is read here; libvips decodes pixels when they are needed.
                 using var header = Image.NewFromStream(original, access: Enums.Access.Sequential);
                 if ((long)header.Width * header.Height > options.Value.MaxPreviewMegapixels * 1_000_000L)

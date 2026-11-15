@@ -29,7 +29,7 @@ public class ArchiveExporter(
     ILogger<ArchiveExporter> logger)
 {
     public const string Format = "commonage-export";
-    public const int Version = 5;
+    public const int Version = 6;
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -243,7 +243,7 @@ public class ArchiveExporter(
     }
 
     private static ExportFile Describe(MediaFile file, string? path, string? problem) =>
-        new(file.Id, path, file.OriginalFileName, file.ContentType, file.SizeBytes, file.Sha256, file.UploadedAt, file.AltText, file.Caption, file.Position, file.Rotation, problem);
+        new(file.Id, path, file.OriginalFileName, file.ContentType, file.SizeBytes, file.Sha256, file.UploadedAt, file.AltText, file.Caption, file.Position, file.Rotation, file.PageCount, problem);
 
     private static ExportItem Describe(ArchiveItem item, List<ExportFile> files, IEnumerable<VisitorNote>? notes, ExportOptions options) => new(
         item.Id,
@@ -464,6 +464,7 @@ internal record ExportFile(
     string? Caption,
     int Position,
     int Rotation,
+    int? PageCount,
     string? Problem);
 
 internal static class ItemsCsv

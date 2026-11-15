@@ -22,6 +22,12 @@ public static partial class TestData
 
     public static string Unique(string text) => $"{text} {Guid.NewGuid():N}";
 
+    /// <summary>
+    /// A word nothing else contains, for searching. It has no digits: the search reads a number such as 1599 inside a word as a
+    /// year and finds dated items by it, which made tests that look for "no results" fail now and then.
+    /// </summary>
+    public static string UniqueWord(string prefix) => prefix + string.Concat(Guid.NewGuid().ToString("N").Select(c => char.IsDigit(c) ? (char)('g' + c - '0') : c));
+
     /// <summary>The app with a database of its own, for tests of what applies to a whole archive, such as its settings.</summary>
     public static async Task<WebApplicationFactory<Program>> NewArchiveAsync(this CommonageAppFactory app, Action<IWebHostBuilder>? configure = null)
     {

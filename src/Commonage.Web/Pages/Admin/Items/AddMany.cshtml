@@ -62,12 +62,12 @@ else
         <div class="mb-3">
             <label for="photo-upload" class="form-label">@T["Photos"]</label>
             @* With no asp-for, so the browser's own check does not come in the way of the message below. *@
-            <input id="photo-upload" type="file" name="files" accept="@Commonage.Web.Media.ImageFormats.AcceptAttribute" multiple class="form-control" aria-describedby="many-help"
+            <input id="photo-upload" type="file" name="files" accept="@Commonage.Web.Media.ImageFormats.AcceptWithDocumentsAttribute" multiple class="form-control" aria-describedby="many-help"
                    data-val="true" data-val-required="@T["Please choose at least one photo."]"
                    data-choose-text="@T["Choose photos"]" data-none-text="@T["No photos chosen"]" data-count-text="@T["Photos chosen: {0}"]" />
             <span data-valmsg-for="files" data-valmsg-replace="true" class="text-danger d-block"></span>
             <div id="many-help" class="form-text">
-                @T["JPEG, PNG, TIFF, WebP, AVIF or GIF. The original file is kept unchanged and is only visible to curators."]
+                @T["JPEG, PNG, TIFF, WebP, AVIF, GIF or PDF. The original file is kept unchanged and is only visible to curators."]
                 <noscript>@T["Without JavaScript, all photos are sent together, and together they can be at most {0} GB. There is no progress to see, and the page waits until they have arrived.", Commonage.Web.Pages.Admin.Items.AddManyModel.MaxRequestBytes / 1024 / 1024 / 1024]</noscript>
             </div>
         </div>

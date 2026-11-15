@@ -20,6 +20,12 @@ public class UploadOptions
     public int MaxPreviewMegapixels { get; set; } = 250;
 
     /// <summary>Uploads are refused when less than this is free, because a full disk also stops the database.</summary>
+    /// <summary>Each call of poppler, the program that reads PDFs, is stopped after this long.</summary>
+    public int PdfTimeoutSeconds { get; set; } = 60;
+
+    /// <summary>The folder with <c>pdfinfo</c> and <c>pdftoppm</c>. Empty: they are looked for like any program.</summary>
+    public string? PdfToolsDirectory { get; set; }
+
     public int MinimumFreeMegabytes { get; set; } = 1024;
 
     /// <summary>Admins get a notice when less than this is free.</summary>
@@ -33,6 +39,7 @@ public enum UploadError
     TooLarge,
     UnsupportedFormat,
     Heic,
+    PdfUnavailable,
 }
 
 /// <summary>What a look at an uploaded file found. Its fingerprint is only there when the file is acceptable.</summary>
@@ -47,6 +54,7 @@ public static class UploadErrorMessages
     {
         UploadError.Empty => localizer["{0} is empty.", fileName],
         UploadError.TooLarge => localizer["{0} is too large.", fileName],
+        UploadError.PdfUnavailable => localizer["{0} is a PDF, and this archive was set up without the program that reads PDFs.", fileName],
         UploadError.Heic => localizer["{0} is in the HEIC format, which this archive cannot read yet. Please save it as a JPEG and choose it again.", fileName],
         _ => localizer["{0} is not a supported photo format. Please use JPEG, PNG, TIFF, WebP, AVIF or GIF.", fileName],
     };
@@ -57,35 +65,37 @@ public class MediaUploadService(
     CommonageDbContext db,
     IFileStorage storage,
     MediaProcessingQueue queue,
+    PdfTools pdf,
     IOptions<UploadOptions> options)
 {
     /// <summary>Checks a file without storing it, so a form can reject it before saving anything else.</summary>
     public async Task<UploadError> CheckAsync(IFormFile upload, CancellationToken cancellationToken = default)
     {
         await using var content = upload.OpenReadStream();
-        return (await DetectAsync(upload.Length, content, cancellationToken)).Error;
+        return (await DetectAsync(upload.Length, content, documents: false, cancellationToken)).Error;
     }
 
-    public async Task<UploadError> AddAsync(ArchiveItem item, IFormFile upload, CancellationToken cancellationToken = default)
+    public async Task<UploadError> AddAsync(ArchiveItem item, IFormFile upload, bool documents, CancellationToken cancellationToken = default)
     {
-        var examined = await ExamineAsync(upload, cancellationToken);
+        var examined = await ExamineAsync(upload, documents, cancellationToken);
         if (examined.Error == UploadError.None)
             await StoreAsync(item, upload, examined, cancellationToken);
         return examined.Error;
     }
 
     /// <summary>Checks a file and takes its fingerprint, to see whether the archive already has it before anything is stored.</summary>
-    public async Task<ExaminedUpload> ExamineAsync(IFormFile upload, CancellationToken cancellationToken = default)
+    public async Task<ExaminedUpload> ExamineAsync(IFormFile upload, bool documents, CancellationToken cancellationToken = default)
     {
         await using var content = upload.OpenReadStream();
-        return await ExamineAsync(content, upload.Length, cancellationToken);
+        return await ExamineAsync(content, upload.Length, documents, cancellationToken);
     }
 
     /// <summary>The same for a file that is not an upload, such as one from an import. The stream must be seekable.</summary>
-    public async Task<ExaminedUpload> ExamineAsync(Stream content, long length, CancellationToken cancellationToken = default)
+    public async Task<ExaminedUpload> ExamineAsync(Stream content, long length, bool documents, CancellationToken cancellationToken = default)
     {
         content.Position = 0;
-        var (error, contentType) = await DetectAsync(length, content, cancellationToken);
+        // <paramref name="documents"/> is true only for curators; a contribution link never gets PDFs, whatever else checks first.
+        var (error, contentType) = await DetectAsync(length, content, documents, cancellationToken);
         if (error != UploadError.None)
             return new ExaminedUpload(error);
 
@@ -138,11 +148,11 @@ public class MediaUploadService(
     {
         db.MediaFiles.Remove(file);
         await db.SaveChangesAsync(cancellationToken);
-        foreach (var key in new[] { file.OriginalKey, file.PreviewKey, file.ThumbnailKey, file.CardKey, file.LargeKey })
+        foreach (var key in file.StoredKeys())
             storage.Delete(key);
     }
 
-    private async Task<(UploadError Error, string? ContentType)> DetectAsync(long length, Stream content, CancellationToken cancellationToken)
+    private async Task<(UploadError Error, string? ContentType)> DetectAsync(long length, Stream content, bool documents, CancellationToken cancellationToken)
     {
         if (length == 0)
             return (UploadError.Empty, null);
@@ -154,6 +164,8 @@ public class MediaUploadService(
         var contentType = ImageFormats.DetectContentType(header.AsSpan(0, headerLength));
         if (contentType is not null)
             return (UploadError.None, contentType);
+        if (documents && ImageFormats.IsPdf(header.AsSpan(0, headerLength)))
+            return pdf.IsAvailable ? (UploadError.None, MediaFile.PdfContentType) : (UploadError.PdfUnavailable, null);
         return (ImageFormats.IsHeic(header.AsSpan(0, headerLength)) ? UploadError.Heic : UploadError.UnsupportedFormat, null);
     }
 
