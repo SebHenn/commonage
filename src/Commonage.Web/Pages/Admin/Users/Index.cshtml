@@ -15,20 +15,33 @@
     <table class="table align-middle">
         <thead>
             <tr>
+                <th scope="col">@T["Name"]</th>
                 <th scope="col">@T["Email address"]</th>
                 <th scope="col">@T["Role"]</th>
                 <th scope="col">@T["Status"]</th>
                 <th scope="col">@T["Authenticator app"]</th>
+                <th scope="col">@T["Last login"]</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var account in Model.Accounts)
             {
                 <tr>
+                    <td class="text-break">@account.DisplayName</td>
                     <td class="text-break"><a asp-page="Edit" asp-route-id="@account.Id">@account.Name</a></td>
                     <td>@(account.Role is null ? T["No role"] : T[account.Role])</td>
                     <td><partial name="_AccountState" model="account.State" /></td>
                     <td>@(account.TwoFactor ? T["Yes"] : T["No"])</td>
+                    <td class="text-nowrap">
+                        @if (account.LastLoginAt is { } lastLogin)
+                        {
+                            <time datetime="@lastLogin.ToString("O")">@Dates.Moment(lastLogin)</time>
+                        }
+                        else
+                        {
+                            @T["Never"]
+                        }
+                    </td>
                 </tr>
             }
         </tbody>

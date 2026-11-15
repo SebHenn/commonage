@@ -561,6 +561,23 @@ namespace Commonage.Web.Data.Migrations
                     b.ToTable("MediaFiles");
                 });
 
+            modelBuilder.Entity("Commonage.Web.Domain.StaffProfile", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("DisplayName")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime?>("LastLoginAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("StaffProfiles");
+                });
+
             modelBuilder.Entity("Commonage.Web.Domain.Tag", b =>
                 {
                     b.Property<int>("Id")
@@ -943,6 +960,15 @@ namespace Commonage.Web.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("ArchiveItem");
+                });
+
+            modelBuilder.Entity("Commonage.Web.Domain.StaffProfile", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                        .WithOne()
+                        .HasForeignKey("Commonage.Web.Domain.StaffProfile", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Commonage.Web.Domain.VisitorNote", b =>

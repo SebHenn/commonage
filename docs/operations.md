@@ -16,6 +16,10 @@ their own email, a message, or in person), and the person chooses their own pass
 and for seven days. If someone forgets their password, an admin creates a new setup link; earlier links stop
 working then.
 
+An account can have a display name, and Commonage remembers when it last logged in (table `StaffProfiles`). Both are shown to
+admins on the Accounts pages only, and are not part of the export, which holds no accounts. The activity log names the account
+by the email address it had when something was done, so it stays true after a rename or a deleted account.
+
 Disabling an account ends its logins within a minute. Admins cannot change, disable or delete their own account, so
 there is always at least one admin left. Everyone changes their own password under "Change password".
 

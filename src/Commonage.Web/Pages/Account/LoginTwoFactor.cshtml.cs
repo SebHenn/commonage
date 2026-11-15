@@ -15,6 +15,7 @@ public class LoginTwoFactorModel(
     SignInManager<IdentityUser> signIn,
     AuditLog audit,
     CommonageDbContext db,
+    TimeProvider clock,
     IStringLocalizer<SharedResource> localizer) : PageModel
 {
     [BindProperty]
@@ -53,6 +54,7 @@ public class LoginTwoFactorModel(
                 audit.RecordFor(user, AuditAction.RecoveryCodeUsed, user.Email);
                 await db.SaveChangesAsync();
             }
+            await StaffProfiles.RecordLoginAsync(db, clock, user.Id, HttpContext.RequestAborted);
             return LocalRedirect(Url.IsLocalUrl(returnUrl) ? returnUrl : "/Admin");
         }
 

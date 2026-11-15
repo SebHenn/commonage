@@ -107,6 +107,7 @@
   <data name="Changed the collection" xml:space="preserve"><value>Changed the collection</value></data>
   <data name="Changed the contribution link" xml:space="preserve"><value>Changed the contribution link</value></data>
   <data name="Changed the item" xml:space="preserve"><value>Changed the item</value></data>
+  <data name="Changed the name of an account" xml:space="preserve"><value>Changed the name of an account</value></data>
   <data name="Changed the order of the collections" xml:space="preserve"><value>Changed the order of the collections</value></data>
   <data name="Changed the order or direction of photos" xml:space="preserve"><value>Changed the order or direction of photos</value></data>
   <data name="Changed the tag" xml:space="preserve"><value>Changed the tag</value></data>
@@ -344,6 +345,7 @@
   <data name="Last backup: {0}" xml:space="preserve"><value>Last backup: {0}</value></data>
   <data name="Last changed" xml:space="preserve"><value>Last changed</value></data>
   <data name="Last database change" xml:space="preserve"><value>Last database change</value></data>
+  <data name="Last login" xml:space="preserve"><value>Last login</value></data>
   <data name="Later" xml:space="preserve"><value>Later</value></data>
   <data name="Later: {0}" xml:space="preserve"><value>Later: {0}</value></data>
   <data name="Leave this field empty" xml:space="preserve"><value>Leave this field empty</value></data>
@@ -406,6 +408,7 @@
   <data name="Names, places, events …" xml:space="preserve"><value>Names, places, events …</value></data>
   <data name="Needed for both buttons, so that nobody else can use a computer you left logged in." xml:space="preserve"><value>Needed for both buttons, so that nobody else can use a computer you left logged in.</value></data>
   <data name="Needs attention" xml:space="preserve"><value>Needs attention</value></data>
+  <data name="Never" xml:space="preserve"><value>Never</value></data>
   <data name="New account" xml:space="preserve"><value>New account</value></data>
   <data name="New collection" xml:space="preserve"><value>New collection</value></data>
   <data name="New contribution link" xml:space="preserve"><value>New contribution link</value></data>
@@ -605,6 +608,7 @@
   <data name="Save and next" xml:space="preserve"><value>Save and next</value></data>
   <data name="Save and publish" xml:space="preserve"><value>Save and publish</value></data>
   <data name="Save as draft" xml:space="preserve"><value>Save as draft</value></data>
+  <data name="Save name" xml:space="preserve"><value>Save name</value></data>
   <data name="Save password" xml:space="preserve"><value>Save password</value></data>
   <data name="Save role" xml:space="preserve"><value>Save role</value></data>
   <data name="Save these details" xml:space="preserve"><value>Save these details</value></data>
@@ -644,6 +648,7 @@
   <data name="Show everything" xml:space="preserve"><value>Show everything</value></data>
   <data name="Show my name with what I send in" xml:space="preserve"><value>Show my name with what I send in</value></data>
   <data name="Showing the newest {0}." xml:space="preserve"><value>Showing the newest {0}.</value></data>
+  <data name="Shown to admins on this page and in the list of accounts. Never to visitors." xml:space="preserve"><value>Shown to admins on this page and in the list of accounts. Never to visitors.</value></data>
   <data name="Six digits. Without your phone, type one of your recovery codes instead. Each one works once." xml:space="preserve"><value>Six digits. Without your phone, type one of your recovery codes instead. Each one works once.</value></data>
   <data name="Skip to content" xml:space="preserve"><value>Skip to content</value></data>
   <data name="Software" xml:space="preserve"><value>Software</value></data>

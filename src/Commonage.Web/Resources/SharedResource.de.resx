@@ -987,4 +987,9 @@
   <data name="Helper" xml:space="preserve"><value>Helferin/Helfer</value></data>
   <data name="Describes items and adds photos. Cannot publish, delete, review contributions or see contributors' details." xml:space="preserve"><value>Beschreibt Einträge und fügt Fotos hinzu. Kann nichts veröffentlichen oder löschen, keine Beiträge prüfen und keine Angaben zu Beitragenden sehen.</value></data>
   <data name="This reference number is already used by another item." xml:space="preserve"><value>Diese Signatur wird bereits von einem anderen Eintrag verwendet.</value></data>
+  <data name="Changed the name of an account" xml:space="preserve"><value>Name eines Kontos geändert</value></data>
+  <data name="Never" xml:space="preserve"><value>Nie</value></data>
+  <data name="Last login" xml:space="preserve"><value>Letzte Anmeldung</value></data>
+  <data name="Save name" xml:space="preserve"><value>Namen speichern</value></data>
+  <data name="Shown to admins on this page and in the list of accounts. Never to visitors." xml:space="preserve"><value>Wird Admins auf dieser Seite und in der Liste der Konten gezeigt, nie Besucherinnen und Besuchern.</value></data>
 </root>

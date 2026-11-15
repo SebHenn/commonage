@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Commonage.Web.Data;
 using Commonage.Web.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,7 @@ using Microsoft.Extensions.Localization;
 
 namespace Commonage.Web.Pages.Account;
 
-public class LoginModel(SignInManager<IdentityUser> signInManager, IStringLocalizer<SharedResource> localizer) : PageModel
+public class LoginModel(SignInManager<IdentityUser> signInManager, CommonageDbContext db, TimeProvider clock, IStringLocalizer<SharedResource> localizer) : PageModel
 {
     [BindProperty]
     public InputModel Input { get; set; } = new();
@@ -35,7 +36,11 @@ public class LoginModel(SignInManager<IdentityUser> signInManager, IStringLocali
 
         var result = await signInManager.PasswordSignInAsync(Input.Email, Input.Password, isPersistent: false, lockoutOnFailure: true);
         if (result.Succeeded)
+        {
+            if (await signInManager.UserManager.FindByNameAsync(Input.Email) is { } account)
+                await StaffProfiles.RecordLoginAsync(db, clock, account.Id, HttpContext.RequestAborted);
             return LocalRedirect(Url.IsLocalUrl(returnUrl) ? returnUrl : "/Admin");
+        }
         if (result.RequiresTwoFactor)
             return RedirectToPage("LoginTwoFactor", new { returnUrl = Url.IsLocalUrl(returnUrl) ? returnUrl : null });
 
