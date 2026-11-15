@@ -52,7 +52,7 @@ public class PdfTests(CommonageAppFactory app)
         };
         for (var page = 1; page <= pages; page++)
         {
-            var content = $"BT /F1 24 Tf 50 700 Td (Page {page} {word}) Tj ET";
+            var content = $"BT /F1 10 Tf 50 700 Td (Page {page} {word}) Tj ET";
             objects.Add($"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents {5 + (page - 1) * 2} 0 R >>");
             objects.Add($"<< /Length {content.Length} >>\nstream\n{content}\nendstream");
         }
