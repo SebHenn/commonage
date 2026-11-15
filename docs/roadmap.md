@@ -471,10 +471,14 @@ shows the years of its published items. M19 is complete.
 
 **M22 Release and ARM**
 
-- Release v0.5.0 with `/release`, after the changelog is checked against M19 to M21. The notes say the export is version 5 and
+- Released v0.5.0 with `/release`, after the changelog is checked against M19 to M21. The notes say the export is version 5 and
   that nothing needs regenerating.
 - `scale-arm.yml` runs the benchmark by hand on GitHub's ARM runner. It is not a required check. A hosted runner is not a small
-  home server, and the numbers are recorded as that. **Not run yet.**
+  home server, and the numbers are recorded as that. **Run on that runner, 50,000 items:** seeding 4.7 s; public pages
+  0.05-0.5 s (start page 0.4-0.5 s, `/places` 0.4 s, tag filter 0.35 s, search 0.1-0.25 s, deep pages 0.2 s); curator pages
+  40-110 ms; the export 8.2 s into a 3 MB ZIP, with memory use growing by up to 104 MB (20-40 MB on the PC). So ARM works and
+  stays fast, and the export's memory is higher than the PC figure suggested but still far from filling a small server. Not
+  tested on a real Raspberry Pi.
 - Weblate (open since M17) is set up once the maintainer's application is through.
 
 **M23 Documents**
