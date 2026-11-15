@@ -14,6 +14,7 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options)
     public DbSet<ArchiveItem> ArchiveItems => Set<ArchiveItem>();
     public DbSet<MediaFile> MediaFiles => Set<MediaFile>();
     public DbSet<ItemFileText> ItemFileTexts => Set<ItemFileText>();
+    public DbSet<StaffProfile> StaffProfiles => Set<StaffProfile>();
     public DbSet<Tag> Tags => Set<Tag>();
     public DbSet<ContributionLink> ContributionLinks => Set<ContributionLink>();
     public DbSet<Contribution> Contributions => Set<Contribution>();
@@ -130,6 +131,13 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options)
             note.HasOne(n => n.ArchiveItem)
                 .WithMany()
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<StaffProfile>(profile =>
+        {
+            profile.HasKey(p => p.UserId);
+            profile.Property(p => p.DisplayName).HasMaxLength(StaffProfile.DisplayNameMaxLength);
+            profile.HasOne<IdentityUser>().WithOne().HasForeignKey<StaffProfile>(p => p.UserId).OnDelete(DeleteBehavior.Cascade);
         });
 
         builder.Entity<ItemFileText>(text =>

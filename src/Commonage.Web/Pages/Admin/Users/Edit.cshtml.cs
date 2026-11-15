@@ -26,6 +26,7 @@ public class EditModel(
     public IdentityUser? Account { get; private set; }
     public AccountState State { get; private set; }
     public bool IsOwnAccount { get; private set; }
+    public DateTime? LastLoginAt { get; private set; }
 
     /// <summary>Shown once, right after it was created. It is never stored by the app.</summary>
     public string? SetupLink { get; private set; }
@@ -37,6 +38,10 @@ public class EditModel(
         [StringLength(256, ErrorMessage = "The email address can be at most {1} characters long.")]
         [Display(Name = "Email address")]
         public string Email { get; set; } = "";
+
+        [StringLength(StaffProfile.DisplayNameMaxLength, ErrorMessage = "The name can be at most {1} characters long.")]
+        [Display(Name = "Name")]
+        public string? DisplayName { get; set; }
 
         [Display(Name = "Role")]
         public string Role { get; set; } = Roles.Curator;
@@ -51,6 +56,7 @@ public class EditModel(
             return NotFound();
         Input.Email = account.Email ?? "";
         Input.Role = await RoleOfAsync(account);
+        Input.DisplayName = (await db.StaffProfiles.FindAsync(id))?.DisplayName;
         return Page();
     }
 
@@ -72,6 +78,7 @@ public class EditModel(
         }
 
         await users.AddToRoleAsync(account, Input.Role);
+        await StaffProfiles.SetDisplayNameAsync(db, account.Id, Input.DisplayName);
         audit.Record(AuditAction.AccountCreated, $"{email} ({Input.Role})");
         await db.SaveChangesAsync();
         return await ShowSetupLinkAsync(account);
@@ -90,6 +97,31 @@ public class EditModel(
             await users.RemoveFromRolesAsync(account, current);
             await users.AddToRoleAsync(account, Input.Role);
             audit.Record(AuditAction.AccountRoleChanged, $"{account.Email} ({Input.Role})");
+            await db.SaveChangesAsync();
+        }
+
+        TempData["Message"] = localizer["Your changes are saved."].Value;
+        return RedirectToPage(new { id });
+    }
+
+    /// <summary>The name to show. An admin may set their own too, unlike the role.</summary>
+    public async Task<IActionResult> OnPostNameAsync(string id)
+    {
+        if (await LoadForChangeAsync(id) is not { } account)
+            return NotFound();
+        Input.DisplayName = Input.DisplayName?.Trim();
+        if (Input.DisplayName is { Length: > StaffProfile.DisplayNameMaxLength })
+        {
+            ModelState.AddModelError("Input.DisplayName",
+                localizer["The name can be at most {1} characters long.", "", StaffProfile.DisplayNameMaxLength]);
+            Input.Email = account.Email ?? "";
+            Input.Role = await RoleOfAsync(account);
+            return Page();
+        }
+
+        if (await StaffProfiles.SetDisplayNameAsync(db, account.Id, Input.DisplayName))
+        {
+            audit.Record(AuditAction.AccountNameChanged, account.Email);
             await db.SaveChangesAsync();
         }
 
@@ -181,6 +213,7 @@ public class EditModel(
         await LoadAsync(account.Id);
         Input.Email = account.Email ?? "";
         Input.Role = await RoleOfAsync(account);
+        Input.DisplayName = (await db.StaffProfiles.FindAsync(account.Id))?.DisplayName;
         // Shown on this response only, so the link is not kept in the browser's history or in a cookie.
         Response.Headers.CacheControl = "no-store";
         return Page();
@@ -192,6 +225,7 @@ public class EditModel(
         if (Account is not null)
         {
             State = AccountStates.Of(Account);
+            LastLoginAt = (await db.StaffProfiles.FindAsync(id))?.LastLoginAt;
             IsOwnAccount = Account.Id == users.GetUserId(User);
         }
         return Account;

@@ -52,6 +52,7 @@ public static class AuditText
         AuditAction.ContributionLinkChanged => localizer["Changed the contribution link"],
         AuditAction.AccountCreated => localizer["Created the account"],
         AuditAction.AccountRoleChanged => localizer["Changed the account's role"],
+        AuditAction.AccountNameChanged => localizer["Changed the name of an account"],
         AuditAction.AccountDisabled => localizer["Disabled the account"],
         AuditAction.AccountEnabled => localizer["Enabled the account"],
         AuditAction.AccountDeleted => localizer["Deleted the account"],
@@ -93,7 +94,7 @@ public static class AuditText
         AuditAction.CollectionCreated or AuditAction.CollectionChanged or AuditAction.CollectionMoved
             or AuditAction.CollectionDeleted => AuditKind.Collections,
         AuditAction.TagChanged or AuditAction.TagsMerged or AuditAction.TagDeleted or AuditAction.UnusedTagsDeleted => AuditKind.Tags,
-        AuditAction.AccountCreated or AuditAction.AccountRoleChanged or AuditAction.AccountDisabled or AuditAction.AccountEnabled
+        AuditAction.AccountCreated or AuditAction.AccountRoleChanged or AuditAction.AccountNameChanged or AuditAction.AccountDisabled or AuditAction.AccountEnabled
             or AuditAction.AccountDeleted or AuditAction.SetupLinkCreated or AuditAction.PasswordChanged
             or AuditAction.TwoFactorEnabled or AuditAction.TwoFactorDisabled or AuditAction.TwoFactorTurnedOff
             or AuditAction.RecoveryCodesCreated or AuditAction.RecoveryCodeUsed => AuditKind.Accounts,

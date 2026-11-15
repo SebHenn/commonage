@@ -171,4 +171,36 @@ public class AccountTests(CommonageAppFactory app)
         Assert.DoesNotContain(email, half);
         Assert.Contains("This link is no longer valid", half);
     }
+
+    [Fact]
+    public async Task An_account_shows_its_name_and_last_login_to_admins_and_the_activity_log_keeps_the_email()
+    {
+        using var admin = app.CreateClient();
+        await Browser.LogInAsCuratorAsync(admin);
+        var (curator, id, email, password) = await app.CreateAccountAsync(admin);
+        curator.Dispose();
+        var name = $"Volunteer {Guid.NewGuid():N}";
+
+        await Browser.PostFormAsync(admin, $"/Admin/Users/Edit/{id}?handler=Name", new() { ["Input.DisplayName"] = name }, pageUrl: $"/Admin/Users/Edit/{id}");
+        var list = await admin.GetStringAsync("/Admin/Users");
+        var log = await admin.GetStringAsync("/Admin/Activity");
+        var profile = await app.WithDbAsync(db => db.StaffProfiles.SingleAsync(p => p.UserId == id));
+
+        Assert.Contains(name, list);
+        Assert.Contains(email, log);
+        Assert.DoesNotContain(name, log);
+        Assert.Contains("Changed the name of an account", log);
+        // Creating the account logged it in once.
+        Assert.NotNull(profile.LastLoginAt);
+        using var wrong = app.CreateClient();
+        await Browser.SendFormAsync(wrong, "/Account/Login", new() { ["Input.Email"] = email, ["Input.Password"] = "Wrong-password-1" });
+        Assert.Equal(profile.LastLoginAt, (await app.WithDbAsync(db => db.StaffProfiles.SingleAsync(p => p.UserId == id))).LastLoginAt);
+        using var again = app.CreateClient();
+        await Browser.LogInAsync(again, email, password);
+        Assert.True((await app.WithDbAsync(db => db.StaffProfiles.SingleAsync(p => p.UserId == id))).LastLoginAt > profile.LastLoginAt);
+        // Visitors and curators never see it.
+        using var visitor = app.CreateClient();
+        Assert.DoesNotContain(name, await visitor.GetStringAsync("/"));
+        Assert.Equal(HttpStatusCode.Forbidden, (await again.GetAsync("/Admin/Users")).StatusCode);
+    }
 }

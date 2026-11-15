@@ -52,7 +52,7 @@ public class PdfTests(CommonageAppFactory app)
         };
         for (var page = 1; page <= pages; page++)
         {
-            var content = $"BT /F1 24 Tf 50 700 Td (Page {page} {word}) Tj ET";
+            var content = $"BT /F1 10 Tf 50 700 Td (Page {page} {word}) Tj ET";
             objects.Add($"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents {5 + (page - 1) * 2} 0 R >>");
             objects.Add($"<< /Length {content.Length} >>\nstream\n{content}\nendstream");
         }
@@ -198,7 +198,17 @@ public class PdfTests(CommonageAppFactory app)
             if (!found.Contains("Items found: 1"))
                 await Task.Delay(100);
         }
-        Assert.Contains("Items found: 1", found);
+        if (!found.Contains("Items found: 1"))
+        {
+            // Shown only on a failure: what the database holds, so that a failure on a machine that is not this one can be understood.
+            var state = await app.WithDbAsync(async db =>
+            {
+                var stored = await db.MediaFiles.IgnoreQueryFilters().AsNoTracking().SingleAsync(f => f.Id == file.Id);
+                var row = await db.ItemFileTexts.IgnoreQueryFilters().AsNoTracking().FirstOrDefaultAsync(t => t.ArchiveItemId == item.Id);
+                return $"status {stored.Status}, error '{stored.ProcessingError}', extracted '{stored.ExtractedText}', index row '{row?.Text}', word '{word}'";
+            });
+            Assert.Fail("The text was not found. " + state);
+        }
         var itemPage = await visitor.GetStringAsync($"/items/{item.Id}");
         Assert.Contains($"/media/{file.Id}/page/3", itemPage);
         Assert.Contains("Page 2 of 3", itemPage);

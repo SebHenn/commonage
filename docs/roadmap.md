@@ -503,7 +503,8 @@ shows the years of its published items. M19 is complete.
 
 **M24 Helpers and accounts**
 
-- Part 1 is done: the `Helper` role. Display names and a last login are still to do.
+- Part 1 is done: the `Helper` role. Part 2: `StaffProfiles` (display name, last login), shown to admins only; the activity log
+  keeps the email address as at the time, so it stays true after a rename.
 - A `Helper` role: describes and uploads. Publishing, the bin, contributors, notes, export and settings stay with curators,
   and contributors' names and email addresses are not shown. `EndpointAccessTests` checks every role against every admin
   address. Display names and a last login for accounts.

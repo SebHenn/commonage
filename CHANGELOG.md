@@ -19,6 +19,8 @@ version may change things that need attention when updating, and these notes say
 
 ### For people running an archive
 
+- Accounts have a **name** (optional, set by an admin) and show when the person last logged in. Both are visible to admins
+  only, on the Accounts pages. The activity log still names the account by its email address as it was at the time.
 - A new account type, **Helper**, for volunteers: they describe items and add photos, but cannot publish, unpublish, delete,
   open contributions that are still to be reviewed, or see who contributed something. Admins choose the type under
   Accounts. The handbook has a section on a scanning evening with helpers.

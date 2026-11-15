@@ -31,6 +31,32 @@
         </div>
     }
 
+    @if (Model.Account is not null)
+    {
+        <dl>
+            <dt>@T["Last login"]</dt>
+            <dd>
+                @if (Model.LastLoginAt is { } lastLogin)
+                {
+                    <time datetime="@lastLogin.ToString("O")">@Dates.Moment(lastLogin)</time>
+                }
+                else
+                {
+                    @T["Never"]
+                }
+            </dd>
+        </dl>
+        <form method="post" asp-page-handler="Name" asp-route-id="@Model.Account.Id" class="mb-4">
+            <div class="mb-3">
+                <label asp-for="Input.DisplayName" class="form-label"></label>
+                <input asp-for="Input.DisplayName" class="form-control" autocomplete="off" aria-describedby="name-help" />
+                <div id="name-help" class="form-text">@T["Shown to admins on this page and in the list of accounts. Never to visitors."]</div>
+                <span asp-validation-for="Input.DisplayName" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">@T["Save name"]</button>
+        </form>
+    }
+
     @if (Model.Account is null)
     {
         <p>@T["The new account gets a setup link instead of a password. Commonage sends no emails, so you pass the link on yourself."]</p>
@@ -40,6 +66,11 @@
                 <label asp-for="Input.Email" class="form-label"></label>
                 <input asp-for="Input.Email" class="form-control" autocomplete="off" />
                 <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.DisplayName" class="form-label"></label>
+                <input asp-for="Input.DisplayName" class="form-control" autocomplete="off" />
+                <span asp-validation-for="Input.DisplayName" class="text-danger"></span>
             </div>
             <partial name="_RoleChoice" model="Model.Input.Role" />
             <button type="submit" class="btn btn-primary">@T["Create account"]</button>
