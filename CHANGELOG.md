@@ -3,6 +3,13 @@
 All notable changes to Commonage. Versions follow [Semantic Versioning](https://semver.org/); before 1.0, a minor
 version may change things that need attention when updating, and these notes say so.
 
+## Unreleased
+
+### For curators
+
+- AVIF and GIF photos can be uploaded, also through contribution links and as the logo. A GIF becomes one still picture:
+  the first frame. The original file is kept as it was sent.
+
 ## 0.5.0 (2026-11-14)
 
 ### For people running an archive

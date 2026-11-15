@@ -204,7 +204,7 @@
                    data-choose-text="@T["Choose photos"]" data-none-text="@T["No photos chosen"]" data-count-text="@T["Photos chosen: {0}"]"
                    data-max-total-bytes="@Commonage.Web.Pages.Admin.Items.EditModel.MaxUploadRequestBytes" data-too-much-text="@T["These photos are too much to send with the form. Save the item first, then add them: they are sent one at a time there."]" />
             <span data-valmsg-for="files" data-valmsg-replace="true" class="text-danger d-block"></span>
-            <div id="files-help" class="form-text">@T["JPEG, PNG, TIFF or WebP. The original file is kept unchanged and is only visible to curators."] <a asp-page="/Admin/Items/AddMany" asp-route-collectionId="@Model.Input.CollectionId">@T["Each photo its own item? Add many photos at once."]</a></div>
+            <div id="files-help" class="form-text">@T["JPEG, PNG, TIFF, WebP, AVIF or GIF. The original file is kept unchanged and is only visible to curators."] <a asp-page="/Admin/Items/AddMany" asp-route-collectionId="@Model.Input.CollectionId">@T["Each photo its own item? Add many photos at once."]</a></div>
         </div>
     }
     <div class="mb-3">

@@ -64,9 +64,34 @@ public class MediaTests(CommonageAppFactory app)
         Assert.False(await db.MediaFiles.AnyAsync(f => f.ArchiveItemId == item.Id));
     }
 
-    private async Task<int> UploadAndWaitForPreviewAsync(HttpClient curator, int itemId)
+    [Theory]
+    [InlineData("gif")]
+    [InlineData("avif")]
+    public async Task Gif_and_avif_photos_are_accepted_and_get_a_still_preview(string format)
     {
-        await Browser.UploadAsync(curator, $"/Admin/Items/Edit/{itemId}", "Upload", "mill.jpg", PhotoWithGps);
+        using var curator = app.CreateClient();
+        await Browser.LogInAsCuratorAsync(curator);
+        var item = await CreateItemAsync(ItemStatus.Published);
+        using var image = NetVips.Image.Black(64, 48) + 120;
+        var bytes = format == "gif"
+            ? image.GifsaveBuffer()
+            : image.HeifsaveBuffer(compression: NetVips.Enums.ForeignHeifCompression.Av1);
+
+        var mediaFileId = await UploadAndWaitForPreviewAsync(curator, item.Id, $"mill.{format}", bytes);
+
+        var preview = await curator.GetByteArrayAsync($"/media/{mediaFileId}/preview");
+        using var previewImage = NetVips.Image.NewFromBuffer(preview);
+        Assert.Equal(64, previewImage.Width);
+        Assert.DoesNotContain(previewImage.GetFields(), field => field.StartsWith("exif", StringComparison.Ordinal));
+        Assert.Equal(bytes, await curator.GetByteArrayAsync($"/admin/media/{mediaFileId}/original"));
+    }
+
+    private Task<int> UploadAndWaitForPreviewAsync(HttpClient curator, int itemId) =>
+        UploadAndWaitForPreviewAsync(curator, itemId, "mill.jpg", PhotoWithGps);
+
+    private async Task<int> UploadAndWaitForPreviewAsync(HttpClient curator, int itemId, string fileName, byte[] content)
+    {
+        await Browser.UploadAsync(curator, $"/Admin/Items/Edit/{itemId}", "Upload", fileName, content);
 
         var deadline = DateTime.UtcNow.AddSeconds(30);
         while (true)

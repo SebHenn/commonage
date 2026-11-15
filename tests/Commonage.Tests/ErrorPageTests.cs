@@ -25,15 +25,18 @@ public class ErrorPageTests(CommonageAppFactory app)
         Assert.Contains("Seite nicht gefunden", await germanResponse.Content.ReadAsStringAsync());
     }
 
-    [Fact]
-    public async Task Images_with_more_pixels_than_the_limit_get_no_preview()
+    [Theory]
+    [InlineData("jpg")]
+    [InlineData("gif")]
+    [InlineData("avif")]
+    public async Task Images_with_more_pixels_than_the_limit_get_no_preview(string format)
     {
         await using var strictServer = app.WithWebHostBuilder(b => b.UseSetting("Uploads:MaxPreviewMegapixels", "0"));
         using var curator = strictServer.CreateClient();
         await Browser.LogInAsCuratorAsync(curator);
         var item = await app.CreateContributionAsync(ItemStatus.Submitted);
 
-        await Browser.UploadAsync(curator, $"/Admin/Items/Edit/{item.Id}", "Upload", "huge.jpg", TestData.Photo);
+        await Browser.UploadAsync(curator, $"/Admin/Items/Edit/{item.Id}", "Upload", "huge." + format, PhotoAs(format));
 
         var deadline = DateTime.UtcNow.AddSeconds(30);
         MediaFile file;
@@ -46,5 +49,16 @@ public class ErrorPageTests(CommonageAppFactory app)
         }
         Assert.Equal(ProcessingStatus.Failed, file.Status);
         Assert.Contains("megapixels", file.ProcessingError);
+    }
+
+    private static byte[] PhotoAs(string format)
+    {
+        using var image = NetVips.Image.NewFromBuffer(TestData.Photo);
+        return format switch
+        {
+            "gif" => image.GifsaveBuffer(),
+            "avif" => image.HeifsaveBuffer(compression: NetVips.Enums.ForeignHeifCompression.Av1),
+            _ => TestData.Photo,
+        };
     }
 }

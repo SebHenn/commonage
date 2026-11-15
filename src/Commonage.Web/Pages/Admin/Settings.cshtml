@@ -36,7 +36,7 @@
             <input id="Logo" type="file" name="Logo" accept="@Commonage.Web.Media.ImageFormats.AcceptAttribute" class="form-control" aria-describedby="logo-help"
                    data-choose-text="@T["Choose a logo"]" data-none-text="@T["No file chosen"]" />
             <span data-valmsg-for="Logo" data-valmsg-replace="true" class="text-danger">@(ViewData.ModelState["Logo"]?.Errors.FirstOrDefault()?.ErrorMessage)</span>
-            <div id="logo-help" class="form-text">@T["JPEG, PNG, TIFF or WebP, at most {0} MB. It is also used as the browser tab's icon.", Commonage.Web.Operations.LogoImages.MaxBytes / 1024 / 1024]</div>
+            <div id="logo-help" class="form-text">@T["JPEG, PNG, TIFF, WebP, AVIF or GIF, at most {0} MB. It is also used as the browser tab's icon.", Commonage.Web.Operations.LogoImages.MaxBytes / 1024 / 1024]</div>
             @if (Model.CurrentLogoId is not null)
             {
                 <div class="form-check mt-2">
