@@ -1,7 +1,7 @@
 # Plan for M27: visibility levels
 
-Status: **plan, no code yet.** It needs the user's answers to the questions at the end, then an adversarial review
-of this plan by the `privacy-reviewer` agent, before part 1 starts. M27 changes the rule every public page rests on
+Status: **plan, no code yet.** The four questions are answered (see "Decisions"), and the adversarial review of this plan by the
+`privacy-reviewer` agent is done and folded in (see "Changes after the review"). Part 1 can start. M27 changes the rule every public page rests on
 ("only published items are public"), so the order is: plan, review of the plan, then code in small parts, each reviewed.
 
 ## What is wanted
@@ -16,7 +16,7 @@ Not planned: members-only (visitor accounts are not planned; it waits for a grou
 ## The rule, stated once
 
 An item is **visible** when `Status == Published`, it is not in the bin (query filter, as now) and
-`PublicFrom` is empty or today (UTC) or earlier.
+`PublicFrom` is empty or today (in the archive's time zone, see below) or earlier.
 Its **media are visible** when the item is visible and `MediaLevel == Everything`.
 
 Two queries in `Data/` (the only place that may write `ItemStatus.Published` in a query):
@@ -35,15 +35,15 @@ On `ArchiveItem`:
 | Column | Type | Meaning |
 |---|---|---|
 | `MediaLevel` | enum, default `Everything` | `Everything` or `RecordOnly`. Stored as a number, named in code. |
-| `PublicFrom` | `DateOnly?` | Null = no embargo. Public from the start of that day, UTC. |
+| `PublicFrom` | `DateOnly?` | Null = no embargo. Public from the start of that day in the archive's time zone (`ArchiveSettings.TimeZone`, as `Dates.Zone`). |
 
 Migration with defaults that change nothing for existing items. Export: both fields are exported in the full export,
 `ArchiveExporter.Version` goes up, `docs/operations.md` says so. In the **published-only** export an embargoed item is
 left out and a record-only item has no media files and no photo list (the export test names both). `Unpublish`
 keeps the embargo date; `Publish` of a draft never sets one by itself.
 
-Why a date and not a time: a curator thinks "from the first of March". The time zone of a small group's server is
-not known, so UTC is documented rather than guessed.
+Why a date and not a time: a curator thinks "from the first of March". The archive already has a configured time zone, so the
+day is that zone's day, the same one every other date on the pages uses.
 
 Why two fields and not one status: "published" stays the curator's yes/no; an embargo is a date on a yes; record-only
 is a property of what is shown. Each can change without the others.
@@ -117,10 +117,14 @@ for up to ten minutes. This is the existing, documented limit for unpublishing; 
   visibility because curators need the same entities, so the discipline is the query and the test.
 - **Search reveals more than the page shows** (PDF text, the recording's transcript). Called out above.
 - **Time**: an embargo is evaluated at request time; anything cached longer than a request (feeds, `max-age`) can show an
-  item late or hide it late. Feeds and pages are not cached by the app; the media ten minutes only matter for the hiding direction.
+  item late or hide it late. Feeds and the sitemap are sent with `max-age=600` too, so an item that becomes record-only or embargoed can stay in a shared cache for ten minutes; `security.md` says so.
 - **Curator error**: record-only is easy to forget. The badge and the preview banner exist for this.
 
-## Questions for the user
+## Decisions
+(Recommendations taken by the user.) Embargo hides the whole item; a date, not a time; a record-only recording keeps its
+transcript (the handbook says so); contributors cannot ask for record-only. Where the review changed a detail, below wins.
+
+## Questions asked (kept for the record)
 
 1. **Embargo hides the whole item** (recommended: as hidden as a draft until the day) or only its media (the record is
    public, the media appear on the day)? The second is "record only until a date" and could be one combined field; the first
@@ -131,3 +135,23 @@ for up to ten minutes. This is the existing, documented limit for unpublishing; 
    until the transcript flag is used? Recommended: accept, and say it in the handbook.
 4. **Contribution links**: may a contributor ask for "record only" when sending (a "please do not show my photo" choice)?
    Recommended: no, not in M27; curators set it, and the contributor's consent text is not changed.
+
+## Changes after the review
+
+Gaps found by an adversarial read of the source, all adopted:
+
+1. **`/collections/{id}`** names a collection by id even with no visible item. It returns 404 when it has none (table and matrix).
+2. **The search page's collection list** shows only collections with a visible item.
+3. **PDF text exclusion** is a flag on `ItemFilter` set by public callers only, so `Pages/Admin` keeps searching PDFs. It covers both the text clause and the date clause. The matrix has a PDF word and a date that only a PDF contains.
+4. **Expressions, not extension methods.** `ItemSummary.FromItem` and `ToCards` are expressions over navigations (`c.Items`, `i.MediaFiles`), so part 1 adds shared `Expression<Func<...>>` definitions for "visible on this day" and "media visible on this day", both taking the day as a parameter (which `ToCards`, `LoadCollectionCards` and Collections/Details do not have yet). `db.VisibleItems`/`VisibleMedia` are built from them. A record-only item has no thumbnail in `FromItem`, so no card links to `/media/{id}/thumbnail`. A collection card with no visible cover uses the existing no-cover look.
+5. **Item page, link preview and feed** filter the media in the query, not in the view: a record-only item loads no files at all.
+6. **Captions and alt text** are text about the media and are hidden with it. The description and the transcript stay (decision 3). Matrix marker in a caption.
+7. **Curator preview** shows the media of a record-only item, with a banner naming the level ("Preview. Visitors see the record only.", "Preview. Public from {date}."); the old "This item is public" line is only for an item that is. The collection cover picker warns for a record-only or embargoed item, like it does for an unpublished one.
+8. **Time zone**: the archive's, not UTC (the form, badge and preview show the date as the curator entered it).
+9. **Ordering and "recent"**: an effective public date, `max(PublishedAt, PublicFrom)`, orders the start page, search "recently added" and the feed and is the feed's `published`, so an embargoed item surfaces when it opens.
+10. **Caching** corrected above.
+11. **Guard test** has an explicit allowlist (the media endpoints and processing use `IgnoreQueryFilters` on purpose, the contribute page for contributions, the exporter's full export for `ArchiveItems`) and forbids the navigation routes too (`.Items`, `.MediaFiles`, `db.MediaFiles`, `db.Collections`, `db.Tags`) in public code outside `Data/`. It is a tripwire: the matrix is what proves behaviour.
+12. **Matrix coverage** is a list of item-related addresses kept in the test, plus an explicit list of addresses that are not about items (`/Account/*`, `/branding/*`, `/health`, `/date-check`, `/contribute/{token}`); `EndpointAccessTests`' list must be covered by the two.
+13. **Media test**: `/media/*` returns 404 for hidden media to everyone; the staff path is `/admin/media/*`. A helper sees only drafts today, so an embargoed published item's media is not theirs either; that stays, and a test says it.
+14. **Published-only export** drops the media rows, the photo list, exported covers and a collection's cover that points at a record-only file; embargoed items are out. File text stays out of the export, as now, and the test names the decision.
+15. **More matrix cases**: a tag only on hidden items (tag index, popular tags, tag kinds, suggestions); a collection of only hidden items (page, list, sitemap); a cover that is a hidden file; decade counts and year spans; next/previous and "from the same time" with an embargoed neighbour; POST to `Tell` on an embargoed item; the day `PublicFrom == today`; an item moved between collections; unpublish and publish again after the embargo.
