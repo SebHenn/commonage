@@ -182,7 +182,7 @@ real pace over M7 and M8 before promising dates. Each milestone is a minor relea
 | **M24 Helpers and accounts** | 3 | A helper describes and uploads but cannot publish, delete or see contributors' email addresses. Accounts have display names and a last login. |
 | **M25 Oral histories** | 4 | A curator uploads an interview. Visitors play it with its transcript beside it, and the file carries no metadata. |
 | **M26 Description history** | 3 | A curator sees who changed which field and when, and restores an earlier description. |
-| **M27 Visibility levels** | 5 | An item can be public as a record without its media, or embargoed until a date. Every public query goes through `VisibleItems`. |
+| **M27 Visibility levels** ✅ | 5 | An item can be public as a record without its media, or embargoed until a date. Every public query goes through `VisibleItems`. |
 | **M28 Toward 1.0** | 3 | Commonage reads its own export, so archives can be merged. Dublin Core and a JSON alternate exist. A 1.0 checklist is met. |
 
 M22 to M28 were planned in November 2026, after M21, from the "Later" list. There are still no reports from groups or
@@ -529,7 +529,7 @@ shows the years of its published items. M19 is complete.
   documents a local whisper.cpp workflow, as "Not planned" promises.
 
 **M26 Description history** | 3 | A curator sees who changed which field and when, and restores an earlier description. |
-| **M27 Visibility levels** | 5 | An item can be public as a record without its media, or embargoed until a date. Every public query goes through `VisibleItems`. |
+| **M27 Visibility levels** ✅ | 5 | An item can be public as a record without its media, or embargoed until a date. Every public query goes through `VisibleItems`. |
 | **M28 Toward 1.0** | 3 | Commonage reads its own export, so archives can be merged. Dublin Core and a JSON alternate exist. A 1.0 checklist is met. |
 
 M22 to M28 were planned in November 2026, after M21, from the "Later" list. There are still no reports from groups or
@@ -898,6 +898,7 @@ shows the years of its published items. M19 is complete.
 
 **M28 Toward 1.0**
 
+- The plan is in [plan-m28-toward-1-0.md](plan-m28-toward-1-0.md).
 - Reading Commonage's own export (versions 4 and later) with the import's dry run. Dublin Core and `/items/{id}.json` as an
   alternate link. A 1.0 checklist: a real group running it, the upgrade tested from every 0.x minor version, a support policy,
   and a second release approver or a written handover.
