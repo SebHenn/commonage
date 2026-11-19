@@ -14,7 +14,7 @@ Für alle, die sich um den Bestand eines Archivs kümmern. Technische Kenntnisse
   es schon unter einem ähnlichen Namen existiert.
 
 **Zu einem früheren Text zurückkehren.** Unter dem Formular listet „Frühere Texte“ jede Änderung an Titel, Beschreibung, Datierung,
-Nennung, ursprünglichem Ort und Referenznummer: wann, von wem und was vorher dastand („Den Text vor dieser Änderung zeigen“). „Diesen
+Nennung, ursprünglichem Ort und Referenznummer: wann, von wem und was vorher dastand („Mit dem heutigen Text vergleichen“ zeigt es neben dem heutigen Stand). „Diesen
 Text wiederherstellen“ setzt ihn zurück, und der ersetzte Text bleibt seinerseits erhalten, Sie können es sich also anders überlegen.
 Helfer können die Liste lesen, aber nichts wiederherstellen. Für Änderungen vor dieser Version steht nichts in der Liste.
 

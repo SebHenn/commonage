@@ -999,7 +999,9 @@
   <data name="Left out, because a recording has no transcript yet: {0}." xml:space="preserve"><value>Ausgelassen, weil eine Aufnahme noch keine Abschrift hat: {0}.</value></data>
   <data name="Restored an earlier text of the item" xml:space="preserve"><value>Einen früheren Text des Eintrags wiederhergestellt</value></data>
   <data name="Earlier texts" xml:space="preserve"><value>Frühere Texte</value></data>
-  <data name="Show the text before this change" xml:space="preserve"><value>Den Text vor dieser Änderung zeigen</value></data>
+  <data name="Compare with the text now" xml:space="preserve"><value>Mit dem heutigen Text vergleichen</value></data>
+  <data name="Before this change" xml:space="preserve"><value>Vor dieser Änderung</value></data>
+  <data name="Now" xml:space="preserve"><value>Jetzt</value></data>
   <data name="Empty" xml:space="preserve"><value>Leer</value></data>
   <data name="Restore this text" xml:space="preserve"><value>Diesen Text wiederherstellen</value></data>
   <data name="The earlier text is back." xml:space="preserve"><value>Der frühere Text ist wieder da.</value></data>
