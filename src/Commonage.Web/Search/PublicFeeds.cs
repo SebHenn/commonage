@@ -123,7 +123,7 @@ public static class PublicFeeds
 
         var address = context.Request.BaseAddress();
         var collections = await db.Collections
-            .Where(c => c.Items.AsQueryable().Any(Visibility.Item))
+            .Where(c => c.Items.AsQueryable().Any(Visibility.Item(db.Today)))
             .OrderBy(c => c.Id)
             .Select(c => c.Id)
             .ToListAsync(cancellationToken);

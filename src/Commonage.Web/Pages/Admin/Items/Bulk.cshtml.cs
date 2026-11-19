@@ -18,6 +18,8 @@ public enum BulkAction
     SetDate,
     MoveToCollection,
     SetRights,
+    SetMediaLevel,
+    SetPublicFrom,
 }
 
 /// <summary>An item as the confirmation names it. A row of "Untitled" says nothing, so those also show their file.</summary>
@@ -63,6 +65,13 @@ public class BulkModel(
 
     [BindProperty]
     public string? RightsUri { get; set; }
+
+    [BindProperty]
+    public MediaLevel MediaLevel { get; set; }
+
+    /// <summary>The day an embargo ends. Empty takes an embargo away.</summary>
+    [BindProperty]
+    public DateOnly? PublicFrom { get; set; }
 
     public int Count { get; private set; }
 
@@ -164,7 +173,13 @@ public class BulkModel(
                 continue;
             changed++;
             item.UpdatedAt = now;
-            audit.Record(Action == BulkAction.Publish ? AuditAction.ItemPublished : AuditAction.ItemChanged, item.Title, item);
+            audit.Record(Action switch
+            {
+                BulkAction.Publish => AuditAction.ItemPublished,
+                BulkAction.SetMediaLevel => AuditAction.ItemMediaLevelChanged,
+                BulkAction.SetPublicFrom => AuditAction.ItemPublicFromChanged,
+                _ => AuditAction.ItemChanged,
+            }, item.Title, item);
         }
 
         try
@@ -218,6 +233,16 @@ public class BulkModel(
                     return false;
                 item.RightsUri = statement;
                 return true;
+            case BulkAction.SetMediaLevel:
+                if (item.MediaLevel == MediaLevel)
+                    return false;
+                item.MediaLevel = MediaLevel;
+                return true;
+            case BulkAction.SetPublicFrom:
+                if (item.PublicFrom == PublicFrom)
+                    return false;
+                item.SetPublicFrom(PublicFrom, now);
+                return true;
             default:
                 return false;
         }
@@ -246,6 +271,7 @@ public class BulkModel(
         {
             BulkAction.SetDate => await items.CountAsync(i => i.DateText != null, cancellationToken),
             BulkAction.SetRights => await items.CountAsync(i => i.RightsUri != null, cancellationToken),
+            BulkAction.SetPublicFrom => await items.CountAsync(i => i.PublicFrom != null, cancellationToken),
             _ => 0,
         };
         Examples = await items.OrderBy(i => i.Id).Take(ExamplesShown)

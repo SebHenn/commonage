@@ -8,6 +8,8 @@
         BulkAction.AddTags => T["Add tags to many at once"],
         BulkAction.SetDate => T["Set the date of many at once"],
         BulkAction.MoveToCollection => T["Move many to a collection"],
+        BulkAction.SetMediaLevel => T["Set what visitors get of many at once"],
+        BulkAction.SetPublicFrom => T["Set the public-from date of many at once"],
         _ => T["Set the rights statement of many at once"],
     };
 }
@@ -104,6 +106,29 @@
             </select>
             <span asp-validation-for="RightsUri" class="text-danger"></span>
             <div id="bulk-rights-help" class="form-text">@T["What others may do with this item. Choose a free licence only if whoever holds the rights really gave it."]</div>
+        </div>
+    }
+    @if (Model.Action == BulkAction.SetMediaLevel)
+    {
+        <fieldset class="mb-3">
+            <legend class="form-label fs-6">@T["What visitors get"]</legend>
+            <div class="form-check">
+                <input type="radio" id="bulk-level-everything" name="MediaLevel" value="@MediaLevel.Everything" class="form-check-input" checked="@(Model.MediaLevel == MediaLevel.Everything)" />
+                <label for="bulk-level-everything" class="form-check-label">@T["Everything: the record with its pictures and recordings"]</label>
+            </div>
+            <div class="form-check">
+                <input type="radio" id="bulk-level-record" name="MediaLevel" value="@MediaLevel.RecordOnly" class="form-check-input" checked="@(Model.MediaLevel == MediaLevel.RecordOnly)" />
+                <label for="bulk-level-record" class="form-check-label">@T["The record only, without pictures and recordings"]</label>
+            </div>
+        </fieldset>
+    }
+    @if (Model.Action == BulkAction.SetPublicFrom)
+    {
+        <div class="mb-3">
+            <label asp-for="PublicFrom" class="form-label">@T["Public from"]</label>
+            <input asp-for="PublicFrom" type="date" value="@Model.PublicFrom?.ToString("yyyy-MM-dd")" class="form-control" aria-describedby="bulk-from-help" />
+            <span asp-validation-for="PublicFrom" class="text-danger"></span>
+            <div id="bulk-from-help" class="form-text">@T["Leave empty to take an embargo away."]</div>
         </div>
     }
     @if (Model.WouldBeReplaced > 0)

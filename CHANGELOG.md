@@ -7,6 +7,11 @@ version may change things that need attention when updating, and these notes say
 
 ### For curators
 
+- A published item can have an **embargo**: set "Public from" on the item, and until the start of that day (in the archive's time
+  zone) it is as hidden as a draft, everywhere, including its pictures. Lists, feeds and the start page put the item where it
+  belongs on the day it opens. Exports of published items leave out items still under embargo (export format version 8).
+- "What visitors get" and "Public from" can be set for many items at once from the item list, and the list can show only items
+  shown as a record only or still under embargo. The collection cover choice says which photos visitors do not see.
 - An item can be shown as a **record only**: visitors get its title, description, date, place and credit, but no picture, page
   image or recording, and search does not find what its PDFs or captions say. Choose "What visitors get" on the item's page;
   the item list shows a "Record only" badge. Exports of published items leave out the files of such items; the full export

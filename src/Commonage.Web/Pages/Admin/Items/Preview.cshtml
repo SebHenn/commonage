@@ -11,6 +11,10 @@
         {
             @T["Preview. Visitors cannot see this item."]
         }
+        else if (Model.Item.PublicFrom is { } publicFrom && publicFrom > Model.Today)
+        {
+            @T["Preview. Public from {0}.", publicFrom.ToString("d", System.Globalization.CultureInfo.CurrentCulture)]
+        }
         else if (Model.Item.MediaLevel == MediaLevel.RecordOnly)
         {
             @T["Preview. Visitors see the record only, without its pictures and recordings."]

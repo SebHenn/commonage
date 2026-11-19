@@ -109,6 +109,7 @@
   <data name="Changed the archive settings" xml:space="preserve"><value>Changed the archive settings</value></data>
   <data name="Changed the collection" xml:space="preserve"><value>Changed the collection</value></data>
   <data name="Changed the contribution link" xml:space="preserve"><value>Changed the contribution link</value></data>
+  <data name="Changed the date from which the item is public" xml:space="preserve"><value>Changed the date from which the item is public</value></data>
   <data name="Changed the item" xml:space="preserve"><value>Changed the item</value></data>
   <data name="Changed the name of an account" xml:space="preserve"><value>Changed the name of an account</value></data>
   <data name="Changed the order of the collections" xml:space="preserve"><value>Changed the order of the collections</value></data>
@@ -344,6 +345,7 @@
   <data name="JPEG, PNG, TIFF, WebP, AVIF, GIF or PDF. The original file is kept unchanged and is only visible to curators." xml:space="preserve"><value>JPEG, PNG, TIFF, WebP, AVIF, GIF or PDF. The original file is kept unchanged and is only visible to curators.</value></data>
   <data name="Keep rejected and withdrawn contributions" xml:space="preserve"><value>Keep rejected and withdrawn contributions</value></data>
   <data name="Keep the activity log" xml:space="preserve"><value>Keep the activity log</value></data>
+  <data name="Kept back from visitors" xml:space="preserve"><value>Kept back from visitors</value></data>
   <data name="Kind" xml:space="preserve"><value>Kind</value></data>
   <data name="Language" xml:space="preserve"><value>Language</value></data>
   <data name="Language of the archive" xml:space="preserve"><value>Language of the archive</value></data>
@@ -356,6 +358,7 @@
   <data name="Last login" xml:space="preserve"><value>Last login</value></data>
   <data name="Later" xml:space="preserve"><value>Later</value></data>
   <data name="Later: {0}" xml:space="preserve"><value>Later: {0}</value></data>
+  <data name="Leave empty to take an embargo away." xml:space="preserve"><value>Leave empty to take an embargo away.</value></data>
   <data name="Leave this field empty" xml:space="preserve"><value>Leave this field empty</value></data>
   <data name="Left out, because a recording has no transcript yet: {0}." xml:space="preserve"><value>Left out, because a recording has no transcript yet: {0}.</value></data>
   <data name="Left out, because the archive already has them: {0}" xml:space="preserve"><value>Left out, because the archive already has them: {0}</value></data>
@@ -488,6 +491,7 @@
   <data name="Open at full size" xml:space="preserve"><value>Open at full size</value></data>
   <data name="Open: the link accepts contributions" xml:space="preserve"><value>Open: the link accepts contributions</value></data>
   <data name="Opened a visitor's note again" xml:space="preserve"><value>Opened a visitor's note again</value></data>
+  <data name="Optional. Until this day the published item is as hidden as a draft." xml:space="preserve"><value>Optional. Until this day the published item is as hidden as a draft.</value></data>
   <data name="Or a folder on the server" xml:space="preserve"><value>Or a folder on the server</value></data>
   <data name="Or start from one of these:" xml:space="preserve"><value>Or start from one of these:</value></data>
   <data name="Or type this key into the app:" xml:space="preserve"><value>Or type this key into the app:</value></data>
@@ -562,6 +566,7 @@
   <data name="Poster: {0}" xml:space="preserve"><value>Poster: {0}</value></data>
   <data name="Preparing the recording…" xml:space="preserve"><value>Preparing the recording…</value></data>
   <data name="Preview" xml:space="preserve"><value>Preview</value></data>
+  <data name="Preview. Public from {0}." xml:space="preserve"><value>Preview. Public from {0}.</value></data>
   <data name="Preview. This item is public." xml:space="preserve"><value>Preview. This item is public.</value></data>
   <data name="Preview. Visitors cannot see this item." xml:space="preserve"><value>Preview. Visitors cannot see this item.</value></data>
   <data name="Preview. Visitors see the record only, without its pictures and recordings." xml:space="preserve"><value>Preview. Visitors see the record only, without its pictures and recordings.</value></data>
@@ -578,6 +583,8 @@
   <data name="Privacy" xml:space="preserve"><value>Privacy</value></data>
   <data name="Problems" xml:space="preserve"><value>Problems</value></data>
   <data name="Public domain: free to use" xml:space="preserve"><value>Public domain: free to use</value></data>
+  <data name="Public from" xml:space="preserve"><value>Public from</value></data>
+  <data name="Public from {0}" xml:space="preserve"><value>Public from {0}</value></data>
   <data name="Publish" xml:space="preserve"><value>Publish</value></data>
   <data name="Publish many at once" xml:space="preserve"><value>Publish many at once</value></data>
   <data name="Publish: {0}" xml:space="preserve"><value>Publish: {0}</value></data>
@@ -652,10 +659,14 @@
   <data name="Separated by semicolons or commas." xml:space="preserve"><value>Separated by semicolons or commas.</value></data>
   <data name="Set the date" xml:space="preserve"><value>Set the date</value></data>
   <data name="Set the date of many at once" xml:space="preserve"><value>Set the date of many at once</value></data>
+  <data name="Set the public-from date" xml:space="preserve"><value>Set the public-from date</value></data>
+  <data name="Set the public-from date of many at once" xml:space="preserve"><value>Set the public-from date of many at once</value></data>
   <data name="Set the rights statement" xml:space="preserve"><value>Set the rights statement</value></data>
   <data name="Set the rights statement of many at once" xml:space="preserve"><value>Set the rights statement of many at once</value></data>
   <data name="Set up nightly backups (docs/deployment.md)" xml:space="preserve"><value>Set up nightly backups (docs/deployment.md)</value></data>
   <data name="Set up on a new phone" xml:space="preserve"><value>Set up on a new phone</value></data>
+  <data name="Set what visitors get" xml:space="preserve"><value>Set what visitors get</value></data>
+  <data name="Set what visitors get of many at once" xml:space="preserve"><value>Set what visitors get of many at once</value></data>
   <data name="Settings" xml:space="preserve"><value>Settings</value></data>
   <data name="Setup link" xml:space="preserve"><value>Setup link</value></data>
   <data name="Several files have this name. Write the path with its folder." xml:space="preserve"><value>Several files have this name. Write the path with its folder.</value></data>
@@ -666,6 +677,7 @@
   <data name="Show everything" xml:space="preserve"><value>Show everything</value></data>
   <data name="Show my name with what I send in" xml:space="preserve"><value>Show my name with what I send in</value></data>
   <data name="Showing the newest {0}." xml:space="preserve"><value>Showing the newest {0}.</value></data>
+  <data name="Shown as a record only" xml:space="preserve"><value>Shown as a record only</value></data>
   <data name="Shown to admins on this page and in the list of accounts. Never to visitors." xml:space="preserve"><value>Shown to admins on this page and in the list of accounts. Never to visitors.</value></data>
   <data name="Six digits. Without your phone, type one of your recovery codes instead. Each one works once." xml:space="preserve"><value>Six digits. Without your phone, type one of your recovery codes instead. Each one works once.</value></data>
   <data name="Skip to content" xml:space="preserve"><value>Skip to content</value></data>
@@ -886,6 +898,7 @@
   <data name="Turned off the account's authenticator app" xml:space="preserve"><value>Turned off the account's authenticator app</value></data>
   <data name="Turning the photo…" xml:space="preserve"><value>Turning the photo…</value></data>
   <data name="Type the six digits the app shows now:" xml:space="preserve"><value>Type the six digits the app shows now:</value></data>
+  <data name="Under embargo" xml:space="preserve"><value>Under embargo</value></data>
   <data name="Understood as: {0}" xml:space="preserve"><value>Understood as: {0}</value></data>
   <data name="Unknown" xml:space="preserve"><value>Unknown</value></data>
   <data name="Unpublish" xml:space="preserve"><value>Unpublish</value></data>
@@ -905,6 +918,7 @@
   <data name="Visitor" xml:space="preserve"><value>Visitor</value></data>
   <data name="Visitors can open a photo at about 3000 pixels, to read a letter or look at a face. Without this they only get a smaller one, about 1600 pixels, and the archive saves the disk space. The original stays private either way, and larger versions have no location data or other embedded details either." xml:space="preserve"><value>Visitors can open a photo at about 3000 pixels, to read a letter or look at a face. Without this they only get a smaller one, about 1600 pixels, and the archive saves the disk space. The original stays private either way, and larger versions have no location data or other embedded details either.</value></data>
   <data name="Visitors can then send the curators more about an item, a correction, or a request to take it down. Only curators read it, under “Notes from visitors”. Name and email address are optional, and the privacy page should say that the archive keeps them." xml:space="preserve"><value>Visitors can then send the curators more about an item, a correction, or a request to take it down. Only curators read it, under “Notes from visitors”. Name and email address are optional, and the privacy page should say that the archive keeps them.</value></data>
+  <data name="Visitors do not see this photo yet or at all" xml:space="preserve"><value>Visitors do not see this photo yet or at all</value></data>
   <data name="Visitors find all places and all people on pages of their own, once an item with the tag is published. That page lists every person's name, so name living people only when they agree." xml:space="preserve"><value>Visitors find all places and all people on pages of their own, once an item with the tag is published. That page lists every person's name, so name living people only when they agree.</value></data>
   <data name="Visitors find the collections in this order." xml:space="preserve"><value>Visitors find the collections in this order.</value></data>
   <data name="Waiting" xml:space="preserve"><value>Waiting</value></data>

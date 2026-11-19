@@ -1015,4 +1015,18 @@
   <data name="The archive shows this item as a record only. Its pictures and recordings are not shown here." xml:space="preserve"><value>Das Archiv zeigt diesen Eintrag nur als Eintrag. Seine Bilder und Aufnahmen werden hier nicht gezeigt.</value></data>
   <data name="The record only, without pictures and recordings" xml:space="preserve"><value>Nur der Eintrag, ohne Bilder und Aufnahmen</value></data>
   <data name="What visitors get" xml:space="preserve"><value>Was Besucher bekommen</value></data>
+  <data name="Public from" xml:space="preserve"><value>Öffentlich ab</value></data>
+  <data name="Optional. Until this day the published item is as hidden as a draft." xml:space="preserve"><value>Optional. Bis zu diesem Tag ist der veröffentlichte Eintrag so verborgen wie ein Entwurf.</value></data>
+  <data name="Public from {0}" xml:space="preserve"><value>Öffentlich ab {0}</value></data>
+  <data name="Preview. Public from {0}." xml:space="preserve"><value>Vorschau. Öffentlich ab {0}.</value></data>
+  <data name="Changed the date from which the item is public" xml:space="preserve"><value>Datum geändert, ab dem der Eintrag öffentlich ist</value></data>
+  <data name="Set what visitors get of many at once" xml:space="preserve"><value>Festlegen, was Besucher bei mehreren bekommen</value></data>
+  <data name="Set the public-from date of many at once" xml:space="preserve"><value>Öffentlich-ab-Datum für mehrere festlegen</value></data>
+  <data name="Leave empty to take an embargo away." xml:space="preserve"><value>Leer lassen, um eine Sperrfrist aufzuheben.</value></data>
+  <data name="Set what visitors get" xml:space="preserve"><value>Festlegen, was Besucher bekommen</value></data>
+  <data name="Set the public-from date" xml:space="preserve"><value>Öffentlich-ab-Datum festlegen</value></data>
+  <data name="Kept back from visitors" xml:space="preserve"><value>Vor Besuchern zurückgehalten</value></data>
+  <data name="Shown as a record only" xml:space="preserve"><value>Nur als Datensatz gezeigt</value></data>
+  <data name="Under embargo" xml:space="preserve"><value>Unter Sperrfrist</value></data>
+  <data name="Visitors do not see this photo yet or at all" xml:space="preserve"><value>Besucher sehen dieses Foto noch nicht oder gar nicht</value></data>
 </root>

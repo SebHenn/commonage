@@ -17,6 +17,12 @@ public class ArchiveItem
     /// <summary>What visitors get of the item once it is published, see <see cref="Domain.MediaLevel"/>.</summary>
     public MediaLevel MediaLevel { get; set; }
 
+    /// <summary>
+    /// An embargo: a published item is not public until the start of this day in the archive's time zone. Empty means none.
+    /// Kept when the item is unpublished, so publishing it again honours the date.
+    /// </summary>
+    public DateOnly? PublicFrom { get; set; }
+
     public int CollectionId { get; set; }
     public Collection Collection { get; set; } = null!;
 
@@ -121,7 +127,38 @@ public class ArchiveItem
         MarkReviewed(now);
         Status = ItemStatus.Published;
         PublishedAt ??= now;
+        AlignPublishedAt(now);
         RejectedOrWithdrawnAt = null;
+    }
+
+    /// <summary>Sets or removes the embargo. <see cref="PublishedAt"/> follows, so that lists and feeds order by when an item is public.</summary>
+    public void SetPublicFrom(DateOnly? day, DateTime now)
+    {
+        PublicFrom = day;
+        AlignPublishedAt(now);
+    }
+
+    /// <summary>
+    /// <see cref="PublishedAt"/> is when the item is, or will be, public: never earlier than the start of the embargo's day, and
+    /// not in the future once there is no embargo. That way every list ordered by it surfaces an item on the day it opens.
+    /// </summary>
+    private void AlignPublishedAt(DateTime now)
+    {
+        if (PublishedAt is not { } at)
+            return;
+        if (PublicFrom is { } day)
+        {
+            var opens = Dates.StartOfDayUtc(day);
+            // A date that was only a promise (still ahead) follows the embargo both ways; one already past only moves later.
+            if (at > now)
+                PublishedAt = opens > now ? opens : now;
+            else if (opens > at)
+                PublishedAt = opens;
+        }
+        else if (at > now)
+        {
+            PublishedAt = now;
+        }
     }
 
     public void Unpublish()

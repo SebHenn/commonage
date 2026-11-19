@@ -12,6 +12,9 @@ public class PreviewModel(CommonageDbContext db) : PageModel
 {
     public ArchiveItem Item { get; private set; } = null!;
 
+    /// <summary>Today in the archive's time zone, to tell whether an embargo is still on.</summary>
+    public DateOnly Today => db.Today;
+
     public async Task<IActionResult> OnGetAsync(int id)
     {
         var items = db.ArchiveItems.AsQueryable();
