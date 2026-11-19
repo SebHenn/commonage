@@ -1,6 +1,6 @@
 # Plan for M28: toward 1.0
 
-Status: **plan, no code yet.** Three parts, in this order, each its own pull request. The plan goes to the `privacy-reviewer` agent
+Status: **plan, no code yet; decisions made (see "Decisions").** Three parts, in this order, each its own pull request. The plan goes to the `privacy-reviewer` agent
 before part 1 starts, as M27 did, because part 1 brings material into the archive from outside and part 2 adds public addresses.
 
 ## What is wanted
@@ -92,7 +92,7 @@ checked by a machine:
 
 Nothing in this part changes behaviour, so it comes last and is the only part that needs the user and the group, not code.
 
-## Decisions to make
+## Decisions (taken as proposed)
 
 1. **Duplicate with a different description:** skip and list (proposed), or offer to add the other text as a revision.
 2. **Contributor details:** left out (proposed), or optional behind a checkbox saying the curator holds that consent.
@@ -156,7 +156,7 @@ The review found no leak in the plan as such, but fourteen gaps. What they chang
 - Every part has its `CHANGELOG.md` entry and `operations.md` update, and `security.md` gets rows for the ZIP import, the public JSON
   and the consent decision.
 
-## Decisions to make (updated)
+## Decisions added by the review
 
-Decision 1 to 4 above stand. The review adds one: **items whose source did not allow sharing are skipped (proposed)**, or a field
+Decisions 1 to 3 stand as proposed. Decision 4 was open: a real group running it is a condition for calling 1.0 supported, and the checklist says so, but the version number does not wait for it. The review adds one: **items whose source did not allow sharing are skipped (proposed)**, or a field
 is added to remember it.
