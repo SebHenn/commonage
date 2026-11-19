@@ -43,20 +43,20 @@ public class AuditLog(CommonageDbContext db, IHttpContextAccessor httpContextAcc
         });
     }
 
-    public void Record(AuditAction action, string? subject, ArchiveItem? item = null)
+    public AuditEntry Record(AuditAction action, string? subject, ArchiveItem? item = null)
     {
         var user = httpContextAccessor.HttpContext?.User;
         var signedIn = user?.Identity?.IsAuthenticated == true;
-        Add(action, subject, item, signedIn ? user!.FindFirstValue(ClaimTypes.NameIdentifier) : null, signedIn ? user!.Identity!.Name : null);
+        return Add(action, subject, item, signedIn ? user!.FindFirstValue(ClaimTypes.NameIdentifier) : null, signedIn ? user!.Identity!.Name : null);
     }
 
     /// <summary>For what an account does while it logs in, before the request knows who it is.</summary>
     public void RecordFor(Microsoft.AspNetCore.Identity.IdentityUser account, AuditAction action, string? subject) =>
         Add(action, subject, null, account.Id, account.UserName);
 
-    private void Add(AuditAction action, string? subject, ArchiveItem? item, string? userId, string? userName)
+    private AuditEntry Add(AuditAction action, string? subject, ArchiveItem? item, string? userId, string? userName)
     {
-        db.AuditEntries.Add(new AuditEntry
+        var entry = new AuditEntry
         {
             At = clock.GetUtcNow().UtcDateTime,
             UserId = userId,
@@ -64,6 +64,8 @@ public class AuditLog(CommonageDbContext db, IHttpContextAccessor httpContextAcc
             Action = action,
             ArchiveItem = item,
             Subject = subject is { Length: > AuditEntry.SubjectMaxLength } ? subject[..AuditEntry.SubjectMaxLength] : subject,
-        });
+        };
+        db.AuditEntries.Add(entry);
+        return entry;
     }
 }

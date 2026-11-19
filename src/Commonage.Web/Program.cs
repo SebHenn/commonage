@@ -85,6 +85,7 @@ var storageRoot = Path.GetFullPath(
 builder.Services.AddSingleton<IFileStorage>(new LocalFileStorage(storageRoot));
 builder.Services.AddSingleton(new ImportStaging(storageRoot));
 builder.Services.AddScoped<ItemImport>();
+builder.Services.AddScoped<ExportImport>();
 builder.Services.Configure<UploadOptions>(builder.Configuration.GetSection("Uploads"));
 builder.Services.AddSingleton<PdfTools>();
 PdfTools.RemoveStaleCopies();
@@ -129,6 +130,7 @@ builder.Services.AddRazorPages(options =>
             options.Conventions.AuthorizePage(page, Policies.ManageArchive);
         options.Conventions.AuthorizeFolder("/Admin/Users", Policies.Administer);
         options.Conventions.AuthorizePage("/Admin/Export", Policies.Administer);
+        options.Conventions.AuthorizePage("/Admin/ImportArchive", Policies.Administer);
         options.Conventions.AuthorizePage("/Admin/Activity", Policies.Administer);
         options.Conventions.AuthorizePage("/Admin/Settings", Policies.Administer);
         options.Conventions.AuthorizePage("/Admin/System", Policies.Administer);

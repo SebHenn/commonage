@@ -28,6 +28,11 @@ public sealed class ImportStaging(string storageRoot)
 
     public string ZipPath(Guid id) => Path.Combine(DirectoryOf(id), "scans.zip");
 
+    /// <summary>Where the ZIP file of an export waits while it is read into the archive.</summary>
+    public string ExportPath(Guid id) => Path.Combine(DirectoryOf(id), "export.zip");
+
+    public bool ExportExists(Guid id) => File.Exists(ExportPath(id));
+
     public string WorkDirectory(Guid id) => Path.Combine(DirectoryOf(id), "work");
 
     public bool Exists(Guid id) => File.Exists(CsvPath(id));
