@@ -162,7 +162,11 @@ What does not arrive, and why: the names, email addresses and consent texts of c
 notes and who gave an item belong to the other archive and its promises. Items that were rejected or withdrawn there, and items
 whose contributor did not agree to sharing, are left out and listed. Items in the other archive's bin are not in its export, so
 they are not seen. An item that is already here (same collection, title and date) is not changed, and a photo that is already
-here is not added a second time. Run the same export again after a break-off: what is there is left out.
+here is not added a second time. A credit or rights holder that a curator typed into an item travels with it, so check them before you publish.
+Run the same export again after a break-off: what is there is left out. That also holds for an item that arrived without all
+its photos (a photo could not be stored, which the page after the import says): it stays a draft with the photos
+that did arrive, and the import never adds to an item that is already here. Add the missing photos by hand, or put the draft in
+the bin and run the import again.
 
 ## A box full of photos
 

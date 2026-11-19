@@ -8,8 +8,11 @@ using Commonage.Web.Data;
 using Commonage.Web.Domain;
 using Commonage.Web.Export;
 using Commonage.Web.Import;
+using Commonage.Web.Media;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Commonage.Tests;
 
@@ -355,6 +358,107 @@ public partial class ExportImportTests(CommonageAppFactory app)
         Assert.Contains("it was rejected in the other archive", html);
         Assert.Contains("withdrew their consent", html);
         Assert.Contains("did not agree to it being shared further", html);
+    }
+
+    [Fact]
+    public async Task A_contribution_that_does_not_say_yes_is_left_out_whether_it_says_no_nothing_or_null()
+    {
+        using var curator = await CuratorAsync(app);
+        var word = Word();
+        var json = ArchiveJson(
+            [Item(1, $"{word} Fine"),
+             Item(2, $"{word} No key", contribution: new { }),
+             Item(3, $"{word} Null answer", contribution: new { consentCoversSharing = (bool?)null }),
+             Item(4, $"{word} Other keys only", contribution: new { showName = true })],
+            [Collection(1, $"{word} Collection")]);
+
+        var html = await RunAsync(curator, Zip(("archive.json", json)));
+
+        Assert.Equal([$"{word} Fine"], (await ItemsAsync(word)).Select(i => i.Title));
+        Assert.Equal(3, Regex.Matches(html, "did not agree to it being shared further").Count);
+    }
+
+    [Fact]
+    public async Task A_photo_that_cannot_be_stored_costs_only_that_photo_and_the_item_stays_a_draft_with_the_others()
+    {
+        var word = Word();
+        var storage = new StorageThatFailsOnOriginal(app.Services.GetRequiredService<IFileStorage>(), failOn: 2);
+        await using var archive = await app.NewArchiveAsync(b => b.ConfigureTestServices(services => services.AddSingleton<IFileStorage>(storage)));
+        using var curator = await CuratorAsync(archive);
+        byte[][] photos = [NewPhoto(), NewPhoto(), NewPhoto()];
+        var json = ArchiveJson(
+            [Item(1, $"{word} Barn", files: [File(7, 1, "a.jpg", photos[0]), File(8, 1, "b.jpg", photos[1]), File(9, 1, "c.jpg", photos[2])])],
+            [Collection(1, $"{word} Collection")]);
+        var zip = Zip(("archive.json", json), ("files/1/7-a.jpg", photos[0]), ("files/1/8-b.jpg", photos[1]), ("files/1/9-c.jpg", photos[2]));
+
+        var dryRun = await DryRunAsync(curator, zip);
+        var response = await curator.PostAsync($"{Page}?handler=Import", new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["__RequestVerificationToken"] = Browser.Token(dryRun),
+            ["StagingId"] = StagingIdPattern().Match(dryRun).Groups[1].Value,
+        }));
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.EnsureSuccessStatusCode();
+        Assert.Contains("Photos that could not be added: 1", body);
+        Assert.DoesNotContain("secret-disk-path", body);
+        var item = Assert.Single(await archive.WithDbAsync(db => db.ArchiveItems.IgnoreQueryFilters().Include(i => i.MediaFiles).ToListAsync()));
+        Assert.Equal(ItemStatus.Draft, item.Status);
+        Assert.Equal([Sha(photos[0]), Sha(photos[2])], item.MediaFiles.OrderBy(f => f.Position).Select(f => f.Sha256));
+        var actions = await archive.WithDbAsync(db => db.AuditEntries.Select(e => e.Action).ToListAsync());
+        Assert.Contains(AuditAction.PhotosAdded, actions);
+        Assert.Equal(1, ImportLock.OneAtATime.CurrentCount);
+
+        // The item is there now, so a second run does not top it up, and the dry run says so.
+        var again = await DryRunAsync(curator, zip);
+        Assert.DoesNotContain("handler=Import", again);
+        Assert.Contains("photos it lacks are not added", again);
+        Assert.Equal(2, (await archive.WithDbAsync(db => db.MediaFiles.CountAsync())));
+    }
+
+    private sealed class StorageThatFailsOnOriginal(IFileStorage real, int failOn) : IFileStorage
+    {
+        private int _originals;
+
+        public Task SaveAsync(string key, Stream content, CancellationToken cancellationToken = default) =>
+            key.StartsWith("originals/", StringComparison.Ordinal) && Interlocked.Increment(ref _originals) == failOn
+                ? throw new IOException("secret-disk-path is full.")
+                : real.SaveAsync(key, content, cancellationToken);
+
+        public Stream OpenRead(string key) => real.OpenRead(key);
+
+        public void Delete(string key) => real.Delete(key);
+    }
+
+    private static object[] EmptyFiles(int count) => Enumerable.Repeat<object>(new { }, count).ToArray();
+
+    [Fact]
+    public async Task More_files_in_all_than_the_cap_are_refused_even_when_no_item_has_too_many()
+    {
+        using var curator = await CuratorAsync(app);
+        var word = Word();
+        var items = Enumerable.Range(1, ExportImport.MaxTotalFiles / ExportImport.MaxFilesPerItem + 1)
+            .Select(i => Item(i, $"{word} {i}", files: EmptyFiles(ExportImport.MaxFilesPerItem))).ToArray();
+
+        var html = await DryRunAsync(curator, Zip(("archive.json", ArchiveJson(items, [Collection(1, $"{word} Collection")]))));
+
+        Assert.Contains("more items, files, tags or collections than one import can read", html);
+        Assert.DoesNotContain("handler=Import", html);
+    }
+
+    [Fact]
+    public async Task A_dry_run_stops_recording_lines_at_a_limit_counts_the_rest_and_still_leaves_out_every_item_with_a_problem()
+    {
+        using var curator = await CuratorAsync(app);
+        var word = Word();
+        var items = Enumerable.Range(1, ExportImport.MaxTotalFiles / ExportImport.MaxFilesPerItem)
+            .Select(i => Item(i, $"{word} {i}", files: EmptyFiles(ExportImport.MaxFilesPerItem))).ToArray();
+
+        var html = await DryRunAsync(curator, Zip(("archive.json", ArchiveJson(items, [Collection(1, $"{word} Collection")]))));
+
+        Assert.Contains("more things found, which are not listed", html);
+        Assert.Contains($"Items with problems, which are left out: {items.Length}", html);
+        Assert.DoesNotContain("handler=Import", html);
     }
 
     [Fact]

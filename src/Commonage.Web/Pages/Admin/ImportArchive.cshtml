@@ -85,6 +85,11 @@
             }
         }
 
+        @if (plan.IssuesNotListed > 0)
+        {
+            <p>@T.Plural("{0, plural, one {And # more thing found, which is not listed.} other {And # more things found, which are not listed.}}", plan.IssuesNotListed)</p>
+        }
+
         <div class="d-flex flex-wrap gap-2 mt-3">
             @if (plan.CanImport)
             {

@@ -238,10 +238,16 @@ Admins can read the ZIP file of a Commonage export on the page **Read an export 
 file is kept in `import-staging` on the media volume until the import is done, or a day. It shares the one-at-a-time lock with
 the spreadsheet import and runs inside one web request, so the reverse proxy needs the same long timeout. Limits: a ZIP of at most
 4 GB; `archive.json` at most 256 MB when unpacked, counted as it is read; at most 20,000 items, 5,000 collections, 50,000 tags and
-500 files per item; at most 8 GB of files in all; at most 50 new collections per run. The format versions 4 to 8 are read. Every
+500 files per item and 100,000 files in all; at most 8 GB of files in all; at most 50 new collections per run; the dry run keeps
+at most 10,000 lines and counts the rest. The format versions 4 to 8 are read. Every
 item is a draft, and the activity log records the run ("Imported items from a Commonage export", with counts only) and each
 new collection, never a title of the other archive's contributors or their details. The database is only added to: nothing is
-changed or removed, so a run that breaks off can be run again.
+changed or removed, so a run that breaks off can be run again. A file that cannot be stored (a full disk, a broken ZIP entry) is
+counted and shown, never explained with the system's own error text; its item stays a draft with the photos that did arrive and the
+activity log has the line for those. The import never adds to an item that is already there, so such an item is not completed by
+running again: add the photos by hand, or put the draft in the bin and run the import again. Items from the export carry the
+credit and rights holder a curator typed in. The run does not stop when the browser tab is closed. The ZIP file waits in a folder
+only the account running the app can read (on Linux and macOS).
 
 ## Export
 

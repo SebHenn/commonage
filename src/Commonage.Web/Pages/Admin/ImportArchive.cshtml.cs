@@ -60,7 +60,7 @@ public class ImportArchiveModel(
         var id = staging.Create();
         try
         {
-            await using var target = System.IO.File.Create(staging.ExportPath(id));
+            await using var target = ImportStaging.CreateOwnerOnlyFile(staging.ExportPath(id));
             await export!.CopyToAsync(target, cancellationToken);
             await target.FlushAsync(cancellationToken);
         }
@@ -136,12 +136,13 @@ public class ImportArchiveModel(
                 return RedirectToPage();
             }
 
-            var result = await import.RunAsync(plan, source, cancellationToken);
+            // Closing the tab must not stop the run between an item and its photos, so it is not given the request's token.
+            var result = await import.RunAsync(plan, source, CancellationToken.None);
             source.Dispose();
             staging.Delete(id);
             TempData["Message"] = localizer["Drafts created: {0}. Photos added: {1}. Previews are being created.", result.Items, result.Files].Value;
             if (result.FilesFailed > 0)
-                TempData["Error"] = localizer["Photos that could not be added, because the files had changed: {0}", result.FilesFailed].Value;
+                TempData["Error"] = localizer["Photos that could not be added: {0}. Their items stay drafts with the photos that did arrive. Add the missing photos by hand, or put the draft in the bin and run the import again.", result.FilesFailed].Value;
             return LocalRedirect(Items.AddManyModel.DraftsUrl);
         }
         finally

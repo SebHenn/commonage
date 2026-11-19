@@ -18,8 +18,25 @@ public sealed class ImportStaging(string storageRoot)
     public Guid Create()
     {
         var id = Guid.NewGuid();
-        Directory.CreateDirectory(DirectoryOf(id));
+        // Owner-only where the system has such permissions: what waits here may hold what the archive does not publish.
+        if (OperatingSystem.IsWindows())
+            Directory.CreateDirectory(DirectoryOf(id));
+        else
+            Directory.CreateDirectory(DirectoryOf(id), OwnerOnlyDirectory);
         return id;
+    }
+
+    internal const UnixFileMode OwnerOnlyDirectory = UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute;
+
+    internal const UnixFileMode OwnerOnlyFile = UnixFileMode.UserRead | UnixFileMode.UserWrite;
+
+    /// <summary>A new file that only the account running the app can read, for what visitors and other curators must not get at.</summary>
+    public static FileStream CreateOwnerOnlyFile(string path)
+    {
+        var options = new FileStreamOptions { Mode = FileMode.Create, Access = FileAccess.Write, Share = FileShare.None };
+        if (!OperatingSystem.IsWindows())
+            options.UnixCreateMode = OwnerOnlyFile;
+        return new FileStream(path, options);
     }
 
     public string DirectoryOf(Guid id) => Path.Combine(Waiting, id.ToString("N"));

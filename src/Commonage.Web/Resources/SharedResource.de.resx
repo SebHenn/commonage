@@ -914,7 +914,7 @@
   <data name="This link is closed" xml:space="preserve"><value>Dieser Link ist geschlossen</value></data>
   <data name="This link is closed. The poster would send people to a page that says so. Open the link first." xml:space="preserve"><value>Dieser Link ist geschlossen. Das Plakat würde die Leute auf eine Seite schicken, die das sagt. Öffnen Sie zuerst den Link.</value></data>
   <data name="To the archive" xml:space="preserve"><value>Zum Archiv</value></data>
-  <data name="An item with this title and date is already in this collection." xml:space="preserve"><value>Ein Objekt mit diesem Titel und Datum ist in dieser Sammlung schon vorhanden.</value></data>
+  <data name="An item with this title and date is already in this collection. It is not changed, and photos it lacks are not added." xml:space="preserve"><value>Ein Objekt mit diesem Titel und Datum ist in dieser Sammlung schon vorhanden. Es wird nicht geändert, und fehlende Fotos werden nicht ergänzt.</value></data>
   <data name="Another import is running. Please wait until it has finished." xml:space="preserve"><value>Es läuft gerade ein anderer Import. Bitte warten Sie, bis er fertig ist.</value></data>
   <data name="As elsewhere: 1953, 12.03.1953, circa 1950, 1950s, 1950–1955." xml:space="preserve"><value>Wie sonst auch: 1953, 12.03.1953, um 1950, 1950er, 1950–1955.</value></data>
   <data name="Check the spreadsheet" xml:space="preserve"><value>Tabelle prüfen</value></data>
@@ -942,7 +942,7 @@
   <data name="None" xml:space="preserve"><value>Keine</value></data>
   <data name="Nothing has been imported yet. This is what would happen." xml:space="preserve"><value>Es wurde noch nichts importiert. So würde es ablaufen.</value></data>
   <data name="Or a folder on the server" xml:space="preserve"><value>Oder ein Ordner auf dem Server</value></data>
-  <data name="Photos that could not be added, because the files had changed: {0}" xml:space="preserve"><value>Fotos, die nicht hinzugefügt werden konnten, weil sich die Dateien geändert hatten: {0}</value></data>
+  <data name="Photos that could not be added: {0}. Their items stay drafts with the photos that did arrive. Add the missing photos by hand, or put the draft in the bin and run the import again." xml:space="preserve"><value>Fotos, die nicht hinzugefügt werden konnten: {0}. Ihre Objekte bleiben Entwürfe mit den Fotos, die angekommen sind. Fügen Sie die fehlenden Fotos von Hand hinzu, oder legen Sie den Entwurf in den Papierkorb und starten Sie den Import erneut.</value></data>
   <data name="Photos that would be added: {0}" xml:space="preserve"><value>Fotos, die hinzugefügt würden: {0}</value></data>
   <data name="Please choose either a ZIP file or a folder, not both." xml:space="preserve"><value>Bitte wählen Sie entweder eine ZIP-Datei oder einen Ordner, nicht beides.</value></data>
   <data name="Please choose the spreadsheet, saved as CSV." xml:space="preserve"><value>Bitte wählen Sie die Tabelle, als CSV gespeichert.</value></data>
@@ -1029,7 +1029,7 @@
   <data name="Shown as a record only" xml:space="preserve"><value>Nur als Datensatz gezeigt</value></data>
   <data name="Under embargo" xml:space="preserve"><value>Unter Sperrfrist</value></data>
   <data name="Visitors do not see this photo yet or at all" xml:space="preserve"><value>Besucher sehen dieses Foto noch nicht oder gar nicht</value></data>
-  <data name="An item with this title and date is already in this collection, with a different description. It is not changed." xml:space="preserve"><value>Ein Objekt mit diesem Titel und Datum ist in dieser Sammlung schon vorhanden, mit anderer Beschreibung. Es wird nicht geändert.</value></data>
+  <data name="An item with this title and date is already in this collection, with a different description. It is not changed, and photos it lacks are not added." xml:space="preserve"><value>Ein Objekt mit diesem Titel und Datum ist in dieser Sammlung schon vorhanden, mit anderer Beschreibung. Es wird nicht geändert, und fehlende Fotos werden nicht ergänzt.</value></data>
   <data name="Check the export" xml:space="preserve"><value>Export prüfen</value></data>
   <data name="Collections that would be created: {0}" xml:space="preserve"><value>Sammlungen, die angelegt würden: {0}</value></data>
   <data name="Created the collection while importing" xml:space="preserve"><value>Sammlung beim Import angelegt</value></data>
@@ -1076,4 +1076,8 @@
   <data name="What the export says" xml:space="preserve"><value>Was der Export sagt</value></data>
   <data name="ZIP file of an export" xml:space="preserve"><value>ZIP-Datei eines Exports</value></data>
   <data name="{0, plural, one {Import the one item that is in order} other {Import the # items that are in order}}" xml:space="preserve"><value>{0, plural, one {Das eine Objekt importieren, das in Ordnung ist} other {Die # Objekte importieren, die in Ordnung sind}}</value></data>
+  <data name="This text can be at most {0, plural, one {# character} other {# characters}} long." xml:space="preserve"><value>Dieser Text darf höchstens {0, plural, one {# Zeichen} other {# Zeichen}} lang sein.</value></data>
+  <data name="{0, plural, one {And # more thing found, which is not listed.} other {And # more things found, which are not listed.}}" xml:space="preserve"><value>{0, plural, one {Und # weiterer Fund, der nicht aufgelistet ist.} other {Und # weitere Funde, die nicht aufgelistet sind.}}</value></data>
+  <data name="An item with this title and date is already in this collection." xml:space="preserve"><value>Ein Objekt mit diesem Titel und Datum ist in dieser Sammlung schon vorhanden.</value></data>
+  <data name="Photos that could not be added, because the files had changed: {0}" xml:space="preserve"><value>Fotos, die nicht hinzugefügt werden konnten, weil sich die Dateien geändert hatten: {0}</value></data>
 </root>

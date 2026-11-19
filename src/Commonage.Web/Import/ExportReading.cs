@@ -164,13 +164,16 @@ public sealed class ImportedFile
 internal sealed class ReadLimits
 {
     public bool TooMany { get; set; }
+
+    /// <summary>Elements read so far of the lists that have a limit for all of them together.</summary>
+    public int Counted { get; set; }
 }
 
 /// <summary>
 /// Reads a JSON array into a list and stops at once when it holds more than <paramref name="max"/> elements, so that a file
 /// made of a hundred million empty items never becomes a hundred million objects.
 /// </summary>
-internal sealed class CappedListConverter<T>(int max, ReadLimits limits) : JsonConverter<List<T>>
+internal sealed class CappedListConverter<T>(int max, ReadLimits limits, int? totalMax = null) : JsonConverter<List<T>>
 {
     public override List<T>? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
@@ -182,6 +185,12 @@ internal sealed class CappedListConverter<T>(int max, ReadLimits limits) : JsonC
         while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
         {
             if (list.Count >= max)
+            {
+                limits.TooMany = true;
+                throw new JsonException();
+            }
+
+            if (totalMax is { } total && ++limits.Counted > total)
             {
                 limits.TooMany = true;
                 throw new JsonException();

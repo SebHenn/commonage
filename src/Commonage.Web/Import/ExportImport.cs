@@ -87,8 +87,20 @@ public record PlannedTag(string Name, TagKind Kind);
 
 public record PlannedNewCollection(string Key, string Title, string? Description);
 
-public class PlannedExportItem
+/// <summary>How many more lines the dry run records, and how many were found beyond that.</summary>
+public sealed class IssueBudget(int limit)
 {
+    private int _remaining = limit;
+
+    public int Omitted { get; set; }
+
+    public bool TryTake() => _remaining > 0 && _remaining-- > 0;
+}
+
+public class PlannedExportItem(IssueBudget? budget = null)
+{
+    private readonly List<ExportIssue> _issues = [];
+
     public int Number { get; init; }
     public string Title { get; set; } = "";
     public string? Status { get; set; }
@@ -110,8 +122,21 @@ public class PlannedExportItem
     public bool HelpWanted { get; set; }
     public MediaLevel MediaLevel { get; set; }
     public DateOnly? PublicFrom { get; set; }
-    public List<ExportIssue> Issues { get; } = [];
+    public IReadOnlyList<ExportIssue> Issues => _issues;
     public List<PlannedExportFile> Files { get; } = [];
+
+    /// <summary>
+    /// Keeps the issue while the plan's budget lasts. An item always keeps one issue of the kind that decides about it (a problem,
+    /// or a reason to leave it out), so that what is not listed never changes what happens to the item.
+    /// </summary>
+    public void AddIssue(ExportIssue issue)
+    {
+        var decides = issue.Severity != ExportIssueSeverity.Note && !_issues.Any(i => i.Severity == issue.Severity);
+        if (decides || budget is null || budget.TryTake())
+            _issues.Add(issue);
+        else
+            budget.Omitted++;
+    }
 
     public bool HasProblem => Issues.Any(i => i.Severity == ExportIssueSeverity.Problem);
     public bool IsLeftOut => !HasProblem && Issues.Any(i => i.Severity == ExportIssueSeverity.LeftOut);
@@ -125,6 +150,9 @@ public class ExportPlan
     public int Version { get; init; }
     public IReadOnlyList<PlannedExportItem> Items { get; init; } = [];
     public IReadOnlyList<PlannedNewCollection> NewCollections { get; init; } = [];
+
+    /// <summary>Lines found beyond <see cref="ExportImport.MaxIssues"/>, which are counted and not listed.</summary>
+    public int IssuesNotListed { get; init; }
 
     public IEnumerable<PlannedExportItem> Ready => Items.Where(i => i.IsReady);
     public int ReadyFileCount => Ready.Sum(i => i.Files.Count);
@@ -152,6 +180,12 @@ public partial class ExportImport(
     public const int MaxCollections = 5_000;
     public const int MaxTags = 50_000;
     public const int MaxFilesPerItem = 500;
+
+    /// <summary>Files in all of archive.json, so that thousands of items with hundreds of files each cannot become millions of objects.</summary>
+    public const int MaxTotalFiles = 100_000;
+
+    /// <summary>Lines of the dry run that are kept. What is found beyond this is only counted; each item keeps what decides about it.</summary>
+    public const int MaxIssues = 10_000;
     public const int MaxTagsPerItemRead = 200;
 
     /// <summary>A run creates at most this many collections, so a file full of invented ones cannot flood the list.</summary>
@@ -163,7 +197,7 @@ public partial class ExportImport(
     public const int AltTextMax = 1000;
     private const int MaxDepth = 24;
 
-    [GeneratedRegex(@"^files/(?<item>[0-9]{1,9})/(?<file>[0-9]{1,9})-[^/]{1,300}$", RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture)]
+    [GeneratedRegex(@"^files/(?<item>[0-9]{1,9})/(?<file>[0-9]{1,9})-[^/]{1,300}\z", RegexOptions.CultureInvariant | RegexOptions.ExplicitCapture)]
     private static partial Regex FilePathPattern();
 
     private static readonly int[] Rotations = [0, 90, 180, 270];
@@ -241,25 +275,27 @@ public partial class ExportImport(
         var today = DateOnly.FromDateTime(clock.GetUtcNow().UtcDateTime);
         long bytesRead = 0;
         var number = 0;
+        var budget = new IssueBudget(MaxIssues);
 
         foreach (var exported in archive.Items ?? [])
         {
             cancellationToken.ThrowIfCancellationRequested();
             number++;
             var item = exported ?? new ImportedItem();
-            var planned = new PlannedExportItem { Number = number, Status = Shorten(item.Status) };
+            var planned = new PlannedExportItem(budget) { Number = number, Status = Shorten(item.Status) };
             planned.Title = Shorten(Text(item.Title)) ?? "";
             items.Add(planned);
 
             // What decides whether the item is imported at all is looked at first; nothing else of a left-out item is examined.
             if (!TryEnum(item.Status, out ItemStatus status))
-                planned.Issues.Add(new ExportIssue(ExportIssueKind.ValueUnknown, "status", Shorten(item.Status)));
+                planned.AddIssue(new ExportIssue(ExportIssueKind.ValueUnknown, "status", Shorten(item.Status)));
             else if (status == ItemStatus.Rejected)
-                planned.Issues.Add(new ExportIssue(ExportIssueKind.ItemRejected, "status"));
+                planned.AddIssue(new ExportIssue(ExportIssueKind.ItemRejected, "status"));
             else if (status == ItemStatus.Withdrawn)
-                planned.Issues.Add(new ExportIssue(ExportIssueKind.ItemWithdrawn, "status"));
-            if (item.Contribution is { ConsentCoversSharing: false })
-                planned.Issues.Add(new ExportIssue(ExportIssueKind.NoConsentToShare, "contribution"));
+                planned.AddIssue(new ExportIssue(ExportIssueKind.ItemWithdrawn, "status"));
+            // Only a contribution that says yes counts: one without the answer (no key, or null) is left out like a no.
+            if (item.Contribution is not null && item.Contribution.ConsentCoversSharing != true)
+                planned.AddIssue(new ExportIssue(ExportIssueKind.NoConsentToShare, "contribution"));
             if (planned.Issues.Count > 0)
                 continue;
 
@@ -338,7 +374,7 @@ public partial class ExportImport(
             }
         }
 
-        return new ExportPlan { Version = ArchiveExporter.Version, Items = items, NewCollections = newCollections.Values.ToList() };
+        return new ExportPlan { Version = ArchiveExporter.Version, Items = items, NewCollections = newCollections.Values.ToList(), IssuesNotListed = budget.Omitted };
     }
 
     private static bool HasProblem(PlannedExportItem planned) => planned.Issues.Any(i => i.Severity == ExportIssueSeverity.Problem);
@@ -346,7 +382,7 @@ public partial class ExportImport(
     private static ExportPlan Refuse(ExportRefusal refusal, int? foundVersion = null) => new() { Refusal = refusal, FoundVersion = foundVersion };
 
     private static void Issue(PlannedExportItem planned, ExportIssueKind kind, string? field = null, string? value = null, string? detail = null, UploadError? upload = null) =>
-        planned.Issues.Add(new ExportIssue(kind, field, value, detail, upload));
+        planned.AddIssue(new ExportIssue(kind, field, value, detail, upload));
 
     /// <summary>
     /// The exported earliest and latest day are used when they are real, because the text may be in a vocabulary this version
@@ -625,12 +661,16 @@ public partial class ExportImport(
             new CappedListConverter<ImportedItem>(MaxItems, limits),
             new CappedListConverter<ImportedCollection>(MaxCollections, limits),
             new CappedListConverter<ImportedTag>(MaxTags, limits),
-            new CappedListConverter<ImportedFile?>(MaxFilesPerItem, limits),
+            new CappedListConverter<ImportedFile?>(MaxFilesPerItem, limits, MaxTotalFiles),
             new CappedListConverter<string?>(MaxTagsPerItemRead, limits),
         },
     };
 
-    /// <summary>Imports the items of a plan that are in order, as drafts. A file that is no longer what the dry run saw is left out and counted.</summary>
+    /// <summary>
+    /// Imports the items of a plan that are in order, as drafts. A file that is no longer what the dry run saw, or that cannot be
+    /// stored, is left out and counted; its item stays a draft with the photos that did arrive. The caller passes a token that
+    /// closing the browser does not cancel, so that a run is never cut off between an item and its photos.
+    /// </summary>
     public async Task<ExportImportResult> RunAsync(ExportPlan plan, IImportSource source, CancellationToken cancellationToken)
     {
         // The entry is added before the first save, so an import that stops half way still has its line in the log.
@@ -705,39 +745,53 @@ public partial class ExportImport(
             items++;
 
             var added = 0;
-            foreach (var planned in row.Files)
+            try
             {
-                try
+                foreach (var planned in row.Files)
                 {
-                    await using var content = await source.OpenSeekableAsync(planned.Entry, uploadOptions.Value.MaxFileSizeBytes, cancellationToken);
-                    var examined = await uploads.ExamineAsync(content, content.Length, documents: true, cancellationToken);
-                    if (examined.Error != UploadError.None || examined.Sha256 != planned.Examined.Sha256)
+                    var stored = false;
+                    try
                     {
-                        failed++;
-                        continue;
-                    }
+                        await using var content = await source.OpenSeekableAsync(planned.Entry, uploadOptions.Value.MaxFileSizeBytes, cancellationToken);
+                        var examined = await uploads.ExamineAsync(content, content.Length, documents: true, cancellationToken);
+                        if (examined.Error != UploadError.None || examined.Sha256 != planned.Examined.Sha256)
+                        {
+                            failed++;
+                            continue;
+                        }
 
-                    var stored = await uploads.StoreAsync(item, content, planned.Name, content.Length, examined, cancellationToken);
-                    files++;
-                    added++;
-                    if (planned.AltText is not null || planned.Caption is not null || planned.Rotation != 0)
-                    {
-                        stored.AltText = planned.AltText;
-                        stored.Caption = planned.Caption;
-                        stored.Rotation = planned.Rotation;
-                        await db.SaveChangesAsync(cancellationToken);
+                        var file = await uploads.StoreAsync(item, content, planned.Name, content.Length, examined, cancellationToken);
+                        stored = true;
+                        files++;
+                        added++;
+                        if (planned.AltText is not null || planned.Caption is not null || planned.Rotation != 0)
+                        {
+                            file.AltText = planned.AltText;
+                            file.Caption = planned.Caption;
+                            file.Rotation = planned.Rotation;
+                            await db.SaveChangesAsync(cancellationToken);
+                        }
                     }
-                }
-                catch (Exception exception) when (exception is EntryTooLargeException or InvalidDataException or IOException)
-                {
-                    failed++;
+                    catch (Exception exception)
+                    {
+                        // Whatever went wrong with one file (a full disk, a lost connection, a broken ZIP entry) costs that file only:
+                        // it is counted, and what was thrown is never shown, because it can hold paths. A stop is not a failure.
+                        DiscardUnsaved(item);
+                        if (exception is OperationCanceledException)
+                            throw;
+                        if (!stored)
+                            failed++;
+                    }
                 }
             }
-
-            if (added > 0)
+            finally
             {
-                audit.Record(AuditAction.PhotosAdded, item.Title, item);
-                await db.SaveChangesAsync(cancellationToken);
+                // Also when the loop is cut short: the photos that did arrive are in the log.
+                if (added > 0)
+                {
+                    audit.Record(AuditAction.PhotosAdded, item.Title, item);
+                    await db.SaveChangesAsync(CancellationToken.None);
+                }
             }
         }
 
@@ -747,6 +801,14 @@ public partial class ExportImport(
         line.Subject = $"{items} / {files}";
         await db.SaveChangesAsync(cancellationToken);
         return new ExportImportResult(items, files, failed, created.Count);
+    }
+
+    /// <summary>Forgets a photo that was never saved, so that the next save does not try it again and fail with it.</summary>
+    private void DiscardUnsaved(ArchiveItem item)
+    {
+        foreach (var entry in db.ChangeTracker.Entries<MediaFile>().Where(e => e.State is EntityState.Added or EntityState.Modified).ToList())
+            entry.State = entry.State == EntityState.Added ? EntityState.Detached : EntityState.Unchanged;
+        item.MediaFiles.RemoveAll(f => f.Id == 0);
     }
 
     /// <summary>The message for a refused export, in the reader's language.</summary>
@@ -769,7 +831,7 @@ public partial class ExportImport(
     {
         ExportIssueKind.ValueUnknown => localizer["This value is not one this archive knows."],
         ExportIssueKind.ValueInvalid => localizer["This value is not valid."],
-        ExportIssueKind.TooLong => localizer["This text can be at most {1} characters long.", "", issue.Detail!],
+        ExportIssueKind.TooLong => localizer.Plural("This text can be at most {0, plural, one {# character} other {# characters}} long.", int.Parse(issue.Detail!, CultureInfo.InvariantCulture)),
         ExportIssueKind.DateUnreadable => localizer["This date could not be understood. Please include a year, for example: 1953, 12.03.1953, circa 1950, 1950s, 1950–1955."],
         ExportIssueKind.RightsUnknown => localizer["This is not one of the archive's rights statements. Write its web address as an export does, or leave the cell empty."],
         ExportIssueKind.TagTooLong => localizer.Plural("A tag can be at most {0, plural, one {# character} other {# characters}} long.", int.Parse(issue.Detail!, CultureInfo.InvariantCulture)),
@@ -784,8 +846,8 @@ public partial class ExportImport(
         ExportIssueKind.ItemRejected => localizer["Left out: it was rejected in the other archive."],
         ExportIssueKind.ItemWithdrawn => localizer["Left out: its contributor withdrew their consent in the other archive."],
         ExportIssueKind.NoConsentToShare => localizer["Left out: its contributor did not agree to it being shared further."],
-        ExportIssueKind.ItemAlreadyThere => localizer["An item with this title and date is already in this collection."],
-        ExportIssueKind.ItemAlreadyThereDifferentText => localizer["An item with this title and date is already in this collection, with a different description. It is not changed."],
+        ExportIssueKind.ItemAlreadyThere => localizer["An item with this title and date is already in this collection. It is not changed, and photos it lacks are not added."],
+        ExportIssueKind.ItemAlreadyThereDifferentText => localizer["An item with this title and date is already in this collection, with a different description. It is not changed, and photos it lacks are not added."],
         ExportIssueKind.SameAsEarlierItem => localizer["The same title and date as item {0}, in the same collection.", issue.Detail!],
         ExportIssueKind.AllFilesAlreadyThere => localizer["Every photo of this item is already in the archive."],
         ExportIssueKind.FileMarkedProblem => localizer["The other archive could not export this file, so it is left out."],
