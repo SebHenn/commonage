@@ -100,6 +100,28 @@ on doing so, even if you take it back later.
 Contributions from before this was possible agreed to this website only. Their picture and text stay out of link previews and the feed,
 and that is not something you can change without asking them, and there is no button for it yet.
 
+## Holding something back
+
+Publishing does not have to mean everything at once. Two choices on an item, both on the edit page (and for many items at
+once, see below), keep part of it from visitors. They apply to published items; a draft is hidden anyway.
+
+- **What visitors get.** "Everything" is the usual case. "The record only, without pictures and recordings" shows the title,
+  description, date, tags and place, and no picture, no thumbnail, no recording, no PDF, no link-preview picture and no match
+  on the text inside a PDF. Use it for a record you want known about while the picture itself must stay with the family or the
+  archive. A recording's **description is its transcript**, so a record-only recording still shows the transcript; if the words
+  must not be public either, keep the item a draft. Contributors cannot ask for this when they send something in.
+- **Public from.** A date, optional. Until the start of that day, in the archive's time zone, the item is as hidden as a draft:
+  not on the page, in search, in a collection's count, in the feed or in the sitemap, and its pictures give "not found". On that
+  day it appears by itself; nobody needs to be there. The date it is listed under follows the date it opens. Take the date away to
+  open it at once, and it is listed as of now.
+
+An item held back wears a badge in the list ("Record only", "Public from ..."), and the **Preview** says in its banner what visitors
+will see. The list can be filtered under **Kept back from visitors**, and many items can be changed together: tick them, choose
+**Set what visitors get** or **Set the public-from date** and confirm. Only curators can set either, and each change is in the item's history.
+
+Feeds and the sitemap are kept for ten minutes, so a change can take that long to reach everyone. Taking something back from
+people who already saw it is not possible: whoever saved a picture keeps it.
+
 ## Working through many items
 
 Open the item list and filter it: by collection, or by what is "still needed", such as a date. Open the first item and use

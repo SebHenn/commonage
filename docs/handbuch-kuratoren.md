@@ -108,6 +108,31 @@ freien Lizenz weiterverwendet hat, darf das weiter tun, auch wenn Sie die Lizenz
 Beiträge aus der Zeit davor haben nur dieser Website zugestimmt. Ihr Bild und ihr Text bleiben aus Linkvorschauen und dem Feed heraus. Das lässt
 sich nicht ändern, ohne die Person zu fragen, und dafür gibt es noch keine Schaltfläche.
 
+## Etwas zurückhalten
+
+Veröffentlichen muss nicht heißen, alles auf einmal zu zeigen. Zwei Einstellungen bei einem Eintrag, beide auf der
+Bearbeitungsseite (für viele Einträge zugleich siehe unten), halten einen Teil vor Besuchern zurück. Sie gelten für veröffentlichte
+Einträge; ein Entwurf ist ohnehin verborgen.
+
+- **Was Besucher bekommen.** „Alles“ ist der Normalfall. „Nur der Eintrag, ohne Bilder und Aufnahmen“ zeigt Titel, Beschreibung,
+  Datum, Schlagwörter und Ort, aber kein Bild, keine Vorschau, keine Aufnahme, kein PDF, kein Bild in der Linkvorschau und keinen
+  Treffer im Text eines PDFs. Nutzen Sie das für einen Eintrag, von dem man wissen soll, während das Bild selbst bei der Familie
+  oder im Archiv bleiben muss. Die **Beschreibung einer Aufnahme ist ihre Abschrift**, also zeigt auch eine Aufnahme „nur als Eintrag“
+  die Abschrift; sollen die Worte ebenfalls nicht öffentlich sein, lassen Sie den Eintrag ein Entwurf. Einsendende Personen können das
+  beim Einsenden nicht wünschen.
+- **Öffentlich ab.** Ein Datum, freiwillig. Bis zum Beginn dieses Tages, in der Zeitzone des Archivs, ist der Eintrag so verborgen wie
+  ein Entwurf: nicht auf der Seite, nicht in der Suche, nicht in der Zahl einer Sammlung, nicht im Feed und nicht in der Sitemap, und seine
+  Bilder liefern „nicht gefunden“. An diesem Tag erscheint er von selbst; niemand muss dabei sein. Das Datum, unter dem er aufgeführt
+  wird, folgt dem Tag, an dem er sich öffnet. Nehmen Sie das Datum weg, öffnet er sofort und wird ab jetzt aufgeführt.
+
+Ein zurückgehaltener Eintrag trägt in der Liste eine Marke („Nur Eintrag“, „Öffentlich ab ...“), und die **Vorschau** sagt im Hinweis, was
+Besucher sehen. Die Liste lässt sich unter **Vor Besuchern zurückgehalten** filtern, und viele Einträge lassen sich zusammen ändern:
+ankreuzen, **Festlegen, was Besucher bekommen** oder **Öffentlich-ab-Datum festlegen** wählen und bestätigen. Nur Kuratoren können beides einstellen,
+und jede Änderung steht im Verlauf des Eintrags.
+
+Feed und Sitemap werden zehn Minuten vorgehalten, eine Änderung kann also so lange brauchen, bis sie überall ankommt. Etwas denen
+wieder wegnehmen, die es schon gesehen haben, geht nicht: Wer ein Bild gespeichert hat, behält es.
+
 ## Viele Einträge bearbeiten
 
 Öffnen Sie die Liste der Einträge und filtern Sie sie: nach Sammlung oder danach, was noch fehlt, zum Beispiel ein Datum.

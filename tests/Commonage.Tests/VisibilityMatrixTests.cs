@@ -139,6 +139,48 @@ public class VisibilityMatrixTests(CommonageAppFactory app)
         Assert.DoesNotContain($"Title {record.Word}", await TextAsync(visitor, $"/search?q=Pages+{record.Word}"));
     }
 
+    [Fact]
+    public async Task Hidden_items_beside_a_shown_one_do_not_appear_as_its_neighbours_or_under_a_shared_tag()
+    {
+        var word = TestData.UniqueWord("neighbours");
+        var (shownId, collectionId, hiddenWords) = await app.WithDbAsync(async db =>
+        {
+            var now = DateTime.UtcNow;
+            var collection = new Collection { Title = $"Shared {word}", CreatedAt = now };
+            var tag = new Tag { Name = $"T {word}", NormalizedName = $"t {word}", Kind = TagKind.Topic };
+            ArchiveItem Make(string kind, Action<ArchiveItem> state)
+            {
+                var item = new ArchiveItem { Title = $"{kind} {word}", Collection = collection, CreatedAt = now, UpdatedAt = now };
+                item.TrySetDate("1954");
+                item.SetTags([tag]);
+                state(item);
+                return item;
+            }
+            var shown = Make("Shown", i => i.Publish(now));
+            var hidden = new[]
+            {
+                Make("Draftneighbour", _ => { }),
+                Make("Embargoneighbour", i => { i.Publish(now); i.SetPublicFrom(DateOnly.FromDateTime(now).AddDays(3), now); }),
+                Make("Binneighbour", i => { i.Publish(now); i.MoveToBin(now); }),
+            };
+            db.AddRange(collection, shown);
+            db.AddRange(hidden);
+            await db.SaveChangesAsync();
+            return (shown.Id, collection.Id, hidden.Select(h => h.Title).ToArray());
+        });
+        using var visitor = app.CreateClient();
+
+        var text = string.Concat(
+            await TextAsync(visitor, $"/items/{shownId}"),
+            await TextAsync(visitor, $"/collections/{collectionId}"),
+            await TextAsync(visitor, $"/search?q={word}"),
+            await TextAsync(visitor, "/search?q=1954"));
+
+        Assert.Contains($"Shown {word}", text);
+        foreach (var title in hiddenWords)
+            Assert.DoesNotContain(title, text);
+    }
+
     private static async Task<string> TextAsync(HttpClient client, string address)
     {
         var response = await client.GetAsync(address);
