@@ -7,6 +7,12 @@ version may change things that need attention when updating, and these notes say
 
 ### For curators
 
+- **Read an export into an archive.** "Read an export into this archive" on the Export page (admins) takes the ZIP file of a Commonage
+  export, from this archive or another, and makes a draft of each item, with its photos, tags, collection, date, "What visitors
+  get" and "Public from". A dry run comes first. What a contributor or visitor gave to the other archive stays there: names,
+  email addresses, consent texts, visitor notes, internal notes and who gave an item are never read. Items that were rejected or
+  withdrawn, or whose contributor did not agree to sharing, are left out and listed with the reason. An item that is already
+  here (same collection, title and date) is never changed. Reads export format versions 4 to 8.
 - A published item can have an **embargo**: set "Public from" on the item, and until the start of that day (in the archive's time
   zone) it is as hidden as a draft, everywhere, including its pictures. Lists, feeds and the start page put the item where it
   belongs on the day it opens. Exports of published items leave out items still under embargo (export format version 8).

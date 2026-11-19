@@ -232,6 +232,17 @@ or email address, including items in the bin. On each item, curators can:
 
 Backups still contain removed data until they are replaced. Delete backups you no longer need.
 
+## Reading an export
+
+Admins can read the ZIP file of a Commonage export on the page **Read an export into this archive** (linked from Export). The
+file is kept in `import-staging` on the media volume until the import is done, or a day. It shares the one-at-a-time lock with
+the spreadsheet import and runs inside one web request, so the reverse proxy needs the same long timeout. Limits: a ZIP of at most
+4 GB; `archive.json` at most 256 MB when unpacked, counted as it is read; at most 20,000 items, 5,000 collections, 50,000 tags and
+500 files per item; at most 8 GB of files in all; at most 50 new collections per run. The format versions 4 to 8 are read. Every
+item is a draft, and the activity log records the run ("Imported items from a Commonage export", with counts only) and each
+new collection, never a title of the other archive's contributors or their details. The database is only added to: nothing is
+changed or removed, so a run that breaks off can be run again.
+
 ## Export
 
 "Manage archive" → "Export" (admins) downloads the whole archive as one ZIP file. It needs no Commonage to read, so

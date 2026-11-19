@@ -148,6 +148,22 @@ First you see a dry run. It changes nothing and lists unreadable dates, collecti
 and rows that would be there twice. Fix the spreadsheet and check again, or import the rows that are in order and deal with the
 rest later. Everything imported is a draft. If it breaks off, run it again: what is already there is left out.
 
+## Reading an export
+
+Admins can read the ZIP file of a Commonage export into an archive, to merge two archives or to start a new one from another:
+**Read an export into this archive** on the Export page. A dry run comes first and changes nothing.
+
+What arrives: the title, description, date, tags, collection, rights, "What visitors get" and "Public from" of each item, and its
+photos. Everything arrives as a **draft**, whatever it was in the other archive, so you decide what to publish. A collection
+that does not exist here is created (at most 50 in one go; import again for the rest). A tag that exists here keeps the kind it
+has here.
+
+What does not arrive, and why: the names, email addresses and consent texts of contributors, notes from visitors, internal
+notes and who gave an item belong to the other archive and its promises. Items that were rejected or withdrawn there, and items
+whose contributor did not agree to sharing, are left out and listed. Items in the other archive's bin are not in its export, so
+they are not seen. An item that is already here (same collection, title and date) is not changed, and a photo that is already
+here is not added a second time. Run the same export again after a break-off: what is there is left out.
+
 ## A box full of photos
 
 **Add many photos** on the item list makes one draft from each photo. Enter what they share first: the collection, and if
