@@ -24,7 +24,7 @@ public static class CollectionCards
     /// <summary>Collections with published items, in the order curators gave them.</summary>
     public static Task<List<CollectionCard>> LoadCollectionCardsAsync(this CommonageDbContext db, CancellationToken cancellationToken) =>
         db.Collections
-            .Where(c => c.Items.Any(i => i.Status == ItemStatus.Published))
+            .Where(c => c.Items.AsQueryable().Any(Visibility.Item))
             .OrderBy(c => c.Position).ThenBy(c => c.Title).ThenBy(c => c.Id)
             .ToCards()
             .ToListAsync(cancellationToken);
@@ -38,19 +38,19 @@ public static class CollectionCards
             c.Id,
             c.Title,
             c.Description,
-            c.Items.Count(i => i.Status == ItemStatus.Published),
-            c.Items.Where(i => i.Status == ItemStatus.Published)
+            c.Items.AsQueryable().Count(Visibility.Item),
+            c.Items.AsQueryable().Where(Visibility.Item)
                 .SelectMany(i => i.MediaFiles)
                 .Where(f => f.Status == ProcessingStatus.Ready && f.Id == c.CoverMediaFileId && !f.ContentType.StartsWith("audio/"))
                 .Select(f => (int?)f.Id)
                 .FirstOrDefault()
-            ?? c.Items.Where(i => i.Status == ItemStatus.Published)
+            ?? c.Items.AsQueryable().Where(Visibility.Item)
                 .SelectMany(i => i.MediaFiles)
                 .Where(f => f.Status == ProcessingStatus.Ready && !f.ContentType.StartsWith("audio/"))
                 .OrderBy(f => f.ArchiveItemId).ThenBy(f => f.Position).ThenBy(f => f.Id)
                 .Select(f => (int?)f.Id)
                 .FirstOrDefault(),
             new YearSpan(
-                c.Items.Where(i => i.Status == ItemStatus.Published).Min(i => (int?)(i.DateFrom ?? i.DateTo)!.Value.Year),
-                c.Items.Where(i => i.Status == ItemStatus.Published).Max(i => (int?)(i.DateTo ?? i.DateFrom)!.Value.Year))));
+                c.Items.AsQueryable().Where(Visibility.Item).Min(i => (int?)(i.DateFrom ?? i.DateTo)!.Value.Year),
+                c.Items.AsQueryable().Where(Visibility.Item).Max(i => (int?)(i.DateTo ?? i.DateFrom)!.Value.Year))));
 }

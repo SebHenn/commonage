@@ -297,7 +297,7 @@ public class ReadableItemTests(CommonageAppFactory app)
             Assert.True(page.IndexOf($"/media/{three}/preview", StringComparison.Ordinal) < page.IndexOf($"/media/{one}/preview", StringComparison.Ordinal));
 
             var title = await app.WithDbAsync(db => db.ArchiveItems.Where(i => i.Id == item.Id).Select(i => i.Title).SingleAsync());
-            var card = await app.WithDbAsync(db => db.PublishedItems.Where(i => i.Id == item.Id).Select(ItemSummary.FromItem).SingleAsync());
+            var card = await app.WithDbAsync(db => db.VisibleItems.Where(i => i.Id == item.Id).Select(ItemSummary.FromItem).SingleAsync());
             Assert.Equal(two, card.ThumbnailMediaFileId);
 
             // An open form can still be saved, and putting photos in order is one thing that happened, not many.

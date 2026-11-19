@@ -21,7 +21,7 @@ queue server and no build step for the front end: pages work without JavaScript,
 
 What is special about it, and easy to break by accident:
 
-- **Only published items are public.** Public pages go through `db.PublishedItems`, and `/media` serves nothing else.
+- **Only published items are public.** Public pages go through `db.VisibleItems`, and `/media` serves only `db.VisibleMedia`.
 - **Originals are private.** Visitors only ever see generated pictures, which carry no EXIF. So GPS positions stay private.
 - **A contributor's personal details stay with curators.** They are never on a public page unless a curator chose so, and never in
   the activity log.

@@ -889,6 +889,8 @@ shows the years of its published items. M19 is complete.
 **M27 Visibility levels**
 
 - The plan is in [plan-m27-visibility.md](plan-m27-visibility.md).
+- *Built (part 1):* `VisibleItems` and `VisibleMedia` replace `PublishedItems`; the matrix and guard tests are in. It found two
+  leaks that were already there (a collection page and the search filter naming a collection with nothing public), now fixed.
 - First a record without its media, then an embargo date. `PublishedItems` becomes `VisibleItems(viewer)`. Members-only waits
   for a group to ask, because visitor accounts are not planned. A separate plan and an adversarial privacy review come before
   any code, and every public page, the feed, the sitemap, link previews and the published-only export get a test with such

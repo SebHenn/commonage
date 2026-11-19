@@ -64,7 +64,7 @@ public static class PublicFeeds
 
         var address = context.Request.BaseAddress();
         // What people agreed to before this existed was "this website". A feed is copied to other places, so those stay out of it.
-        var items = await db.PublishedItems
+        var items = await db.VisibleItems
             .Where(i => i.Contribution == null || i.Contribution.ConsentCoversSharing)
             .Include(i => i.MediaFiles.Where(f => f.Status == ProcessingStatus.Ready && !f.ContentType.StartsWith("audio/")).OrderBy(f => f.Position).ThenBy(f => f.Id).Take(1))
             .OrderByDescending(i => i.PublishedAt).ThenByDescending(i => i.Id)
@@ -123,11 +123,11 @@ public static class PublicFeeds
 
         var address = context.Request.BaseAddress();
         var collections = await db.Collections
-            .Where(c => c.Items.Any(i => i.Status == ItemStatus.Published))
+            .Where(c => c.Items.AsQueryable().Any(Visibility.Item))
             .OrderBy(c => c.Id)
             .Select(c => c.Id)
             .ToListAsync(cancellationToken);
-        var items = await db.PublishedItems
+        var items = await db.VisibleItems
             .OrderByDescending(i => i.PublishedAt).ThenByDescending(i => i.Id)
             .Take(MaxSitemapItems)
             .Select(i => new { i.Id, i.UpdatedAt })

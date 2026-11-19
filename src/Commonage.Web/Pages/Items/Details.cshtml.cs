@@ -23,7 +23,7 @@ public class DetailsModel(CommonageDbContext db, ArchiveProfile profile, IString
 
     public async Task<IActionResult> OnGetAsync(int id, CancellationToken cancellationToken)
     {
-        var item = await db.PublishedItems
+        var item = await db.VisibleItems
             .Include(i => i.Collection)
             .Include(i => i.Contribution)
             .Include(i => i.Tags.OrderBy(t => t.Name))

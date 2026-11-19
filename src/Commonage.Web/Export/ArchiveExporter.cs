@@ -51,7 +51,7 @@ public class ArchiveExporter(
         // changes the archive while a large export is being written. Nothing is written to the database.
         await using var snapshot = await db.Database.BeginTransactionAsync(System.Data.IsolationLevel.RepeatableRead, cancellationToken);
         var collections = await db.Collections.AsNoTracking().OrderBy(c => c.Id).ToListAsync(cancellationToken);
-        var source = (options.PublishedOnly ? db.PublishedItems : db.ArchiveItems).AsNoTracking();
+        var source = (options.PublishedOnly ? db.VisibleItems : db.ArchiveItems).AsNoTracking();
         if (options.PublishedOnly)
         {
             var used = await source.Select(i => i.CollectionId).Distinct().ToListAsync(cancellationToken);

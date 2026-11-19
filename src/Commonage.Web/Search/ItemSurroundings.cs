@@ -14,7 +14,7 @@ public record ItemSurroundings(ItemLink? Previous, ItemLink? Next, IReadOnlyList
 
     public static async Task<ItemSurroundings> LoadAsync(CommonageDbContext db, ArchiveItem item, CancellationToken cancellationToken)
     {
-        var inCollection = db.PublishedItems.Where(i => i.CollectionId == item.CollectionId && i.Id != item.Id);
+        var inCollection = db.VisibleItems.Where(i => i.CollectionId == item.CollectionId && i.Id != item.Id);
         var sort = await db.Collections.Where(c => c.Id == item.CollectionId).Select(c => c.Sort).FirstAsync(cancellationToken);
 
         // In the order of the collection's page.
@@ -36,7 +36,7 @@ public record ItemSurroundings(ItemLink? Previous, ItemLink? Next, IReadOnlyList
         if (item is { DateFrom: { } from, DateTo: { } to })
         {
             var alreadyShown = sameCollection.Select(i => i.Id).ToList();
-            sameTime = await db.PublishedItems
+            sameTime = await db.VisibleItems
                 .Where(i => i.Id != item.Id && !alreadyShown.Contains(i.Id) && i.DateFrom != null && i.DateTo != null && i.DateFrom <= to && i.DateTo >= from)
                 // Closest to the same period first, so that "summer 1953" comes before "1930–1955".
                 .OrderBy(i => Math.Abs(i.DateFrom!.Value.DayNumber - from.DayNumber) + Math.Abs(i.DateTo!.Value.DayNumber - to.DayNumber))

@@ -46,7 +46,10 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options)
     public const string FoldFunction = "commonage_fold";
 
     /// <summary>Items the public may see. Every public page must start from this query.</summary>
-    public IQueryable<ArchiveItem> PublishedItems => ArchiveItems.Where(i => i.Status == ItemStatus.Published);
+    public IQueryable<ArchiveItem> VisibleItems => ArchiveItems.Where(Visibility.Item);
+
+    /// <summary>Files the public may be given. <c>/media</c> and every cover or first photo start from this.</summary>
+    public IQueryable<MediaFile> VisibleMedia => MediaFiles.Where(Visibility.Media);
 
     /// <summary>Items in the bin. Query filters hide them from every other query, see <see cref="OnModelCreating"/>.</summary>
     public IQueryable<ArchiveItem> BinnedItems => ArchiveItems.IgnoreQueryFilters().Where(i => i.DeletedAt != null);

@@ -33,7 +33,7 @@ public record TextSearch(string? Query, IReadOnlyList<DateInSearch> Dates)
 
 /// <summary>
 /// Filters and sorts archive items. It never decides what the caller may see: public pages pass
-/// <see cref="CommonageDbContext.PublishedItems"/>, curator pages pass all items.
+/// <see cref="CommonageDbContext.VisibleItems"/>, curator pages pass all items.
 /// </summary>
 public static class ItemSearch
 {

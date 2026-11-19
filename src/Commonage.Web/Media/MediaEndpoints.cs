@@ -55,8 +55,7 @@ public static class MediaEndpoints
     private static async Task<IResult> ServePublicDerivativeAsync(
         int id, string variant, CommonageDbContext db, IFileStorage storage, ArchiveProfile profile, HttpContext context)
     {
-        var file = await db.PublishedItems
-            .SelectMany(i => i.MediaFiles)
+        var file = await db.VisibleMedia
             .FirstOrDefaultAsync(f => f.Id == id && f.Status == ProcessingStatus.Ready);
         if (file is null || file.IsAudio)
             return Results.NotFound();
@@ -77,8 +76,7 @@ public static class MediaEndpoints
     /// </summary>
     private static async Task<IResult> ServePublicAudioAsync(int id, CommonageDbContext db, IFileStorage storage, HttpContext context)
     {
-        var file = await db.PublishedItems
-            .SelectMany(i => i.MediaFiles)
+        var file = await db.VisibleMedia
             .FirstOrDefaultAsync(f => f.Id == id && f.Status == ProcessingStatus.Ready && f.ContentType.StartsWith("audio/"));
         if (file is null || !storage.Exists(file.AudioKey))
             return Results.NotFound();
@@ -101,8 +99,7 @@ public static class MediaEndpoints
     /// <summary>One page of a published PDF, drawn as a picture. The PDF itself is never served to visitors.</summary>
     private static async Task<IResult> ServePublicPageAsync(int id, int page, CommonageDbContext db, IFileStorage storage, HttpContext context)
     {
-        var file = await db.PublishedItems
-            .SelectMany(i => i.MediaFiles)
+        var file = await db.VisibleMedia
             .FirstOrDefaultAsync(f => f.Id == id && f.Status == ProcessingStatus.Ready);
         if (file is null || page < 1 || page > (file.PageCount ?? 0))
             return Results.NotFound();

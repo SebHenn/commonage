@@ -111,7 +111,7 @@ public class TellModel(
     {
         if (!(await profile.GetAsync()).AcceptVisitorNotes)
             return false;
-        if (await db.PublishedItems.FirstOrDefaultAsync(i => i.Id == id, cancellationToken) is not { } item)
+        if (await db.VisibleItems.FirstOrDefaultAsync(i => i.Id == id, cancellationToken) is not { } item)
             return false;
         Item = item;
         return true;

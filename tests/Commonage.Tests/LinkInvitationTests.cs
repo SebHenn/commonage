@@ -24,7 +24,10 @@ public class LinkInvitationTests(CommonageAppFactory app)
                 InviteOnCollectionPage = invite,
                 CreatedAt = DateTime.UtcNow,
             };
-            db.Add(link);
+            // A collection with nothing public has no page, so each one holds a published item.
+            var item = new ArchiveItem { Title = $"Mill {suffix}", Collection = collection, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow };
+            item.Publish(DateTime.UtcNow);
+            db.AddRange(link, item);
             await db.SaveChangesAsync();
             return (collection.Id, link.Id, link.Token);
         });

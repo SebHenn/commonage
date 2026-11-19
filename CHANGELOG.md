@@ -51,6 +51,8 @@ Updating needs no picture regeneration. Migrations run by themselves at start.
 
 ### For visitors and curators
 
+- A collection with nothing public in it, only drafts or items in the bin, no longer has a page of its own, and the search's
+  collection filter no longer lists it. Before, anyone who knew or guessed its number could read its title and description.
 - A year, decade, month or period typed into the search, such as "Mill Street 1950s", "circa 1960" or "before 1945", also finds
   what is dated then. The page says how it read the date. Curators' item list searches the same way.
 - The start page shows the archive through the decades, and the search shows the decades of what it found. Each decade opens
