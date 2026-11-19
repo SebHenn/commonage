@@ -39,7 +39,7 @@ public sealed class ImportStaging(string storageRoot)
             if (Directory.Exists(DirectoryOf(id)))
                 Directory.Delete(DirectoryOf(id), recursive: true);
         }
-        catch (IOException)
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
             // Left over, and removed with the next old one.
         }
@@ -57,9 +57,9 @@ public sealed class ImportStaging(string storageRoot)
                 if (now - Directory.GetLastWriteTimeUtc(directory) > age)
                     Directory.Delete(directory, recursive: true);
             }
-            catch (IOException)
+            catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
             {
-                // In use, so it is not old.
+                // In use or not ours to remove, so it stays, and one such folder must not stop the page or the others from being cleared.
             }
         }
     }
