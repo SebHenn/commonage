@@ -1029,4 +1029,51 @@
   <data name="Shown as a record only" xml:space="preserve"><value>Nur als Datensatz gezeigt</value></data>
   <data name="Under embargo" xml:space="preserve"><value>Unter Sperrfrist</value></data>
   <data name="Visitors do not see this photo yet or at all" xml:space="preserve"><value>Besucher sehen dieses Foto noch nicht oder gar nicht</value></data>
+  <data name="An item with this title and date is already in this collection, with a different description. It is not changed." xml:space="preserve"><value>Ein Objekt mit diesem Titel und Datum ist in dieser Sammlung schon vorhanden, mit anderer Beschreibung. Es wird nicht geändert.</value></data>
+  <data name="Check the export" xml:space="preserve"><value>Export prüfen</value></data>
+  <data name="Collections that would be created: {0}" xml:space="preserve"><value>Sammlungen, die angelegt würden: {0}</value></data>
+  <data name="Created the collection while importing" xml:space="preserve"><value>Sammlung beim Import angelegt</value></data>
+  <data name="Every photo of this item is already in the archive." xml:space="preserve"><value>Jedes Foto dieses Objekts ist schon im Archiv.</value></data>
+  <data name="Field" xml:space="preserve"><value>Feld</value></data>
+  <data name="Good to know" xml:space="preserve"><value>Gut zu wissen</value></data>
+  <data name="Import an export" xml:space="preserve"><value>Export einlesen</value></data>
+  <data name="Import from a spreadsheet instead" xml:space="preserve"><value>Stattdessen aus einer Tabelle importieren</value></data>
+  <data name="Imported items become drafts, whatever they were in the other archive. A large import takes a while: keep this page open. If it breaks off, run it again: what is already there is left out." xml:space="preserve"><value>Eingelesene Objekte werden Entwürfe, was auch immer sie im anderen Archiv waren. Ein großer Import dauert eine Weile: Lassen Sie diese Seite offen. Bricht er ab, starten Sie ihn erneut: Was schon da ist, wird ausgelassen.</value></data>
+  <data name="Imported items from a Commonage export" xml:space="preserve"><value>Objekte aus einem Commonage-Export eingelesen</value></data>
+  <data name="Items left out on purpose: {0}" xml:space="preserve"><value>Absichtlich ausgelassene Objekte: {0}</value></data>
+  <data name="Items read: {0}" xml:space="preserve"><value>Gelesene Objekte: {0}</value></data>
+  <data name="Items that can be imported: {0}" xml:space="preserve"><value>Objekte, die importiert werden können: {0}</value></data>
+  <data name="Items with problems, which are left out: {0}" xml:space="preserve"><value>Objekte mit Problemen, die ausgelassen werden: {0}</value></data>
+  <data name="Left out" xml:space="preserve"><value>Ausgelassen</value></data>
+  <data name="Left out: it was rejected in the other archive." xml:space="preserve"><value>Ausgelassen: Es wurde im anderen Archiv abgelehnt.</value></data>
+  <data name="Left out: its contributor did not agree to it being shared further." xml:space="preserve"><value>Ausgelassen: Die Person, die es beigetragen hat, hat der Weitergabe nicht zugestimmt.</value></data>
+  <data name="Left out: its contributor withdrew their consent in the other archive." xml:space="preserve"><value>Ausgelassen: Die Person, die es beigetragen hat, hat ihre Einwilligung im anderen Archiv zurückgezogen.</value></data>
+  <data name="More lines than are listed here: {0}" xml:space="preserve"><value>Weitere Zeilen, die hier nicht aufgelistet sind: {0}</value></data>
+  <data name="One import creates at most {0, plural, one {# collection} other {# collections}}. Import again for the rest." xml:space="preserve"><value>Ein Import legt höchstens {0, plural, one {# Sammlung} other {# Sammlungen}} an. Importieren Sie erneut für den Rest.</value></data>
+  <data name="Please choose the ZIP file of an export." xml:space="preserve"><value>Bitte wählen Sie die ZIP-Datei eines Exports.</value></data>
+  <data name="Read an export into this archive" xml:space="preserve"><value>Einen Export in dieses Archiv einlesen</value></data>
+  <data name="Reads the ZIP file that the export of a Commonage archive makes, to merge two archives or to start a new one from another. Every item becomes a draft, and nothing is imported before you have seen a dry run." xml:space="preserve"><value>Liest die ZIP-Datei, die der Export eines Commonage-Archivs erzeugt, um zwei Archive zusammenzuführen oder ein neues aus einem anderen zu beginnen. Jedes Objekt wird ein Entwurf, und nichts wird importiert, bevor Sie einen Probelauf gesehen haben.</value></data>
+  <data name="Some items keep what the other archive chose for what visitors get of them, or the day from which they are public. They arrive as drafts either way." xml:space="preserve"><value>Manche Objekte behalten, was das andere Archiv dafür festgelegt hat, was Besucher davon bekommen, oder den Tag, ab dem sie öffentlich sind. Sie kommen in jedem Fall als Entwürfe an.</value></data>
+  <data name="The collection of this item is not in the export." xml:space="preserve"><value>Die Sammlung dieses Objekts ist nicht im Export.</value></data>
+  <data name="The days in the export differ from what this text means here. The days of the export are used." xml:space="preserve"><value>Die Tage im Export weichen von dem ab, was dieser Text hier bedeutet. Die Tage des Exports werden verwendet.</value></data>
+  <data name="The file archive.json in this export could not be read." xml:space="preserve"><value>Die Datei archive.json in diesem Export konnte nicht gelesen werden.</value></data>
+  <data name="The file archive.json in this export is too large to read." xml:space="preserve"><value>Die Datei archive.json in diesem Export ist zu groß zum Lesen.</value></data>
+  <data name="The other archive could not export this file, so it is left out." xml:space="preserve"><value>Das andere Archiv konnte diese Datei nicht exportieren, daher wird sie ausgelassen.</value></data>
+  <data name="The place of this file in the ZIP file is not the one an export writes." xml:space="preserve"><value>Der Ort dieser Datei in der ZIP-Datei ist nicht der, den ein Export schreibt.</value></data>
+  <data name="The same file as in item {0}." xml:space="preserve"><value>Dieselbe Datei wie in Objekt {0}.</value></data>
+  <data name="The same title and date as item {0}, in the same collection." xml:space="preserve"><value>Derselbe Titel und dasselbe Datum wie Objekt {0}, in derselben Sammlung.</value></data>
+  <data name="This ZIP file is not a Commonage export: it has no archive.json." xml:space="preserve"><value>Diese ZIP-Datei ist kein Commonage-Export: Sie enthält keine archive.json.</value></data>
+  <data name="This export has the format version {0}. This archive reads the versions {1} to {2}." xml:space="preserve"><value>Dieser Export hat die Formatversion {0}. Dieses Archiv liest die Versionen {1} bis {2}.</value></data>
+  <data name="This export holds more data than one import can read." xml:space="preserve"><value>Dieser Export enthält mehr Daten, als ein Import lesen kann.</value></data>
+  <data name="This export holds more items, files, tags or collections than one import can read." xml:space="preserve"><value>Dieser Export enthält mehr Objekte, Dateien, Schlagwörter oder Sammlungen, als ein Import lesen kann.</value></data>
+  <data name="This file does not match its checksum, so it is left out." xml:space="preserve"><value>Diese Datei passt nicht zu ihrer Prüfsumme, daher wird sie ausgelassen.</value></data>
+  <data name="This file is not in the ZIP file." xml:space="preserve"><value>Diese Datei ist nicht in der ZIP-Datei.</value></data>
+  <data name="This is not a Commonage export." xml:space="preserve"><value>Das ist kein Commonage-Export.</value></data>
+  <data name="This value is not one this archive knows." xml:space="preserve"><value>Diesen Wert kennt dieses Archiv nicht.</value></data>
+  <data name="This value is not valid." xml:space="preserve"><value>Dieser Wert ist ungültig.</value></data>
+  <data name="What happens" xml:space="preserve"><value>Was geschieht</value></data>
+  <data name="What is left out: the names, email addresses and consent texts of contributors, notes from visitors, internal notes, who gave an item, users, settings, and the activity log. Items that were rejected or withdrawn, or whose contributor did not agree to sharing, are not imported. An item that is already here is never changed." xml:space="preserve"><value>Was ausgelassen wird: Namen, E-Mail-Adressen und Einwilligungstexte der Beitragenden, Hinweise von Besuchern, interne Notizen, wer ein Objekt gegeben hat, Konten, Einstellungen und das Aktivitätsprotokoll. Abgelehnte oder zurückgezogene Objekte und solche, bei denen die Person der Weitergabe nicht zugestimmt hat, werden nicht importiert. Ein Objekt, das schon hier ist, wird nie geändert.</value></data>
+  <data name="What the export says" xml:space="preserve"><value>Was der Export sagt</value></data>
+  <data name="ZIP file of an export" xml:space="preserve"><value>ZIP-Datei eines Exports</value></data>
+  <data name="{0, plural, one {Import the one item that is in order} other {Import the # items that are in order}}" xml:space="preserve"><value>{0, plural, one {Das eine Objekt importieren, das in Ordnung ist} other {Die # Objekte importieren, die in Ordnung sind}}</value></data>
 </root>
