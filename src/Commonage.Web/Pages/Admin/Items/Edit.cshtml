@@ -17,6 +17,10 @@
     @if (Model.CurrentStatus is { } status)
     {
         <partial name="_StatusBadge" model="status" />
+        @if (Model.Input.MediaLevel == MediaLevel.RecordOnly)
+        {
+            <span class="badge text-bg-light border">@T["Record only"]</span>
+        }
     }
     @if (Model.CurrentStatus == ItemStatus.Published)
     {
@@ -256,6 +260,22 @@
             <div id="help-wanted-help" class="form-text">@T["Lists the item on the page that asks visitors for help, once it is published and the archive asks visitors."]</div>
         </div>
     </div>
+
+    @if (mayManage)
+    {
+        <fieldset class="mb-3">
+            <legend class="form-label fs-6">@T["What visitors get"]</legend>
+            <div class="form-check">
+                <input type="radio" asp-for="Input.MediaLevel" value="@MediaLevel.Everything" id="media-level-everything" class="form-check-input" aria-describedby="media-level-help" />
+                <label for="media-level-everything" class="form-check-label">@T["Everything: the record with its pictures and recordings"]</label>
+            </div>
+            <div class="form-check">
+                <input type="radio" asp-for="Input.MediaLevel" value="@MediaLevel.RecordOnly" id="media-level-record" class="form-check-input" aria-describedby="media-level-help" />
+                <label for="media-level-record" class="form-check-label">@T["The record only, without pictures and recordings"]</label>
+            </div>
+            <div id="media-level-help" class="form-text">@T["Applies once the item is published. A recording's transcript in the description stays visible."]</div>
+        </fieldset>
+    }
 
     <partial name="_Catalogue" model="Model" />
 

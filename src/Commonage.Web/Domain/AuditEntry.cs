@@ -7,6 +7,7 @@ public enum AuditAction
     ItemChanged,
     ItemPublished,
     ItemUnpublished,
+    ItemMediaLevelChanged,
     ItemDeleted,
     PhotosAdded,
     PhotoDeleted,

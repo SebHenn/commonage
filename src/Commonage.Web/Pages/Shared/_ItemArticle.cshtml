@@ -119,6 +119,10 @@
             }
         </div>
     }
+    @if (ViewData["RecordOnly"] is true)
+    {
+        <p class="item-record-only text-muted">@T["The archive shows this item as a record only. Its pictures and recordings are not shown here."]</p>
+    }
     <div class="item-text prose">
         @if (!string.IsNullOrWhiteSpace(Model.Description))
         {

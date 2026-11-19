@@ -219,7 +219,7 @@ else
                                 }
                             </td>
                             <td class="d-none d-md-table-cell">@item.CollectionTitle</td>
-                            <td><partial name="_StatusBadge" model="item.Status" /></td>
+                            <td><partial name="_StatusBadge" model="item.Status" />@if (item.RecordOnly) { <span class="badge text-bg-light border">@T["Record only"]</span> }</td>
                             <td class="d-none d-md-table-cell">@Dates.Moment(item.UpdatedAt)</td>
                         </tr>
                     }

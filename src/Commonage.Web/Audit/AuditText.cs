@@ -24,6 +24,7 @@ public static class AuditText
         AuditAction.ItemChanged => localizer["Changed the item"],
         AuditAction.ItemPublished => localizer["Published the item"],
         AuditAction.ItemUnpublished => localizer["Unpublished the item"],
+        AuditAction.ItemMediaLevelChanged => localizer["Changed what visitors get of the item"],
         AuditAction.ItemFieldRestored => localizer["Restored an earlier text of the item"],
         AuditAction.ItemDeleted => localizer["Deleted the item for good"],
         AuditAction.ItemMovedToBin => localizer["Moved the item to the bin"],
@@ -82,7 +83,7 @@ public static class AuditText
 
     public static AuditKind KindOf(AuditAction action) => action switch
     {
-        AuditAction.ItemCreated or AuditAction.ItemChanged or AuditAction.ItemFieldRestored or AuditAction.ItemPublished or AuditAction.ItemUnpublished
+        AuditAction.ItemCreated or AuditAction.ItemChanged or AuditAction.ItemFieldRestored or AuditAction.ItemPublished or AuditAction.ItemUnpublished or AuditAction.ItemMediaLevelChanged
             or AuditAction.ItemDeleted or AuditAction.ItemMovedToBin or AuditAction.ItemRestored or AuditAction.ItemPurged
             or AuditAction.ItemMovedToBinAfterKeptTime or AuditAction.ItemsImported => AuditKind.Items,
         AuditAction.PhotosAdded or AuditAction.PhotosArranged or AuditAction.PhotoDeleted or AuditAction.PhotoMovedToBin

@@ -7,6 +7,10 @@ version may change things that need attention when updating, and these notes say
 
 ### For curators
 
+- An item can be shown as a **record only**: visitors get its title, description, date, place and credit, but no picture, page
+  image or recording, and search does not find what its PDFs or captions say. Choose "What visitors get" on the item's page;
+  the item list shows a "Record only" badge. Exports of published items leave out the files of such items; the full export
+  keeps them (export format version 7).
 - The page of an item shows its **earlier texts**: when the title, description, date, credit, original location or reference
   number was changed, by whom, and what it said before, shown beside what the field says now. A curator can put an earlier text back with one button; the text it
   replaces is kept in turn. Texts from before this version have no history, and the history is not part of the export.

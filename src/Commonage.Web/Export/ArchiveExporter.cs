@@ -29,7 +29,7 @@ public class ArchiveExporter(
     ILogger<ArchiveExporter> logger)
 {
     public const string Format = "commonage-export";
-    public const int Version = 6;
+    public const int Version = 7;
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -69,6 +69,8 @@ public class ArchiveExporter(
         {
             var files = await db.MediaFiles.AsNoTracking()
                 .Where(f => batch.Contains(f.ArchiveItemId))
+                // A copy of what is public holds no file of an item shown as a record only.
+                .Where(f => !options.PublishedOnly || f.ArchiveItem.MediaLevel == MediaLevel.Everything)
                 .OrderBy(f => f.ArchiveItemId).ThenBy(f => f.Position).ThenBy(f => f.Id)
                 .ToListAsync(cancellationToken);
             foreach (var file in files)
@@ -188,7 +190,7 @@ public class ArchiveExporter(
                 : (await db.VisitorNotes.AsNoTracking().Where(n => ids.Contains(n.ArchiveItemId)).OrderBy(n => n.Id).ToListAsync(cancellationToken)).ToLookup(n => n.ArchiveItemId);
             foreach (var item in items)
             {
-                var files = item.MediaFiles.OrderBy(f => f.Position).ThenBy(f => f.Id).Select(file =>
+                var files = (options.PublishedOnly && item.MediaLevel == MediaLevel.RecordOnly ? [] : item.MediaFiles).OrderBy(f => f.Position).ThenBy(f => f.Id).Select(file =>
                 {
                     var problem = problems.GetValueOrDefault(file.Id);
                     return Describe(file, problem == "missing" ? null : PathOf(item.Id, file), problem);
@@ -268,6 +270,7 @@ public class ArchiveExporter(
         options.PublishedOnly || !options.IncludePersonalData ? null : item.InternalNotes,
         options.PublishedOnly ? null : item.NeedsTranscription,
         item.HelpWanted,
+        item.MediaLevel,
         item.Contribution is not { } contribution ? null : new ExportContribution(
             options.IncludePersonalData ? contribution.ContributorName : null,
             options.IncludePersonalData ? contribution.ContributorEmail : null,
@@ -420,6 +423,7 @@ internal record ExportItem(
     string? InternalNotes,
     bool? NeedsTranscription,
     bool HelpWanted,
+    MediaLevel MediaLevel,
     ExportContribution? Contribution,
     IReadOnlyList<ExportNote>? Notes,
     IReadOnlyList<ExportFile> Files);

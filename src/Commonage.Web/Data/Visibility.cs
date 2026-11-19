@@ -13,6 +13,11 @@ public static class Visibility
     /// <summary>An item visitors may see: published and, by the query filter, not in the bin.</summary>
     public static readonly Expression<Func<ArchiveItem, bool>> Item = i => i.Status == ItemStatus.Published;
 
-    /// <summary>A file visitors may be given: it belongs to a visible item.</summary>
-    public static readonly Expression<Func<MediaFile, bool>> Media = f => f.ArchiveItem.Status == ItemStatus.Published;
+    /// <summary>A visible item whose media visitors may also have. Covers and first photos come from these only.</summary>
+    public static readonly Expression<Func<ArchiveItem, bool>> ItemWithMedia =
+        i => i.Status == ItemStatus.Published && i.MediaLevel == MediaLevel.Everything;
+
+    /// <summary>A file visitors may be given: it belongs to a visible item that shows its media.</summary>
+    public static readonly Expression<Func<MediaFile, bool>> Media =
+        f => f.ArchiveItem.Status == ItemStatus.Published && f.ArchiveItem.MediaLevel == MediaLevel.Everything;
 }

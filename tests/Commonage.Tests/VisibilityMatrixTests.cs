@@ -40,6 +40,7 @@ public class VisibilityMatrixTests(CommonageAppFactory app)
                 ExtractedText = $"Pages {word}",
             };
             item.MediaFiles.Add(file);
+            item.FileText = new ItemFileText { Text = $"Pages {word}" };
             state(item, now);
             db.AddRange(collection, item);
             await db.SaveChangesAsync();
@@ -101,6 +102,31 @@ public class VisibilityMatrixTests(CommonageAppFactory app)
         using var visitor = app.CreateClient();
 
         Assert.Equal(HttpStatusCode.NotFound, (await visitor.GetAsync($"/items/{draft.ItemId}/tell")).StatusCode);
+    }
+
+    [Fact]
+    public async Task A_record_only_item_shows_its_record_and_nothing_about_its_media()
+    {
+        var record = await SeedAsync("recordonly", (i, now) => { i.Publish(now); i.MediaLevel = MediaLevel.RecordOnly; });
+        using var visitor = app.CreateClient();
+
+        var everything = new StringBuilder();
+        foreach (var address in Addresses)
+            everything.Append(await TextAsync(visitor, string.Format(address, record.Word)));
+        everything.Append(await TextAsync(visitor, $"/items/{record.ItemId}"));
+        everything.Append(await TextAsync(visitor, $"/collections/{record.CollectionId}"));
+        var text = everything.ToString();
+
+        foreach (var part in new[] { "Title ", "Words ", "Credit ", "P " })
+            Assert.Contains(part + record.Word, text);
+        foreach (var part in new[] { "Alt ", "Caption ", "Pages " })
+            Assert.DoesNotContain(part + record.Word, text);
+        Assert.DoesNotContain($"/media/{record.FileId}/", text);
+        foreach (var variant in new[] { "preview", "thumbnail", "card", "large" })
+            Assert.Equal(HttpStatusCode.NotFound, (await visitor.GetAsync($"/media/{record.FileId}/{variant}")).StatusCode);
+
+        // What the pages of the PDFs say is not found by a visitor, but a curator finds it.
+        Assert.DoesNotContain($"Title {record.Word}", await TextAsync(visitor, $"/search?q=Pages+{record.Word}"));
     }
 
     private static async Task<string> TextAsync(HttpClient client, string address)

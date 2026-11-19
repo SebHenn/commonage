@@ -12,7 +12,8 @@ public record ItemSummary(int Id, string Title, string? DateText, int? Thumbnail
         i.Id,
         i.Title,
         i.DateText,
-        i.MediaFiles.Where(f => f.Status == ProcessingStatus.Ready && !f.ContentType.StartsWith("audio/")).OrderBy(f => f.Position).ThenBy(f => f.Id).Select(f => (int?)f.Id).FirstOrDefault(),
+        // A record without its media has no picture, also not as a thumbnail.
+        i.MediaLevel != MediaLevel.Everything ? null : i.MediaFiles.Where(f => f.Status == ProcessingStatus.Ready && !f.ContentType.StartsWith("audio/")).OrderBy(f => f.Position).ThenBy(f => f.Id).Select(f => (int?)f.Id).FirstOrDefault(),
         i.Collection.Title);
 }
 
@@ -39,12 +40,12 @@ public static class CollectionCards
             c.Title,
             c.Description,
             c.Items.AsQueryable().Count(Visibility.Item),
-            c.Items.AsQueryable().Where(Visibility.Item)
+            c.Items.AsQueryable().Where(Visibility.ItemWithMedia)
                 .SelectMany(i => i.MediaFiles)
                 .Where(f => f.Status == ProcessingStatus.Ready && f.Id == c.CoverMediaFileId && !f.ContentType.StartsWith("audio/"))
                 .Select(f => (int?)f.Id)
                 .FirstOrDefault()
-            ?? c.Items.AsQueryable().Where(Visibility.Item)
+            ?? c.Items.AsQueryable().Where(Visibility.ItemWithMedia)
                 .SelectMany(i => i.MediaFiles)
                 .Where(f => f.Status == ProcessingStatus.Ready && !f.ContentType.StartsWith("audio/"))
                 .OrderBy(f => f.ArchiveItemId).ThenBy(f => f.Position).ThenBy(f => f.Id)

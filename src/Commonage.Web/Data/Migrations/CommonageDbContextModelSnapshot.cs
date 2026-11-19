@@ -80,6 +80,9 @@ namespace Commonage.Web.Data.Migrations
                         .HasMaxLength(20000)
                         .HasColumnType("character varying(20000)");
 
+                    b.Property<int>("MediaLevel")
+                        .HasColumnType("integer");
+
                     b.Property<bool>("NeedsTranscription")
                         .HasColumnType("boolean");
 

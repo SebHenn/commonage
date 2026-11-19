@@ -1007,4 +1007,12 @@
   <data name="The earlier text is back." xml:space="preserve"><value>Der frühere Text ist wieder da.</value></data>
   <data name="Original location" xml:space="preserve"><value>Ursprünglicher Ort</value></data>
   <data name="This text cannot be put back: the field would be empty or no longer reads as valid." xml:space="preserve"><value>Dieser Text kann nicht zurückgesetzt werden: Das Feld wäre leer oder ließe sich nicht mehr lesen.</value></data>
+  <data name="Applies once the item is published. A recording's transcript in the description stays visible." xml:space="preserve"><value>Gilt, sobald der Eintrag veröffentlicht ist. Die Abschrift einer Aufnahme in der Beschreibung bleibt sichtbar.</value></data>
+  <data name="Changed what visitors get of the item" xml:space="preserve"><value>Geändert, was Besucher vom Eintrag bekommen</value></data>
+  <data name="Everything: the record with its pictures and recordings" xml:space="preserve"><value>Alles: der Eintrag mit seinen Bildern und Aufnahmen</value></data>
+  <data name="Preview. Visitors see the record only, without its pictures and recordings." xml:space="preserve"><value>Vorschau. Besucher sehen nur den Eintrag, ohne seine Bilder und Aufnahmen.</value></data>
+  <data name="Record only" xml:space="preserve"><value>Nur Eintrag</value></data>
+  <data name="The archive shows this item as a record only. Its pictures and recordings are not shown here." xml:space="preserve"><value>Das Archiv zeigt diesen Eintrag nur als Eintrag. Seine Bilder und Aufnahmen werden hier nicht gezeigt.</value></data>
+  <data name="The record only, without pictures and recordings" xml:space="preserve"><value>Nur der Eintrag, ohne Bilder und Aufnahmen</value></data>
+  <data name="What visitors get" xml:space="preserve"><value>Was Besucher bekommen</value></data>
 </root>

@@ -27,7 +27,7 @@ public class DetailsModel(CommonageDbContext db, ArchiveProfile profile, IString
             .Include(i => i.Collection)
             .Include(i => i.Contribution)
             .Include(i => i.Tags.OrderBy(t => t.Name))
-            .Include(i => i.MediaFiles.Where(f => f.Status == ProcessingStatus.Ready).OrderBy(f => f.Position).ThenBy(f => f.Id))
+            .Include(i => i.MediaFiles.Where(f => f.Status == ProcessingStatus.Ready && f.ArchiveItem.MediaLevel == MediaLevel.Everything).OrderBy(f => f.Position).ThenBy(f => f.Id))
             .FirstOrDefaultAsync(i => i.Id == id, cancellationToken);
         if (item is null)
             return NotFound();

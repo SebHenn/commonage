@@ -74,6 +74,7 @@
   <data name="Anyone can ask for their details, or what they sent in, to be changed or removed. The contact page says how to reach the archive. Backups keep older copies until they are replaced." xml:space="preserve"><value>Anyone can ask for their details, or what they sent in, to be changed or removed. The contact page says how to reach the archive. Backups keep older copies until they are replaced.</value><comment>Part of the privacy text an archive starts with. Please have a second translator review it.</comment></data>
   <data name="Anyone with a contribution link can send in photos and stories for a collection. Share it with a group, put it in a newsletter or on a poster. What people send in waits for your review and is never public before you publish it." xml:space="preserve"><value>Anyone with a contribution link can send in photos and stories for a collection. Share it with a group, put it in a newsletter or on a poster. What people send in waits for your review and is never public before you publish it.</value></data>
   <data name="Anything" xml:space="preserve"><value>Anything</value></data>
+  <data name="Applies once the item is published. A recording's transcript in the description stays visible." xml:space="preserve"><value>Applies once the item is published. A recording's transcript in the description stays visible.</value></data>
   <data name="Apply filters" xml:space="preserve"><value>Apply filters</value></data>
   <data name="Archive settings" xml:space="preserve"><value>Archive settings</value></data>
   <data name="As elsewhere: 1953, 12.03.1953, circa 1950, 1950s, 1950–1955." xml:space="preserve"><value>As elsewhere: 1953, 12.03.1953, circa 1950, 1950s, 1950–1955.</value></data>
@@ -114,6 +115,7 @@
   <data name="Changed the order or direction of photos" xml:space="preserve"><value>Changed the order or direction of photos</value></data>
   <data name="Changed the tag" xml:space="preserve"><value>Changed the tag</value></data>
   <data name="Changed their password" xml:space="preserve"><value>Changed their password</value></data>
+  <data name="Changed what visitors get of the item" xml:space="preserve"><value>Changed what visitors get of the item</value></data>
   <data name="Check the contribution, complete the details below, then publish it, accept it as a draft or reject it." xml:space="preserve"><value>Check the contribution, complete the details below, then publish it, accept it as a draft or reject it.</value></data>
   <data name="Check the spreadsheet" xml:space="preserve"><value>Check the spreadsheet</value></data>
   <data name="Checks" xml:space="preserve"><value>Checks</value></data>
@@ -253,6 +255,7 @@
   <data name="Everything" xml:space="preserve"><value>Everything</value></data>
   <data name="Everything from this time" xml:space="preserve"><value>Everything from this time</value></data>
   <data name="Everything that is known about the collections and items, complete and exact. Dates are ISO 8601 and in UTC. Each file lists its SHA-256 checksum, so you can check that a copy is intact." xml:space="preserve"><value>Everything that is known about the collections and items, complete and exact. Dates are ISO 8601 and in UTC. Each file lists its SHA-256 checksum, so you can check that a copy is intact.</value></data>
+  <data name="Everything: the record with its pictures and recordings" xml:space="preserve"><value>Everything: the record with its pictures and recordings</value></data>
   <data name="Export" xml:space="preserve"><value>Export</value></data>
   <data name="Export the archive" xml:space="preserve"><value>Export the archive</value></data>
   <data name="Export, settings and the log itself" xml:space="preserve"><value>Export, settings and the log itself</value></data>
@@ -561,6 +564,7 @@
   <data name="Preview" xml:space="preserve"><value>Preview</value></data>
   <data name="Preview. This item is public." xml:space="preserve"><value>Preview. This item is public.</value></data>
   <data name="Preview. Visitors cannot see this item." xml:space="preserve"><value>Preview. Visitors cannot see this item.</value></data>
+  <data name="Preview. Visitors see the record only, without its pictures and recordings." xml:space="preserve"><value>Preview. Visitors see the record only, without its pictures and recordings.</value></data>
   <data name="Preview: {0}" xml:space="preserve"><value>Preview: {0}</value></data>
   <data name="Previews" xml:space="preserve"><value>Previews</value></data>
   <data name="Previews are being created. Reload the page in a moment." xml:space="preserve"><value>Previews are being created. Reload the page in a moment.</value></data>
@@ -583,6 +587,7 @@
   <data name="Received from" xml:space="preserve"><value>Received from</value></data>
   <data name="Received when" xml:space="preserve"><value>Received when</value></data>
   <data name="Recently added" xml:space="preserve"><value>Recently added</value></data>
+  <data name="Record only" xml:space="preserve"><value>Record only</value></data>
   <data name="Recording of {0}" xml:space="preserve"><value>Recording of {0}</value></data>
   <data name="Recording {0} of {1}" xml:space="preserve"><value>Recording {0} of {1}</value></data>
   <data name="Reference" xml:space="preserve"><value>Reference</value></data>
@@ -712,6 +717,7 @@
   <data name="The archive did not accept this. Please reload the page and try again. Photos have to be chosen again." xml:space="preserve"><value>The archive did not accept this. Please reload the page and try again. Photos have to be chosen again.</value></data>
   <data name="The archive did not accept this. Reload the page, choose the photos that are missing and try again." xml:space="preserve"><value>The archive did not accept this. Reload the page, choose the photos that are missing and try again.</value></data>
   <data name="The archive has no collections yet." xml:space="preserve"><value>The archive has no collections yet.</value></data>
+  <data name="The archive shows this item as a record only. Its pictures and recordings are not shown here." xml:space="preserve"><value>The archive shows this item as a record only. Its pictures and recordings are not shown here.</value></data>
   <data name="The archive's default: {0}" xml:space="preserve"><value>The archive's default: {0}</value></data>
   <data name="The archive's logo, if it has one. Its name and pages are under &quot;settings&quot; in archive.json." xml:space="preserve"><value>The archive's logo, if it has one. Its name and pages are under "settings" in archive.json.</value></data>
   <data name="The archive's storage is full" xml:space="preserve"><value>The archive's storage is full</value></data>
@@ -788,6 +794,7 @@
   <data name="The photo is in the bin. You can restore it there for {0, plural, one {# day} other {# days}}." xml:space="preserve"><value>The photo is in the bin. You can restore it there for {0, plural, one {# day} other {# days}}.</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="The photo is restored." xml:space="preserve"><value>The photo is restored.</value></data>
   <data name="The photo visitors see for the collection. They only see a photo while its item is published; until then, and without a choice, they see the first photo of the collection." xml:space="preserve"><value>The photo visitors see for the collection. They only see a photo while its item is published; until then, and without a choice, they see the first photo of the collection.</value></data>
+  <data name="The record only, without pictures and recordings" xml:space="preserve"><value>The record only, without pictures and recordings</value></data>
   <data name="The request could not be processed" xml:space="preserve"><value>The request could not be processed</value></data>
   <data name="The same file as in row {0}." xml:space="preserve"><value>The same file as in row {0}.</value></data>
   <data name="The same items as a table, for spreadsheet programs. It is UTF-8. Cells that start with =, +, - or @ get a leading apostrophe, so a spreadsheet never runs them as formulas; archive.json has the exact text." xml:space="preserve"><value>The same items as a table, for spreadsheet programs. It is UTF-8. Cells that start with =, +, - or @ get a leading apostrophe, so a spreadsheet never runs them as formulas; archive.json has the exact text.</value></data>
@@ -920,6 +927,7 @@
   <data name="What others may do with this item. Choose a free licence only if whoever holds the rights really gave it." xml:space="preserve"><value>What others may do with this item. Choose a free licence only if whoever holds the rights really gave it.</value></data>
   <data name="What the cell says" xml:space="preserve"><value>What the cell says</value></data>
   <data name="What this means" xml:space="preserve"><value>What this means</value></data>
+  <data name="What visitors get" xml:space="preserve"><value>What visitors get</value></data>
   <data name="What visitors sent through “Do you know more about this?” on an item. It is not shown publicly: write what is worth keeping into the item, then mark the note as dealt with." xml:space="preserve"><value>What visitors sent through “Do you know more about this?” on an item. It is not shown publicly: write what is worth keeping into the item, then mark the note as dealt with.</value></data>
   <data name="What whoever runs the server should keep an eye on. Visitors and uptime monitors that open /health learn only whether all is well, not what follows here." xml:space="preserve"><value>What whoever runs the server should keep an eye on. Visitors and uptime monitors that open /health learn only whether all is well, not what follows here.</value></data>
   <data name="What would you like to tell us?" xml:space="preserve"><value>What would you like to tell us?</value></data>
