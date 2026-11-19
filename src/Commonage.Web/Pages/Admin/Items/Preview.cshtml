@@ -7,7 +7,18 @@
 
 <div class="alert alert-info d-flex flex-wrap gap-2 align-items-center" role="status">
     <span class="me-auto">
-        @(Model.Item.Status == ItemStatus.Published ? T["Preview. This item is public."] : T["Preview. Visitors cannot see this item."])
+        @if (Model.Item.Status != ItemStatus.Published)
+        {
+            @T["Preview. Visitors cannot see this item."]
+        }
+        else if (Model.Item.MediaLevel == MediaLevel.RecordOnly)
+        {
+            @T["Preview. Visitors see the record only, without its pictures and recordings."]
+        }
+        else
+        {
+            @T["Preview. This item is public."]
+        }
     </span>
     <a asp-page="/Admin/Items/Edit" asp-route-id="@Model.Item.Id" class="alert-link">@T["Back to editing"]</a>
 </div>

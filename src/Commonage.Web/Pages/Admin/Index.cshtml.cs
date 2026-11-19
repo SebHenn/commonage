@@ -116,7 +116,8 @@ public class IndexModel(CommonageDbContext db, ArchiveHealth health, ArchiveProf
                 i.MediaFiles.Count,
                 i.Title == "" ? i.MediaFiles.OrderBy(f => f.Id).Select(f => f.OriginalFileName).FirstOrDefault() : null,
                 // Worth a look before a decision on a contribution. Contributors are never told.
-                i.Status == ItemStatus.Submitted && i.MediaFiles.Any(f => db.MediaFiles.Any(other => other.Sha256 == f.Sha256 && other.ArchiveItemId != i.Id))))
+                i.Status == ItemStatus.Submitted && i.MediaFiles.Any(f => db.MediaFiles.Any(other => other.Sha256 == f.Sha256 && other.ArchiveItemId != i.Id)),
+                i.MediaLevel == MediaLevel.RecordOnly))
             .ToPagedListAsync(PageNumber, PageSize, cancellationToken);
     }
 }

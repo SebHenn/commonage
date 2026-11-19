@@ -7,6 +7,10 @@ version may change things that need attention when updating, and these notes say
 
 ### For curators
 
+- An item can be shown as a **record only**: visitors get its title, description, date, place and credit, but no picture, page
+  image or recording, and search does not find what its PDFs or captions say. Choose "What visitors get" on the item's page;
+  the item list shows a "Record only" badge. Exports of published items leave out the files of such items; the full export
+  keeps them (export format version 7).
 - The page of an item shows its **earlier texts**: when the title, description, date, credit, original location or reference
   number was changed, by whom, and what it said before, shown beside what the field says now. A curator can put an earlier text back with one button; the text it
   replaces is kept in turn. Texts from before this version have no history, and the history is not part of the export.
@@ -51,6 +55,8 @@ Updating needs no picture regeneration. Migrations run by themselves at start.
 
 ### For visitors and curators
 
+- A collection with nothing public in it, only drafts or items in the bin, no longer has a page of its own, and the search's
+  collection filter no longer lists it. Before, anyone who knew or guessed its number could read its title and description.
 - A year, decade, month or period typed into the search, such as "Mill Street 1950s", "circa 1960" or "before 1945", also finds
   what is dated then. The page says how it read the date. Curators' item list searches the same way.
 - The start page shows the archive through the decades, and the search shows the decades of what it found. Each decade opens

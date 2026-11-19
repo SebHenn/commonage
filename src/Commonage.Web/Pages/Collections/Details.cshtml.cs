@@ -25,13 +25,13 @@ public class DetailsModel(CommonageDbContext db) : PageModel
 
     public async Task<IActionResult> OnGetAsync(int id, CancellationToken cancellationToken)
     {
-        var collection = await db.Collections.FindAsync([id], cancellationToken);
+        var collection = await db.Collections.Where(c => c.Id == id && c.Items.AsQueryable().Any(Visibility.Item)).FirstOrDefaultAsync(cancellationToken);
         if (collection is null)
             return NotFound();
 
         Collection = collection;
         Years = await db.Collections.Where(c => c.Id == id).ToCards().Select(c => c.Years).FirstAsync(cancellationToken);
-        Items = await db.PublishedItems
+        Items = await db.VisibleItems
             .Filter(new ItemFilter(CollectionId: id))
             .Sort(collection.Sort.ToItemSort(), query: null)
             .Select(ItemSummary.FromItem)

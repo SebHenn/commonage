@@ -32,18 +32,18 @@ public class IndexModel(CommonageDbContext db, Commonage.Web.Operations.ArchiveP
     public async Task OnGetAsync()
     {
         Identity = await profile.GetAsync();
-        HelpWanted = Identity.AcceptVisitorNotes && await db.PublishedItems.AnyAsync(i => i.HelpWanted);
+        HelpWanted = Identity.AcceptVisitorNotes && await db.VisibleItems.AnyAsync(i => i.HelpWanted);
         Collections = await db.LoadCollectionCardsAsync(HttpContext.RequestAborted);
-        Recent = await db.PublishedItems
+        Recent = await db.VisibleItems
             .OrderByDescending(i => i.PublishedAt)
             .ThenByDescending(i => i.Id)
             .Take(RecentCount)
             .Select(ItemSummary.FromItem)
             .ToListAsync();
 
-        Decades = await DecadeTimeline.LoadAsync(db.PublishedItems, HttpContext.RequestAborted);
+        Decades = await DecadeTimeline.LoadAsync(db.VisibleItems, HttpContext.RequestAborted);
 
-        var popularTags = await db.PublishedItems
+        var popularTags = await db.VisibleItems
             .SelectMany(i => i.Tags)
             .GroupBy(t => t.Name)
             .OrderByDescending(g => g.Count())
@@ -52,7 +52,7 @@ public class IndexModel(CommonageDbContext db, Commonage.Web.Operations.ArchiveP
             .Take(MaxTags)
             .ToListAsync();
         Tags = popularTags.Order(StringComparer.CurrentCultureIgnoreCase).ToList();
-        TagKinds = await db.PublishedItems
+        TagKinds = await db.VisibleItems
             .SelectMany(i => i.Tags)
             .Where(t => t.Kind != Domain.TagKind.Topic)
             .Select(t => t.Kind)

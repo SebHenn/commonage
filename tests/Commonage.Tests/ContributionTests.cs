@@ -54,7 +54,7 @@ public class ContributionTests(CommonageAppFactory app)
 
         Assert.Equal(HttpStatusCode.NotFound, (await visitor.GetAsync($"/items/{item.Id}")).StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, (await visitor.GetAsync($"/media/{item.MediaFiles[0].Id}/preview")).StatusCode);
-        Assert.DoesNotContain("Flood in Mill Street", await visitor.GetStringAsync($"/collections/{collectionId}"));
+        Assert.Equal(HttpStatusCode.NotFound, (await visitor.GetAsync($"/collections/{collectionId}")).StatusCode);
 
         var waiting = await curator.GetStringAsync("/Admin?status=Submitted");
         var review = await curator.GetStringAsync($"/Admin/Items/Edit/{item.Id}");

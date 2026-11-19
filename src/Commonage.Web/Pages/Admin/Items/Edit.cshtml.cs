@@ -174,6 +174,9 @@ public class EditModel(
         [Display(Name = "Ask visitors for help with this item")]
         public bool HelpWanted { get; set; }
 
+        [Display(Name = "What visitors get")]
+        public MediaLevel MediaLevel { get; set; }
+
         /// <summary>The item's version when the form was opened, to notice changes made by someone else since.</summary>
         public uint? Version { get; set; }
     }
@@ -210,6 +213,7 @@ public class EditModel(
                 InternalNotes = item.InternalNotes,
                 NeedsTranscription = item.NeedsTranscription,
                 HelpWanted = item.HelpWanted,
+                MediaLevel = item.MediaLevel,
             };
             RightsWereProposed = item.RightsUri is null && item.Contribution is not null;
             await ShowStateAsync(item);
@@ -343,6 +347,10 @@ public class EditModel(
         item.InternalNotes = Clean(Input.InternalNotes);
         item.NeedsTranscription = Input.NeedsTranscription;
         item.HelpWanted = Input.HelpWanted;
+        // Helpers do not decide what the public gets, as they do not publish.
+        var mediaLevelChanged = User.MayManage() && item.MediaLevel != Input.MediaLevel;
+        if (mediaLevelChanged)
+            item.MediaLevel = Input.MediaLevel;
         if ((Input.AltTexts.Count > 0 || Input.Captions.Count > 0) && id is not null)
         {
             foreach (var file in await db.MediaFiles.Where(f => f.ArchiveItemId == id).ToListAsync())
@@ -354,6 +362,8 @@ public class EditModel(
             }
         }
         audit.Record(isNew ? AuditAction.ItemCreated : AuditAction.ItemChanged, item.Title, item);
+        if (mediaLevelChanged)
+            audit.Record(AuditAction.ItemMediaLevelChanged, item.Title, item);
 
         switch (command)
         {

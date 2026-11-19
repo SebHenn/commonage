@@ -31,7 +31,7 @@ public class TagIndexModel(CommonageDbContext db) : PageModel
         Kind = found;
 
         // Only what visitors can see: a name on drafts alone is not shown.
-        var tags = await db.PublishedItems
+        var tags = await db.VisibleItems
             .SelectMany(i => i.Tags)
             .Where(t => t.Kind == Kind)
             .GroupBy(t => t.Name)

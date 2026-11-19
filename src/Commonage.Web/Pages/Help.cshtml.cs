@@ -21,7 +21,7 @@ public class HelpModel(CommonageDbContext db, ArchiveProfile profile) : PageMode
         if (!(await profile.GetAsync()).AcceptVisitorNotes)
             return NotFound();
 
-        Items = await db.PublishedItems
+        Items = await db.VisibleItems
             .Where(i => i.HelpWanted)
             .OrderByDescending(i => i.PublishedAt)
             .ThenByDescending(i => i.Id)

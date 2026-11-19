@@ -76,7 +76,7 @@ public class SearchModel(CommonageDbContext db) : PageModel
         var search = await db.ToSearchAsync(Text, cancellationToken);
         (Query, Dates) = (search.Query, search.Dates);
         var filter = new ItemFilter(Query, Tag, Collection, From, To, Dates);
-        var matches = db.PublishedItems.Filter(filter);
+        var matches = db.VisibleItems.Filter(filter);
 
         Results = await matches
             .Sort(Sort, Query)
@@ -101,13 +101,13 @@ public class SearchModel(CommonageDbContext db) : PageModel
                 Decades = [];
         }
 
-        var collections = await db.Collections.OrderBy(c => c.Title).ToListAsync(cancellationToken);
+        var collections = await db.Collections.Where(c => c.Items.AsQueryable().Any(Visibility.Item)).OrderBy(c => c.Title).ToListAsync(cancellationToken);
         CollectionOptions = new SelectList(collections, nameof(Domain.Collection.Id), nameof(Domain.Collection.Title), Collection);
         CollectionTitle = collections.FirstOrDefault(c => c.Id == Collection)?.Title;
 
         if (Results.TotalCount == 0)
         {
-            PopularTags = await db.PublishedItems
+            PopularTags = await db.VisibleItems
                 .SelectMany(i => i.Tags)
                 .GroupBy(t => t.Name)
                 .OrderByDescending(g => g.Count())

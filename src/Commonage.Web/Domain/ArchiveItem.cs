@@ -14,6 +14,9 @@ public class ArchiveItem
     public string? Description { get; set; }
     public ItemStatus Status { get; set; }
 
+    /// <summary>What visitors get of the item once it is published, see <see cref="Domain.MediaLevel"/>.</summary>
+    public MediaLevel MediaLevel { get; set; }
+
     public int CollectionId { get; set; }
     public Collection Collection { get; set; } = null!;
 

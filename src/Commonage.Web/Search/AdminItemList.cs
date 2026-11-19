@@ -43,7 +43,7 @@ public record AdminItemFilter(
 /// <summary>One line of the curators' item list.</summary>
 public record AdminItemRow(
     int Id, string Title, string CollectionTitle, ItemStatus Status, DateTime UpdatedAt, int? ThumbnailMediaFileId, int PhotoCount,
-    string? FirstFileName = null, bool HasIdenticalFile = false);
+    string? FirstFileName = null, bool HasIdenticalFile = false, bool RecordOnly = false);
 
 /// <summary>The curators' item list. The edit page uses it too, to go on to the next item of the same list.</summary>
 public static class AdminItemList
@@ -56,7 +56,7 @@ public static class AdminItemList
         // A reference number is not in the search index, on purpose, so it is looked up on its own. Whoever types one wants that item.
         var isReference = filter.Text is { Length: > 0 } text && await db.ArchiveItems.AnyAsync(i => i.ReferenceNumber == text.Trim(), cancellationToken);
         var search = isReference ? TextSearch.None : await db.ToSearchAsync(filter.Text, cancellationToken);
-        var items = db.ArchiveItems.Filter(new ItemFilter(search.Query, filter.Tag, filter.CollectionId, Dates: search.Dates));
+        var items = db.ArchiveItems.Filter(new ItemFilter(search.Query, filter.Tag, filter.CollectionId, Dates: search.Dates, SearchAllFileText: true));
         if (isReference)
             items = items.Where(i => i.ReferenceNumber == filter.Text!.Trim());
         if (filter.Status is { } status)

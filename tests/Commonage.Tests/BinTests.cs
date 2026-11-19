@@ -35,7 +35,7 @@ public class BinTests(CommonageAppFactory app)
             await Browser.PostFormAsync(curator, $"{ItemPage(item)}?handler=Delete", new(), ItemPage(item));
 
             Assert.Equal(HttpStatusCode.NotFound, (await visitor.GetAsync($"/items/{item.Id}")).StatusCode);
-            Assert.DoesNotContain(item.Title, await visitor.GetStringAsync($"/collections/{item.CollectionId}"));
+            Assert.Equal(HttpStatusCode.NotFound, (await visitor.GetAsync($"/collections/{item.CollectionId}")).StatusCode);
             Assert.DoesNotContain(item.Title, await curator.GetStringAsync("/Admin"));
             Assert.Contains(item.Title, await curator.GetStringAsync("/Admin/Bin"));
             var opened = await curator.GetAsync(ItemPage(item));

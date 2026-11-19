@@ -18,9 +18,13 @@ public enum ItemSort
 
 /// <param name="Query">A full-text query from <see cref="ItemSearch.ToSearchQueryAsync"/>, or null to match all items.</param>
 /// <param name="Dates">Dates typed into the search. Each one matches what is dated within it, or has its words.</param>
+/// <param name="SearchAllFileText">
+/// Curators search what the PDFs of every item say. Without it, only the PDFs of items that show their media are searched: what
+/// the pages of a record without its media say must not be found by a visitor. Left off by default so that a new caller is safe.
+/// </param>
 public record ItemFilter(
     string? Query = null, string? Tag = null, int? CollectionId = null, int? YearFrom = null, int? YearTo = null,
-    IReadOnlyList<DateInSearch>? Dates = null);
+    IReadOnlyList<DateInSearch>? Dates = null, bool SearchAllFileText = false);
 
 /// <param name="Query">The full-text query for the words of the date itself, so that "1958" also finds "Team photo 1958".</param>
 public record DateInSearch(SearchDate Date, string Query);
@@ -33,7 +37,7 @@ public record TextSearch(string? Query, IReadOnlyList<DateInSearch> Dates)
 
 /// <summary>
 /// Filters and sorts archive items. It never decides what the caller may see: public pages pass
-/// <see cref="CommonageDbContext.PublishedItems"/>, curator pages pass all items.
+/// <see cref="CommonageDbContext.VisibleItems"/>, curator pages pass all items.
 /// </summary>
 public static class ItemSearch
 {
@@ -42,12 +46,14 @@ public static class ItemSearch
 
     public static IQueryable<ArchiveItem> Filter(this IQueryable<ArchiveItem> items, ItemFilter filter)
     {
+        var searchAllFileText = filter.SearchAllFileText;
         if (filter.Query is { } query)
         {
             items = items.Where(i => EF.Property<NpgsqlTsVector>(i, CommonageDbContext.SearchVector)
                 .Matches(EF.Functions.ToTsQuery(CommonageDbContext.SearchConfiguration, query))
                 // What the item's PDFs say. All words must be in the item's own text or all in the documents, not split between them.
-                || (i.FileText != null && EF.Property<NpgsqlTsVector>(i.FileText, CommonageDbContext.SearchVector)
+                || (i.FileText != null && (searchAllFileText || i.MediaLevel == MediaLevel.Everything)
+                    && EF.Property<NpgsqlTsVector>(i.FileText, CommonageDbContext.SearchVector)
                     .Matches(EF.Functions.ToTsQuery(CommonageDbContext.SearchConfiguration, query))));
         }
 
@@ -69,7 +75,8 @@ public static class ItemSearch
                     && (to == null || i.DateFrom == null || i.DateFrom <= to))
                 || EF.Property<NpgsqlTsVector>(i, CommonageDbContext.SearchVector)
                     .Matches(EF.Functions.ToTsQuery(CommonageDbContext.SearchConfiguration, words))
-                || (i.FileText != null && EF.Property<NpgsqlTsVector>(i.FileText, CommonageDbContext.SearchVector)
+                || (i.FileText != null && (searchAllFileText || i.MediaLevel == MediaLevel.Everything)
+                    && EF.Property<NpgsqlTsVector>(i.FileText, CommonageDbContext.SearchVector)
                     .Matches(EF.Functions.ToTsQuery(CommonageDbContext.SearchConfiguration, words))));
         }
 
