@@ -101,7 +101,7 @@ public class SearchModel(CommonageDbContext db) : PageModel
                 Decades = [];
         }
 
-        var collections = await db.Collections.Where(c => c.Items.AsQueryable().Any(Visibility.Item)).OrderBy(c => c.Title).ToListAsync(cancellationToken);
+        var collections = await db.Collections.Where(c => c.Items.AsQueryable().Any(Visibility.Item(db.Today))).OrderBy(c => c.Title).ToListAsync(cancellationToken);
         CollectionOptions = new SelectList(collections, nameof(Domain.Collection.Id), nameof(Domain.Collection.Title), Collection);
         CollectionTitle = collections.FirstOrDefault(c => c.Id == Collection)?.Title;
 

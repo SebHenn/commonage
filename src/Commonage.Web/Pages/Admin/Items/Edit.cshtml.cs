@@ -177,6 +177,9 @@ public class EditModel(
         [Display(Name = "What visitors get")]
         public MediaLevel MediaLevel { get; set; }
 
+        [Display(Name = "Public from")]
+        public DateOnly? PublicFrom { get; set; }
+
         /// <summary>The item's version when the form was opened, to notice changes made by someone else since.</summary>
         public uint? Version { get; set; }
     }
@@ -214,6 +217,7 @@ public class EditModel(
                 NeedsTranscription = item.NeedsTranscription,
                 HelpWanted = item.HelpWanted,
                 MediaLevel = item.MediaLevel,
+                PublicFrom = item.PublicFrom,
             };
             RightsWereProposed = item.RightsUri is null && item.Contribution is not null;
             await ShowStateAsync(item);
@@ -351,6 +355,9 @@ public class EditModel(
         var mediaLevelChanged = User.MayManage() && item.MediaLevel != Input.MediaLevel;
         if (mediaLevelChanged)
             item.MediaLevel = Input.MediaLevel;
+        var publicFromChanged = User.MayManage() && item.PublicFrom != Input.PublicFrom;
+        if (publicFromChanged)
+            item.SetPublicFrom(Input.PublicFrom, now);
         if ((Input.AltTexts.Count > 0 || Input.Captions.Count > 0) && id is not null)
         {
             foreach (var file in await db.MediaFiles.Where(f => f.ArchiveItemId == id).ToListAsync())
@@ -364,6 +371,8 @@ public class EditModel(
         audit.Record(isNew ? AuditAction.ItemCreated : AuditAction.ItemChanged, item.Title, item);
         if (mediaLevelChanged)
             audit.Record(AuditAction.ItemMediaLevelChanged, item.Title, item);
+        if (publicFromChanged)
+            audit.Record(AuditAction.ItemPublicFromChanged, item.Title, item);
 
         switch (command)
         {

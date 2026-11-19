@@ -21,6 +21,10 @@
         {
             <span class="badge text-bg-light border">@T["Record only"]</span>
         }
+        @if (Model.Input.PublicFrom is { } publicFrom)
+        {
+            <span class="badge text-bg-light border">@T["Public from {0}", publicFrom.ToString("d", System.Globalization.CultureInfo.CurrentCulture)]</span>
+        }
     }
     @if (Model.CurrentStatus == ItemStatus.Published)
     {
@@ -275,6 +279,13 @@
             </div>
             <div id="media-level-help" class="form-text">@T["Applies once the item is published. A recording's transcript in the description stays visible."]</div>
         </fieldset>
+
+        <div class="mb-3">
+            <label asp-for="Input.PublicFrom" class="form-label"></label>
+            <input asp-for="Input.PublicFrom" type="date" value="@Model.Input.PublicFrom?.ToString("yyyy-MM-dd")" class="form-control w-auto" aria-describedby="public-from-help" />
+            <div id="public-from-help" class="form-text">@T["Optional. Until this day the published item is as hidden as a draft."]</div>
+            <span asp-validation-for="Input.PublicFrom" class="text-danger"></span>
+        </div>
     }
 
     <partial name="_Catalogue" model="Model" />

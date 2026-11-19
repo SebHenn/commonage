@@ -7,7 +7,7 @@ using NpgsqlTypes;
 
 namespace Commonage.Web.Data;
 
-public class CommonageDbContext(DbContextOptions<CommonageDbContext> options)
+public class CommonageDbContext(DbContextOptions<CommonageDbContext> options, TimeProvider? clock = null)
     : IdentityDbContext<IdentityUser>(options), IDataProtectionKeyContext
 {
     public DbSet<Collection> Collections => Set<Collection>();
@@ -46,10 +46,13 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options)
     public const string FoldFunction = "commonage_fold";
 
     /// <summary>Items the public may see. Every public page must start from this query.</summary>
-    public IQueryable<ArchiveItem> VisibleItems => ArchiveItems.Where(Visibility.Item);
+    public IQueryable<ArchiveItem> VisibleItems => ArchiveItems.Where(Visibility.Item(Today));
+
+    /// <summary>Today in the archive's time zone: what an embargo is compared with.</summary>
+    public DateOnly Today => Dates.Today((clock ?? TimeProvider.System).GetUtcNow());
 
     /// <summary>Files the public may be given. <c>/media</c> and every cover or first photo start from this.</summary>
-    public IQueryable<MediaFile> VisibleMedia => MediaFiles.Where(Visibility.Media);
+    public IQueryable<MediaFile> VisibleMedia => MediaFiles.Where(Visibility.Media(Today));
 
     /// <summary>Items in the bin. Query filters hide them from every other query, see <see cref="OnModelCreating"/>.</summary>
     public IQueryable<ArchiveItem> BinnedItems => ArchiveItems.IgnoreQueryFilters().Where(i => i.DeletedAt != null);

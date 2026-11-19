@@ -25,33 +25,33 @@ public static class CollectionCards
     /// <summary>Collections with published items, in the order curators gave them.</summary>
     public static Task<List<CollectionCard>> LoadCollectionCardsAsync(this CommonageDbContext db, CancellationToken cancellationToken) =>
         db.Collections
-            .Where(c => c.Items.AsQueryable().Any(Visibility.Item))
+            .Where(c => c.Items.AsQueryable().Any(Visibility.Item(db.Today)))
             .OrderBy(c => c.Position).ThenBy(c => c.Title).ThenBy(c => c.Id)
-            .ToCards()
+            .ToCards(db.Today)
             .ToListAsync(cancellationToken);
 
     /// <summary>
     /// What visitors see of each collection, from its published items only: drafts, items in the bin and their photos count
     /// for nothing, and a chosen cover whose item is not published, or has moved to another collection, is passed over.
     /// </summary>
-    public static IQueryable<CollectionCard> ToCards(this IQueryable<Collection> collections) =>
+    public static IQueryable<CollectionCard> ToCards(this IQueryable<Collection> collections, DateOnly today) =>
         collections.Select(c => new CollectionCard(
             c.Id,
             c.Title,
             c.Description,
-            c.Items.AsQueryable().Count(Visibility.Item),
-            c.Items.AsQueryable().Where(Visibility.ItemWithMedia)
+            c.Items.AsQueryable().Count(Visibility.Item(today)),
+            c.Items.AsQueryable().Where(Visibility.ItemWithMedia(today))
                 .SelectMany(i => i.MediaFiles)
                 .Where(f => f.Status == ProcessingStatus.Ready && f.Id == c.CoverMediaFileId && !f.ContentType.StartsWith("audio/"))
                 .Select(f => (int?)f.Id)
                 .FirstOrDefault()
-            ?? c.Items.AsQueryable().Where(Visibility.ItemWithMedia)
+            ?? c.Items.AsQueryable().Where(Visibility.ItemWithMedia(today))
                 .SelectMany(i => i.MediaFiles)
                 .Where(f => f.Status == ProcessingStatus.Ready && !f.ContentType.StartsWith("audio/"))
                 .OrderBy(f => f.ArchiveItemId).ThenBy(f => f.Position).ThenBy(f => f.Id)
                 .Select(f => (int?)f.Id)
                 .FirstOrDefault(),
             new YearSpan(
-                c.Items.AsQueryable().Where(Visibility.Item).Min(i => (int?)(i.DateFrom ?? i.DateTo)!.Value.Year),
-                c.Items.AsQueryable().Where(Visibility.Item).Max(i => (int?)(i.DateTo ?? i.DateFrom)!.Value.Year))));
+                c.Items.AsQueryable().Where(Visibility.Item(today)).Min(i => (int?)(i.DateFrom ?? i.DateTo)!.Value.Year),
+                c.Items.AsQueryable().Where(Visibility.Item(today)).Max(i => (int?)(i.DateTo ?? i.DateFrom)!.Value.Year))));
 }

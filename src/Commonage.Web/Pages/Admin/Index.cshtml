@@ -125,6 +125,10 @@ else
                 <option value="@ItemNeed.AltText" selected="@(Model.Needs == ItemNeed.AltText)">@T["Photo descriptions"]</option>
                 <option value="@ItemNeed.Transcription" selected="@(Model.Needs == ItemNeed.Transcription)">@T["A transcription"]</option>
                 <option value="@ItemNeed.HelpWanted" selected="@(Model.Needs == ItemNeed.HelpWanted)">@T["Help from visitors"]</option>
+                <optgroup label="@T["Kept back from visitors"]">
+                    <option value="@ItemNeed.RecordOnly" selected="@(Model.Needs == ItemNeed.RecordOnly)">@T["Shown as a record only"]</option>
+                    <option value="@ItemNeed.Embargoed" selected="@(Model.Needs == ItemNeed.Embargoed)">@T["Under embargo"]</option>
+                </optgroup>
             </select>
         </div>
         <div class="col-6 col-md-2">
@@ -163,6 +167,8 @@ else
                     <option value="@Commonage.Web.Pages.Admin.Items.BulkAction.SetDate">@T["Set the date"]</option>
                     <option value="@Commonage.Web.Pages.Admin.Items.BulkAction.MoveToCollection">@T["Move to a collection"]</option>
                     <option value="@Commonage.Web.Pages.Admin.Items.BulkAction.SetRights">@T["Set the rights statement"]</option>
+                    <option value="@Commonage.Web.Pages.Admin.Items.BulkAction.SetMediaLevel">@T["Set what visitors get"]</option>
+                    <option value="@Commonage.Web.Pages.Admin.Items.BulkAction.SetPublicFrom">@T["Set the public-from date"]</option>
                 </select>
             </div>
             <button type="submit" name="scope" value="selected" class="btn btn-outline-primary">@T["For the ticked items"]</button>
@@ -219,7 +225,7 @@ else
                                 }
                             </td>
                             <td class="d-none d-md-table-cell">@item.CollectionTitle</td>
-                            <td><partial name="_StatusBadge" model="item.Status" />@if (item.RecordOnly) { <span class="badge text-bg-light border">@T["Record only"]</span> }</td>
+                            <td><partial name="_StatusBadge" model="item.Status" />@if (item.RecordOnly) { <span class="badge text-bg-light border">@T["Record only"]</span> }@if (item.EmbargoedUntil is { } until) { <span class="badge text-bg-light border">@T["Public from {0}", until.ToString("d", System.Globalization.CultureInfo.CurrentCulture)]</span> }</td>
                             <td class="d-none d-md-table-cell">@Dates.Moment(item.UpdatedAt)</td>
                         </tr>
                     }

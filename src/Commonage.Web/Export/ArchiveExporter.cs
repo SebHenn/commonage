@@ -29,7 +29,7 @@ public class ArchiveExporter(
     ILogger<ArchiveExporter> logger)
 {
     public const string Format = "commonage-export";
-    public const int Version = 7;
+    public const int Version = 8;
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -271,6 +271,7 @@ public class ArchiveExporter(
         options.PublishedOnly ? null : item.NeedsTranscription,
         item.HelpWanted,
         item.MediaLevel,
+        item.PublicFrom,
         item.Contribution is not { } contribution ? null : new ExportContribution(
             options.IncludePersonalData ? contribution.ContributorName : null,
             options.IncludePersonalData ? contribution.ContributorEmail : null,
@@ -424,6 +425,7 @@ internal record ExportItem(
     bool? NeedsTranscription,
     bool HelpWanted,
     MediaLevel MediaLevel,
+    DateOnly? PublicFrom,
     ExportContribution? Contribution,
     IReadOnlyList<ExportNote>? Notes,
     IReadOnlyList<ExportFile> Files);

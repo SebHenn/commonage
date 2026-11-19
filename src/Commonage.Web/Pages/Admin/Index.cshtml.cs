@@ -105,6 +105,7 @@ public class IndexModel(CommonageDbContext db, ArchiveHealth health, ArchiveProf
         HelpWantedNotPublished = await visible.CountAsync(i => i.HelpWanted && (i.Status == ItemStatus.Draft || i.Status == ItemStatus.Submitted), cancellationToken);
 
         var items = await db.QueryAsync(Filter, cancellationToken);
+        var today = db.Today;
         Items = await items
             .Select(i => new AdminItemRow(
                 i.Id,
@@ -117,7 +118,8 @@ public class IndexModel(CommonageDbContext db, ArchiveHealth health, ArchiveProf
                 i.Title == "" ? i.MediaFiles.OrderBy(f => f.Id).Select(f => f.OriginalFileName).FirstOrDefault() : null,
                 // Worth a look before a decision on a contribution. Contributors are never told.
                 i.Status == ItemStatus.Submitted && i.MediaFiles.Any(f => db.MediaFiles.Any(other => other.Sha256 == f.Sha256 && other.ArchiveItemId != i.Id)),
-                i.MediaLevel == MediaLevel.RecordOnly))
+                i.MediaLevel == MediaLevel.RecordOnly,
+                i.Status == ItemStatus.Published && i.PublicFrom > today ? i.PublicFrom : null))
             .ToPagedListAsync(PageNumber, PageSize, cancellationToken);
     }
 }

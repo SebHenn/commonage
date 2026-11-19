@@ -90,6 +90,9 @@ namespace Commonage.Web.Data.Migrations
                         .HasMaxLength(300)
                         .HasColumnType("character varying(300)");
 
+                    b.Property<DateOnly?>("PublicFrom")
+                        .HasColumnType("date");
+
                     b.Property<DateTime?>("PublishedAt")
                         .HasColumnType("timestamp with time zone");
 

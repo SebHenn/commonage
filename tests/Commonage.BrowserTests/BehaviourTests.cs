@@ -37,6 +37,22 @@ public class BehaviourTests(BrowserFixture app)
     }
 
     [Fact]
+    public async Task What_visitors_get_and_the_public_from_date_are_chosen_on_the_item_and_kept()
+    {
+        var page = await app.LogInAsync();
+        var id = await CreateItemAsync(page, "Embargo form test");
+
+        await page.CheckAsync("#media-level-record");
+        await page.FillAsync("[name='Input.PublicFrom']", "2099-01-01");
+        await page.ClickAsync(Button("Save as draft"));
+        await page.WaitForURLAsync($"**/Admin/Items/Edit/{id}");
+        await page.GotoAsync($"/Admin/Items/Edit/{id}");
+
+        Assert.True(await page.IsCheckedAsync("#media-level-record"));
+        Assert.Equal("2099-01-01", await page.InputValueAsync("[name='Input.PublicFrom']"));
+    }
+
+    [Fact]
     public async Task Answering_no_to_a_confirmation_stops_the_action()
     {
         var page = await app.LogInAsync();

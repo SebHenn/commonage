@@ -78,6 +78,10 @@
                                         {
                                             <span class="d-block text-muted">@T["Not published"]</span>
                                         }
+                                        else if (!choice.ShownToVisitors)
+                                        {
+                                            <span class="d-block text-muted">@T["Visitors do not see this photo yet or at all"]</span>
+                                        }
                                     </span>
                                 </span>
                             </label>

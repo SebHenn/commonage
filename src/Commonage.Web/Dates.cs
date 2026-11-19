@@ -12,6 +12,21 @@ public static partial class Dates
     /// <summary>The archive's time zone for this request, or null for the server's clock.</summary>
     public static AsyncLocal<TimeZoneInfo?> Zone { get; } = new();
 
+    /// <summary>The day it is now in the archive's time zone.</summary>
+    public static DateOnly Today(DateTimeOffset utcNow) => DateOnly.FromDateTime(Local(utcNow.UtcDateTime));
+
+    /// <summary>The moment a day starts in the archive's time zone.</summary>
+    public static DateTime StartOfDayUtc(DateOnly day)
+    {
+        var local = day.ToDateTime(TimeOnly.MinValue);
+        if (Zone.Value is not { } zone)
+            return local.ToUniversalTime();
+        // A day that starts in the gap of a clock change starts when the gap ends.
+        if (zone.IsInvalidTime(local))
+            local = local.AddHours(1);
+        return TimeZoneInfo.ConvertTimeToUtc(local, zone);
+    }
+
     public static string Day(DateTime utc) => Local(utc).ToString(DayPattern(), CultureInfo.CurrentCulture);
 
     public static string Moment(DateTime utc) => $"{Day(utc)} {Local(utc).ToString("t", CultureInfo.CurrentCulture)}";

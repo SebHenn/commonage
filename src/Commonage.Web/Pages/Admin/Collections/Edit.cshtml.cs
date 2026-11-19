@@ -26,7 +26,7 @@ public class EditModel(CommonageDbContext db, AuditLog audit, IStringLocalizer<S
     /// <summary>What still uses the collection. Only an unused one can be deleted.</summary>
     public CollectionUse Use { get; private set; } = new(0, 0, 0);
 
-    public record CoverChoice(int MediaFileId, string ItemTitle, bool Published);
+    public record CoverChoice(int MediaFileId, string ItemTitle, bool Published, bool ShownToVisitors);
 
     public record CollectionUse(int Items, int InBin, int Links)
     {
@@ -164,13 +164,15 @@ public class EditModel(CommonageDbContext db, AuditLog audit, IStringLocalizer<S
 
         // The chosen one first, so it is always offered, then published items' photos, newest item first, each item's in order.
         var current = collection.CoverMediaFileId;
+        var today = db.Today;
         CoverChoices = await db.MediaFiles
             .Where(f => f.ArchiveItem.CollectionId == id && f.Status == ProcessingStatus.Ready && !f.ContentType.StartsWith("audio/"))
             .OrderByDescending(f => f.Id == current)
-            .ThenByDescending(f => f.ArchiveItem.Status == ItemStatus.Published)
+            .ThenByDescending(f => f.ArchiveItem.Status == ItemStatus.Published && (f.ArchiveItem.PublicFrom == null || f.ArchiveItem.PublicFrom <= today) && f.ArchiveItem.MediaLevel == MediaLevel.Everything)
             .ThenByDescending(f => f.ArchiveItemId).ThenBy(f => f.Position).ThenBy(f => f.Id)
             .Take(MaxCoverChoices)
-            .Select(f => new CoverChoice(f.Id, f.ArchiveItem.Title, f.ArchiveItem.Status == ItemStatus.Published))
+            .Select(f => new CoverChoice(f.Id, f.ArchiveItem.Title, f.ArchiveItem.Status == ItemStatus.Published,
+                f.ArchiveItem.Status == ItemStatus.Published && (f.ArchiveItem.PublicFrom == null || f.ArchiveItem.PublicFrom <= today) && f.ArchiveItem.MediaLevel == MediaLevel.Everything))
             .ToListAsync(cancellationToken);
     }
 }

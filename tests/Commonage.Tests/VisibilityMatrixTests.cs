@@ -54,10 +54,12 @@ public class VisibilityMatrixTests(CommonageAppFactory app)
         var shown = await SeedAsync("shown", (i, now) => i.Publish(now));
         var draft = await SeedAsync("draft", (_, _) => { });
         var binned = await SeedAsync("binned", (i, now) => { i.Publish(now); i.MoveToBin(now); });
+        var embargoed = await SeedAsync("embargoed", (i, now) => { i.Publish(now); i.SetPublicFrom(DateOnly.FromDateTime(now).AddDays(3), now); });
+        var opened = await SeedAsync("opened", (i, now) => { i.Publish(now); i.SetPublicFrom(DateOnly.FromDateTime(now).AddDays(-3), now); });
         using var visitor = app.CreateClient();
 
         var everything = new StringBuilder();
-        foreach (var marked in new[] { shown, draft, binned })
+        foreach (var marked in new[] { shown, opened, draft, binned, embargoed })
         {
             foreach (var address in Addresses)
                 everything.Append(await TextAsync(visitor, string.Format(address, marked.Word)));
@@ -67,7 +69,8 @@ public class VisibilityMatrixTests(CommonageAppFactory app)
         var text = everything.ToString();
 
         Assert.Contains($"Title {shown.Word}", text);
-        foreach (var hidden in new[] { draft, binned })
+        Assert.Contains($"Title {opened.Word}", text);
+        foreach (var hidden in new[] { draft, binned, embargoed })
             foreach (var part in new[] { "Title ", "Words ", "Credit ", "Alt ", "Caption ", "Pages ", "Box ", "P " })
                 Assert.DoesNotContain(part + hidden.Word, text);
     }
@@ -76,11 +79,15 @@ public class VisibilityMatrixTests(CommonageAppFactory app)
     public async Task A_collection_of_hidden_items_has_no_page_card_or_sitemap_entry()
     {
         var draft = await SeedAsync("onlydraft", (_, _) => { });
+        var embargoed = await SeedAsync("onlyembargoed", (i, now) => { i.Publish(now); i.SetPublicFrom(DateOnly.FromDateTime(now).AddDays(3), now); });
         using var visitor = app.CreateClient();
 
-        Assert.Equal(HttpStatusCode.NotFound, (await visitor.GetAsync($"/collections/{draft.CollectionId}")).StatusCode);
-        Assert.DoesNotContain($"/collections/{draft.CollectionId}\"", await TextAsync(visitor, "/collections"));
-        Assert.DoesNotContain($"/collections/{draft.CollectionId}<", await TextAsync(visitor, "/sitemap.xml"));
+        foreach (var hidden in new[] { draft, embargoed })
+        {
+            Assert.Equal(HttpStatusCode.NotFound, (await visitor.GetAsync($"/collections/{hidden.CollectionId}")).StatusCode);
+            Assert.DoesNotContain($"/collections/{hidden.CollectionId}\"", await TextAsync(visitor, "/collections"));
+            Assert.DoesNotContain($"/collections/{hidden.CollectionId}<", await TextAsync(visitor, "/sitemap.xml"));
+        }
     }
 
     [Fact]
@@ -88,9 +95,10 @@ public class VisibilityMatrixTests(CommonageAppFactory app)
     {
         var draft = await SeedAsync("picturedraft", (_, _) => { });
         var binned = await SeedAsync("picturebinned", (i, now) => { i.Publish(now); i.MoveToBin(now); });
+        var embargoed = await SeedAsync("pictureembargoed", (i, now) => { i.Publish(now); i.SetPublicFrom(DateOnly.FromDateTime(now).AddDays(3), now); });
         using var visitor = app.CreateClient();
 
-        foreach (var hidden in new[] { draft, binned })
+        foreach (var hidden in new[] { draft, binned, embargoed })
             foreach (var variant in new[] { "preview", "thumbnail", "card", "large" })
                 Assert.Equal(HttpStatusCode.NotFound, (await visitor.GetAsync($"/media/{hidden.FileId}/{variant}")).StatusCode);
     }
@@ -99,9 +107,11 @@ public class VisibilityMatrixTests(CommonageAppFactory app)
     public async Task A_visitor_cannot_open_the_note_form_of_a_hidden_item()
     {
         var draft = await SeedAsync("notedraft", (_, _) => { });
+        var embargoed = await SeedAsync("noteembargoed", (i, now) => { i.Publish(now); i.SetPublicFrom(DateOnly.FromDateTime(now).AddDays(3), now); });
         using var visitor = app.CreateClient();
 
-        Assert.Equal(HttpStatusCode.NotFound, (await visitor.GetAsync($"/items/{draft.ItemId}/tell")).StatusCode);
+        foreach (var hidden in new[] { draft, embargoed })
+            Assert.Equal(HttpStatusCode.NotFound, (await visitor.GetAsync($"/items/{hidden.ItemId}/tell")).StatusCode);
     }
 
     [Fact]
