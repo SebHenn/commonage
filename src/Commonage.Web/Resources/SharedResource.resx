@@ -90,6 +90,7 @@
   <data name="Back to the item" xml:space="preserve"><value>Back to the item</value></data>
   <data name="Backup" xml:space="preserve"><value>Backup</value></data>
   <data name="Backups and keys" xml:space="preserve"><value>Backups and keys</value></data>
+  <data name="Before this change" xml:space="preserve"><value>Before this change</value></data>
   <data name="Best match" xml:space="preserve"><value>Best match</value></data>
   <data name="Bin" xml:space="preserve"><value>Bin</value></data>
   <data name="Browse by tag" xml:space="preserve"><value>Browse by tag</value></data>
@@ -137,6 +138,7 @@
   <data name="Columns that are not imported: {0}" xml:space="preserve"><value>Columns that are not imported: {0}</value></data>
   <data name="Columns that are not in this list, such as id or status, are not imported. A cell that starts with an apostrophe before =, +, - or @ is read without it, as exports write them." xml:space="preserve"><value>Columns that are not in this list, such as id or status, are not imported. A cell that starts with an apostrophe before =, +, - or @ is read without it, as exports write them.</value></data>
   <data name="Commonage archive export" xml:space="preserve"><value>Commonage archive export</value></data>
+  <data name="Compare with the text now" xml:space="preserve"><value>Compare with the text now</value></data>
   <data name="Consent" xml:space="preserve"><value>Consent</value></data>
   <data name="Contact" xml:space="preserve"><value>Contact</value></data>
   <data name="Contact the archive" xml:space="preserve"><value>Contact the archive</value></data>
@@ -462,6 +464,7 @@
   <data name="Nothing has been recorded yet." xml:space="preserve"><value>Nothing has been recorded yet.</value></data>
   <data name="Nothing is waiting for help right now. Thank you for looking." xml:space="preserve"><value>Nothing is waiting for help right now. Thank you for looking.</value></data>
   <data name="Nothing matches your search. Try fewer words or remove a filter." xml:space="preserve"><value>Nothing matches your search. Try fewer words or remove a filter.</value></data>
+  <data name="Now" xml:space="preserve"><value>Now</value></data>
   <data name="Of which originals: {0} in {1, plural, one {# file} other {# files}}. The rest are the picture sizes made from them." xml:space="preserve"><value>Of which originals: {0} in {1, plural, one {# file} other {# files}}. The rest are the picture sizes made from them.</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="Oldest first" xml:space="preserve"><value>Oldest first</value></data>
   <data name="On each contribution you can remove their name and email address, mark it as withdrawn, or move the item to the bin and delete it there for good. Backups keep older copies until they are replaced." xml:space="preserve"><value>On each contribution you can remove their name and email address, mark it as withdrawn, or move the item to the bin and delete it there for good. Backups keep older copies until they are replaced.</value></data>
@@ -657,7 +660,6 @@
   <data name="Show all tags" xml:space="preserve"><value>Show all tags</value></data>
   <data name="Show everything" xml:space="preserve"><value>Show everything</value></data>
   <data name="Show my name with what I send in" xml:space="preserve"><value>Show my name with what I send in</value></data>
-  <data name="Show the text before this change" xml:space="preserve"><value>Show the text before this change</value></data>
   <data name="Showing the newest {0}." xml:space="preserve"><value>Showing the newest {0}.</value></data>
   <data name="Shown to admins on this page and in the list of accounts. Never to visitors." xml:space="preserve"><value>Shown to admins on this page and in the list of accounts. Never to visitors.</value></data>
   <data name="Six digits. Without your phone, type one of your recovery codes instead. Each one works once." xml:space="preserve"><value>Six digits. Without your phone, type one of your recovery codes instead. Each one works once.</value></data>

@@ -63,6 +63,9 @@ public class EditModel(
     public IReadOnlyList<AuditEntry> History { get; private set; } = [];
     public IReadOnlyList<ItemRevision> Revisions { get; private set; } = [];
 
+    /// <summary>What the revised fields say now, to show beside an earlier text.</summary>
+    public IReadOnlyDictionary<RevisionField, string?> CurrentTexts { get; private set; } = new Dictionary<RevisionField, string?>();
+
     /// <summary>When the disk is nearly full, curators are told so instead of being offered the upload form.</summary>
     public bool CanUpload => health.CanAcceptUploads();
 
@@ -596,7 +599,6 @@ public class EditModel(
         return RedirectToPage("/Admin/Index");
     }
 
-    /// <summary>Hides a contribution for good because the contributor withdrew their consent.</summary>
     /// <summary>Puts a field back to what it said before a change. The text it has now is kept as a revision in turn.</summary>
     public async Task<IActionResult> OnPostRestoreTextAsync(int id, long revisionId, CancellationToken cancellationToken)
     {
@@ -738,6 +740,7 @@ public class EditModel(
             OpenNotes = await db.VisitorNotes.CountAsync(n => n.ArchiveItemId == item.Id && n.HandledAt == null);
             MediaFiles = await db.MediaFiles.Where(f => f.ArchiveItemId == item.Id).OrderBy(f => f.Position).ThenBy(f => f.Id).ToListAsync();
             IdenticalFiles = await FindIdenticalFilesAsync(MediaFiles);
+            CurrentTexts = Enum.GetValues<RevisionField>().ToDictionary(f => f, f => RevisionFields.Get(item, f));
             Revisions = await db.ItemRevisions
                 .Where(r => r.ArchiveItemId == item.Id)
                 .OrderByDescending(r => r.At).ThenByDescending(r => r.Id)

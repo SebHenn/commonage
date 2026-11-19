@@ -45,7 +45,11 @@ public class RevisionTests(CommonageAppFactory app)
         Assert.Equal(RevisionField.Description, revision.Field);
         Assert.Equal("The first text", revision.OldValue);
         Assert.Equal(CommonageAppFactory.AdminEmail, revision.UserName);
-        Assert.Contains("The first text", await curator.GetStringAsync($"/Admin/Items/Edit/{item.Id}"));
+        var page = await curator.GetStringAsync($"/Admin/Items/Edit/{item.Id}");
+        // The earlier text is shown beside what the field says now, so a curator sees what a restore would change.
+        var section = page[page.IndexOf("id=\"revisions-heading\"", StringComparison.Ordinal)..];
+        Assert.Contains("The first text", section);
+        Assert.Contains("The second text", section);
 
         await Browser.PostFormAsync(curator, $"/Admin/Items/Edit/{item.Id}?handler=RestoreText&revisionId={revision.Id}", new(), $"/Admin/Items/Edit/{item.Id}");
 

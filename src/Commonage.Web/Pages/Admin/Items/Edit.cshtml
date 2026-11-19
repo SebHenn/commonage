@@ -336,8 +336,18 @@
                         })
                         · @(revision.UserName ?? T["Unknown"].Value)
                         <details>
-                            <summary>@T["Show the text before this change"]</summary>
-                            <p class="text-preserve-lines text-break mb-2">@(string.IsNullOrEmpty(revision.OldValue) ? T["Empty"].Value : revision.OldValue)</p>
+                            <summary>@T["Compare with the text now"]</summary>
+                            <div class="row g-2 mb-2">
+                                <div class="col-md-6">
+                                    <h3 class="h6 mb-1">@T["Before this change"]</h3>
+                                    <p class="text-preserve-lines text-break border rounded p-2 mb-0">@(string.IsNullOrEmpty(revision.OldValue) ? T["Empty"].Value : revision.OldValue)</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h3 class="h6 mb-1">@T["Now"]</h3>
+                                    @{ var now = Model.CurrentTexts.GetValueOrDefault(revision.Field); }
+                                    <p class="text-preserve-lines text-break border rounded p-2 mb-0">@(string.IsNullOrEmpty(now) ? T["Empty"].Value : now)</p>
+                                </div>
+                            </div>
                         </details>
                         @if (mayManage)
                         {
