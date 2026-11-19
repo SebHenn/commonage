@@ -111,9 +111,11 @@ public class ImportArchiveModel(
             return RedirectToPage();
         }
 
+        IImportSource? source = null;
+        var started = false;
         try
         {
-            using var source = ImportSources.OpenZip(staging.ExportPath(id), staging.WorkDirectory(id));
+            source = ImportSources.OpenZip(staging.ExportPath(id), staging.WorkDirectory(id));
             if (source is null)
             {
                 TempData["Error"] = localizer["The files for this import are no longer there. Please choose them again."].Value;
@@ -125,8 +127,7 @@ public class ImportArchiveModel(
             if (!plan.CanImport)
             {
                 TempData["Error"] = localizer["There is nothing left to import."].Value;
-                source.Dispose();
-                staging.Delete(id);
+                started = true;
                 return RedirectToPage();
             }
 
@@ -136,17 +137,29 @@ public class ImportArchiveModel(
                 return RedirectToPage();
             }
 
-            // Closing the tab must not stop the run between an item and its photos, so it is not given the request's token.
+            // Closing the tab must not stop the run between an item and its photos, so it is not given the request's token. A very
+            // large import can outlast what a browser or a proxy waits for; it goes on, and the activity log has the result.
+            // Whatever way it ends, the copy is of no more use: what came in is there, and a second run would find it so.
+            started = true;
             var result = await import.RunAsync(plan, source, CancellationToken.None);
-            source.Dispose();
-            staging.Delete(id);
             TempData["Message"] = localizer["Drafts created: {0}. Photos added: {1}. Previews are being created.", result.Items, result.Files].Value;
+            var problems = new List<string>();
             if (result.FilesFailed > 0)
-                TempData["Error"] = localizer["Photos that could not be added: {0}. Their items stay drafts with the photos that did arrive. Add the missing photos by hand, or put the draft in the bin and run the import again.", result.FilesFailed].Value;
+                problems.Add(localizer["Photos that could not be added: {0}. Their items stay drafts with the photos that did arrive. Add the missing photos by hand, or put the draft in the bin and run the import again.", result.FilesFailed].Value);
+            if (result.ItemsFailed > 0)
+                problems.Add(localizer.Plural("{0, plural, one {# item} other {# items}} could not be created.", result.ItemsFailed));
+            if (result.ItemsNotTried > 0)
+                problems.Add(localizer.Plural("The import stopped early, because the disk or the database kept failing, or the server was shutting down. {0, plural, one {# item was} other {# items were}} not tried. What came in stays as drafts. Choose the same file again for the rest.", result.ItemsNotTried));
+            if (problems.Count > 0)
+                TempData["Error"] = string.Join(" ", problems);
             return LocalRedirect(Items.AddManyModel.DraftsUrl);
         }
         finally
         {
+            // The ZIP file is closed before its folder is removed, which Windows needs.
+            source?.Dispose();
+            if (started)
+                staging.Delete(id);
             ImportLock.OneAtATime.Release();
         }
     }

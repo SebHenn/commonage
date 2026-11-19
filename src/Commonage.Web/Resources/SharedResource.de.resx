@@ -1033,6 +1033,9 @@
   <data name="Check the export" xml:space="preserve"><value>Export prüfen</value></data>
   <data name="Collections that would be created: {0}" xml:space="preserve"><value>Sammlungen, die angelegt würden: {0}</value></data>
   <data name="Created the collection while importing" xml:space="preserve"><value>Sammlung beim Import angelegt</value></data>
+  <data name="Could not add every photo of this item while importing" xml:space="preserve"><value>Beim Import konnten nicht alle Fotos dieses Objekts hinzugefügt werden</value></data>
+  <data name="{0, plural, one {# item} other {# items}} could not be created." xml:space="preserve"><value>{0, plural, one {# Objekt konnte} other {# Objekte konnten}} nicht angelegt werden.</value></data>
+  <data name="The import stopped early, because the disk or the database kept failing, or the server was shutting down. {0, plural, one {# item was} other {# items were}} not tried. What came in stays as drafts. Choose the same file again for the rest." xml:space="preserve"><value>Der Import wurde vorzeitig beendet, weil der Datenträger oder die Datenbank immer wieder ausfiel oder der Server heruntergefahren wurde. {0, plural, one {# Objekt wurde} other {# Objekte wurden}} nicht versucht. Was angekommen ist, bleibt als Entwurf. Wählen Sie dieselbe Datei erneut für den Rest.</value></data>
   <data name="Every photo of this item is already in the archive." xml:space="preserve"><value>Jedes Foto dieses Objekts ist schon im Archiv.</value></data>
   <data name="Field" xml:space="preserve"><value>Feld</value></data>
   <data name="Good to know" xml:space="preserve"><value>Gut zu wissen</value></data>

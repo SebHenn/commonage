@@ -12,7 +12,9 @@ using Commonage.Web.Media;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Commonage.Tests;
 
@@ -55,14 +57,17 @@ public partial class ExportImportTests(CommonageAppFactory app)
 
     private static object Collection(int id, string title) => new { id, title, description = (string?)null };
 
-    private static object File(int id, int item, string name, byte[] content, string? sha = null, string? path = null) => new
+    private static object File(int id, int item, string name, byte[] content, string? sha = null, string? path = null,
+        string? altText = null, string? caption = null, int rotation = 0) => new
     {
         id,
         path = path ?? $"files/{item}/{id}-{name}",
         originalFileName = name,
         sha256 = sha ?? Sha(content),
         position = 0,
-        rotation = 0,
+        rotation,
+        altText,
+        caption,
         problem = (string?)null,
     };
 
@@ -428,6 +433,259 @@ public partial class ExportImportTests(CommonageAppFactory app)
         public Stream OpenRead(string key) => real.OpenRead(key);
 
         public void Delete(string key) => real.Delete(key);
+    }
+
+    /// <summary>Stores through the real storage, but fails the saves of originals that the script names, and tells what was saved and removed.</summary>
+    private sealed class ScriptedStorage(IFileStorage real, Func<int, Exception?> failure, Action<int>? afterSave = null) : IFileStorage
+    {
+        private int _originals;
+
+        public List<string> Saved { get; } = [];
+
+        public List<string> Deleted { get; } = [];
+
+        public async Task SaveAsync(string key, Stream content, CancellationToken cancellationToken = default)
+        {
+            if (!key.StartsWith("originals/", StringComparison.Ordinal))
+            {
+                await real.SaveAsync(key, content, cancellationToken);
+                return;
+            }
+
+            var number = Interlocked.Increment(ref _originals);
+            if (failure(number) is { } exception)
+                throw exception;
+            await real.SaveAsync(key, content, cancellationToken);
+            Saved.Add(key);
+            afterSave?.Invoke(number);
+        }
+
+        public Stream OpenRead(string key) => real.OpenRead(key);
+
+        public bool Exists(string key) => real.Exists(key);
+
+        public void Delete(string key)
+        {
+            Deleted.Add(key);
+            real.Delete(key);
+        }
+    }
+
+    /// <summary>Makes the save of a new photo fail the way a lost database connection does.</summary>
+    private sealed class FailingPhotoSave : SaveChangesInterceptor
+    {
+        public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
+            DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default) =>
+            eventData.Context!.ChangeTracker.Entries<MediaFile>().Any(e => e.State == EntityState.Added)
+                ? throw new DbUpdateException("secret-db-detail")
+                : base.SavingChangesAsync(eventData, result, cancellationToken);
+    }
+
+    private sealed class FakeLifetime : IHostApplicationLifetime
+    {
+        public CancellationTokenSource Stopping { get; } = new();
+
+        public CancellationToken ApplicationStarted => CancellationToken.None;
+
+        public CancellationToken ApplicationStopping => Stopping.Token;
+
+        public CancellationToken ApplicationStopped => CancellationToken.None;
+
+        public void StopApplication() => Stopping.Cancel();
+    }
+
+    private static string Copy(string word, int number) => $"{word} {number}";
+
+    private (byte[] Zip, byte[][] Photos) ManyItems(string word, int items, int filesPerItem = 1)
+    {
+        var photos = Enumerable.Range(0, items * filesPerItem).Select(_ => NewPhoto()).ToArray();
+        var entries = new List<(string, byte[])>();
+        var all = new List<object>();
+        for (var i = 1; i <= items; i++)
+        {
+            var files = new List<object>();
+            for (var f = 1; f <= filesPerItem; f++)
+            {
+                var photo = photos[(i - 1) * filesPerItem + f - 1];
+                var id = i * 100 + f;
+                files.Add(File(id, i, $"p{id}.jpg", photo));
+                entries.Add(($"files/{i}/{id}-p{id}.jpg", photo));
+            }
+
+            all.Add(Item(i, Copy(word, i), files: [.. files]));
+        }
+
+        return (Zip([("archive.json", ArchiveJson([.. all], [Collection(1, $"{word} Collection")])), .. entries]), photos);
+    }
+
+    private static async Task<ExportImportResult> RunDirectAsync(WebApplicationFactory<Program> archive, byte[] zip, IHostApplicationLifetime? lifetime = null)
+    {
+        var folder = Path.Combine(Path.GetTempPath(), "commonage-tests", Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(folder);
+        try
+        {
+            var zipPath = Path.Combine(folder, "export.zip");
+            await System.IO.File.WriteAllBytesAsync(zipPath, zip);
+            using var source = ImportSources.OpenZip(zipPath, Path.Combine(folder, "work"))!;
+            using var scope = archive.Services.CreateScope();
+            var import = lifetime is null
+                ? scope.ServiceProvider.GetRequiredService<ExportImport>()
+                : ActivatorUtilities.CreateInstance<ExportImport>(scope.ServiceProvider, lifetime);
+            var plan = await import.PlanAsync(source, CancellationToken.None);
+            Assert.True(plan.CanImport);
+            return await import.RunAsync(plan, source, CancellationToken.None);
+        }
+        finally
+        {
+            Directory.Delete(folder, recursive: true);
+        }
+    }
+
+    private static Task<HttpResponseMessage> PostImportAsync(HttpClient client, string dryRunHtml) =>
+        client.PostAsync($"{Page}?handler=Import", new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["__RequestVerificationToken"] = Browser.Token(dryRunHtml),
+            ["StagingId"] = StagingIdPattern().Match(dryRunHtml).Groups[1].Value,
+        }));
+
+    private Task<string?> SummaryAsync(WebApplicationFactory<Program> archive) =>
+        archive.WithDbAsync(db => db.AuditEntries.Where(e => e.Action == AuditAction.ArchiveImported).Select(e => e.Subject).SingleAsync());
+
+    [Fact]
+    public async Task A_run_that_keeps_failing_stops_instead_of_creating_empty_drafts_and_says_how_many_items_it_did_not_try()
+    {
+        var word = Word();
+        var storage = new ScriptedStorage(app.Services.GetRequiredService<IFileStorage>(), _ => new IOException("secret-disk-path is full."));
+        await using var archive = await app.NewArchiveAsync(b => b.ConfigureTestServices(services => services.AddSingleton<IFileStorage>(storage)));
+        using var curator = await CuratorAsync(archive);
+        var (zip, _) = ManyItems(word, ExportImport.StopAfterFailures + 3);
+
+        var dryRun = await DryRunAsync(curator, zip);
+        var response = await PostImportAsync(curator, dryRun);
+        var body = await response.Content.ReadAsStringAsync();
+
+        response.EnsureSuccessStatusCode();
+        Assert.Contains("The import stopped early", body);
+        Assert.Contains("3 items were not tried", body);
+        Assert.DoesNotContain("secret-disk-path", body);
+        Assert.Equal(ExportImport.StopAfterFailures, await archive.WithDbAsync(db => db.ArchiveItems.CountAsync()));
+        Assert.Equal($"{ExportImport.StopAfterFailures} / 0", await SummaryAsync(archive));
+    }
+
+    [Fact]
+    public async Task One_good_file_between_failures_keeps_a_run_going()
+    {
+        var word = Word();
+        var storage = new ScriptedStorage(app.Services.GetRequiredService<IFileStorage>(), n => n % 2 == 1 ? new IOException("Full.") : null);
+        await using var archive = await app.NewArchiveAsync(b => b.ConfigureTestServices(services => services.AddSingleton<IFileStorage>(storage)));
+        var (zip, _) = ManyItems(word, ExportImport.StopAfterFailures * 2);
+
+        var result = await RunDirectAsync(archive, zip);
+
+        Assert.Equal(ExportImport.StopAfterFailures * 2, result.Items);
+        Assert.Equal(0, result.ItemsNotTried);
+        Assert.Equal(ExportImport.StopAfterFailures, result.FilesFailed);
+    }
+
+    [Fact]
+    public async Task A_run_stops_between_items_when_the_app_is_shutting_down()
+    {
+        var word = Word();
+        var lifetime = new FakeLifetime();
+        var storage = new ScriptedStorage(app.Services.GetRequiredService<IFileStorage>(), _ => null, afterSave: n =>
+        {
+            if (n == 1)
+                lifetime.Stopping.Cancel();
+        });
+        await using var archive = await app.NewArchiveAsync(b => b.ConfigureTestServices(services => services.AddSingleton<IFileStorage>(storage)));
+        var (zip, photos) = ManyItems(word, 3);
+
+        var result = await RunDirectAsync(archive, zip, lifetime);
+
+        Assert.Equal(1, result.Items);
+        Assert.Equal(1, result.Files);
+        Assert.Equal(2, result.ItemsNotTried);
+        Assert.Equal([Sha(photos[0])], await archive.WithDbAsync(db => db.MediaFiles.Select(f => f.Sha256).ToListAsync()));
+        Assert.Equal("1 / 1", await SummaryAsync(archive));
+    }
+
+    [Fact]
+    public async Task A_run_that_is_cut_short_after_an_added_photo_still_logs_the_photos_and_the_summary_and_rethrows_the_real_error()
+    {
+        var word = Word();
+        var storage = new ScriptedStorage(app.Services.GetRequiredService<IFileStorage>(), n => n == 2 ? new InvalidOperationException("Not a disk problem.") : null);
+        await using var archive = await app.NewArchiveAsync(b => b.ConfigureTestServices(services => services.AddSingleton<IFileStorage>(storage)));
+        var (zip, _) = ManyItems(word, 1, filesPerItem: 2);
+
+        var thrown = await Assert.ThrowsAsync<InvalidOperationException>(() => RunDirectAsync(archive, zip));
+
+        Assert.Equal("Not a disk problem.", thrown.Message);
+        var actions = await archive.WithDbAsync(db => db.AuditEntries.Select(e => e.Action).ToListAsync());
+        Assert.Contains(AuditAction.PhotosAdded, actions);
+        Assert.Equal("1 / 1", await SummaryAsync(archive));
+        Assert.Equal(1, await archive.WithDbAsync(db => db.MediaFiles.CountAsync()));
+    }
+
+    [Fact]
+    public async Task The_lock_is_released_and_the_copy_removed_when_a_run_fails_in_a_way_that_is_not_a_failed_file()
+    {
+        var word = Word();
+        var storage = new ScriptedStorage(app.Services.GetRequiredService<IFileStorage>(), _ => new InvalidOperationException("secret-bug-detail"));
+        await using var archive = await app.NewArchiveAsync(b => b.ConfigureTestServices(services => services.AddSingleton<IFileStorage>(storage)));
+        using var curator = await CuratorAsync(archive);
+        var (zip, _) = ManyItems(word, 2);
+        var dryRun = await DryRunAsync(curator, zip);
+        var id = Guid.Parse(StagingIdPattern().Match(dryRun).Groups[1].Value);
+
+        var response = await PostImportAsync(curator, dryRun);
+
+        Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+        Assert.Equal(1, ImportLock.OneAtATime.CurrentCount);
+        Assert.False(archive.Services.GetRequiredService<ImportStaging>().ExportExists(id));
+        Assert.Equal("1 / 0", await SummaryAsync(archive));
+    }
+
+    [Fact]
+    public async Task A_photo_whose_save_fails_leaves_no_stored_original_and_is_counted_and_logged_against_its_item()
+    {
+        var word = Word();
+        var storage = new ScriptedStorage(app.Services.GetRequiredService<IFileStorage>(), _ => null);
+        var failing = new FailingPhotoSave();
+        await using var archive = await app.NewArchiveAsync(b => b.ConfigureTestServices(services =>
+        {
+            services.AddSingleton<IFileStorage>(storage);
+            services.ConfigureDbContext<CommonageDbContext>(options => options.AddInterceptors(failing));
+        }));
+        var (zip, _) = ManyItems(word, 1);
+
+        var result = await RunDirectAsync(archive, zip);
+
+        Assert.Equal(new ExportImportResult(1, 0, 1, 1), result);
+        var key = Assert.Single(storage.Saved);
+        Assert.Equal([key], storage.Deleted);
+        Assert.False(storage.Exists(key));
+        var line = await archive.WithDbAsync(db => db.AuditEntries.Where(e => e.Action == AuditAction.ImportPhotosMissing).SingleAsync());
+        Assert.Equal(Copy(word, 1), line.Subject);
+        Assert.NotNull(line.ArchiveItemId);
+        Assert.DoesNotContain(AuditAction.PhotosAdded, await archive.WithDbAsync(db => db.AuditEntries.Select(e => e.Action).ToListAsync()));
+        Assert.Equal("1 / 0", await SummaryAsync(archive));
+    }
+
+    [Fact]
+    public async Task The_text_and_the_turn_of_a_photo_are_stored_with_it_in_one_save()
+    {
+        var word = Word();
+        await using var archive = await app.NewArchiveAsync();
+        var photo = NewPhoto();
+        var json = ArchiveJson(
+            [Item(1, $"{word} Barn", files: [File(7, 1, "a.jpg", photo, altText: "A red barn", caption: "Before the fire", rotation: 90)])],
+            [Collection(1, $"{word} Collection")]);
+
+        var result = await RunDirectAsync(archive, Zip(("archive.json", json), ("files/1/7-a.jpg", photo)));
+
+        Assert.Equal(new ExportImportResult(1, 1, 0, 1), result);
+        var stored = await archive.WithDbAsync(db => db.MediaFiles.SingleAsync());
+        Assert.Equal(("A red barn", "Before the fire", 90), (stored.AltText, stored.Caption, stored.Rotation));
     }
 
     private static object[] EmptyFiles(int count) => Enumerable.Repeat<object>(new { }, count).ToArray();

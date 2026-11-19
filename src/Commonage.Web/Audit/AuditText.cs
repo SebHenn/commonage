@@ -81,6 +81,7 @@ public static class AuditText
         AuditAction.ItemsImported => localizer["Imported items from a spreadsheet"],
         AuditAction.ArchiveImported => localizer["Imported items from a Commonage export"],
         AuditAction.CollectionCreatedByImport => localizer["Created the collection while importing"],
+        AuditAction.ImportPhotosMissing => localizer["Could not add every photo of this item while importing"],
         _ => action.ToString(),
     };
 
@@ -90,7 +91,7 @@ public static class AuditText
             or AuditAction.ItemDeleted or AuditAction.ItemMovedToBin or AuditAction.ItemRestored or AuditAction.ItemPurged
             or AuditAction.ItemMovedToBinAfterKeptTime or AuditAction.ItemsImported or AuditAction.ArchiveImported => AuditKind.Items,
         AuditAction.PhotosAdded or AuditAction.PhotosArranged or AuditAction.PhotoDeleted or AuditAction.PhotoMovedToBin
-            or AuditAction.PhotoRestored or AuditAction.PhotoPurged or AuditAction.PreviewRetried => AuditKind.Photos,
+            or AuditAction.PhotoRestored or AuditAction.PhotoPurged or AuditAction.PreviewRetried or AuditAction.ImportPhotosMissing => AuditKind.Photos,
         AuditAction.ContributionReceived or AuditAction.ContributionAccepted or AuditAction.ContributionRejected
             or AuditAction.ContributionWithdrawn or AuditAction.ContributorDetailsRemoved or AuditAction.ContributorDetailsChanged
             or AuditAction.ContributionLinkCreated or AuditAction.ContributionLinkChanged

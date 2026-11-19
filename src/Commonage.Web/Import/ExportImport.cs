@@ -9,8 +9,11 @@ using Commonage.Web.Export;
 using Commonage.Web.Media;
 using Commonage.Web.Pages.Admin.Items;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Npgsql;
 
 namespace Commonage.Web.Import;
 
@@ -160,7 +163,8 @@ public class ExportPlan
     public bool CanImport => Refusal == ExportRefusal.None && Ready.Any();
 }
 
-public record ExportImportResult(int Items, int Files, int FilesFailed, int CollectionsCreated);
+/// <summary><see cref="ItemsNotTried"/> are the items left when the run stopped early; <see cref="ItemsFailed"/> those that could not be created.</summary>
+public record ExportImportResult(int Items, int Files, int FilesFailed, int CollectionsCreated, int ItemsFailed = 0, int ItemsNotTried = 0);
 
 /// <summary>
 /// Brings the ZIP file of Commonage's own export into the archive as drafts. <see cref="PlanAsync"/> only looks and changes
@@ -173,9 +177,14 @@ public partial class ExportImport(
     AuditLog audit,
     IStringLocalizer<SharedResource> localizer,
     IOptions<UploadOptions> uploadOptions,
-    TimeProvider clock)
+    TimeProvider clock,
+    IHostApplicationLifetime lifetime,
+    ILogger<ExportImport> logger)
 {
     public const int MinVersion = 4;
+
+    /// <summary>A run stops after this many failures in a row: a full disk or a lost database fails every file, and each item would only become an empty draft.</summary>
+    public const int StopAfterFailures = 5;
     public const int MaxItems = 20_000;
     public const int MaxCollections = 5_000;
     public const int MaxTags = 50_000;
@@ -668,8 +677,10 @@ public partial class ExportImport(
 
     /// <summary>
     /// Imports the items of a plan that are in order, as drafts. A file that is no longer what the dry run saw, or that cannot be
-    /// stored, is left out and counted; its item stays a draft with the photos that did arrive. The caller passes a token that
-    /// closing the browser does not cancel, so that a run is never cut off between an item and its photos.
+    /// stored, is left out and counted; its item stays a draft with the photos that did arrive. Within one item the run is not
+    /// cut off by a token, so that it never stops between an item and its photos; between items it stops when the app is shutting
+    /// down, and after <see cref="StopAfterFailures"/> failures in a row (a full disk or a lost database), so that it does not go
+    /// on creating empty drafts. What was done is in the activity log whichever way the run ends.
     /// </summary>
     public async Task<ExportImportResult> RunAsync(ExportPlan plan, IImportSource source, CancellationToken cancellationToken)
     {
@@ -690,118 +701,179 @@ public partial class ExportImport(
         var loggedId = logged.Id;
         var newCollectionIds = created.ToDictionary(c => c.Key, c => c.Value.Id, StringComparer.OrdinalIgnoreCase);
 
+        var ready = plan.Ready.ToList();
+        var tried = 0;
         var items = 0;
         var files = 0;
         var failed = 0;
+        var itemsFailed = 0;
+        var streak = 0;
         var tags = new Dictionary<string, Tag>(StringComparer.Ordinal);
-        foreach (var row in plan.Ready)
+        Exception? error = null;
+        try
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            // Everything tracked is looked after at every save, which gets slow with thousands of items.
-            if (items > 0 && items % 100 == 0)
+            foreach (var row in ready)
             {
-                db.ChangeTracker.Clear();
-                tags.Clear();
-            }
-
-            var stamp = clock.GetUtcNow().UtcDateTime;
-            var item = new ArchiveItem
-            {
-                Title = row.Title,
-                Description = row.Description,
-                Status = ItemStatus.Draft,
-                MediaLevel = row.MediaLevel,
-                PublicFrom = row.PublicFrom,
-                CollectionId = row.CollectionId ?? newCollectionIds[row.NewCollectionKey!],
-                RightsUri = row.RightsUri,
-                RightsHolder = row.RightsHolder,
-                Credit = row.Credit,
-                ReferenceNumber = row.ReferenceNumber,
-                OriginalLocation = row.OriginalLocation,
-                NeedsTranscription = row.NeedsTranscription,
-                HelpWanted = row.HelpWanted,
-                CreatedAt = stamp,
-                UpdatedAt = stamp,
-            };
-            if (row.DateText is not null)
-                item.SetDateRange(row.DateText, row.DateFrom!.Value, row.DateTo!.Value);
-
-            var missing = row.Tags.Where(t => !tags.ContainsKey(Tag.Normalize(t.Name))).ToList();
-            if (missing.Count > 0)
-            {
-                var normalized = missing.Select(t => Tag.Normalize(t.Name)).ToList();
-                foreach (var found in await db.Tags.Where(t => normalized.Contains(t.NormalizedName)).ToListAsync(cancellationToken))
-                    tags[found.NormalizedName] = found;
-                // A tag that is there keeps its kind: the archive's own choice wins over what an export says.
-                foreach (var tag in missing.Where(t => !tags.ContainsKey(Tag.Normalize(t.Name))))
-                    tags[Tag.Normalize(tag.Name)] = new Tag { Name = tag.Name, NormalizedName = Tag.Normalize(tag.Name), Kind = tag.Kind };
-            }
-
-            item.SetTags(row.Tags.Select(t => tags[Tag.Normalize(t.Name)]).ToList());
-
-            db.ArchiveItems.Add(item);
-            audit.Record(AuditAction.ItemCreated, item.Title, item);
-            await db.SaveChangesAsync(cancellationToken);
-            items++;
-
-            var added = 0;
-            try
-            {
-                foreach (var planned in row.Files)
+                cancellationToken.ThrowIfCancellationRequested();
+                if (lifetime.ApplicationStopping.IsCancellationRequested || streak >= StopAfterFailures)
+                    break;
+                tried++;
+                // Everything tracked is looked after at every save, which gets slow with thousands of items.
+                if (tried > 1 && tried % 100 == 1)
                 {
-                    var stored = false;
-                    try
-                    {
-                        await using var content = await source.OpenSeekableAsync(planned.Entry, uploadOptions.Value.MaxFileSizeBytes, cancellationToken);
-                        var examined = await uploads.ExamineAsync(content, content.Length, documents: true, cancellationToken);
-                        if (examined.Error != UploadError.None || examined.Sha256 != planned.Examined.Sha256)
-                        {
-                            failed++;
-                            continue;
-                        }
+                    db.ChangeTracker.Clear();
+                    tags.Clear();
+                }
 
-                        var file = await uploads.StoreAsync(item, content, planned.Name, content.Length, examined, cancellationToken);
-                        stored = true;
-                        files++;
-                        added++;
-                        if (planned.AltText is not null || planned.Caption is not null || planned.Rotation != 0)
-                        {
-                            file.AltText = planned.AltText;
-                            file.Caption = planned.Caption;
-                            file.Rotation = planned.Rotation;
-                            await db.SaveChangesAsync(cancellationToken);
-                        }
-                    }
-                    catch (Exception exception)
+                var stamp = clock.GetUtcNow().UtcDateTime;
+                var item = new ArchiveItem
+                {
+                    Title = row.Title,
+                    Description = row.Description,
+                    Status = ItemStatus.Draft,
+                    MediaLevel = row.MediaLevel,
+                    PublicFrom = row.PublicFrom,
+                    CollectionId = row.CollectionId ?? newCollectionIds[row.NewCollectionKey!],
+                    RightsUri = row.RightsUri,
+                    RightsHolder = row.RightsHolder,
+                    Credit = row.Credit,
+                    ReferenceNumber = row.ReferenceNumber,
+                    OriginalLocation = row.OriginalLocation,
+                    NeedsTranscription = row.NeedsTranscription,
+                    HelpWanted = row.HelpWanted,
+                    CreatedAt = stamp,
+                    UpdatedAt = stamp,
+                };
+                if (row.DateText is not null)
+                    item.SetDateRange(row.DateText, row.DateFrom!.Value, row.DateTo!.Value);
+
+                try
+                {
+                    var missing = row.Tags.Where(t => !tags.ContainsKey(Tag.Normalize(t.Name))).ToList();
+                    if (missing.Count > 0)
                     {
-                        // Whatever went wrong with one file (a full disk, a lost connection, a broken ZIP entry) costs that file only:
-                        // it is counted, and what was thrown is never shown, because it can hold paths. A stop is not a failure.
-                        DiscardUnsaved(item);
-                        if (exception is OperationCanceledException)
-                            throw;
-                        if (!stored)
+                        var normalized = missing.Select(t => Tag.Normalize(t.Name)).ToList();
+                        foreach (var found in await db.Tags.Where(t => normalized.Contains(t.NormalizedName)).ToListAsync(cancellationToken))
+                            tags[found.NormalizedName] = found;
+                        // A tag that is there keeps its kind: the archive's own choice wins over what an export says.
+                        foreach (var tag in missing.Where(t => !tags.ContainsKey(Tag.Normalize(t.Name))))
+                            tags[Tag.Normalize(tag.Name)] = new Tag { Name = tag.Name, NormalizedName = Tag.Normalize(tag.Name), Kind = tag.Kind };
+                    }
+
+                    item.SetTags(row.Tags.Select(t => tags[Tag.Normalize(t.Name)]).ToList());
+
+                    db.ArchiveItems.Add(item);
+                    audit.Record(AuditAction.ItemCreated, item.Title, item);
+                    await db.SaveChangesAsync(cancellationToken);
+                }
+                catch (Exception exception) when (IsStoreFailure(exception))
+                {
+                    logger.LogWarning("The import could not create item {Number}: {ExceptionType}", row.Number, exception.GetType().Name);
+                    // What the failed save left tracked would fail the next one, too. The run's own line is read again at the end.
+                    db.ChangeTracker.Clear();
+                    tags.Clear();
+                    itemsFailed++;
+                    streak++;
+                    continue;
+                }
+
+                items++;
+
+                var added = 0;
+                var failedHere = 0;
+                Exception? itemError = null;
+                try
+                {
+                    foreach (var planned in row.Files)
+                    {
+                        try
+                        {
+                            await using var content = await source.OpenSeekableAsync(planned.Entry, uploadOptions.Value.MaxFileSizeBytes, cancellationToken);
+                            var examined = await uploads.ExamineAsync(content, content.Length, documents: true, cancellationToken);
+                            if (examined.Error != UploadError.None || examined.Sha256 != planned.Examined.Sha256)
+                            {
+                                failed++;
+                                failedHere++;
+                                continue;
+                            }
+
+                            await uploads.StoreAsync(item, content, planned.Name, content.Length, examined, cancellationToken, planned.AltText, planned.Caption, planned.Rotation);
+                            files++;
+                            added++;
+                            streak = 0;
+                        }
+                        catch (Exception exception) when (IsStoreFailure(exception) || exception is InvalidDataException or EntryTooLargeException)
+                        {
+                            // Whatever went wrong with one file (a full disk, a lost connection, a broken ZIP entry) costs that file only:
+                            // it is counted, and what was thrown is never shown, because it can hold paths. Anything else stops the run.
+                            DiscardUnsaved(item);
+                            logger.LogWarning("The import could not add a file to item {Number}: {ExceptionType}", row.Number, exception.GetType().Name);
                             failed++;
+                            failedHere++;
+                            if (IsStoreFailure(exception) && ++streak >= StopAfterFailures)
+                                break;
+                        }
+                        catch
+                        {
+                            DiscardUnsaved(item);
+                            throw;
+                        }
                     }
                 }
-            }
-            finally
-            {
-                // Also when the loop is cut short: the photos that did arrive are in the log.
-                if (added > 0)
+                catch (Exception exception)
                 {
-                    audit.Record(AuditAction.PhotosAdded, item.Title, item);
-                    await db.SaveChangesAsync(CancellationToken.None);
+                    itemError = exception;
+                    throw;
+                }
+                finally
+                {
+                    // Also when the loop is cut short: the photos that did arrive, and the ones that did not, are in the log.
+                    try
+                    {
+                        if (added > 0)
+                            audit.Record(AuditAction.PhotosAdded, item.Title, item);
+                        if (failedHere > 0)
+                            audit.Record(AuditAction.ImportPhotosMissing, item.Title, item);
+                        if (added > 0 || failedHere > 0)
+                            await db.SaveChangesAsync(CancellationToken.None);
+                    }
+                    catch (Exception exception) when (itemError is not null || IsStoreFailure(exception))
+                    {
+                        // This must not hide what stopped the loop, and a database that is gone is the same failure as any other.
+                        logger.LogWarning("The import could not write the log lines of item {Number}: {ExceptionType}", row.Number, exception.GetType().Name);
+                        db.ChangeTracker.Clear();
+                        tags.Clear();
+                        streak++;
+                    }
                 }
             }
         }
+        catch (Exception exception)
+        {
+            error = exception;
+            throw;
+        }
+        finally
+        {
+            // How many came in, as numbers only, so the line reads the same in every language. Written whichever way the run ends.
+            try
+            {
+                db.ChangeTracker.Clear();
+                var line = await db.AuditEntries.FirstAsync(e => e.Id == loggedId, CancellationToken.None);
+                line.Subject = $"{items} / {files}";
+                await db.SaveChangesAsync(CancellationToken.None);
+            }
+            catch (Exception exception) when (error is not null)
+            {
+                logger.LogWarning("The import could not write its summary line: {ExceptionType}", exception.GetType().Name);
+            }
+        }
 
-        // How many came in, as numbers only, so the line reads the same in every language.
-        db.ChangeTracker.Clear();
-        var line = await db.AuditEntries.FirstAsync(e => e.Id == loggedId, cancellationToken);
-        line.Subject = $"{items} / {files}";
-        await db.SaveChangesAsync(cancellationToken);
-        return new ExportImportResult(items, files, failed, created.Count);
+        return new ExportImportResult(items, files, failed, created.Count, itemsFailed, ready.Count - tried);
     }
+
+    /// <summary>What a full disk, a broken file system or a lost database throws. Anything else is not something the run can go on after.</summary>
+    private static bool IsStoreFailure(Exception exception) => exception is IOException or DbUpdateException or NpgsqlException;
 
     /// <summary>Forgets a photo that was never saved, so that the next save does not try it again and fail with it.</summary>
     private void DiscardUnsaved(ArchiveItem item)

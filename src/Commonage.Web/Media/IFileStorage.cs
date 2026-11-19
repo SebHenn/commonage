@@ -40,12 +40,28 @@ public class LocalFileStorage(string rootPath) : IFileStorage
 
         // Write to a temporary file first so a crash never leaves a half-written file under the real key.
         var temporaryPath = path + ".uploading";
-        await using (var target = File.Create(temporaryPath))
+        try
         {
-            await content.CopyToAsync(target, cancellationToken);
-        }
+            await using (var target = File.Create(temporaryPath))
+            {
+                await content.CopyToAsync(target, cancellationToken);
+            }
 
-        File.Move(temporaryPath, path, overwrite: true);
+            File.Move(temporaryPath, path, overwrite: true);
+        }
+        catch
+        {
+            // A full disk or a lost stream must not leave a half-written file behind that nothing will ever remove.
+            try
+            {
+                File.Delete(temporaryPath);
+            }
+            catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+            {
+            }
+
+            throw;
+        }
     }
 
     // FileShare.Delete lets a curator delete a file while it is being read, for example by the preview generator or an

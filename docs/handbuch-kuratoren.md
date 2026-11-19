@@ -167,7 +167,14 @@ Notizen und wer einen Eintrag gegeben hat gehören dem anderen Archiv und dem, w
 zurückgezogene Einträge und solche, bei denen die Person der Weitergabe nicht zugestimmt hat, werden ausgelassen und aufgelistet.
 Einträge im Papierkorb des anderen Archivs stehen nicht in dessen Export und werden deshalb nicht gesehen. Ein Eintrag, der schon
 hier ist (gleiche Sammlung, gleicher Titel, gleiches Datum), wird nicht geändert, und ein Foto, das schon hier ist, wird nicht
-noch einmal hinzugefügt. Starten Sie denselben Export nach einem Abbruch erneut: Was da ist, wird ausgelassen.
+noch einmal hinzugefügt. Starten Sie denselben Export nach einem Abbruch erneut: Was da ist, wird ausgelassen. Für jeden Entwurf, der
+nicht alle seine Fotos bekommen hat, steht eine Zeile im Aktivitätsprotokoll.
+
+Bei einem sehr großen Import kann der Browser oder der Server davor länger warten, als er will, und die Seite zeigt dann einen Fehler
+oder nichts, während der Import weiterläuft. Starten Sie ihn nicht noch einmal: Warten Sie und sehen Sie ins Aktivitätsprotokoll, wo
+die Zeile des Laufs ("Objekte aus einem Commonage-Export eingelesen") mit der Zahl der Einträge und Fotos erscheint, wenn er fertig
+ist. Fällt der Datenträger oder die Datenbank immer wieder aus oder wird der Server heruntergefahren, endet der Import vorzeitig nach
+den Einträgen, die er geschafft hat, und die Seite nennt, wie viele er nicht versucht hat; wählen Sie dieselbe Datei erneut für den Rest.
 
 ## Eine Tabelle voller Einträge
 

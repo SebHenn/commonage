@@ -166,7 +166,13 @@ here is not added a second time. A credit or rights holder that a curator typed 
 Run the same export again after a break-off: what is there is left out. That also holds for an item that arrived without all
 its photos (a photo could not be stored, which the page after the import says): it stays a draft with the photos
 that did arrive, and the import never adds to an item that is already here. Add the missing photos by hand, or put the draft in
-the bin and run the import again.
+the bin and run the import again. The activity log has a line for each draft that did not get all its photos.
+
+A very large import can take longer than your browser or the server in front of it waits, and the page may then show an error or
+nothing at all while the import goes on. Do not start it again: wait, and look at the activity log, where the run's line ("Imported
+items from a Commonage export") appears with the number of items and photos when it is done. If the disk or the database keeps
+failing, or the server is shut down, the import stops early after the items it has done and the page says how many it did not try;
+choose the same file again for the rest.
 
 ## A box full of photos
 

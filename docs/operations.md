@@ -249,6 +249,16 @@ running again: add the photos by hand, or put the draft in the bin and run the i
 credit and rights holder a curator typed in. The run does not stop when the browser tab is closed. The ZIP file waits in a folder
 only the account running the app can read (on Linux and macOS).
 
+How a run fails: only a failed file or save (`IOException`, the ZIP reader's errors, `DbUpdateException`, `NpgsqlException`) is
+counted and survived; the warning in the application log names only the exception type and the item's number in the export, never a
+file name or message. After 5 failures in a row (a full disk or a lost database) the run stops and creates no further items; it
+also stops between items when the app is shutting down. The page then says how many items were not tried, and the same file can be
+chosen again for the rest. Any other exception ends the run, but the lock is released, the staged copy removed and the run's line in
+the activity log ("items / photos") and the "Added photos" lines are written first. A photo whose save fails has its stored original
+removed again. Each draft that lacks photos has a line "Could not add every photo of this item while importing" in the activity
+log. A very large import can outlast the browser's or the reverse proxy's wait, so the page may time out while the import goes on;
+the result is the line in the activity log.
+
 ## Export
 
 "Manage archive" → "Export" (admins) downloads the whole archive as one ZIP file. It needs no Commonage to read, so
