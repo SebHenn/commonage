@@ -261,6 +261,76 @@ public class PublicItemJsonTests(CommonageAppFactory app)
     }
 
     [Fact]
+    public async Task Hostile_text_is_encoded_in_the_tags_and_other_scripts_stay_readable_in_the_json()
+    {
+        const string Attack = "\"><script>alert(1)</script> & 'x'\nsecond <b>line</b>";
+        const string Arabic = "مرحبا بالعالم";
+        const string Cjk = "東京の写真 中文";
+        var item = await SeedAsync("hostile", (i, _) =>
+        {
+            i.Title = $"{Attack} {Arabic}";
+            i.Description = $"{Attack} {Cjk}";
+        });
+        using var visitor = app.CreateClient();
+
+        var (_, page) = await GetAsync(visitor, $"/items/{item.ItemId}");
+        var (_, body) = await GetAsync(visitor, $"/items/{item.ItemId}.json");
+
+        var tags = string.Concat(Regex.Matches(page, "<meta name=\"DC\\.[^>]*>").Select(m => m.Value));
+        Assert.Contains("DC.title", tags);
+        Assert.Contains("DC.description", tags);
+        Assert.DoesNotContain("\"><script", tags);
+        Assert.DoesNotContain("<script>alert", tags);
+        Assert.DoesNotContain("<b>", tags);
+        Assert.Contains("&lt;script&gt;", tags);
+        Assert.Contains("&quot;", tags);
+
+        // Nothing readable is escaped, and what could break out of a page that embeds the JSON is.
+        Assert.Contains(Arabic, body);
+        Assert.Contains(Cjk, body);
+        Assert.DoesNotContain("\\u0645", body, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("\\u6771", body, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain('<', body);
+        Assert.DoesNotContain('>', body);
+        Assert.DoesNotContain('&', body);
+        Assert.DoesNotContain('\'', body);
+        Assert.Contains("\\u003C", body, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("\\u0026", body);
+        Assert.Contains("\\u0027", body);
+        using var json = JsonDocument.Parse(body);
+        Assert.Equal($"{Attack} {Arabic}", json.RootElement.GetProperty("title").GetString());
+        Assert.Equal($"{Attack} {Cjk}", json.RootElement.GetProperty("description").GetString());
+    }
+
+    [Fact]
+    public async Task Only_a_ready_file_that_is_not_in_the_bin_is_listed()
+    {
+        var item = await SeedAsync("filestates", (i, now) =>
+        {
+            MediaFile Extra(string alt, ProcessingStatus status) => new()
+            {
+                ArchiveItem = i, OriginalFileName = $"{alt}.jpg", ContentType = "image/jpeg", Sha256 = new string('b', 64), SizeBytes = 10,
+                StorageId = Guid.NewGuid(), Status = status, AltText = alt,
+            };
+            var binned = Extra("AltBinned", ProcessingStatus.Ready);
+            binned.DeletedAt = now;
+            i.MediaFiles.Add(binned);
+            i.MediaFiles.Add(Extra("AltPending", ProcessingStatus.Pending));
+            i.MediaFiles.Add(Extra("AltFailed", ProcessingStatus.Failed));
+            i.MediaFiles.Add(Extra("AltReady", ProcessingStatus.Ready));
+        });
+        using var visitor = app.CreateClient();
+
+        var (_, body) = await GetAsync(visitor, $"/items/{item.ItemId}.json");
+
+        using var json = JsonDocument.Parse(body);
+        var alts = json.RootElement.GetProperty("files").EnumerateArray().Select(f => f.GetProperty("altText").GetString()).ToList();
+        Assert.Equal(2, alts.Count);
+        Assert.Contains($"Alt {item.Word}", alts);
+        Assert.Contains("AltReady", alts);
+    }
+
+    [Fact]
     public async Task The_sitemap_does_not_list_the_json()
     {
         var item = await SeedAsync("sitemap");
