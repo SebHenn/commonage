@@ -26,9 +26,6 @@ public class ImportModel(
     TimeProvider clock,
     IStringLocalizer<SharedResource> localizer) : PageModel
 {
-    /// <summary>An import runs one at a time: two of them would each be sure that an item is not there yet.</summary>
-    private static readonly SemaphoreSlim OneAtATime = new(1, 1);
-
     /// <summary>How many problems the page lists. The rest is counted.</summary>
     public const int ShownIssues = 200;
 
@@ -132,7 +129,7 @@ public class ImportModel(
             return RedirectToPage();
         }
 
-        if (!await OneAtATime.WaitAsync(0, cancellationToken))
+        if (!await ImportLock.OneAtATime.WaitAsync(0, cancellationToken))
         {
             TempData["Error"] = localizer["Another import is running. Please wait until it has finished."].Value;
             return RedirectToPage();
@@ -165,7 +162,7 @@ public class ImportModel(
         }
         finally
         {
-            OneAtATime.Release();
+            ImportLock.OneAtATime.Release();
         }
     }
 

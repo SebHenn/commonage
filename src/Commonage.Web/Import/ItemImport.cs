@@ -102,7 +102,7 @@ public class ItemImport(
         "collection", "title", "date", "tags", "description", "rights", "rights_holder", "credit", "reference_number", "original_location", "files",
     ];
 
-    private const int TitleMax = 300, DescriptionMax = 20000, HolderMax = 300, CreditMax = 300, ReferenceMax = 100, LocationMax = 300;
+    public const int TitleMax = 300, DescriptionMax = 20000, HolderMax = 300, CreditMax = 300, ReferenceMax = 100, LocationMax = 300;
 
     /// <summary>The template: the columns, in order, and no rows.</summary>
     public static string TemplateCsv() => string.Join(',', Columns) + "\r\n";

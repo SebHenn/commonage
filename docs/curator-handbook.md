@@ -148,6 +148,32 @@ First you see a dry run. It changes nothing and lists unreadable dates, collecti
 and rows that would be there twice. Fix the spreadsheet and check again, or import the rows that are in order and deal with the
 rest later. Everything imported is a draft. If it breaks off, run it again: what is already there is left out.
 
+## Reading an export
+
+Admins can read the ZIP file of a Commonage export into an archive, to merge two archives or to start a new one from another:
+**Read an export into this archive** on the Export page. A dry run comes first and changes nothing.
+
+What arrives: the title, description, date, tags, collection, rights, "What visitors get" and "Public from" of each item, and its
+photos. Everything arrives as a **draft**, whatever it was in the other archive, so you decide what to publish. A collection
+that does not exist here is created (at most 50 in one go; import again for the rest). A tag that exists here keeps the kind it
+has here.
+
+What does not arrive, and why: the names, email addresses and consent texts of contributors, notes from visitors, internal
+notes and who gave an item belong to the other archive and its promises. Items that were rejected or withdrawn there, and items
+whose contributor did not agree to sharing, are left out and listed. Items in the other archive's bin are not in its export, so
+they are not seen. An item that is already here (same collection, title and date) is not changed, and a photo that is already
+here is not added a second time. A credit or rights holder that a curator typed into an item travels with it, so check them before you publish.
+Run the same export again after a break-off: what is there is left out. That also holds for an item that arrived without all
+its photos (a photo could not be stored, which the page after the import says): it stays a draft with the photos
+that did arrive, and the import never adds to an item that is already here. Add the missing photos by hand, or put the draft in
+the bin and run the import again. The activity log has a line for each draft that did not get all its photos.
+
+A very large import can take longer than your browser or the server in front of it waits, and the page may then show an error or
+nothing at all while the import goes on. Do not start it again: wait, and look at the activity log, where the run's line ("Imported
+items from a Commonage export") appears with the number of items and photos when it is done. If the disk or the database keeps
+failing, or the server is shut down, the import stops early after the items it has done and the page says how many it did not try;
+choose the same file again for the rest.
+
 ## A box full of photos
 
 **Add many photos** on the item list makes one draft from each photo. Enter what they share first: the collection, and if

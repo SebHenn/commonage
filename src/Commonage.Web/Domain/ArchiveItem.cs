@@ -208,6 +208,12 @@ public class ArchiveItem
         return true;
     }
 
+    /// <summary>
+    /// Sets the date as written together with the earliest and latest day it stands for, when those come from somewhere that
+    /// already knows them, such as an export. Nothing is read from <paramref name="text"/> here.
+    /// </summary>
+    public void SetDateRange(string text, DateOnly from, DateOnly to) => (DateText, DateFrom, DateTo) = (text.Trim(), from, to);
+
     private void MarkReviewed(DateTime now)
     {
         if (Contribution is not null && Status == ItemStatus.Submitted)

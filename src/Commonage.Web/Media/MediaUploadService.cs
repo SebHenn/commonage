@@ -119,8 +119,10 @@ public class MediaUploadService(
         return await StoreAsync(item, content, upload.FileName, upload.Length, examined, cancellationToken);
     }
 
-    /// <summary>The same for a file that is not an upload, such as one from an import.</summary>
-    public async Task<MediaFile> StoreAsync(ArchiveItem item, Stream content, string fileName, long length, ExaminedUpload examined, CancellationToken cancellationToken = default)
+    /// <summary>The same for a file that is not an upload, such as one from an import. The text and the turn are saved with the file, in one save. When that save fails, the stored original is removed again.</summary>
+    public async Task<MediaFile> StoreAsync(
+        ArchiveItem item, Stream content, string fileName, long length, ExaminedUpload examined, CancellationToken cancellationToken = default,
+        string? altText = null, string? caption = null, int rotation = 0)
     {
         // After everything else, also what is in the bin, because it may come back to its place.
         var last = await db.MediaFiles.IgnoreQueryFilters().Where(f => f.ArchiveItemId == item.Id).MaxAsync(f => (int?)f.Position, cancellationToken);
@@ -135,11 +137,36 @@ public class MediaUploadService(
             StorageId = Guid.NewGuid(),
             Status = ProcessingStatus.Pending,
             UploadedAt = DateTime.UtcNow,
+            AltText = altText,
+            Caption = caption,
+            Rotation = rotation,
         };
         content.Position = 0;
         await storage.SaveAsync(file.OriginalKey, content, cancellationToken);
-        db.MediaFiles.Add(file);
-        await db.SaveChangesAsync(cancellationToken);
+        try
+        {
+            db.MediaFiles.Add(file);
+            await db.SaveChangesAsync(cancellationToken);
+        }
+        catch
+        {
+            // The file is stored; if the save failed, nothing in the database knows it and nothing would ever remove it.
+            // A failed save can still have been committed (a dropped connection), so the file goes only when a fresh
+            // look shows no row for it. If that look fails too, an orphan file is better than a lost original.
+            db.Entry(file).State = EntityState.Detached;
+            try
+            {
+                var committed = await db.MediaFiles.IgnoreQueryFilters().AsNoTracking()
+                    .AnyAsync(m => m.StorageId == file.StorageId, CancellationToken.None);
+                if (!committed)
+                    storage.Delete(file.OriginalKey);
+            }
+            catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or DbUpdateException or InvalidOperationException or Npgsql.NpgsqlException)
+            {
+            }
+
+            throw;
+        }
 
         queue.Enqueue(file.Id);
         return file;

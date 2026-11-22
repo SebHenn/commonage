@@ -29,6 +29,23 @@ public class FileStorageTests : IDisposable
         Assert.Throws<ArgumentException>(() => storage.OpenRead("../secrets.txt"));
     }
 
+    [Fact]
+    public async Task A_copy_that_fails_leaves_no_half_written_file_behind()
+    {
+        var storage = new LocalFileStorage(_root);
+
+        await Assert.ThrowsAsync<IOException>(() => storage.SaveAsync("originals/abc", new StreamThatFails()));
+
+        Assert.False(storage.Exists("originals/abc"));
+        Assert.Empty(Directory.EnumerateFiles(_root, "*", SearchOption.AllDirectories));
+    }
+
+    private sealed class StreamThatFails : MemoryStream
+    {
+        public override ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default) =>
+            throw new IOException("The disk is full.");
+    }
+
     public void Dispose()
     {
         if (Directory.Exists(_root))

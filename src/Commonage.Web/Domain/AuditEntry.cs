@@ -62,6 +62,9 @@ public enum AuditAction
     ItemsImported,
     AccountNameChanged,
     ItemFieldRestored,
+    ArchiveImported,
+    CollectionCreatedByImport,
+    ImportPhotosMissing,
 }
 
 /// <summary>

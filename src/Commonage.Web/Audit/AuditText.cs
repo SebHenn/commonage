@@ -79,6 +79,9 @@ public static class AuditText
         AuditAction.TagDeleted => localizer["Deleted the unused tag"],
         AuditAction.UnusedTagsDeleted => localizer["Deleted all unused tags"],
         AuditAction.ItemsImported => localizer["Imported items from a spreadsheet"],
+        AuditAction.ArchiveImported => localizer["Imported items from a Commonage export"],
+        AuditAction.CollectionCreatedByImport => localizer["Created the collection while importing"],
+        AuditAction.ImportPhotosMissing => localizer["Could not add every photo of this item while importing"],
         _ => action.ToString(),
     };
 
@@ -86,16 +89,16 @@ public static class AuditText
     {
         AuditAction.ItemCreated or AuditAction.ItemChanged or AuditAction.ItemFieldRestored or AuditAction.ItemPublished or AuditAction.ItemUnpublished or AuditAction.ItemMediaLevelChanged or AuditAction.ItemPublicFromChanged
             or AuditAction.ItemDeleted or AuditAction.ItemMovedToBin or AuditAction.ItemRestored or AuditAction.ItemPurged
-            or AuditAction.ItemMovedToBinAfterKeptTime or AuditAction.ItemsImported => AuditKind.Items,
+            or AuditAction.ItemMovedToBinAfterKeptTime or AuditAction.ItemsImported or AuditAction.ArchiveImported => AuditKind.Items,
         AuditAction.PhotosAdded or AuditAction.PhotosArranged or AuditAction.PhotoDeleted or AuditAction.PhotoMovedToBin
-            or AuditAction.PhotoRestored or AuditAction.PhotoPurged or AuditAction.PreviewRetried => AuditKind.Photos,
+            or AuditAction.PhotoRestored or AuditAction.PhotoPurged or AuditAction.PreviewRetried or AuditAction.ImportPhotosMissing => AuditKind.Photos,
         AuditAction.ContributionReceived or AuditAction.ContributionAccepted or AuditAction.ContributionRejected
             or AuditAction.ContributionWithdrawn or AuditAction.ContributorDetailsRemoved or AuditAction.ContributorDetailsChanged
             or AuditAction.ContributionLinkCreated or AuditAction.ContributionLinkChanged
             or AuditAction.VisitorNoteReceived or AuditAction.VisitorNoteHandled or AuditAction.VisitorNoteReopened
             or AuditAction.VisitorNoteDetailsRemoved or AuditAction.VisitorNoteDeleted => AuditKind.Contributions,
         AuditAction.CollectionCreated or AuditAction.CollectionChanged or AuditAction.CollectionMoved
-            or AuditAction.CollectionDeleted => AuditKind.Collections,
+            or AuditAction.CollectionDeleted or AuditAction.CollectionCreatedByImport => AuditKind.Collections,
         AuditAction.TagChanged or AuditAction.TagsMerged or AuditAction.TagDeleted or AuditAction.UnusedTagsDeleted => AuditKind.Tags,
         AuditAction.AccountCreated or AuditAction.AccountRoleChanged or AuditAction.AccountNameChanged or AuditAction.AccountDisabled or AuditAction.AccountEnabled
             or AuditAction.AccountDeleted or AuditAction.SetupLinkCreated or AuditAction.PasswordChanged

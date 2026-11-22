@@ -1,0 +1,133 @@
+@page
+@model Commonage.Web.Pages.Admin.ImportArchiveModel
+@using Commonage.Web.Import
+@{
+    ViewData["Title"] = T["Import an export"];
+    var plan = Model.Plan;
+    var shown = Commonage.Web.Pages.Admin.ImportArchiveModel.ShownIssues;
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="@Commonage.Web.Search.AdminItemList.Page">@T["Items"]</a></li>
+    </ol>
+</nav>
+
+<h1>@ViewData["Title"]</h1>
+
+@if (plan is { Refusal: not ExportRefusal.None })
+{
+    <p class="alert alert-danger col-lg-8" role="alert">@Model.DescribeRefusal()</p>
+}
+
+@if (plan is { Refusal: ExportRefusal.None })
+{
+    <section class="col-lg-10" aria-labelledby="dry-run-heading">
+        <h2 id="dry-run-heading" class="h4">@T["The dry run"]</h2>
+        <p>@T["Nothing has been imported yet. This is what would happen."]</p>
+        <ul class="list-unstyled">
+            <li>@T["Items read: {0}", plan.Items.Count]</li>
+            <li><strong>@T["Items that can be imported: {0}", plan.Ready.Count()]</strong></li>
+            <li>@T["Photos that would be added: {0}", plan.ReadyFileCount]</li>
+            <li>@T["Collections that would be created: {0}", plan.NewCollections.Count]</li>
+            <li>@T["Items with problems, which are left out: {0}", plan.Items.Count(i => i.HasProblem)]</li>
+            <li>@T["Items left out on purpose: {0}", plan.Items.Count(i => i.IsLeftOut)]</li>
+        </ul>
+
+        @if (plan.Ready.Any(i => i.MediaLevel != Commonage.Web.Domain.MediaLevel.Everything || i.PublicFrom is not null))
+        {
+            <p class="alert alert-info" role="status">@T["Some items keep what the other archive chose for what visitors get of them, or the day from which they are public. They arrive as drafts either way."]</p>
+        }
+
+        @foreach (var (heading, rows, why) in new[]
+        {
+            (T["Problems"].Value, Model.Problems, T["What is wrong"].Value),
+            (T["Left out"].Value, Model.LeftOut, T["Why"].Value),
+            (T["Good to know"].Value, Model.Notes, T["What happens"].Value),
+        })
+        {
+            var list = rows.ToList();
+            if (list.Count == 0)
+            {
+                continue;
+            }
+
+            <h3 class="h5">@heading</h3>
+            <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                    <caption class="visually-hidden">@heading</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">@T["Item"]</th>
+                            <th scope="col">@T["Title"]</th>
+                            <th scope="col">@T["Field"]</th>
+                            <th scope="col">@T["What the export says"]</th>
+                            <th scope="col">@why</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var (item, issue) in list.Take(shown))
+                        {
+                            <tr>
+                                <td>@item.Number</td>
+                                <td dir="auto">@item.Title</td>
+                                <td><code>@issue.Field</code></td>
+                                <td dir="auto">@issue.Value</td>
+                                <td>@Model.Describe(issue)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            @if (list.Count > shown)
+            {
+                <p>@T["More lines than are listed here: {0}", list.Count - shown]</p>
+            }
+        }
+
+        @if (plan.IssuesNotListed > 0)
+        {
+            <p>@T.Plural("{0, plural, one {And # more thing found, which is not listed.} other {And # more things found, which are not listed.}}", plan.IssuesNotListed)</p>
+        }
+
+        <div class="d-flex flex-wrap gap-2 mt-3">
+            @if (plan.CanImport)
+            {
+                <form method="post" asp-page-handler="Import" data-send-once>
+                    <input type="hidden" asp-for="StagingId" />
+                    <button type="submit" class="btn btn-primary">@T.Plural("{0, plural, one {Import the one item that is in order} other {Import the # items that are in order}}", plan.Ready.Count())</button>
+                </form>
+            }
+            <form method="post" asp-page-handler="Cancel">
+                <input type="hidden" asp-for="StagingId" />
+                <button type="submit" class="btn btn-outline-secondary">@(plan.CanImport ? T["Do not import"] : T["Start again"])</button>
+            </form>
+        </div>
+        @if (plan.CanImport)
+        {
+            <p class="form-text">@T["Imported items become drafts, whatever they were in the other archive. A large import takes a while: keep this page open. If it breaks off, run it again: what is already there is left out."]</p>
+        }
+    </section>
+}
+else if (!Model.CanUpload)
+{
+    <p class="alert alert-warning" role="status">@T["The disk is nearly full, so no photos can be added at the moment. Tell the person who runs the server."]</p>
+}
+else
+{
+    <div class="col-lg-8">
+        <p>@T["Reads the ZIP file that the export of a Commonage archive makes, to merge two archives or to start a new one from another. Every item becomes a draft, and nothing is imported before you have seen a dry run."]</p>
+        <p>@T["What is left out: the names, email addresses and consent texts of contributors, notes from visitors, internal notes, who gave an item, users, settings, and the activity log. Items that were rejected or withdrawn, or whose contributor did not agree to sharing, are not imported. An item that is already here is never changed."]</p>
+        <p><a asp-page="Items/Import">@T["Import from a spreadsheet instead"]</a></p>
+
+        <form method="post" enctype="multipart/form-data">
+            <partial name="_ErrorSummary" />
+            <div class="mb-3">
+                <label for="export" class="form-label">@T["ZIP file of an export"]</label>
+                <input type="file" id="export" name="export" class="form-control" accept=".zip,application/zip" required />
+                <span class="text-danger field-validation-valid" data-valmsg-for="export" data-valmsg-replace="true"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">@T["Check the export"]</button>
+        </form>
+    </div>
+}

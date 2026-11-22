@@ -232,6 +232,33 @@ or email address, including items in the bin. On each item, curators can:
 
 Backups still contain removed data until they are replaced. Delete backups you no longer need.
 
+## Reading an export
+
+Admins can read the ZIP file of a Commonage export on the page **Read an export into this archive** (linked from Export). The
+file is kept in `import-staging` on the media volume until the import is done, or a day. It shares the one-at-a-time lock with
+the spreadsheet import and runs inside one web request, so the reverse proxy needs the same long timeout. Limits: a ZIP of at most
+4 GB; `archive.json` at most 256 MB when unpacked, counted as it is read; at most 20,000 items, 5,000 collections, 50,000 tags and
+500 files per item and 100,000 files in all; at most 8 GB of files in all; at most 50 new collections per run; the dry run keeps
+at most 10,000 lines and counts the rest. The format versions 4 to 8 are read. Every
+item is a draft, and the activity log records the run ("Imported items from a Commonage export", with counts only) and each
+new collection, never a title of the other archive's contributors or their details. The database is only added to: nothing is
+changed or removed, so a run that breaks off can be run again. A file that cannot be stored (a full disk, a broken ZIP entry) is
+counted and shown, never explained with the system's own error text; its item stays a draft with the photos that did arrive and the
+activity log has the line for those. The import never adds to an item that is already there, so such an item is not completed by
+running again: add the photos by hand, or put the draft in the bin and run the import again. Items from the export carry the
+credit and rights holder a curator typed in. The run does not stop when the browser tab is closed. The ZIP file waits in a folder
+only the account running the app can read (on Linux and macOS).
+
+How a run fails: only a failed file or save (`IOException`, the ZIP reader's errors, `DbUpdateException`, `NpgsqlException`) is
+counted and survived; the warning in the application log names only the exception type and the item's number in the export, never a
+file name or message. After 5 failures in a row (a full disk or a lost database) the run stops and creates no further items; it
+also stops between items when the app is shutting down. The page then says how many items were not tried, and the same file can be
+chosen again for the rest. Any other exception ends the run, but the lock is released, the staged copy removed and the run's line in
+the activity log ("items / photos") and the "Added photos" lines are written first. A photo whose save fails has its stored original
+removed again. Each draft that lacks photos has a line "Could not add every photo of this item while importing" in the activity
+log. A very large import can outlast the browser's or the reverse proxy's wait, so the page may time out while the import goes on;
+the result is the line in the activity log.
+
 ## Export
 
 "Manage archive" → "Export" (admins) downloads the whole archive as one ZIP file. It needs no Commonage to read, so

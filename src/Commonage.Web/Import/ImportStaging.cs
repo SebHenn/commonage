@@ -18,8 +18,25 @@ public sealed class ImportStaging(string storageRoot)
     public Guid Create()
     {
         var id = Guid.NewGuid();
-        Directory.CreateDirectory(DirectoryOf(id));
+        // Owner-only where the system has such permissions: what waits here may hold what the archive does not publish.
+        if (OperatingSystem.IsWindows())
+            Directory.CreateDirectory(DirectoryOf(id));
+        else
+            Directory.CreateDirectory(DirectoryOf(id), OwnerOnlyDirectory);
         return id;
+    }
+
+    internal const UnixFileMode OwnerOnlyDirectory = UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute;
+
+    internal const UnixFileMode OwnerOnlyFile = UnixFileMode.UserRead | UnixFileMode.UserWrite;
+
+    /// <summary>A new file that only the account running the app can read, for what visitors and other curators must not get at.</summary>
+    public static FileStream CreateOwnerOnlyFile(string path)
+    {
+        var options = new FileStreamOptions { Mode = FileMode.Create, Access = FileAccess.Write, Share = FileShare.None };
+        if (!OperatingSystem.IsWindows())
+            options.UnixCreateMode = OwnerOnlyFile;
+        return new FileStream(path, options);
     }
 
     public string DirectoryOf(Guid id) => Path.Combine(Waiting, id.ToString("N"));
@@ -27,6 +44,11 @@ public sealed class ImportStaging(string storageRoot)
     public string CsvPath(Guid id) => Path.Combine(DirectoryOf(id), "sheet.csv");
 
     public string ZipPath(Guid id) => Path.Combine(DirectoryOf(id), "scans.zip");
+
+    /// <summary>Where the ZIP file of an export waits while it is read into the archive.</summary>
+    public string ExportPath(Guid id) => Path.Combine(DirectoryOf(id), "export.zip");
+
+    public bool ExportExists(Guid id) => File.Exists(ExportPath(id));
 
     public string WorkDirectory(Guid id) => Path.Combine(DirectoryOf(id), "work");
 
@@ -39,7 +61,7 @@ public sealed class ImportStaging(string storageRoot)
             if (Directory.Exists(DirectoryOf(id)))
                 Directory.Delete(DirectoryOf(id), recursive: true);
         }
-        catch (IOException)
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
             // Left over, and removed with the next old one.
         }
@@ -57,9 +79,9 @@ public sealed class ImportStaging(string storageRoot)
                 if (now - Directory.GetLastWriteTimeUtc(directory) > age)
                     Directory.Delete(directory, recursive: true);
             }
-            catch (IOException)
+            catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
             {
-                // In use, so it is not old.
+                // In use or not ours to remove, so it stays, and one such folder must not stop the page or the others from being cleared.
             }
         }
     }

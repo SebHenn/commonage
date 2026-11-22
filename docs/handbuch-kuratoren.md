@@ -151,6 +151,31 @@ bestätigen. Jeder geänderte Eintrag bekommt eine Zeile in seinem Verlauf.
 Beim Veröffentlichen von vielen werden nur Entwürfe mit Titel genommen. Über Beiträge wird einzeln entschieden. Rückgängig
 machen lässt sich eine Änderung an vielen nicht, also probieren Sie sie im Zweifel erst an wenigen aus.
 
+## Einen Export einlesen
+
+Admins können die ZIP-Datei eines Commonage-Exports in ein Archiv einlesen, um zwei Archive zusammenzuführen oder ein neues aus
+einem anderen zu beginnen: **Einen Export in dieses Archiv einlesen** auf der Seite Export. Zuerst kommt ein Probelauf, der nichts
+ändert.
+
+Was ankommt: Titel, Beschreibung, Datum, Schlagwörter, Sammlung, Rechte, "Was Besucher bekommen" und "Öffentlich ab" jedes Eintrags
+und seine Fotos. Alles kommt als **Entwurf** an, was es im anderen Archiv auch war; was veröffentlicht wird, entscheiden Sie. Eine
+Sammlung, die es hier nicht gibt, wird angelegt (höchstens 50 auf einmal; importieren Sie erneut für den Rest). Ein Schlagwort,
+das es hier gibt, behält die Art, die es hier hat.
+
+Was nicht ankommt, und warum: Namen, E-Mail-Adressen und Einwilligungstexte der Beitragenden, Hinweise von Besuchern, interne
+Notizen und wer einen Eintrag gegeben hat gehören dem anderen Archiv und dem, was dort versprochen wurde. Abgelehnte oder
+zurückgezogene Einträge und solche, bei denen die Person der Weitergabe nicht zugestimmt hat, werden ausgelassen und aufgelistet.
+Einträge im Papierkorb des anderen Archivs stehen nicht in dessen Export und werden deshalb nicht gesehen. Ein Eintrag, der schon
+hier ist (gleiche Sammlung, gleicher Titel, gleiches Datum), wird nicht geändert, und ein Foto, das schon hier ist, wird nicht
+noch einmal hinzugefügt. Starten Sie denselben Export nach einem Abbruch erneut: Was da ist, wird ausgelassen. Für jeden Entwurf, der
+nicht alle seine Fotos bekommen hat, steht eine Zeile im Aktivitätsprotokoll.
+
+Bei einem sehr großen Import kann der Browser oder der Server davor länger warten, als er will, und die Seite zeigt dann einen Fehler
+oder nichts, während der Import weiterläuft. Starten Sie ihn nicht noch einmal: Warten Sie und sehen Sie ins Aktivitätsprotokoll, wo
+die Zeile des Laufs ("Objekte aus einem Commonage-Export eingelesen") mit der Zahl der Einträge und Fotos erscheint, wenn er fertig
+ist. Fällt der Datenträger oder die Datenbank immer wieder aus oder wird der Server heruntergefahren, endet der Import vorzeitig nach
+den Einträgen, die er geschafft hat, und die Seite nennt, wie viele er nicht versucht hat; wählen Sie dieselbe Datei erneut für den Rest.
+
 ## Eine Tabelle voller Einträge
 
 Liegt das Archiv schon in einer Tabelle vor, macht **Tabelle importieren** unter Archiv verwalten aus jeder Zeile einen Entwurf.
