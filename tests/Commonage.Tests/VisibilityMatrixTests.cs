@@ -67,6 +67,7 @@ public class VisibilityMatrixTests(CommonageAppFactory app)
             foreach (var address in Addresses)
                 everything.Append(await TextAsync(visitor, string.Format(address, marked.Word)));
             everything.Append(await TextAsync(visitor, $"/items/{marked.ItemId}"));
+            everything.Append(await TextAsync(visitor, $"/items/{marked.ItemId}.json"));
             everything.Append(await TextAsync(visitor, $"/collections/{marked.CollectionId}"));
         }
         var text = everything.ToString();

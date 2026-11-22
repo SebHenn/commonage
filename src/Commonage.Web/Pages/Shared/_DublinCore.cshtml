@@ -1,0 +1,33 @@
+@model Commonage.Web.Search.PublicItemRecord
+@* The simple Dublin Core elements of a public item, as the page says them. Nothing here is not also in the JSON. *@
+<link rel="schema.DC" href="http://purl.org/dc/elements/1.1/" />
+<meta name="DC.title" content="@Model.Title" />
+@if (Model.Description is not null)
+{
+    <meta name="DC.description" content="@Model.Description" />
+}
+@if (Model.DateText is not null)
+{
+    <meta name="DC.date" content="@Model.DateText" />
+}
+@if (Model.Credit is not null)
+{
+    <meta name="DC.creator" content="@Model.Credit" />
+}
+@if (Model.Rights is not null)
+{
+    <meta name="DC.rights" content="@Model.Rights" />
+}
+@if (Model.Language is not null)
+{
+    <meta name="DC.language" content="@Model.Language" />
+}
+@foreach (var subject in Model.Subjects)
+{
+    <meta name="DC.subject" content="@subject" />
+}
+<meta name="DC.identifier" content="@Model.Identifier" />
+@if (Model.Type is not null)
+{
+    <meta name="DC.type" content="@Model.Type" />
+}

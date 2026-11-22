@@ -207,6 +207,7 @@ app.MapArchiveHealth();
 app.MapMediaEndpoints();
 app.MapDateCheck();
 app.MapPublicFeeds();
+app.MapPublicItemJson();
 app.MapBrandingEndpoints();
 app.MapStaticAssets();
 app.MapRazorPages()

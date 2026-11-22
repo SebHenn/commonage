@@ -142,6 +142,13 @@ the request, so behind Caddy they depend on `ASPNETCORE_FORWARDEDHEADERS_ENABLED
 tries that setting. Text goes into XML through `XmlText`, because one pasted control character would make a whole feed unreadable.
 `ArchiveItem.MayTravel` decides what goes along with a link, and it needs the contribution to be loaded.
 
+`Search/PublicItemRecord.cs` is what an item says to programs: `/items/{id}.json` and the `DC.*` tags (`Pages/Shared/_DublinCore.cshtml`,
+written by the layout when the page set `ViewData["Record"]`). `PublicItemRecord` is an allow-list: add a field there on purpose,
+and never serialise `ArchiveItem` or `MediaFile`. It follows the link-preview rules, so description and files go with `MayTravel`,
+and files with `MediaLevel.Everything`. The endpoint answers a hidden item with `Results.NotFound()` and nothing else, so the
+re-executed error page makes it identical to the page's own 404; it sets `public, max-age=600` and no `ETag` or `Last-Modified`
+on the 200 only. The dates stay as written (`DateText`) next to the earliest and latest day.
+
 ## Photos of an item
 
 `MediaFile.Position` orders an item's photos, and the first is its cover. Anything that picks or lists photos must order by

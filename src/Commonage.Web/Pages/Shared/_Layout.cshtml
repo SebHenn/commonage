@@ -25,6 +25,15 @@
     {
         <link rel="canonical" href="@canonical" />
     }
+    @if (ViewData["Record"] is Commonage.Web.Search.PublicItemRecord record)
+    {
+        @* Only a page that is visible gets here, so the address of the JSON is not given away for anything else. *@
+        <link rel="alternate" type="application/json" href="@record.JsonAddress" />
+        @if (identity.AllowSearchEngines)
+        {
+            <partial name="_DublinCore" model="record" />
+        }
+    }
     @if (!isPrivatePage && identity.AllowSearchEngines)
     {
         var address = Context.Request.BaseAddress();

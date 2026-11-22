@@ -130,7 +130,12 @@ Besucher sehen. Die Liste lässt sich unter **Vor Besuchern zurückgehalten** fi
 ankreuzen, **Festlegen, was Besucher bekommen** oder **Öffentlich-ab-Datum festlegen** wählen und bestätigen. Nur Kuratoren können beides einstellen,
 und jede Änderung steht im Verlauf des Eintrags.
 
-Feed und Sitemap werden zehn Minuten vorgehalten, eine Änderung kann also so lange brauchen, bis sie überall ankommt. Etwas denen
+Jeder öffentliche Eintrag hat außerdem unter seiner Adresse mit angehängtem `.json` eine maschinenlesbare Fassung, und seine Seite enthält
+Dublin-Core-Angaben, für Bibliotheken und Programme, die Archive einsammeln. Sie enthält nur, was die Seite zeigt (ein Eintrag nur mit
+Datensatz nennt keine Dateien, und bei einem Eintrag, dessen Beitragende nicht über diese Website hinaus zugestimmt haben, fehlen
+Beschreibung und Dateien), und sie folgt demselben Schalter wie der Feed.
+
+Feed, Sitemap und diese Fassung werden zehn Minuten vorgehalten, eine Änderung kann also so lange brauchen, bis sie überall ankommt. Etwas denen
 wieder wegnehmen, die es schon gesehen haben, geht nicht: Wer ein Bild gespeichert hat, behält es.
 
 ## Viele Einträge bearbeiten
