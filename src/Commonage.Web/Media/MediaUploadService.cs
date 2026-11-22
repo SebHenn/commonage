@@ -150,12 +150,18 @@ public class MediaUploadService(
         }
         catch
         {
-            // The file is stored but nothing in the database knows it, so nothing would ever remove it.
+            // The file is stored; if the save failed, nothing in the database knows it and nothing would ever remove it.
+            // A failed save can still have been committed (a dropped connection), so the file goes only when a fresh
+            // look shows no row for it. If that look fails too, an orphan file is better than a lost original.
+            db.Entry(file).State = EntityState.Detached;
             try
             {
-                storage.Delete(file.OriginalKey);
+                var committed = await db.MediaFiles.IgnoreQueryFilters().AsNoTracking()
+                    .AnyAsync(m => m.StorageId == file.StorageId, CancellationToken.None);
+                if (!committed)
+                    storage.Delete(file.OriginalKey);
             }
-            catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+            catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or DbUpdateException or InvalidOperationException or Npgsql.NpgsqlException)
             {
             }
 
