@@ -32,7 +32,7 @@ Updating to a newer minor before 1.0 may need attention; the notes in [CHANGELOG
 
 - Running the published image the way [docs/deployment.md](docs/deployment.md) describes, on x86 or ARM.
 - The export, backup and restore described in [docs/operations.md](docs/operations.md).
-- Updating by one release at a time, to the newest.
+- Updating to the newest release. The update test jumps from each earlier minor straight to the current version, so that is the path that is tested.
 
 ## What is not supported
 

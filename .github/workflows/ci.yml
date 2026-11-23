@@ -85,7 +85,9 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - run: sh scripts/test-update.sh ${{ matrix.minor }}
+      - run: sh scripts/test-update.sh "$MINOR"
+        env:
+          MINOR: ${{ matrix.minor }}
 
   secret-scan:
     runs-on: ubuntu-latest

@@ -20,7 +20,7 @@ if command -v cygpath >/dev/null 2>&1; then repository=$(cygpath -m "$repository
 head=$(git rev-parse HEAD)
 minor=${1:-}
 case "$minor" in
-    "" | [0-9]*.[0-9]*) ;;
+    "" | [0-9]*.[0-9]*) case "$minor" in *[!0-9.]*) echo "Usage: scripts/test-update.sh [minor, such as 0.3]" >&2; exit 2 ;; esac ;;
     *) echo "Usage: scripts/test-update.sh [minor, such as 0.3]" >&2; exit 2 ;;
 esac
 # The newest earlier release (of the given minor) with a published image. A release just tagged may still be waiting for
@@ -116,7 +116,8 @@ migrations_before=$(migrations)
 # The backup that release itself makes, with its own scripts. It is restored into the new version at the end.
 echo "Making a backup with $previous..."
 sh scripts/backup.sh "$work/old-backup" >/dev/null || fail "$previous could not make a backup"
-old_backup=$(ls -dt "$work"/old-backup/commonage-* | head -n 1)
+old_backup=$(ls -dt "$work"/old-backup/commonage-* 2>/dev/null | head -n 1)
+[ -n "$old_backup" ] || fail "$previous made no backup folder"
 
 echo "Trying an update that fails after upgrading the database..."
 if sh scripts/update.sh 9.0.1 "$work/backups"; then
