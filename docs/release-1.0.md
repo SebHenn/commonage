@@ -21,7 +21,7 @@ Where a condition is checked by a machine, it is checked by a named test or scri
 | # | Condition | Checked by | Status |
 |---|---|---|---|
 | 1 | A real group has run it for a season | A written note from the group (their name only if they agree). Not something a test can show. | **Not met.** No group has reported yet (see the roadmap). Needed for "supported", not for the number. |
-| 2 | The upgrade works from every 0.x minor | `scripts/test-update.sh` in CI: job `update` (newest earlier release) and the matrix job `update-from` (each earlier minor), both in `ci.yml`, run on every pull request. | **Built, not yet run in CI.** The matrix covers every earlier minor with an image; see below. |
+| 2 | The upgrade works from every 0.x minor | `scripts/test-update.sh` in CI: job `update` (newest earlier release) and the matrix job `update-from` (each earlier minor), both in `ci.yml`, run on every pull request. | **Met.** `update` and `update-from-0.1` to `update-from-0.5` pass in CI (checked on #76 and #77). The matrix covers every earlier minor with an image; see below. |
 | 3 | Export and import round trip | `ExportImportTests` in `tests/Commonage.Tests`. | **Met, with the limits below.** |
 | 4 | A support policy | [SUPPORT.md](../SUPPORT.md) and the "Which versions get fixes" section of [SECURITY.md](../SECURITY.md). | **Met.** Confirmed by the maintainer (Seb H.) on 2026-11-23: security fixes go to the newest minor only; older versions update through it. |
 | 5 | A second person can release | [handover.md](handover.md): a second reviewer of the `release` environment, or a written handover. | **Not met.** The handover is written; no second approver exists. |
