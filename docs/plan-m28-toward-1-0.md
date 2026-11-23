@@ -1,6 +1,6 @@
 # Plan for M28: toward 1.0
 
-Status: **plan, no code yet; decisions made (see "Decisions").** Three parts, in this order, each its own pull request. The plan goes to the `privacy-reviewer` agent
+Status: **built in three parts; part 3 is `docs/release-1.0.md` and `SUPPORT.md`. Decisions made (see "Decisions").** Three parts, in this order, each its own pull request. The plan goes to the `privacy-reviewer` agent
 before part 1 starts, as M27 did, because part 1 brings material into the archive from outside and part 2 adds public addresses.
 
 ## What is wanted

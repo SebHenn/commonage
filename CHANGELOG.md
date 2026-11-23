@@ -5,6 +5,16 @@ version may change things that need attention when updating, and these notes say
 
 ## Unreleased
 
+### For people running an archive and for maintainers
+
+- **The 1.0 checklist** is written down in `docs/release-1.0.md`: each condition, how it is checked, and where it stands. Some are
+  not met yet and it says so (a group that has run it for a season, a second person who
+  can approve a release). `SUPPORT.md` says which versions get security fixes and what is not supported: the newest minor only, as
+  the maintainer decided on 2026-11-23. The program itself does not change.
+- **The update is tested from every earlier minor.** `scripts/test-update.sh` takes a minor (`scripts/test-update.sh 0.3`),
+  makes a backup with that release's own scripts and, after updating, restores that backup into the new version. A new CI job
+  `update-from` runs it for 0.1 to 0.5. It has not run in CI yet, so `docs/release-1.0.md` does not claim more than that.
+
 ### For visitors and other programs
 
 - **A public item can be read by a program.** Each public item page now names `/items/{number}.json` as an alternate and carries
