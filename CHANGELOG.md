@@ -7,6 +7,14 @@ version may change things that need attention when updating, and these notes say
 
 ### For people running an archive and for maintainers
 
+- **PostgreSQL 19.** The database image moves from 18 to 19. A new PostgreSQL version cannot open the data of the old
+  one, so `scripts/update.sh` now moves the archive with the backup: it stops the app, backs up, starts the new database
+  beside the old data and restores into it. The old database stays in the `db-data` volume untouched, so going back stays
+  possible; once the archive has run well, remove it with the command the update prints (see "A new PostgreSQL version"
+  in `docs/operations.md`). The update takes longer than usual and needs room for a second copy of the database. Future
+  major versions work the same way. `scripts/backup.sh` no longer recreates the database container, and
+  `scripts/test-update.sh` tests the move.
+
 - **The 1.0 checklist** is written down in `docs/release-1.0.md`: each condition, how it is checked, and where it stands. Some are
   not met yet and it says so (a group that has run it for a season, a second person who
   can approve a release). `SUPPORT.md` says which versions get security fixes and what is not supported: the newest minor only, as

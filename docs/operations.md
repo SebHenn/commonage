@@ -340,6 +340,32 @@ up, deletes all containers and volumes, restores and compares, and checks that n
 without `COMMONAGE_LOGIN_KEY`. It runs in CI on every pull request, as its own
 Compose project on ports 18080 and 15432, so it can also run next to your own archive.
 
+### A new PostgreSQL version
+
+Now and then a release moves to a new major version of PostgreSQL (18 to 19, for example), which cannot open the data of
+the old one. `scripts/update.sh` notices this and handles it, without you doing anything extra: it stops the app, makes
+the backup, checks its checksums again, starts the new database beside the old data and restores the backup into it.
+The old database is not deleted: each major version has its own folder in the `db-data` volume
+(`/var/lib/postgresql/18`, `/var/lib/postgresql/19`), so the previous release still finds its data, and if the new
+version does not come up, the script goes back to the previous release and restores the backup as always. The archive is
+down while this happens, longer than for an ordinary update, in proportion to the size of the database.
+
+Plan for the disk: until you remove the old database, the volume holds the database twice, and the backup is a third
+copy. The update checks the space for the backup only, so look at `docker system df` first if the database is large.
+
+When the archive has run well for a while (a week, say), free the space of the old database. The update prints this
+command, with the right version number:
+
+```sh
+docker compose run --rm --no-deps --entrypoint rm db -rf /var/lib/postgresql/18
+```
+
+This is final. After it, going back to the previous release means restoring a backup. If an update did not come up and
+went back, an unused folder of the new version stays in the volume; the next try uses it again.
+
+An archive that is moved by hand (`git checkout` and `docker compose up`, without the script) would start an empty
+database for the new version. Use `scripts/update.sh`, or restore the backup with `scripts/restore.sh` right after.
+
 ## Demo archive
 
 `COMMONAGE_DEMO=en` or `COMMONAGE_DEMO=de` in `.env` fills a new, empty archive with made-up content when the app

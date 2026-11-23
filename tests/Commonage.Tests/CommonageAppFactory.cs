@@ -11,7 +11,7 @@ public class CommonageAppFactory : WebApplicationFactory<Program>, IAsyncLifetim
     public const string AdminEmail = "admin@example.org";
     public const string AdminPassword = "Test-only-password-1";
 
-    private readonly PostgreSqlContainer _db = new PostgreSqlBuilder("postgres:18-alpine").Build();
+    private readonly PostgreSqlContainer _db = new PostgreSqlBuilder("postgres:19-alpine").Build();
     private readonly string _storageRoot = Path.Combine(Path.GetTempPath(), "commonage-tests", Guid.NewGuid().ToString("N"));
 
     /// <summary>Connects as the container's superuser, for tests that set up databases of their own.</summary>

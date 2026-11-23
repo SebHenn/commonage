@@ -1,7 +1,8 @@
 #!/bin/sh
 # Tests updating a real archive: starts an earlier published release in the production setup, makes a backup with that
 # release's own scripts, tries an update that fails after upgrading the database, checks that everything went back,
-# updates to the current code, and finally restores the old release's backup into the new version.
+# updates to the current code (which moves the archive to a new PostgreSQL major version when the code uses another one
+# than the release, and keeps the old database in the volume), and finally restores the old release's backup into the new version.
 #
 #   scripts/test-update.sh          from the newest earlier release that has a published image
 #   scripts/test-update.sh 0.3      from the newest 0.3.x release that has a published image
@@ -95,6 +96,20 @@ running_image() {
     docker inspect --format '{{.Config.Image}}' "$(docker compose ps --quiet web)"
 }
 
+database_major() {
+    version=$(docker compose exec -T db psql --username=commonage --dbname=commonage -Atc 'show server_version_num' | tr -d '')
+    echo $(( version / 10000 ))
+}
+
+item_count() {
+    docker compose exec -T db psql --username=commonage --dbname=commonage -Atc 'select count(*) from "ArchiveItems"' | tr -d ''
+}
+
+# The PostgreSQL major that the current code starts. When the previous release runs another one, the update moves the
+# archive to it, and that is the path this test is about.
+expected_major=$(git show "$head:compose.yaml" | sed -n 's/^ *image: *postgres:\([0-9][0-9]*\).*/\1/p' | head -n 1)
+[ -n "$expected_major" ] || fail "could not read the PostgreSQL version from compose.yaml"
+
 migrations() {
     docker compose exec -T db psql --username=commonage --dbname=commonage -Atc 'select count(*) from "__EFMigrationsHistory"' | tr -d '\r'
 }
@@ -112,6 +127,10 @@ echo "Starting $previous with the demo content..."
 docker compose up -d --no-build >/dev/null 2>&1
 wait_for_page
 migrations_before=$(migrations)
+major_before=$(database_major)
+items_before=$(item_count)
+[ "$items_before" -gt 0 ] || fail "the demo content is not in the database"
+echo "$previous runs PostgreSQL $major_before; the current code runs PostgreSQL $expected_major."
 
 # The backup that release itself makes, with its own scripts. It is restored into the new version at the end.
 echo "Making a backup with $previous..."
@@ -129,6 +148,8 @@ wait_for_page
 grep -q '^COMMONAGE_VERSION=8.0.0' .env || fail ".env did not go back"
 grep -q '^POSTGRES_PASSWORD=update-test' .env || fail ".env lost its other lines"
 [ "$(migrations)" = "$migrations_before" ] || fail "the database was not restored ($(migrations) migrations, was $migrations_before)"
+[ "$(database_major)" = "$major_before" ] || fail "the database is on PostgreSQL $(database_major) after going back, was $major_before"
+[ "$(item_count)" = "$items_before" ] || fail "the items were not restored after going back"
 [ ! -e .env.updating ] || fail "a temporary file stayed behind"
 
 echo "Refusing what cannot work..."
@@ -149,6 +170,16 @@ readable=$(docker compose exec -T db psql --username=commonage --dbname=commonag
     "select count(*) from \"DataProtectionKeys\" where \"Xml\" like '%requiresEncryption=\"true\"%'" | tr -d '\r')
 [ "$readable" = 0 ] || fail "$readable login keys in the database are still readable without the key"
 curl -kfsS https://localhost/search | grep -q "Flood in Mill Street" || fail "the content did not survive the update"
+[ "$(database_major)" = "$expected_major" ] || fail "the database is on PostgreSQL $(database_major), not $expected_major"
+[ "$(item_count)" = "$items_before" ] || fail "the items did not survive the update ($(item_count), were $items_before)"
+if [ "$major_before" != "$expected_major" ]; then
+    # The old database stays in the volume until the curator removes it, with the command the update prints.
+    old_folders=$(docker compose run --rm --no-deps -T --entrypoint ls db /var/lib/postgresql | tr -d '')
+    echo "$old_folders" | grep -qx "$major_before" || fail "the old database was not kept in the volume ($old_folders)"
+    docker compose run --rm --no-deps -T --entrypoint rm db -rf "/var/lib/postgresql/$major_before" >/dev/null
+    old_folders=$(docker compose run --rm --no-deps -T --entrypoint ls db /var/lib/postgresql | tr -d '')
+    [ "$old_folders" = "$expected_major" ] || fail "removing the old database left '$old_folders'"
+fi
 migrations_current=$(migrations)
 [ "$(ls -d "$work"/backups/commonage-* | wc -l)" -ge 2 ] || fail "no backup was made"
 

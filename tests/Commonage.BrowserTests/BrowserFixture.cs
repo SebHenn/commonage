@@ -15,7 +15,7 @@ public sealed class BrowserFixture : WebApplicationFactory<Program>, IAsyncLifet
     public const string AdminEmail = "admin@example.org";
     public const string AdminPassword = "Browser-test-password-1";
 
-    private readonly PostgreSqlContainer _db = new PostgreSqlBuilder("postgres:18-alpine").Build();
+    private readonly PostgreSqlContainer _db = new PostgreSqlBuilder("postgres:19-alpine").Build();
     private readonly string _storageRoot = Path.Combine(Path.GetTempPath(), "commonage-browser-tests", Guid.NewGuid().ToString("N"));
     private IPlaywright? _playwright;
     private IBrowserContext? _lastContext;

@@ -48,7 +48,30 @@ add_login_key() {
 }
 
 pull() {
-    [ "${COMMONAGE_UPDATE_SKIP_PULL:-}" = 1 ] || docker compose pull --quiet web
+    [ "${COMMONAGE_UPDATE_SKIP_PULL:-}" = 1 ] || docker compose pull --quiet web "$@"
+}
+
+# The PostgreSQL major version of the database that is running now (18, 19, ...).
+running_database_major() {
+    version=$(docker compose exec -T db psql --username=commonage --dbname=commonage -Atc 'show server_version_num' 2>/dev/null | tr -d '\r') || return 0
+    case "$version" in
+        [0-9][0-9][0-9][0-9][0-9]*) echo $(( version / 10000 )) ;;
+    esac
+}
+
+# The PostgreSQL major version that the checked-out compose files start (18 for "postgres:18-alpine@sha256:...").
+configured_database_major() {
+    docker compose config 2>/dev/null | sed -n 's/^ *image: *postgres:\([0-9][0-9]*\).*/\1/p' | head -n 1
+}
+
+# Checks the backup again right before the database is replaced.
+backup_is_intact() {
+    [ -s "$1/database.dump" ] && [ -f "$1/media.tar" ] || return 1
+    if command -v sha256sum >/dev/null 2>&1; then
+        (cd "$1" && sha256sum -c --quiet SHA256SUMS)
+    else
+        (cd "$1" && shasum -a 256 -c --quiet SHA256SUMS)
+    fi
 }
 
 # Asks from inside the Compose network, because in production the app has no open port. The app answers only after it
@@ -76,16 +99,41 @@ if [ "${1:-}" = --after-checkout ]; then
         set_version "${previous_ref#v}"
     }
 
+    # A new PostgreSQL major version cannot open the data of the old one. The database that is running still belongs to
+    # the previous release, which is what the backup has to read, so this is asked before anything is changed.
+    old_major=$(running_database_major)
+    new_major=$(configured_database_major)
+    major_change=0
+    if [ -z "$old_major" ] || [ -z "$new_major" ]; then
+        go_back_without_restoring
+        die "could not tell which PostgreSQL version the database runs ('$old_major') and which $new_ref needs ('$new_major'). Nothing was changed."
+    fi
+    [ "$old_major" = "$new_major" ] || major_change=1
+
+    # The app stops before the backup, so that nothing is added between the backup and the move to the new database.
+    go_back_without_restoring_and_restart() {
+        go_back_without_restoring
+        docker compose up -d web >/dev/null 2>&1 || true
+    }
+    if [ "$major_change" = 1 ]; then
+        echo "$new_ref uses PostgreSQL $new_major, the archive is on PostgreSQL $old_major. The archive is moved with the backup."
+        docker compose stop web >/dev/null 2>&1 || true
+    fi
+
     echo "Backing up..."
     if ! sh scripts/backup.sh "$backups"; then
-        go_back_without_restoring
+        go_back_without_restoring_and_restart
         die "the backup failed. Nothing was changed."
     fi
     backup=$(ls -dt "$backups"/commonage-* | head -n 1)
 
     echo "Getting $new_ref..."
     set_version "$setting"
-    if ! pull; then
+    if [ "$major_change" = 1 ]; then
+        # Nothing is replaced unless the backup is whole and the new database image is here.
+        backup_is_intact "$backup" || { go_back_without_restoring_and_restart; die "the backup did not pass its checksums. Nothing was changed."; }
+        pull db || { go_back_without_restoring_and_restart; die "could not download $new_ref. Nothing was changed."; }
+    elif ! pull; then
         go_back_without_restoring
         die "could not download $new_ref. Nothing was changed."
     fi
@@ -94,9 +142,20 @@ if [ "${1:-}" = --after-checkout ]; then
     add_login_key
 
     echo "Starting $new_ref. The app upgrades the database when it starts, which can take a while."
-    if docker compose up -d --remove-orphans web && wait_until_healthy; then
+    # With a new PostgreSQL major, the new database starts empty beside the old data (each major has its own folder in
+    # the volume, which is left untouched), and the backup is restored into it. The app starts at the end of the restore.
+    if [ "$major_change" = 1 ]; then
+        echo "Moving the archive to PostgreSQL $new_major..."
+    fi
+    if { [ "$major_change" != 1 ] || sh scripts/restore.sh --yes "$backup"; } &&
+        docker compose up -d --remove-orphans web && wait_until_healthy; then
         docker compose up -d --remove-orphans >/dev/null
         echo "Updated to $new_ref. The backup from just before is in $backup"
+        if [ "$major_change" = 1 ]; then
+            echo "The archive now runs on PostgreSQL $new_major. The old database is still in the volume, untouched, so that going back stays possible."
+            echo "Once the archive has run well for a while, free its disk space with:"
+            echo "  docker compose run --rm --no-deps --entrypoint rm db -rf /var/lib/postgresql/$old_major"
+        fi
         exit 0
     fi
 

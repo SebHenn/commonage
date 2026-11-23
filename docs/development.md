@@ -261,6 +261,19 @@ unchanged tag, merge by themselves once every required check has passed. Each ch
 rebase the next waiting update (`.github/workflows/dependabot-auto-merge.yml`), since `main` only accepts pull
 requests that are up to date. An update whose checks fail stays open for a maintainer.
 
+**A new major version of `postgres` is not ignored.** `scripts/update.sh` compares the major version of the running
+database with the one the new release's `compose.yaml` starts (read from the `image: postgres:<major>` line), and when they
+differ it stops the app, backs up, starts the new database in its own folder of the `db-data` volume (the image keeps
+each major in `/var/lib/postgresql/<major>`, so the old data stays untouched) and restores the backup into it; a failed
+start goes back through the same backup. `scripts/backup.sh` uses `--no-recreate` so that the backup still reads the
+old database. So the Dependabot change to `compose.yaml` is the only change a bump needs, as long as the image keeps this
+layout (PostgreSQL 18 and later) and the volume stays mounted at `/var/lib/postgresql`. Besides the pull request itself,
+change `postgres:<major>-alpine` in `tests/Commonage.Tests/CommonageAppFactory.cs` and
+`tests/Commonage.BrowserTests/BrowserFixture.cs`, which Dependabot does not see. CI job `update` starts the previous
+release and updates to the pull request, so it exercises the move, the failed update and the removal of the old
+database; it fails, with the reason in its log, if any of it does not work. Release notes for the release that carries
+the bump should say it (see the entry for 19 in `CHANGELOG.md`).
+
 Major updates are never merged automatically. Read the release notes, check in the CI log that all tests ran (a test
 runner that finds no tests still succeeds), then merge.
 

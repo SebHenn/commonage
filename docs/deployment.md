@@ -136,6 +136,10 @@ upgrades the database when it starts. If the new version does not come up, the s
 and restores the backup, so the archive is as it was. Anything added during those minutes would be lost, so update when
 nobody is working on the archive. The archive is down for a short time either way.
 
+If the new release uses a newer PostgreSQL, the script moves the database with the backup and keeps the old one in the volume
+until you remove it; the release notes say so, and [Backup and restore](operations.md#a-new-postgresql-version) has the
+details.
+
 The script is part of Commonage from version 0.3. To get from 0.2 to it once, by hand:
 
 ```sh
