@@ -110,6 +110,11 @@ item_count() {
 expected_major=$(git show "$head:compose.yaml" | sed -n 's/^ *image: *postgres:\([0-9][0-9]*\).*/\1/p' | head -n 1)
 [ -n "$expected_major" ] || fail "could not read the PostgreSQL version from compose.yaml"
 
+# Different for every database cluster: it only stays the same when the original data directory is the one that runs.
+cluster_identity() {
+    docker compose exec -T db psql --username=commonage --dbname=commonage -Atc 'select system_identifier from pg_control_system()' | tr -d '\r'
+}
+
 migrations() {
     docker compose exec -T db psql --username=commonage --dbname=commonage -Atc 'select count(*) from "__EFMigrationsHistory"' | tr -d '\r'
 }
@@ -129,6 +134,7 @@ wait_for_page
 migrations_before=$(migrations)
 major_before=$(database_major)
 items_before=$(item_count)
+identity_before=$(cluster_identity)
 [ "$items_before" -gt 0 ] || fail "the demo content is not in the database"
 echo "$previous runs PostgreSQL $major_before; the current code runs PostgreSQL $expected_major."
 
@@ -149,8 +155,29 @@ grep -q '^COMMONAGE_VERSION=8.0.0' .env || fail ".env did not go back"
 grep -q '^POSTGRES_PASSWORD=update-test' .env || fail ".env lost its other lines"
 [ "$(migrations)" = "$migrations_before" ] || fail "the database was not restored ($(migrations) migrations, was $migrations_before)"
 [ "$(database_major)" = "$major_before" ] || fail "the database is on PostgreSQL $(database_major) after going back, was $major_before"
+[ "$(cluster_identity)" = "$identity_before" ] || fail "going back did not bring back the original database (another cluster runs)"
 [ "$(item_count)" = "$items_before" ] || fail "the items were not restored after going back"
 [ ! -e .env.updating ] || fail "a temporary file stayed behind"
+
+if [ "$major_before" != "$expected_major" ]; then
+    echo "Interrupting an update right after the old database was set aside..."
+    if COMMONAGE_UPDATE_TEST_CRASH=after-rename sh scripts/update.sh 9.0.0 "$work/backups" >/dev/null 2>&1; then
+        fail "the interrupted update reported success"
+    fi
+    [ -f .update-in-progress ] || fail "the interrupted update left no marker"
+    if again=$(sh scripts/update.sh 9.0.0 "$work/backups" 2>&1); then fail "an update was accepted over an unfinished one"; fi
+    echo "$again" | grep -q "/var/lib/postgresql/$major_before/kept" || fail "the refusal does not say where the old database is: $again"
+    echo "$again" | grep -q -- "--recover" || fail "the refusal does not say how to recover: $again"
+    sh scripts/update.sh --recover >/dev/null || fail "the recovery failed"
+    wait_for_page
+    [ ! -e .update-in-progress ] || fail "the marker stayed after the recovery"
+    [ "$(running_image)" = "$image:8.0.0" ] || fail "the old image does not run after the recovery, but $(running_image)"
+    [ "$(git describe --tags --exact-match HEAD)" = v8.0.0 ] || fail "the checkout did not go back in the recovery"
+    grep -q '^COMMONAGE_VERSION=8.0.0' .env || fail ".env did not go back in the recovery"
+    [ "$(database_major)" = "$major_before" ] || fail "the database is not on PostgreSQL $major_before after the recovery"
+    [ "$(cluster_identity)" = "$identity_before" ] || fail "the recovery did not bring back the original database"
+    [ "$(item_count)" = "$items_before" ] || fail "the items are not as before after the recovery"
+fi
 
 echo "Refusing what cannot work..."
 if sh scripts/update.sh 7.0.0 "$work/backups" 2>/dev/null; then fail "an unknown release was accepted"; fi
