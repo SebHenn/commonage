@@ -119,7 +119,12 @@ An item held back wears a badge in the list ("Record only", "Public from ..."), 
 will see. The list can be filtered under **Kept back from visitors**, and many items can be changed together: tick them, choose
 **Set what visitors get** or **Set the public-from date** and confirm. Only curators can set either, and each change is in the item's history.
 
-Feeds and the sitemap are kept for ten minutes, so a change can take that long to reach everyone. Taking something back from
+Each public item also has a machine-readable copy at its address with `.json` added, and its page carries Dublin Core tags, for
+libraries and programs that collect archives. It holds only what the page shows (a record-only item lists no files, and an item
+whose contributor did not agree to sharing beyond this website lists neither description nor files), and it follows the same
+switch as the feed.
+
+Feeds, the sitemap and that copy are kept for ten minutes, so a change can take that long to reach everyone. Taking something back from
 people who already saw it is not possible: whoever saved a picture keeps it.
 
 ## Working through many items

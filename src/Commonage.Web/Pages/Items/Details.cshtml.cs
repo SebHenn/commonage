@@ -17,6 +17,8 @@ public class DetailsModel(CommonageDbContext db, ArchiveProfile profile, IString
 
     public LinkPreview Preview { get; private set; } = null!;
 
+    public PublicItemRecord Record { get; private set; } = null!;
+
     public ArchiveItem Item { get; private set; } = null!;
 
     public ItemSurroundings Surroundings { get; private set; } = null!;
@@ -33,6 +35,7 @@ public class DetailsModel(CommonageDbContext db, ArchiveProfile profile, IString
             return NotFound();
 
         Item = item;
+        Record = PublicItemRecord.From(item, item.MediaFiles, await profile.GetAsync(), Request.BaseAddress());
         Surroundings = await db.LoadSurroundingsAsync(item, cancellationToken);
 
         Address = $"{Request.BaseAddress()}/items/{item.Id}";

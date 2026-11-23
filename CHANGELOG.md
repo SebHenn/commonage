@@ -5,6 +5,17 @@ version may change things that need attention when updating, and these notes say
 
 ## Unreleased
 
+### For visitors and other programs
+
+- **A public item can be read by a program.** Each public item page now names `/items/{number}.json` as an alternate and carries
+  Dublin Core tags (`DC.title`, `DC.description`, `DC.date`, `DC.creator`, `DC.rights`, `DC.language`, `DC.subject`, `DC.identifier`,
+  `DC.type`). The JSON has the title, description, the date as written plus its earliest and latest day, credit, rights, language,
+  tags, collection and, when visitors get the files, their public addresses. It follows the rules of link previews: an item whose
+  contributor did not agree to sharing beyond the website leaves out description and files, and a record-only item lists no files.
+  Nothing a curator keeps to themselves, no contributor details and no original file names are in it. An item visitors cannot see
+  answers "not found", exactly like its page. The answer is kept for ten minutes. With "Let search engines list this archive" off,
+  the Dublin Core tags are left out and the JSON says `noindex` (the JSON and its link stay, as they are not a search page). After a take-down or a change to what visitors get, an answer already given can stay in a cache for up to ten minutes.
+
 ### For curators
 
 - **Read an export into an archive.** "Read an export into this archive" on the Export page (admins) takes the ZIP file of a Commonage
