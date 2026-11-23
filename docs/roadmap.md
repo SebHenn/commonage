@@ -962,6 +962,11 @@ reading Commonage's own export moved into M23 to M28 above. What is left, in thi
 6. **Weblate: decided.** Hosted Weblate on its gratis plan for libre projects. Translators accept the license and the
    Developer Certificate of Origin in its contributor agreement, and its commits carry their sign-off. See
    [translating.md](translating.md).
+7. **The next .NET version.** The app targets .NET 10 (LTS). Dependabot's .NET 11 bumps were closed because the move
+   changes the target framework, the Dockerfile images and `global.json` together, so it is one planned pull request,
+   not a routine bump. Decide when to take it: at the next LTS, or earlier if .NET 11 brings something needed. Until
+   then Dependabot's .NET major pull requests stay closed. A major version of any other dependency is not ignored; it
+   is reviewed and, if it needs work, handled (as PostgreSQL 19 was, in `scripts/update.sh`).
 
 ### Languages
 
