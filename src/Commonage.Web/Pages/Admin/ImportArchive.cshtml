@@ -32,6 +32,10 @@
             <li>@T["Collections that would be created: {0}", plan.NewCollections.Count]</li>
             <li>@T["Items with problems, which are left out: {0}", plan.Items.Count(i => i.HasProblem)]</li>
             <li>@T["Items left out on purpose: {0}", plan.Items.Count(i => i.IsLeftOut)]</li>
+            @if (plan.StoriesNotImported > 0)
+            {
+                <li>@T.Plural("The export holds {0, plural, one {# story} other {# stories}}. Stories are not imported.", plan.StoriesNotImported)</li>
+            }
         </ul>
 
         @if (plan.Ready.Any(i => i.MediaLevel != Commonage.Web.Domain.MediaLevel.Everything || i.PublicFrom is not null))

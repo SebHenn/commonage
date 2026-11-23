@@ -170,6 +170,31 @@ public static class DemoContent
         }
 
         db.ArchiveItems.AddRange(items);
+        // A story that curators can open under Stories: words between three published items, and one part that names the draft,
+        // which visitors will not see.
+        var story = new Story
+        {
+            Title = T("Mill Street over thirty years", "Die Mühlenstraße in dreißig Jahren"),
+            Summary = T("From the winter of 1952 to the street party of 1971, told with a few of the photos.",
+                "Vom Winter 1952 bis zum Straßenfest 1971, erzählt mit einigen der Fotos."),
+            Status = StoryStatus.Draft,
+            CreatedAt = now,
+            UpdatedAt = now,
+            Position = 0,
+        };
+        void Part(StoryBlockKind kind, string? text = null, ArchiveItem? item = null, string? caption = null) =>
+            story.Blocks.Add(new StoryBlock { Position = story.Blocks.Count, Kind = kind, Text = text, ArchiveItem = item, Caption = caption });
+        Part(StoryBlockKind.Text, T("The mill stood at the top of the street, and for many years everything in Mill Street was named after it.",
+            "Die Mühle stand am oberen Ende der Straße, und viele Jahre hieß in der Mühlenstraße alles nach ihr."));
+        Part(StoryBlockKind.Item, item: items[0], caption: T("The mill in the first winter we have a photo of.", "Die Mühle im ersten Winter, aus dem wir ein Foto haben."));
+        Part(StoryBlockKind.Text, T("In 1962 the water came into the street. People remember how neighbours carried the bakery's flour upstairs.",
+            "1962 kam das Wasser in die Straße. Man erinnert sich, wie die Nachbarn das Mehl der Bäckerei die Treppe hinauftrugen."));
+        Part(StoryBlockKind.Item, item: items[1], caption: T("The street in March 1962.", "Die Straße im März 1962."));
+        Part(StoryBlockKind.Item, item: draft, caption: T("Still to be sorted before visitors can see it.", "Muss noch sortiert werden, bevor Besucher es sehen."));
+        Part(StoryBlockKind.Text, T("Nine years later a new bridge was opened, and the whole street celebrated.",
+            "Neun Jahre später wurde eine neue Brücke eröffnet, und die ganze Straße feierte."));
+        Part(StoryBlockKind.Item, item: items[3], caption: T("The street party for the new bridge.", "Das Straßenfest zur neuen Brücke."));
+        db.Stories.Add(story);
         // A made-up group, so the demo shows an archive as a group would set it up.
         db.ArchiveSettings.Add(new ArchiveSettings { DefaultLanguage = language, ContentLanguage = language, PrivacyReviewed = true, ImprintNotNeeded = true, DefaultRightsUri = RightsOptions.NotEvaluated });
         void Text(ArchiveTextKind kind, string text) => db.ArchiveTexts.Add(new ArchiveText { Language = language, Kind = kind, Text = text });

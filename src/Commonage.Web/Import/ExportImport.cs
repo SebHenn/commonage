@@ -151,6 +151,9 @@ public class ExportPlan
     public ExportRefusal Refusal { get; init; }
     public int? FoundVersion { get; init; }
     public int Version { get; init; }
+
+    /// <summary>How many stories the export holds. They are not imported.</summary>
+    public int StoriesNotImported { get; init; }
     public IReadOnlyList<PlannedExportItem> Items { get; init; } = [];
     public IReadOnlyList<PlannedNewCollection> NewCollections { get; init; } = [];
 
@@ -383,7 +386,7 @@ public partial class ExportImport(
             }
         }
 
-        return new ExportPlan { Version = ArchiveExporter.Version, Items = items, NewCollections = newCollections.Values.ToList(), IssuesNotListed = budget.Omitted };
+        return new ExportPlan { Version = ArchiveExporter.Version, Items = items, NewCollections = newCollections.Values.ToList(), IssuesNotListed = budget.Omitted, StoriesNotImported = archive.Stories?.Count ?? 0 };
     }
 
     private static bool HasProblem(PlannedExportItem planned) => planned.Issues.Any(i => i.Severity == ExportIssueSeverity.Problem);

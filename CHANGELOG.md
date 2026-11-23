@@ -3,6 +3,19 @@
 All notable changes to Commonage. Versions follow [Semantic Versioning](https://semver.org/); before 1.0, a minor
 version may change things that need attention when updating, and these notes say so.
 
+## Unreleased
+
+### For curators
+
+- **Stories, first part.** Under "Stories" in the admin area, curators write a story: a title, a few words of summary, and
+  parts in order, each a text or one of the items of the archive with a caption. A story can be moved up and down in the
+  list, and its parts within it, with buttons that work without JavaScript and keep the place on the page. The preview shows
+  it as visitors will see it: a part with an item that is not public is left out. A story with parts that visitors cannot
+  see says so on the page, only here. Publishing a story changes nothing for visitors yet; the public pages come in a later
+  part. Helpers do not see stories.
+- **Export format 9** has `stories` after `items`. An export of published items has only published stories and the parts
+  whose item is in it. An import counts the stories in the dry run and does not import them. The demo archive has a story.
+
 ## 0.6.0 (2026-11-23)
 
 Updating needs no picture regeneration. Migrations run by themselves at start. **This update moves the database to

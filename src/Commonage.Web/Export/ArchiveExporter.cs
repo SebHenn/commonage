@@ -29,7 +29,7 @@ public class ArchiveExporter(
     ILogger<ArchiveExporter> logger)
 {
     public const string Format = "commonage-export";
-    public const int Version = 8;
+    public const int Version = 9;
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -51,7 +51,9 @@ public class ArchiveExporter(
         // changes the archive while a large export is being written. Nothing is written to the database.
         await using var snapshot = await db.Database.BeginTransactionAsync(System.Data.IsolationLevel.RepeatableRead, cancellationToken);
         var collections = await db.Collections.AsNoTracking().OrderBy(c => c.Id).ToListAsync(cancellationToken);
-        var source = (options.PublishedOnly ? db.VisibleItems : db.ArchiveItems).AsNoTracking();
+        // One day for every decision of the export: items, stories and their blocks agree on what is embargoed.
+        var today = db.Today;
+        var source = (options.PublishedOnly ? db.ArchiveItems.Where(Visibility.Item(today)) : db.ArchiveItems).AsNoTracking();
         if (options.PublishedOnly)
         {
             var used = await source.Select(i => i.CollectionId).Distinct().ToListAsync(cancellationToken);
@@ -129,6 +131,16 @@ public class ArchiveExporter(
             }
 
             json.WriteEndArray();
+            json.WritePropertyName("stories");
+            json.WriteStartArray();
+            await foreach (var story in DescribeStoriesAsync(source, options, today, cancellationToken))
+            {
+                JsonSerializer.Serialize(json, story, JsonOptions);
+                if (json.BytesPending > 64 * 1024)
+                    await json.FlushAsync(cancellationToken);
+            }
+
+            json.WriteEndArray();
             Property(json, "settings", new ExportSettings(
                 settings.DefaultLanguage, settings.ContentLanguage, settings.OtherContentLanguages, settings.AccentColor, settings.TimeZone, settings.DefaultRightsUri, settings.AllowSearchEngines, settings.RequireTwoFactor, settings.LargePhotos, settings.PrivacyReviewed,
                 settings.ImprintNotNeeded, settings.RestoreTestedAt, settings.ActivityLogKeptYears, settings.RejectedKeptMonths, settings.AcceptVisitorNotes, logoPath,
@@ -166,6 +178,39 @@ public class ArchiveExporter(
                 yield break;
             last = batch[^1];
             yield return batch;
+        }
+    }
+
+    /// <summary>
+    /// The stories in order, a batch at a time. A copy of what is public holds only published stories, and in them only the blocks
+    /// whose item is in this export; a copy of everything leaves out stories in the bin and the blocks of items in the bin. No
+    /// block names an item that is not under "items".
+    /// </summary>
+    private async IAsyncEnumerable<ExportStory> DescribeStoriesAsync(
+        IQueryable<ArchiveItem> items, ExportOptions options, DateOnly today,
+        [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken)
+    {
+        var stories = (options.PublishedOnly ? Visibility.Story(db, today) : db.Stories).AsNoTracking();
+        var last = 0;
+        while (true)
+        {
+            var after = last;
+            var batch = await stories.Where(s => s.Id > after).OrderBy(s => s.Id).Take(50)
+                .Select(s => new
+                {
+                    s.Id, s.Title, s.Summary, s.Status, s.CreatedAt, s.PublishedAt, s.Position,
+                    Blocks = s.Blocks
+                        .Where(b => b.Kind == StoryBlockKind.Text || items.Any(i => i.Id == b.ArchiveItemId))
+                        .OrderBy(b => b.Position).ThenBy(b => b.Id)
+                        .Select(b => new ExportStoryBlock(b.Kind, b.Text, b.ArchiveItemId, b.Caption))
+                        .ToList(),
+                })
+                .ToListAsync(cancellationToken);
+            if (batch.Count == 0)
+                yield break;
+            last = batch[^1].Id;
+            foreach (var s in batch)
+                yield return new ExportStory(s.Id, s.Title, s.Summary, s.Status, s.CreatedAt, s.PublishedAt, s.Position, s.Blocks);
         }
     }
 
@@ -353,6 +398,7 @@ public class ArchiveExporter(
         text.Append("    files/<item id>/<file id>-<original file name>\n\n");
         Paragraph(localizer["Curators may have turned a photo: archive.json gives its \"rotation\" in degrees clockwise, and its \"position\" among the photos of the item."], "    ");
         Entry("branding/", localizer["The archive's logo, if it has one. Its name and pages are under \"settings\" in archive.json."]);
+        Paragraph(localizer["\"stories\" in archive.json lists the stories: each has its parts in order, and a part is either a text or the number of an item under \"items\" with a caption."]);
         Paragraph(localizer["\"includesPersonalData\" in archive.json says whether the names of contributors, photographers and authors and contributors' email addresses are included. If they are, keep this file as carefully as the archive itself."]);
         Paragraph(localizer["\"contentLanguage\" under \"settings\" says which language most of the material is written in, as a code such as \"de\" or \"pl\". \"mul\" means several languages, none of them most."]);
         Paragraph(localizer["A file with \"problem\": \"missing\" was not found on the server; \"checksumMismatch\" means it no longer matches the checksum taken when it was uploaded. Both should be looked into."]);
@@ -398,6 +444,11 @@ internal record ExportSettings(
 internal record ExportText(string Language, ArchiveTextKind Kind, string Text);
 
 internal record ExportCollection(int Id, string Title, string? Description, DateTime CreatedAt, int Position, CollectionSort Sort, int? CoverFileId);
+
+/// <summary>A story: its words and its parts in order. A part is a text or names an item that is under "items".</summary>
+internal record ExportStory(int Id, string Title, string? Summary, StoryStatus Status, DateTime CreatedAt, DateTime? PublishedAt, int Position, IReadOnlyList<ExportStoryBlock> Blocks);
+
+internal record ExportStoryBlock(StoryBlockKind Kind, string? Text, int? ItemId, string? Caption);
 
 /// <summary>A tag and what it names. Items list their tags by name.</summary>
 internal record ExportTag(string Name, TagKind Kind);
