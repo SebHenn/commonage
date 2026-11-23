@@ -19,7 +19,8 @@ should not.
 - **Dependency updates** arrive from Dependabot. Patches and minor updates that pass all checks merge themselves.
   Everything else needs someone to look.
 - **A release** is a tag: see "Releasing" in [development.md](development.md). The image is built for x86 and ARM, waits for
-  approval, and gets a signed attestation.
+  approval, and gets a signed attestation. Before 1.0, [release-1.0.md](release-1.0.md) lists what else has to be true;
+  a second person who can approve a release is one of its conditions, and is not met yet.
 - **Code scanning alerts** are in the repository's Security tab. Some are open on purpose; the reason is in each one.
 - **Where the project is going** is in [roadmap.md](roadmap.md), including what was decided against and why.
 

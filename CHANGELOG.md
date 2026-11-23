@@ -5,6 +5,13 @@ version may change things that need attention when updating, and these notes say
 
 ## Unreleased
 
+### For people running an archive and for maintainers
+
+- **The 1.0 checklist** is written down in `docs/release-1.0.md`: each condition, how it is checked, and where it stands. Some are
+  not met yet and it says so (a group that has run it for a season, the upgrade from every earlier minor, a second person who
+  can approve a release). `SUPPORT.md` proposes which versions get security fixes and what is not supported; the maintainer has to
+  confirm it. Documentation only, nothing changes in the program.
+
 ### For visitors and other programs
 
 - **A public item can be read by a program.** Each public item page now names `/items/{number}.json` as an alternate and carries

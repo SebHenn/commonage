@@ -41,6 +41,7 @@ and password from `.env`. The health check is at http://localhost:8080/health.
   Report vulnerabilities as described in [SECURITY.md](SECURITY.md).
 - [Development](docs/development.md): working on the code, and how it fits together.
 - [Handing the project over](docs/handover.md): what a new maintainer needs to know.
+- [The 1.0 checklist](docs/release-1.0.md) and [support](SUPPORT.md): what has to be true before 1.0, and where it stands.
 
 If this project ever stops, archives keep working: a running archive calls no service of this project, and exports, backups and the
 published images stay usable. See [what that means in practice](docs/handover.md#if-the-project-stops).
