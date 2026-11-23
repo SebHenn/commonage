@@ -1083,4 +1083,66 @@
   <data name="{0, plural, one {And # more thing found, which is not listed.} other {And # more things found, which are not listed.}}" xml:space="preserve"><value>{0, plural, one {Und # weiterer Fund, der nicht aufgelistet ist.} other {Und # weitere Funde, die nicht aufgelistet sind.}}</value></data>
   <data name="An item with this title and date is already in this collection." xml:space="preserve"><value>Ein Objekt mit diesem Titel und Datum ist in dieser Sammlung schon vorhanden.</value></data>
   <data name="Photos that could not be added, because the files had changed: {0}" xml:space="preserve"><value>Fotos, die nicht hinzugefügt werden konnten, weil sich die Dateien geändert hatten: {0}</value></data>
+  <data name="&quot;stories&quot; in archive.json lists the stories: each has its parts in order, and a part is either a text or the number of an item under &quot;items&quot; with a caption." xml:space="preserve"><value>„stories“ in archive.json listet die Geschichten auf: Jede hat ihre Teile in der Reihenfolge, und ein Teil ist entweder ein Text oder die Nummer eines Objekts unter „items“ mit einer Bildunterschrift.</value></data>
+  <data name="A few words that open the story and describe it in a list." xml:space="preserve"><value>Ein paar Worte, die die Geschichte eröffnen und sie in einer Liste beschreiben.</value></data>
+  <data name="A story can have at most {0, plural, one {# part} other {# parts}}." xml:space="preserve"><value>Eine Geschichte kann höchstens {0, plural, one {# Teil} other {# Teile}} haben.</value></data>
+  <data name="A story puts text and items in an order of your choice. Visitors cannot read stories yet." xml:space="preserve"><value>Eine Geschichte bringt Texte und Objekte in eine Reihenfolge Ihrer Wahl. Besucher können Geschichten noch nicht lesen.</value></data>
+  <data name="Add an item" xml:space="preserve"><value>Objekt hinzufügen</value></data>
+  <data name="Add text" xml:space="preserve"><value>Text hinzufügen</value></data>
+  <data name="Added an item to the story" xml:space="preserve"><value>Hat der Geschichte ein Objekt hinzugefügt</value></data>
+  <data name="Caption (optional)" xml:space="preserve"><value>Bildunterschrift (optional)</value></data>
+  <data name="Changed the order of the parts of the story" xml:space="preserve"><value>Hat die Reihenfolge der Teile der Geschichte geändert</value></data>
+  <data name="Changed the order of the stories" xml:space="preserve"><value>Hat die Reihenfolge der Geschichten geändert</value></data>
+  <data name="Changed the story" xml:space="preserve"><value>Hat die Geschichte geändert</value></data>
+  <data name="Created the story" xml:space="preserve"><value>Hat die Geschichte angelegt</value></data>
+  <data name="Deleted the story after its time in the bin" xml:space="preserve"><value>Hat die Geschichte nach ihrer Zeit im Papierkorb gelöscht</value></data>
+  <data name="Deleted the story for good" xml:space="preserve"><value>Hat die Geschichte endgültig gelöscht</value></data>
+  <data name="Edit story" xml:space="preserve"><value>Geschichte bearbeiten</value></data>
+  <data name="Item number {0}" xml:space="preserve"><value>Objekt Nummer {0}</value></data>
+  <data name="Item {0} of {1}" xml:space="preserve"><value>Objekt {0} von {1}</value></data>
+  <data name="Moved the story to the bin" xml:space="preserve"><value>Hat die Geschichte in den Papierkorb gelegt</value></data>
+  <data name="New story" xml:space="preserve"><value>Neue Geschichte</value></data>
+  <data name="Number or address of the item" xml:space="preserve"><value>Nummer oder Adresse des Objekts</value></data>
+  <data name="Parts of the story" xml:space="preserve"><value>Teile der Geschichte</value></data>
+  <data name="Please enter the number of an item, or the address of its page." xml:space="preserve"><value>Bitte geben Sie die Nummer eines Objekts oder die Adresse seiner Seite ein.</value></data>
+  <data name="Please write some text." xml:space="preserve"><value>Bitte schreiben Sie etwas Text.</value></data>
+  <data name="Preview. This is what visitors will see, without the items they may not see." xml:space="preserve"><value>Vorschau. So sehen Besucher die Geschichte, ohne die Objekte, die sie nicht sehen dürfen.</value></data>
+  <data name="Preview. This story is a draft: visitors cannot see it." xml:space="preserve"><value>Vorschau. Diese Geschichte ist ein Entwurf: Besucher können sie nicht sehen.</value></data>
+  <data name="Preview. Visitors see no part of this story, so they cannot find it." xml:space="preserve"><value>Vorschau. Besucher sehen keinen Teil dieser Geschichte und können sie deshalb nicht finden.</value></data>
+  <data name="Published the story" xml:space="preserve"><value>Hat die Geschichte veröffentlicht</value></data>
+  <data name="Remove this item from the story? The item itself stays in the archive." xml:space="preserve"><value>Dieses Objekt aus der Geschichte entfernen? Das Objekt selbst bleibt im Archiv.</value></data>
+  <data name="Remove this text from the story? It cannot be brought back." xml:space="preserve"><value>Diesen Text aus der Geschichte entfernen? Er lässt sich nicht zurückholen.</value></data>
+  <data name="Remove: {0}" xml:space="preserve"><value>Entfernen: {0}</value></data>
+  <data name="Removed an item from the story" xml:space="preserve"><value>Hat ein Objekt aus der Geschichte entfernt</value></data>
+  <data name="Save caption" xml:space="preserve"><value>Bildunterschrift speichern</value></data>
+  <data name="Save text" xml:space="preserve"><value>Text speichern</value></data>
+  <data name="Someone else changed this story while you were working on it" xml:space="preserve"><value>Jemand anderes hat diese Geschichte geändert, während Sie daran gearbeitet haben</value></data>
+  <data name="Stories" xml:space="preserve"><value>Geschichten</value></data>
+  <data name="Summary" xml:space="preserve"><value>Zusammenfassung</value></data>
+  <data name="Text {0} of {1}" xml:space="preserve"><value>Text {0} von {1}</value></data>
+  <data name="The caption can be at most {0} characters long." xml:space="preserve"><value>Die Bildunterschrift kann höchstens {0} Zeichen lang sein.</value></data>
+  <data name="The export holds {0, plural, one {# story} other {# stories}}. Stories are not imported." xml:space="preserve"><value>Der Export enthält {0, plural, one {# Geschichte} other {# Geschichten}}. Geschichten werden nicht importiert.</value></data>
+  <data name="The item is added. Visitors will not see it until it is public." xml:space="preserve"><value>Das Objekt ist hinzugefügt. Besucher sehen es erst, wenn es öffentlich ist.</value></data>
+  <data name="The number of the item, or the address of its page, for example /items/12." xml:space="preserve"><value>Die Nummer des Objekts oder die Adresse seiner Seite, zum Beispiel /items/12.</value></data>
+  <data name="The story is a draft again." xml:space="preserve"><value>Die Geschichte ist wieder ein Entwurf.</value></data>
+  <data name="The story is published." xml:space="preserve"><value>Die Geschichte ist veröffentlicht.</value></data>
+  <data name="The summary can be at most {1} characters long." xml:space="preserve"><value>Die Zusammenfassung kann höchstens {1} Zeichen lang sein.</value></data>
+  <data name="The text can be at most {0} characters long." xml:space="preserve"><value>Der Text kann höchstens {0} Zeichen lang sein.</value></data>
+  <data name="There are no stories yet." xml:space="preserve"><value>Es gibt noch keine Geschichten.</value></data>
+  <data name="There is no item with this number." xml:space="preserve"><value>Es gibt kein Objekt mit dieser Nummer.</value></data>
+  <data name="This item is in the bin. Take it out of the bin first." xml:space="preserve"><value>Dieses Objekt ist im Papierkorb. Holen Sie es zuerst aus dem Papierkorb.</value></data>
+  <data name="This item no longer exists." xml:space="preserve"><value>Dieses Objekt gibt es nicht mehr.</value></data>
+  <data name="This item was turned down or withdrawn, and cannot be part of a story." xml:space="preserve"><value>Dieses Objekt wurde abgelehnt oder zurückgezogen und kann nicht Teil einer Geschichte sein.</value></data>
+  <data name="This story has no parts yet. Add text or an item below." xml:space="preserve"><value>Diese Geschichte hat noch keine Teile. Fügen Sie unten Text oder ein Objekt hinzu.</value></data>
+  <data name="Title of the new story" xml:space="preserve"><value>Titel der neuen Geschichte</value></data>
+  <data name="Took the story out of the bin" xml:space="preserve"><value>Hat die Geschichte aus dem Papierkorb geholt</value></data>
+  <data name="Unpublished the story" xml:space="preserve"><value>Hat die Veröffentlichung der Geschichte zurückgenommen</value></data>
+  <data name="Visitors cannot read stories yet. A published story is the first thing they will see once they can." xml:space="preserve"><value>Besucher können Geschichten noch nicht lesen. Eine veröffentlichte Geschichte sehen sie als Erstes, sobald sie es können.</value></data>
+  <data name="Visitors do not see this item until {0}." xml:space="preserve"><value>Besucher sehen dieses Objekt erst ab {0}.</value></data>
+  <data name="Visitors do not see this item: it is in the bin." xml:space="preserve"><value>Besucher sehen dieses Objekt nicht: Es ist im Papierkorb.</value></data>
+  <data name="Visitors do not see this item: it is not published." xml:space="preserve"><value>Besucher sehen dieses Objekt nicht: Es ist nicht veröffentlicht.</value></data>
+  <data name="Visitors do not see this item: it was turned down or withdrawn." xml:space="preserve"><value>Besucher sehen dieses Objekt nicht: Es wurde abgelehnt oder zurückgezogen.</value></data>
+  <data name="Visitors see this item without its photos." xml:space="preserve"><value>Besucher sehen dieses Objekt ohne seine Fotos.</value></data>
+  <data name="{0, plural, one {# item not shown to visitors} other {# items not shown to visitors}}" xml:space="preserve"><value>{0, plural, one {# Objekt, das Besuchern nicht gezeigt wird} other {# Objekte, die Besuchern nicht gezeigt werden}}</value></data>
+  <data name="{0, plural, one {# part} other {# parts}}" xml:space="preserve"><value>{0, plural, one {# Teil} other {# Teile}}</value></data>
 </root>

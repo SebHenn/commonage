@@ -1,0 +1,33 @@
+@model Commonage.Web.Data.StoryBody
+@inject Commonage.Web.Operations.ArchiveProfile Profile
+@{
+    var material = (await Profile.GetAsync()).MaterialLanguage;
+}
+
+@* Public: nothing here may say more than the page shows. No ids, positions, anchors or data attributes, so that a block
+   left out because its item is hidden leaves nothing to tell it was there. *@
+<article class="story">
+    <h1 lang="@material">@Model.Title</h1>
+    @if (!string.IsNullOrWhiteSpace(Model.Summary))
+    {
+        <p class="lead text-preserve-lines" lang="@material">@Model.Summary</p>
+    }
+    @foreach (var block in Model.Blocks)
+    {
+        switch (block)
+        {
+            case Commonage.Web.Data.StoryBlockView.Text text:
+                <p class="text-preserve-lines" lang="@material">@text.Value</p>
+                break;
+            case Commonage.Web.Data.StoryBlockView.Item item:
+                <figure class="story-figure">
+                    <partial name="_ItemCards" model="new[] { item.Summary }" />
+                    @if (!string.IsNullOrWhiteSpace(item.Caption))
+                    {
+                        <figcaption class="text-preserve-lines" lang="@material">@item.Caption</figcaption>
+                    }
+                </figure>
+                break;
+        }
+    }
+</article>

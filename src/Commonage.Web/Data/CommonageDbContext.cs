@@ -12,6 +12,8 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options, Ti
 {
     public DbSet<Collection> Collections => Set<Collection>();
     public DbSet<ArchiveItem> ArchiveItems => Set<ArchiveItem>();
+    public DbSet<Story> Stories => Set<Story>();
+    public DbSet<StoryBlock> StoryBlocks => Set<StoryBlock>();
     public DbSet<MediaFile> MediaFiles => Set<MediaFile>();
     public DbSet<ItemFileText> ItemFileTexts => Set<ItemFileText>();
     public DbSet<StaffProfile> StaffProfiles => Set<StaffProfile>();
@@ -57,6 +59,15 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options, Ti
     /// <summary>Items in the bin. Query filters hide them from every other query, see <see cref="OnModelCreating"/>.</summary>
     public IQueryable<ArchiveItem> BinnedItems => ArchiveItems.IgnoreQueryFilters().Where(i => i.DeletedAt != null);
 
+    /// <summary>
+    /// Stories the public may read: published, not in the bin and with at least one block visitors may see. Every public story
+    /// page must start from this query, and show blocks only through <see cref="VisibleStoryBlocks"/>.
+    /// </summary>
+    public IQueryable<Story> VisibleStories => Visibility.Story(this, Today);
+
+    /// <summary>Stories in the bin. Query filters hide them from every other query.</summary>
+    public IQueryable<Story> BinnedStories => Stories.IgnoreQueryFilters().Where(s => s.DeletedAt != null);
+
     /// <summary>Photos in the bin on their own. The photos of an item in the bin go and come back with the item.</summary>
     public IQueryable<MediaFile> BinnedPhotos =>
         MediaFiles.IgnoreQueryFilters().Where(f => f.DeletedAt != null && f.ArchiveItem.DeletedAt == null);
@@ -75,6 +86,39 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options, Ti
                 .WithMany()
                 .HasForeignKey(c => c.CoverMediaFileId)
                 .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        builder.Entity<Story>(story =>
+        {
+            story.HasQueryFilter(s => s.DeletedAt == null);
+            story.Property(s => s.Version).IsRowVersion();
+            story.Property(s => s.Title).HasMaxLength(Story.TitleMaxLength);
+            story.Property(s => s.Summary).HasMaxLength(Story.SummaryMaxLength);
+            story.Property(s => s.Status).HasConversion<string>().HasMaxLength(20);
+            story.HasIndex(s => s.Position);
+            story.HasMany(s => s.Blocks)
+                .WithOne(b => b.Story)
+                .HasForeignKey(b => b.StoryId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<StoryBlock>(block =>
+        {
+            // A story in the bin takes its blocks with it, and brings them back.
+            block.HasQueryFilter(b => b.Story.DeletedAt == null);
+            block.Property(b => b.Kind).HasConversion<string>().HasMaxLength(20);
+            block.Property(b => b.Text).HasMaxLength(StoryBlock.TextMaxLength);
+            block.Property(b => b.Caption).HasMaxLength(StoryBlock.CaptionMaxLength);
+            block.HasIndex(b => new { b.StoryId, b.Position });
+            block.HasIndex(b => b.ArchiveItemId);
+            // An item deleted for good takes its blocks with it. Optional, so that the item's own query filter does not hide the block.
+            block.HasOne(b => b.ArchiveItem)
+                .WithMany()
+                .HasForeignKey(b => b.ArchiveItemId)
+                .OnDelete(DeleteBehavior.Cascade);
+            block.ToTable(t => t.HasCheckConstraint("CK_StoryBlocks_Kind",
+                "(\"Kind\" = 'Text' AND \"ArchiveItemId\" IS NULL AND \"Text\" IS NOT NULL AND \"Caption\" IS NULL) OR " +
+                "(\"Kind\" = 'Item' AND \"ArchiveItemId\" IS NOT NULL AND \"Text\" IS NULL)"));
         });
 
         builder.Entity<ArchiveItem>(item =>
@@ -223,6 +267,9 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options, Ti
             entry.Property(e => e.Subject).HasMaxLength(AuditEntry.SubjectMaxLength);
             entry.HasIndex(e => e.At);
             entry.HasOne(e => e.ArchiveItem)
+                .WithMany()
+                .OnDelete(DeleteBehavior.SetNull);
+            entry.HasOne(e => e.Story)
                 .WithMany()
                 .OnDelete(DeleteBehavior.SetNull);
         });

@@ -18,7 +18,7 @@ namespace Commonage.Web.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.14")
+                .HasAnnotation("ProductVersion", "10.0.15")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -268,6 +268,9 @@ namespace Commonage.Web.Data.Migrations
                     b.Property<DateTime>("At")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int?>("StoryId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Subject")
                         .HasMaxLength(300)
                         .HasColumnType("character varying(300)");
@@ -285,6 +288,8 @@ namespace Commonage.Web.Data.Migrations
                     b.HasIndex("ArchiveItemId");
 
                     b.HasIndex("At");
+
+                    b.HasIndex("StoryId");
 
                     b.ToTable("AuditEntries");
                 });
@@ -621,6 +626,98 @@ namespace Commonage.Web.Data.Migrations
                     b.ToTable("StaffProfiles");
                 });
 
+            modelBuilder.Entity("Commonage.Web.Domain.Story", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("PublishedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("Summary")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Position");
+
+                    b.ToTable("Stories");
+                });
+
+            modelBuilder.Entity("Commonage.Web.Domain.StoryBlock", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("ArchiveItemId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Caption")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<string>("Kind")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("StoryId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Text")
+                        .HasMaxLength(20000)
+                        .HasColumnType("character varying(20000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ArchiveItemId");
+
+                    b.HasIndex("StoryId", "Position");
+
+                    b.ToTable("StoryBlocks", t =>
+                        {
+                            t.HasCheckConstraint("CK_StoryBlocks_Kind", "(\"Kind\" = 'Text' AND \"ArchiveItemId\" IS NULL AND \"Text\" IS NOT NULL AND \"Caption\" IS NULL) OR (\"Kind\" = 'Item' AND \"ArchiveItemId\" IS NOT NULL AND \"Text\" IS NULL)");
+                        });
+                });
+
             modelBuilder.Entity("Commonage.Web.Domain.Tag", b =>
                 {
                     b.Property<int>("Id")
@@ -943,7 +1040,14 @@ namespace Commonage.Web.Data.Migrations
                         .HasForeignKey("ArchiveItemId")
                         .OnDelete(DeleteBehavior.SetNull);
 
+                    b.HasOne("Commonage.Web.Domain.Story", "Story")
+                        .WithMany()
+                        .HasForeignKey("StoryId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.Navigation("ArchiveItem");
+
+                    b.Navigation("Story");
                 });
 
             modelBuilder.Entity("Commonage.Web.Domain.Collection", b =>
@@ -1025,6 +1129,24 @@ namespace Commonage.Web.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Commonage.Web.Domain.StoryBlock", b =>
+                {
+                    b.HasOne("Commonage.Web.Domain.ArchiveItem", "ArchiveItem")
+                        .WithMany()
+                        .HasForeignKey("ArchiveItemId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Commonage.Web.Domain.Story", "Story")
+                        .WithMany("Blocks")
+                        .HasForeignKey("StoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ArchiveItem");
+
+                    b.Navigation("Story");
+                });
+
             modelBuilder.Entity("Commonage.Web.Domain.VisitorNote", b =>
                 {
                     b.HasOne("Commonage.Web.Domain.ArchiveItem", "ArchiveItem")
@@ -1104,6 +1226,11 @@ namespace Commonage.Web.Data.Migrations
             modelBuilder.Entity("Commonage.Web.Domain.ContributionLink", b =>
                 {
                     b.Navigation("Contributions");
+                });
+
+            modelBuilder.Entity("Commonage.Web.Domain.Story", b =>
+                {
+                    b.Navigation("Blocks");
                 });
 #pragma warning restore 612, 618
         }

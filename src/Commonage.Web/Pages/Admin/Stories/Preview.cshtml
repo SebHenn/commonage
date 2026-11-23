@@ -1,0 +1,26 @@
+@page "{id:int}"
+@model Commonage.Web.Pages.Admin.Stories.PreviewModel
+@using Commonage.Web.Domain
+@{
+    ViewData["Title"] = T["Preview: {0}", ArchiveItem.ShownTitle(T, Model.Body.Title)];
+}
+
+<div class="alert alert-info d-flex flex-wrap gap-2 align-items-center" role="status">
+    <span class="me-auto">
+        @if (Model.Status != StoryStatus.Published)
+        {
+            @T["Preview. This story is a draft: visitors cannot see it."]
+        }
+        else if (Model.Body.Blocks.Count == 0)
+        {
+            @T["Preview. Visitors see no part of this story, so they cannot find it."]
+        }
+        else
+        {
+            @T["Preview. This is what visitors will see, without the items they may not see."]
+        }
+    </span>
+    <a asp-page="/Admin/Stories/Edit" asp-route-id="@Model.StoryId" class="alert-link">@T["Back to editing"]</a>
+</div>
+
+<partial name="_StoryBody" model="Model.Body" />

@@ -19,6 +19,15 @@ public class AuditLog(CommonageDbContext db, IHttpContextAccessor httpContextAcc
     public Task RecordPhotosArrangedAsync(ArchiveItem item, CancellationToken cancellationToken) =>
         RecordOncePerSittingAsync(AuditAction.PhotosArranged, item, cancellationToken);
 
+    /// <summary>Putting the blocks of a story in order takes many moves; one sitting of them is one entry.</summary>
+    public async Task RecordStoryBlocksArrangedAsync(Story story, CancellationToken cancellationToken)
+    {
+        var userId = httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var since = clock.GetUtcNow().UtcDateTime.AddMinutes(-30);
+        if (!await db.AuditEntries.AnyAsync(e => e.StoryId == story.Id && e.Action == AuditAction.StoryBlocksArranged && e.UserId == userId && e.At > since, cancellationToken))
+            Record(AuditAction.StoryBlocksArranged, story.Title, story: story);
+    }
+
     private async Task RecordOncePerSittingAsync(AuditAction action, ArchiveItem item, CancellationToken cancellationToken)
     {
         var userId = httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -43,18 +52,18 @@ public class AuditLog(CommonageDbContext db, IHttpContextAccessor httpContextAcc
         });
     }
 
-    public AuditEntry Record(AuditAction action, string? subject, ArchiveItem? item = null)
+    public AuditEntry Record(AuditAction action, string? subject, ArchiveItem? item = null, Story? story = null)
     {
         var user = httpContextAccessor.HttpContext?.User;
         var signedIn = user?.Identity?.IsAuthenticated == true;
-        return Add(action, subject, item, signedIn ? user!.FindFirstValue(ClaimTypes.NameIdentifier) : null, signedIn ? user!.Identity!.Name : null);
+        return Add(action, subject, item, signedIn ? user!.FindFirstValue(ClaimTypes.NameIdentifier) : null, signedIn ? user!.Identity!.Name : null, story);
     }
 
     /// <summary>For what an account does while it logs in, before the request knows who it is.</summary>
     public void RecordFor(Microsoft.AspNetCore.Identity.IdentityUser account, AuditAction action, string? subject) =>
-        Add(action, subject, null, account.Id, account.UserName);
+        Add(action, subject, null, account.Id, account.UserName, null);
 
-    private AuditEntry Add(AuditAction action, string? subject, ArchiveItem? item, string? userId, string? userName)
+    private AuditEntry Add(AuditAction action, string? subject, ArchiveItem? item, string? userId, string? userName, Story? story)
     {
         var entry = new AuditEntry
         {
@@ -63,6 +72,7 @@ public class AuditLog(CommonageDbContext db, IHttpContextAccessor httpContextAcc
             UserName = userName,
             Action = action,
             ArchiveItem = item,
+            Story = story,
             Subject = subject is { Length: > AuditEntry.SubjectMaxLength } ? subject[..AuditEntry.SubjectMaxLength] : subject,
         };
         db.AuditEntries.Add(entry);

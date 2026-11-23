@@ -10,6 +10,7 @@ public enum AuditKind
     Photos,
     Contributions,
     Collections,
+    Stories,
     Tags,
     Accounts,
     Archive,
@@ -46,6 +47,18 @@ public static class AuditText
         AuditAction.CollectionChanged => localizer["Changed the collection"],
         AuditAction.CollectionMoved => localizer["Changed the order of the collections"],
         AuditAction.CollectionDeleted => localizer["Deleted the empty collection"],
+        AuditAction.StoryCreated => localizer["Created the story"],
+        AuditAction.StoryChanged => localizer["Changed the story"],
+        AuditAction.StoryPublished => localizer["Published the story"],
+        AuditAction.StoryUnpublished => localizer["Unpublished the story"],
+        AuditAction.StoryItemAdded => localizer["Added an item to the story"],
+        AuditAction.StoryItemRemoved => localizer["Removed an item from the story"],
+        AuditAction.StoryBlocksArranged => localizer["Changed the order of the parts of the story"],
+        AuditAction.StoriesArranged => localizer["Changed the order of the stories"],
+        AuditAction.StoryMovedToBin => localizer["Moved the story to the bin"],
+        AuditAction.StoryRestored => localizer["Took the story out of the bin"],
+        AuditAction.StoryDeleted => localizer["Deleted the story for good"],
+        AuditAction.StoryPurged => localizer["Deleted the story after its time in the bin"],
         AuditAction.VisitorNoteReceived => localizer["A visitor sent a note about the item"],
         AuditAction.VisitorNoteHandled => localizer["Marked a visitor's note as dealt with"],
         AuditAction.VisitorNoteReopened => localizer["Opened a visitor's note again"],
@@ -99,6 +112,9 @@ public static class AuditText
             or AuditAction.VisitorNoteDetailsRemoved or AuditAction.VisitorNoteDeleted => AuditKind.Contributions,
         AuditAction.CollectionCreated or AuditAction.CollectionChanged or AuditAction.CollectionMoved
             or AuditAction.CollectionDeleted or AuditAction.CollectionCreatedByImport => AuditKind.Collections,
+        AuditAction.StoryCreated or AuditAction.StoryChanged or AuditAction.StoryPublished or AuditAction.StoryUnpublished
+            or AuditAction.StoryItemAdded or AuditAction.StoryItemRemoved or AuditAction.StoryBlocksArranged or AuditAction.StoriesArranged
+            or AuditAction.StoryMovedToBin or AuditAction.StoryRestored or AuditAction.StoryDeleted or AuditAction.StoryPurged => AuditKind.Stories,
         AuditAction.TagChanged or AuditAction.TagsMerged or AuditAction.TagDeleted or AuditAction.UnusedTagsDeleted => AuditKind.Tags,
         AuditAction.AccountCreated or AuditAction.AccountRoleChanged or AuditAction.AccountNameChanged or AuditAction.AccountDisabled or AuditAction.AccountEnabled
             or AuditAction.AccountDeleted or AuditAction.SetupLinkCreated or AuditAction.PasswordChanged
@@ -115,6 +131,7 @@ public static class AuditText
         AuditKind.Photos => localizer["Photos"],
         AuditKind.Contributions => localizer["Contributions, links and notes from visitors"],
         AuditKind.Collections => localizer["Collections"],
+        AuditKind.Stories => localizer["Stories"],
         AuditKind.Tags => localizer["Tags"],
         AuditKind.Accounts => localizer["Accounts and logins"],
         AuditKind.Archive => localizer["Export, settings and the log itself"],

@@ -124,7 +124,7 @@ builder.Services.AddRazorPages(options =>
         // A helper reaches the item list, the item form, adding many photos and the preview, and nothing else: EndpointAccessTests
         // lists what a helper may reach, so a new page under /Admin stays closed to them until that list says otherwise.
         options.Conventions.AuthorizeFolder("/Admin", Policies.Describe);
-        foreach (var folder in new[] { "/Admin/Collections", "/Admin/Tags", "/Admin/Contributions", "/Admin/Notes" })
+        foreach (var folder in new[] { "/Admin/Collections", "/Admin/Stories", "/Admin/Tags", "/Admin/Contributions", "/Admin/Notes" })
             options.Conventions.AuthorizeFolder(folder, Policies.ManageArchive);
         foreach (var page in new[] { "/Admin/Contributors", "/Admin/Bin", "/Admin/Items/Bulk", "/Admin/Items/Import" })
             options.Conventions.AuthorizePage(page, Policies.ManageArchive);
