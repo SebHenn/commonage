@@ -263,16 +263,21 @@ requests that are up to date. An update whose checks fail stays open for a maint
 
 **A new major version of `postgres` is not ignored.** `scripts/update.sh` compares the major version of the running
 database with the one the new release's `compose.yaml` starts (read from the `image: postgres:<major>` line), and when they
-differ it stops the app, backs up, renames the old data in the `db-data` volume (`<major>/docker` to `<major>/kept`: the new image refuses to start while
-a folder `/var/lib/postgresql/*/docker` of another major exists, which is why a plain bump breaks existing archives),
-starts an empty new database and restores the backup into it; a failed start renames it back and goes back through the
-same backup. `scripts/backup.sh` uses `--no-recreate` so that the backup still reads the
+differ it stops the app, backs up, renames the old data in the `db-data` volume (`<major>/docker` to `<major>/kept`: the new
+image refuses to start while a folder `/var/lib/postgresql/*/docker` of another major exists, which is why a plain bump
+breaks existing archives), starts an empty new database and restores the backup's database into it
+(`restore.sh --database-only`); a failed start renames the old data back. A file `.update-in-progress` marks the time in
+between, and `update.sh --recover` clears it. `scripts/backup.sh` uses `--no-recreate` so that the backup still reads the
 old database. So the Dependabot change to `compose.yaml` is the only change to the scripts and compose files a bump needs, as long as the image keeps this
 layout (PostgreSQL 18 and later) and the volume stays mounted at `/var/lib/postgresql`. Besides the pull request itself,
 change `postgres:<major>-alpine` in `tests/Commonage.Tests/CommonageAppFactory.cs` and
 `tests/Commonage.BrowserTests/BrowserFixture.cs`, which Dependabot does not see. CI job `update` starts the previous
-release and updates to the pull request, so it exercises the move, the failed update and the removal of the old
-database; it fails, with the reason in its log, if any of it does not work. Release notes for the release that carries
+release (PostgreSQL 18 now) and updates to the pull request. It covers: the move to the new major with the data still there;
+a failed update going back to the original database (the same cluster comes back); an update killed after the old data
+was set aside, the refusal that follows and `--recover`; the old data still being in the volume, and its removal with the
+printed command. The `update-from-*` jobs cover the move from each earlier minor. Not covered: a disk too full for the
+second copy (the check is only read by hand), a lost connection that is not a kill of the script, and the first major bump
+after 19 (20 is untested until it comes; the script reads all numbers from the compose file). Release notes for the release that carries
 the bump should say it (see the entry for 19 in `CHANGELOG.md`).
 
 Major updates are never merged automatically. Read the release notes, check in the CI log that all tests ran (a test

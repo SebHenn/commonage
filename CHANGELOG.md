@@ -11,7 +11,9 @@ version may change things that need attention when updating, and these notes say
   one, so `scripts/update.sh` now moves the archive with the backup: it stops the app, backs up, starts the new database
   beside the old data and restores into it. The old database stays in the `db-data` volume, renamed and otherwise untouched, so going back stays
   possible; once the archive has run well, remove it with the command the update prints (see "A new PostgreSQL version"
-  in `docs/operations.md`). The update takes longer than usual and needs room for a second copy of the database. Future
+  in `docs/operations.md`). The update takes longer than usual and checks first that the volume has room for a second copy of
+  the database. An update that is interrupted midway leaves `.update-in-progress` and refuses to go on until
+  `sh scripts/update.sh --recover` has put the old database back. `scripts/restore.sh` has a new `--database-only`. Future
   major versions work the same way. `scripts/backup.sh` no longer recreates the database container, and
   `scripts/test-update.sh` tests the move.
 
