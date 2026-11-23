@@ -500,3 +500,7 @@ App_Data/
 /backups/
 *.dump
 *.sql.gz
+
+# An update that stopped halfway (scripts/update.sh)
+/.update-in-progress
+/.update-in-progress.tmp

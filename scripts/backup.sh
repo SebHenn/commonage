@@ -23,7 +23,9 @@ sha256() {
     if command -v sha256sum >/dev/null 2>&1; then sha256sum "$@"; else shasum -a 256 "$@"; fi
 }
 
-docker compose up -d --wait db >/dev/null
+# Never recreates the database container: during an update that moves to a new PostgreSQL major, the new compose files
+# would start an empty database instead of the one that has to be backed up.
+docker compose up -d --wait --no-recreate db >/dev/null
 
 # The database first, then the files: an upload in between leaves an extra file, which does no harm.
 echo "Backing up the database..."
