@@ -54,12 +54,20 @@ public partial class SecurityHeaderTests(CommonageAppFactory app)
             return tag.Id;
         });
 
+        var storyId = await app.WithDbAsync(async db =>
+        {
+            var story = new Story { Title = TestData.Unique("A story"), CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow };
+            db.Stories.Add(story);
+            await db.SaveChangesAsync();
+            return story.Id;
+        });
+
         // "Do you know more about this?" is off by default and its page is not there then; the shared database is put back afterwards.
         await SetVisitorNotesAsync(true);
         var results = new List<string>();
         foreach (var route in routes)
         {
-            var url = FillIn(route, item, token, tagId, linkId);
+            var url = FillIn(route, item, token, tagId, linkId, storyId);
             using var response = await curator.GetAsync(url);
             var html = await response.Content.ReadAsStringAsync();
             if (InlineScript().IsMatch(html) || EventHandlerAttribute().IsMatch(html) || StyleAttributeOrElement().IsMatch(html))
@@ -86,11 +94,12 @@ public partial class SecurityHeaderTests(CommonageAppFactory app)
         return saved;
     });
 
-    private static string FillIn(string route, ArchiveItem item, string token, int tagId, int linkId)
+    private static string FillIn(string route, ArchiveItem item, string token, int tagId, int linkId, int storyId)
     {
         var id = route.StartsWith("/Collections", StringComparison.OrdinalIgnoreCase) || route.Contains("Admin/Collections", StringComparison.OrdinalIgnoreCase)
             ? item.CollectionId.ToString()
             : route.Contains("Admin/Tags", StringComparison.OrdinalIgnoreCase) ? tagId.ToString()
+            : route.Contains("Admin/Stories", StringComparison.OrdinalIgnoreCase) ? storyId.ToString()
             : route.Contains("Admin/Contributions", StringComparison.OrdinalIgnoreCase) ? linkId.ToString() : item.Id.ToString();
         var url = route
             .Replace("{token}", token)

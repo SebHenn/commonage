@@ -208,9 +208,36 @@ public partial class ExportImportTests(CommonageAppFactory app)
         Assert.Single(await into.WithDbAsync(db => db.ArchiveItems.IgnoreQueryFilters().ToListAsync()));
     }
 
+    /// <summary>Stories are only counted: the dry run says how many there are, nothing of them is read, and nothing is created for them.</summary>
+    [Fact]
+    public async Task Stories_in_an_export_are_counted_by_the_dry_run_and_not_imported()
+    {
+        using var curator = await CuratorAsync(app);
+        var word = Word();
+        var json = JsonSerializer.SerializeToUtf8Bytes(new
+        {
+            format = "commonage-export", version = 9, collections = new[] { Collection(1, $"{word} Collection") }, tags = Array.Empty<object>(),
+            items = new[] { Item(1, $"{word} Barn") },
+            stories = new object[]
+            {
+                new { id = 1, title = "First", blocks = new object[] { new { kind = "Text", text = "words" }, new { kind = "Item", itemId = 1, caption = "c" } } },
+                new { id = 2, title = (string?)null, blocks = (object?)null, extra = new { deeply = new[] { 1, 2, 3 } } },
+            },
+        }, Json);
+        var storiesBefore = await app.WithDbAsync(db => db.Stories.IgnoreQueryFilters().CountAsync());
+
+        var html = await DryRunAsync(curator, Zip(("archive.json", json)));
+        await ImportAsync(curator, html);
+
+        Assert.Contains("The export holds 2 stories. Stories are not imported.", html);
+        Assert.Single(await ItemsAsync(word));
+        Assert.Equal(storiesBefore, await app.WithDbAsync(db => db.Stories.IgnoreQueryFilters().CountAsync()));
+    }
+
     [Theory]
     [InlineData(4)]
     [InlineData(8)]
+    [InlineData(9)]
     public async Task Versions_four_to_the_current_one_are_read(int version)
     {
         using var curator = await CuratorAsync(app);
@@ -225,7 +252,7 @@ public partial class ExportImportTests(CommonageAppFactory app)
 
     [Theory]
     [InlineData(3, "format version 3")]
-    [InlineData(9, "format version 9")]
+    [InlineData(10, "format version 10")]
     public async Task Other_versions_and_other_files_are_refused_with_a_sentence(int version, string expected)
     {
         using var curator = await CuratorAsync(app);
@@ -798,7 +825,7 @@ public partial class ExportImportTests(CommonageAppFactory app)
     public void Every_property_of_the_export_has_a_decision_and_the_reader_holds_exactly_what_is_not_dropped()
     {
         var assembly = typeof(ArchiveExporter).Assembly;
-        string[] types = ["ExportSettings", "ExportText", "ExportCollection", "ExportTag", "ExportItem", "ExportDate", "ExportContribution", "ExportNote", "ExportFile"];
+        string[] types = ["ExportSettings", "ExportText", "ExportCollection", "ExportTag", "ExportItem", "ExportDate", "ExportContribution", "ExportNote", "ExportFile", "ExportStory", "ExportStoryBlock"];
         var missing = new List<string>();
         var found = new HashSet<string>();
         foreach (var name in types)
