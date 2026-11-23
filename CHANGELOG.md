@@ -3,7 +3,11 @@
 All notable changes to Commonage. Versions follow [Semantic Versioning](https://semver.org/); before 1.0, a minor
 version may change things that need attention when updating, and these notes say so.
 
-## Unreleased
+## 0.6.0 (2026-11-23)
+
+Updating needs no picture regeneration. Migrations run by themselves at start. **This update moves the database to
+PostgreSQL 19, which takes longer than usual and needs room for a second copy of the database in the volume; read "A new
+PostgreSQL version" in `docs/operations.md` before updating a real archive.**
 
 ### For people running an archive and for maintainers
 
@@ -23,7 +27,7 @@ version may change things that need attention when updating, and these notes say
   the maintainer decided on 2026-11-23. The program itself does not change.
 - **The update is tested from every earlier minor.** `scripts/test-update.sh` takes a minor (`scripts/test-update.sh 0.3`),
   makes a backup with that release's own scripts and, after updating, restores that backup into the new version. A new CI job
-  `update-from` runs it for 0.1 to 0.5. It has not run in CI yet, so `docs/release-1.0.md` does not claim more than that.
+  `update-from` runs it for 0.1 to 0.5, and it passes.
 
 ### For visitors and other programs
 
