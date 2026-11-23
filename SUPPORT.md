@@ -1,8 +1,8 @@
 # Support
 
-> **Proposed, not yet confirmed.** Everything under "Proposed" is a default chosen to be something one maintainer can keep.
-> Seb H. confirms or changes it before 1.0 (see [docs/release-1.0.md](docs/release-1.0.md)). Until then
-> [SECURITY.md](SECURITY.md) is what holds.
+> **Confirmed by the maintainer, Seb H., on 2026-11-23.** Which versions get security fixes is decided.
+> The rest of this page is written as defaults a single maintainer can keep.
+> See [docs/release-1.0.md](docs/release-1.0.md). [SECURITY.md](SECURITY.md) says the same about fixes.
 
 ## Reporting a security problem
 
@@ -15,31 +15,30 @@ Open an issue in the repository, `SebHenn/commonage`. Never put an archive's mat
 an issue: describe what you did and what happened, and say which version you run. A group's export, backup or `.env`
 does not belong in a public place.
 
-## Proposed: which versions get security fixes
+## Which versions get security fixes
 
 | Version | Security fixes | For how long |
 |---|---|---|
 | The newest minor (today 0.5; after 1.0, the newest 1.x) | Yes: Commonage, and relevant fixes in .NET, libvips and the base images, as a rule within a week of a fix being available | As long as it is the newest |
 | Any older minor | No | Update to the newest one |
-| The last 0.x minor, once 1.0 is out | Proposed: security fixes only, for three months after 1.0 | Three months, then none |
 
-"Fix" means a bug-fix release of the newest minor (for example 0.5.1). Fixes are not made for older minors. This is the
-rule already in SECURITY.md, with one added period for the move to 1.0.
+"Fix" means a bug-fix release of the newest minor (for example 0.5.1). Fixes are not made for older minors, and there is
+no extra period after 1.0: someone on an older version updates through the newest minor. This is the rule in SECURITY.md.
 
 Updating is done with `scripts/update.sh`; see [docs/operations.md](docs/operations.md). Keep a backup before updating.
 Updating to a newer minor before 1.0 may need attention; the notes in [CHANGELOG.md](CHANGELOG.md) say so.
 
-## Proposed: what is supported
+## What is supported
 
 - Running the published image the way [docs/deployment.md](docs/deployment.md) describes, on x86 or ARM.
 - The export, backup and restore described in [docs/operations.md](docs/operations.md).
 - Updating by one release at a time, to the newest.
 
-## Proposed: what is not supported
+## What is not supported
 
 - Modified copies, or images built from a changed source.
 - A server without HTTPS, or one that exposes the database or the files folder.
-- A version that is not the newest minor (apart from the period above).
+- A version that is not the newest minor.
 - Reading another system's export; only Commonage's own export is read.
 - Recovering an archive without a backup. Commonage stores files in a folder and data in PostgreSQL; the backup is the group's job.
 - Help with a group's own server, domain, mail or network.

@@ -70,6 +70,23 @@ jobs:
       # Starts the previous published release, tries an update that fails, then updates to this code.
       - run: sh scripts/test-update.sh
 
+  # The upgrade from each earlier minor, with a backup made by that version. A new job, so the name of "update" stays.
+  update-from:
+    name: update-from-${{ matrix.minor }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        # Each earlier 0.x minor. v0.1.0 never had a published image, so 0.1 means v0.1.1. Add a line for each new minor.
+        minor: ["0.1", "0.2", "0.3", "0.4", "0.5"]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - run: sh scripts/test-update.sh ${{ matrix.minor }}
+
   secret-scan:
     runs-on: ubuntu-latest
     timeout-minutes: 10

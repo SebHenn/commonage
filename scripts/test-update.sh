@@ -1,9 +1,12 @@
 #!/bin/sh
-# Tests updating a real archive: starts the previous published release in the production setup, tries an update that
-# fails after upgrading the database, checks that everything went back, then updates to the current code.
+# Tests updating a real archive: starts an earlier published release in the production setup, makes a backup with that
+# release's own scripts, tries an update that fails after upgrading the database, checks that everything went back,
+# updates to the current code, and finally restores the old release's backup into the new version.
 #
-#   scripts/test-update.sh
+#   scripts/test-update.sh          from the newest earlier release that has a published image
+#   scripts/test-update.sh 0.3      from the newest 0.3.x release that has a published image
 #
+# CI runs it for each earlier minor (job "update-from" in ci.yml), and from the newest one on every pull request.
 # Works on its own clone and as its own Compose project, so it never touches your archive, but it needs ports 80 and
 # 443 free. CI runs it on every pull request.
 set -eu
@@ -15,9 +18,15 @@ cd "$repository"
 if command -v cygpath >/dev/null 2>&1; then repository=$(cygpath -m "$repository"); fi
 
 head=$(git rev-parse HEAD)
-# The newest earlier release with a published image. A release just tagged may still be waiting for its approval.
+minor=${1:-}
+case "$minor" in
+    "" | [0-9]*.[0-9]*) ;;
+    *) echo "Usage: scripts/test-update.sh [minor, such as 0.3]" >&2; exit 2 ;;
+esac
+# The newest earlier release (of the given minor) with a published image. A release just tagged may still be waiting for
+# its approval, and v0.1.0 never had an image.
 previous=
-for tag in $(git tag --list 'v[0-9]*.[0-9]*.[0-9]*' --merged HEAD --sort=-v:refname); do
+for tag in $(git tag --list "v${minor:-[0-9]*}.[0-9]*" --merged HEAD --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$'); do
     [ "$(git rev-parse "$tag^{commit}")" != "$head" ] || continue
     if docker pull --quiet "ghcr.io/sebhenn/commonage:${tag#v}" >/dev/null 2>&1; then
         previous=$tag
@@ -25,7 +34,7 @@ for tag in $(git tag --list 'v[0-9]*.[0-9]*.[0-9]*' --merged HEAD --sort=-v:refn
     fi
     echo "$tag has no published image yet, so trying the release before it."
 done
-[ -n "$previous" ] || { echo "FAILED: no earlier release with an image found. CI must fetch the tags." >&2; exit 1; }
+[ -n "$previous" ] || { echo "FAILED: no earlier release ${minor:+of $minor }with an image found. CI must fetch the tags." >&2; exit 1; }
 echo "Testing the update from $previous to $head."
 
 work=$(mktemp -d)
@@ -104,6 +113,11 @@ docker compose up -d --no-build >/dev/null 2>&1
 wait_for_page
 migrations_before=$(migrations)
 
+# The backup that release itself makes, with its own scripts. It is restored into the new version at the end.
+echo "Making a backup with $previous..."
+sh scripts/backup.sh "$work/old-backup" >/dev/null || fail "$previous could not make a backup"
+old_backup=$(ls -dt "$work"/old-backup/commonage-* | head -n 1)
+
 echo "Trying an update that fails after upgrading the database..."
 if sh scripts/update.sh 9.0.1 "$work/backups"; then
     fail "the update to a broken version reported success"
@@ -134,9 +148,17 @@ readable=$(docker compose exec -T db psql --username=commonage --dbname=commonag
     "select count(*) from \"DataProtectionKeys\" where \"Xml\" like '%requiresEncryption=\"true\"%'" | tr -d '\r')
 [ "$readable" = 0 ] || fail "$readable login keys in the database are still readable without the key"
 curl -kfsS https://localhost/search | grep -q "Flood in Mill Street" || fail "the content did not survive the update"
+migrations_current=$(migrations)
 [ "$(ls -d "$work"/backups/commonage-* | wc -l)" -ge 2 ] || fail "no backup was made"
 
 echo "Updating to the version it is already on changes nothing..."
 sh scripts/update.sh 9.0.0 "$work/backups" | grep -q "Already on" || fail "it did not notice the version is current"
+
+echo "Restoring the backup made by $previous into the new version..."
+sh scripts/restore.sh --yes "$old_backup" >/dev/null
+wait_for_page
+[ "$(running_image)" = "$image:9.0.0" ] || fail "the new image does not run after the restore, but $(running_image)"
+[ "$(migrations)" = "$migrations_current" ] || fail "the database from the backup was not upgraded ($(migrations) migrations, the new version has $migrations_current)"
+curl -kfsS https://localhost/search | grep -q "Flood in Mill Street" || fail "the content of the old backup did not come back"
 
 echo "The update works."

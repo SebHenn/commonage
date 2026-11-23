@@ -244,7 +244,9 @@ Without JavaScript, `css/nojs.css` shows what would otherwise stay folded away.
   violation), tests each JavaScript behaviour, and does the main tasks with JavaScript switched off. Add new pages to
   `AccessibilityTests`, and a test for each new behaviour in `wwwroot/js`.
 - `scripts/test-backup-restore.sh` and `scripts/test-update.sh` run whole archives in Docker. The second needs ports 80
-  and 443 free.
+  and 443 free. `scripts/test-update.sh 0.3` starts from the newest published 0.3.x (without an argument, from the newest earlier
+  release), also makes a backup with that release and restores it into the new version at the end. CI runs it for each earlier
+  minor in the `update-from` job.
 
 Before a release, also check by hand what automated tests cannot judge
 ([accessibility.md](accessibility.md#before-each-release)).

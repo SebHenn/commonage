@@ -21,32 +21,36 @@ Where a condition is checked by a machine, it is checked by a named test or scri
 | # | Condition | Checked by | Status |
 |---|---|---|---|
 | 1 | A real group has run it for a season | A written note from the group (their name only if they agree). Not something a test can show. | **Not met.** No group has reported yet (see the roadmap). Needed for "supported", not for the number. |
-| 2 | The upgrade works from every 0.x minor | `scripts/test-update.sh` in CI (job in `ci.yml`, run on every pull request). | **Partly met, and not claimed as more.** See below. |
+| 2 | The upgrade works from every 0.x minor | `scripts/test-update.sh` in CI: job `update` (newest earlier release) and the matrix job `update-from` (each earlier minor), both in `ci.yml`, run on every pull request. | **Built, not yet run in CI.** The matrix covers every earlier minor with an image; see below. |
 | 3 | Export and import round trip | `ExportImportTests` in `tests/Commonage.Tests`. | **Met, with the limits below.** |
-| 4 | A support policy | [SUPPORT.md](../SUPPORT.md) and the "Which versions get fixes" section of [SECURITY.md](../SECURITY.md). | **Written, proposed, not yet confirmed by the maintainer.** |
+| 4 | A support policy | [SUPPORT.md](../SUPPORT.md) and the "Which versions get fixes" section of [SECURITY.md](../SECURITY.md). | **Met.** Confirmed by the maintainer (Seb H.) on 2026-11-23: security fixes go to the newest minor only; older versions update through it. |
 | 5 | A second person can release | [handover.md](handover.md): a second reviewer of the `release` environment, or a written handover. | **Not met.** The handover is written; no second approver exists. |
 | 6 | No open `LEAK` from the privacy review, and no known accepted limit missing from `security.md` | The last dated review, below, and [security.md](security.md). | **Reviews done for M28; a final review before the tag is still to do.** |
 | 7 | Accessibility and translations | `AccessibilityTests` in `tests/Commonage.BrowserTests` (axe, every page; a new page must be added) and `TranslationTests` in `tests/Commonage.Tests`. | **Met by tests.** Real phones and screen readers have not been tested (see below). |
 
 ### 2. The upgrade, in detail
 
-What `scripts/test-update.sh` really does: it takes the **newest earlier release that has a published image** (today v0.5.0),
-starts it in the production setup with the demo content, tries an update to a deliberately broken image that fails after the
-database was upgraded, checks that the old version, `.env`, checkout and database all come back, refuses an unknown
-release, a wrong version and an update over changed files, then updates to the code in the pull request, and checks that
-updating to the version it is already on changes nothing.
+What `scripts/test-update.sh <minor>` does: it takes the **newest release of that minor that has a published image**, starts it
+in the production setup with the demo content, makes a backup with **that release's own** `scripts/backup.sh`, tries an update
+to a deliberately broken image that fails after the database was upgraded, checks that the old version, `.env`, checkout and
+database all come back, refuses an unknown release, a wrong version and an update over changed files, then updates to the
+code in the pull request, checks that updating to the version it is already on changes nothing, and finally restores the old
+release's backup into the new version (the app upgrades that database when it starts) and checks the content is back.
 
-What it does **not** do, so the condition stays open:
+Which minors are covered: the published images are 0.1.1, 0.2.0, 0.3.0, 0.4.0, 0.4.1 and 0.5.0 (checked against the registry's
+tag list on 2026-11-23). v0.1.0 never had an image, so 0.1 is tested as v0.1.1. The `update-from` job in `ci.yml` runs one
+matrix entry for each of 0.1 to 0.5 with `fail-fast: false`; the older `update` job still tests the newest earlier release. A
+new minor needs a new line in the matrix. The `update-from-*` check names are new and are not required checks until the
+maintainer makes them so.
 
-- It tests one starting version, not each of 0.1, 0.2, 0.3, 0.4 and 0.5. An upgrade from an older minor runs through the
-  same migrations in order, but no machine has tried each.
+What is **not** shown, said plainly:
+
+- The matrix has not run in CI yet, and `scripts/test-update.sh` was **not run here** (Docker Desktop was not running, and it
+  is not started without asking). It passes `sh -n` and its release selection was checked against the tags only. Releases
+  0.1 to 0.4 have not been tried by this script at all: an old release's own scripts or health check may need a small fix the
+  first time. Read the first CI run before ticking this condition.
+- Only the newest patch of each minor is the starting point (0.4.0 is not tried separately from 0.4.1).
 - The archive in it holds the demo content, not a large or old one.
-- The plan's idea of restoring a backup made by each earlier version is not built.
-  `scripts/test-backup-restore.sh` backs up and restores an archive made by the **current** code only.
-
-To meet the condition it needs either a matrix over the earlier minors in `ci.yml` (and old images that still start), or a
-decision that the supported starting point is the newest minor and older ones are told to go through it, written in
-`SUPPORT.md`. That is a decision for the maintainer.
 
 ### 3. The round trip, in detail
 
@@ -92,8 +96,8 @@ repository. The maintainer should check them against the pull requests (#72 and 
 
 ## What the maintainer still has to decide or do
 
-1. Confirm or change the proposals in [SUPPORT.md](../SUPPORT.md).
-2. Decide how condition 2 is met: an upgrade matrix in CI, or a stated starting point.
+1. (Done on 2026-11-23: the support policy is confirmed, newest minor only.)
+2. Read the first CI run of the `update-from` matrix, fix what it finds, and decide whether `update-from-*` become required checks.
 3. Add a second reviewer of the `release` environment, or someone who takes over (condition 5); see [handover.md](handover.md).
 4. Run and date the final privacy review, and confirm the log above.
 5. Find a group, and decide when "supported" is announced.
