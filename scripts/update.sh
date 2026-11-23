@@ -64,6 +64,25 @@ configured_database_major() {
     docker compose config 2>/dev/null | sed -n 's/^ *image: *postgres:\([0-9][0-9]*\).*/\1/p' | head -n 1
 }
 
+# Runs a command in the database volume, with the database stopped. The image of the database refuses to start while
+# the volume holds the data of another major version in /var/lib/postgresql/<major>/docker, so the old data is renamed
+# to /var/lib/postgresql/<major>/kept: nothing is deleted, the new version no longer sees it, and the previous release
+# gets it back by renaming it again.
+in_database_volume() {
+    docker compose stop db >/dev/null 2>&1 || true
+    docker compose run --rm --no-deps -T --entrypoint sh db -c "$1" >/dev/null
+}
+
+# The majors are numbers (read from PostgreSQL and the compose file), so they are safe inside the command.
+set_old_database_aside() {
+    in_database_volume "[ -d /var/lib/postgresql/$1/docker ] && mv /var/lib/postgresql/$1/docker /var/lib/postgresql/$1/kept"
+}
+
+# Undoes the above after a failed update. The database of the new major in the volume is only a copy of the backup.
+bring_old_database_back() {
+    in_database_volume "rm -rf /var/lib/postgresql/$2/docker; if [ -d /var/lib/postgresql/$1/kept ] && [ ! -e /var/lib/postgresql/$1/docker ]; then mv /var/lib/postgresql/$1/kept /var/lib/postgresql/$1/docker; fi"
+}
+
 # Checks the backup again right before the database is replaced.
 backup_is_intact() {
     [ -s "$1/database.dump" ] && [ -f "$1/media.tar" ] || return 1
@@ -142,17 +161,17 @@ if [ "${1:-}" = --after-checkout ]; then
     add_login_key
 
     echo "Starting $new_ref. The app upgrades the database when it starts, which can take a while."
-    # With a new PostgreSQL major, the new database starts empty beside the old data (each major has its own folder in
-    # the volume, which is left untouched), and the backup is restored into it. The app starts at the end of the restore.
+    # With a new PostgreSQL major, the old data is set aside in the volume (not deleted), the new database starts empty
+    # and the backup is restored into it. The app starts at the end of the restore.
     if [ "$major_change" = 1 ]; then
         echo "Moving the archive to PostgreSQL $new_major..."
     fi
-    if { [ "$major_change" != 1 ] || sh scripts/restore.sh --yes "$backup"; } &&
+    if { [ "$major_change" != 1 ] || { set_old_database_aside "$old_major" && sh scripts/restore.sh --yes "$backup"; }; } &&
         docker compose up -d --remove-orphans web && wait_until_healthy; then
         docker compose up -d --remove-orphans >/dev/null
         echo "Updated to $new_ref. The backup from just before is in $backup"
         if [ "$major_change" = 1 ]; then
-            echo "The archive now runs on PostgreSQL $new_major. The old database is still in the volume, untouched, so that going back stays possible."
+            echo "The archive now runs on PostgreSQL $new_major. The old database is still in the volume, set aside, so that going back stays possible."
             echo "Once the archive has run well for a while, free its disk space with:"
             echo "  docker compose run --rm --no-deps --entrypoint rm db -rf /var/lib/postgresql/$old_major"
         fi
@@ -165,6 +184,9 @@ if [ "${1:-}" = --after-checkout ]; then
     # The exact version, because a version such as 0.3 may now point to the release that just failed.
     git checkout -q "$previous_ref"
     set_version "${previous_ref#v}"
+    if [ "$major_change" = 1 ]; then
+        bring_old_database_back "$old_major" "$new_major" || echo "Could not put the old database back in the volume." >&2
+    fi
     if pull && sh scripts/restore.sh --yes "$backup" && wait_until_healthy; then
         docker compose up -d --remove-orphans >/dev/null
         die "the archive is back on $previous_ref as it was before. Nothing was lost, unless something changed during the update attempt. Please report the problem."

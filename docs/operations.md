@@ -344,10 +344,11 @@ Compose project on ports 18080 and 15432, so it can also run next to your own ar
 
 Now and then a release moves to a new major version of PostgreSQL (18 to 19, for example), which cannot open the data of
 the old one. `scripts/update.sh` notices this and handles it, without you doing anything extra: it stops the app, makes
-the backup, checks its checksums again, starts the new database beside the old data and restores the backup into it.
-The old database is not deleted: each major version has its own folder in the `db-data` volume
-(`/var/lib/postgresql/18`, `/var/lib/postgresql/19`), so the previous release still finds its data, and if the new
-version does not come up, the script goes back to the previous release and restores the backup as always. The archive is
+the backup, checks its checksums again, sets the old data aside, starts an empty new database and restores the backup into it.
+The old database is not deleted: the script only renames its folder in the `db-data` volume
+(`/var/lib/postgresql/18/docker` becomes `/var/lib/postgresql/18/kept`), because the new PostgreSQL image refuses to
+start next to it. If the new version does not come up, the script renames it back, goes back to the previous release and
+restores the backup as always, so the archive is as it was. The archive is
 down while this happens, longer than for an ordinary update, in proportion to the size of the database.
 
 Plan for the disk: until you remove the old database, the volume holds the database twice, and the backup is a third
@@ -360,11 +361,14 @@ command, with the right version number:
 docker compose run --rm --no-deps --entrypoint rm db -rf /var/lib/postgresql/18
 ```
 
-This is final. After it, going back to the previous release means restoring a backup. If an update did not come up and
-went back, an unused folder of the new version stays in the volume; the next try uses it again.
+This is final. Until then, going back to the previous release later is possible: stop the archive, check out the
+previous release (`COMMONAGE_VERSION` in `.env` as before), run
+`docker compose run --rm --no-deps --entrypoint sh db -c 'rm -rf /var/lib/postgresql/19/docker && mv /var/lib/postgresql/18/kept /var/lib/postgresql/18/docker'`
+(with your two version numbers), and restore the newest backup with `scripts/restore.sh`, so nothing added since the
+update is lost.
 
-An archive that is moved by hand (`git checkout` and `docker compose up`, without the script) would start an empty
-database for the new version. Use `scripts/update.sh`, or restore the backup with `scripts/restore.sh` right after.
+An archive that is moved by hand (`git checkout` and `docker compose up`, without the script) does not start: the new
+database refuses a volume that holds the old one. Use `scripts/update.sh`.
 
 ## Demo archive
 

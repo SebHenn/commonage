@@ -97,12 +97,12 @@ running_image() {
 }
 
 database_major() {
-    version=$(docker compose exec -T db psql --username=commonage --dbname=commonage -Atc 'show server_version_num' | tr -d '')
+    version=$(docker compose exec -T db psql --username=commonage --dbname=commonage -Atc 'show server_version_num' | tr -d '\r')
     echo $(( version / 10000 ))
 }
 
 item_count() {
-    docker compose exec -T db psql --username=commonage --dbname=commonage -Atc 'select count(*) from "ArchiveItems"' | tr -d ''
+    docker compose exec -T db psql --username=commonage --dbname=commonage -Atc 'select count(*) from "ArchiveItems"' | tr -d '\r'
 }
 
 # The PostgreSQL major that the current code starts. When the previous release runs another one, the update moves the
@@ -173,12 +173,13 @@ curl -kfsS https://localhost/search | grep -q "Flood in Mill Street" || fail "th
 [ "$(database_major)" = "$expected_major" ] || fail "the database is on PostgreSQL $(database_major), not $expected_major"
 [ "$(item_count)" = "$items_before" ] || fail "the items did not survive the update ($(item_count), were $items_before)"
 if [ "$major_before" != "$expected_major" ]; then
-    # The old database stays in the volume until the curator removes it, with the command the update prints.
-    old_folders=$(docker compose run --rm --no-deps -T --entrypoint ls db /var/lib/postgresql | tr -d '')
-    echo "$old_folders" | grep -qx "$major_before" || fail "the old database was not kept in the volume ($old_folders)"
+    # The old database stays in the volume, set aside, until the curator removes it with the command the update prints.
+    kept=$(docker compose run --rm --no-deps -T --entrypoint ls db "/var/lib/postgresql/$major_before" | tr -d '\r')
+    [ "$kept" = kept ] || fail "the old database was not kept in the volume ('$kept')"
     docker compose run --rm --no-deps -T --entrypoint rm db -rf "/var/lib/postgresql/$major_before" >/dev/null
-    old_folders=$(docker compose run --rm --no-deps -T --entrypoint ls db /var/lib/postgresql | tr -d '')
+    old_folders=$(docker compose run --rm --no-deps -T --entrypoint ls db /var/lib/postgresql | tr -d '\r')
     [ "$old_folders" = "$expected_major" ] || fail "removing the old database left '$old_folders'"
+    [ "$(database_major)" = "$expected_major" ] || fail "the database does not answer after removing the old one"
 fi
 migrations_current=$(migrations)
 [ "$(ls -d "$work"/backups/commonage-* | wc -l)" -ge 2 ] || fail "no backup was made"
