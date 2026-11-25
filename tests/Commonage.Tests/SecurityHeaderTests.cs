@@ -57,6 +57,9 @@ public partial class SecurityHeaderTests(CommonageAppFactory app)
         var storyId = await app.WithDbAsync(async db =>
         {
             var story = new Story { Title = TestData.Unique("A story"), CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow };
+            // Published with a text, so that the page visitors read is checked too.
+            story.Publish(DateTime.UtcNow);
+            story.Blocks.Add(new StoryBlock { Position = 0, Kind = StoryBlockKind.Text, Text = "Some words." });
             db.Stories.Add(story);
             await db.SaveChangesAsync();
             return story.Id;
@@ -99,7 +102,7 @@ public partial class SecurityHeaderTests(CommonageAppFactory app)
         var id = route.StartsWith("/Collections", StringComparison.OrdinalIgnoreCase) || route.Contains("Admin/Collections", StringComparison.OrdinalIgnoreCase)
             ? item.CollectionId.ToString()
             : route.Contains("Admin/Tags", StringComparison.OrdinalIgnoreCase) ? tagId.ToString()
-            : route.Contains("Admin/Stories", StringComparison.OrdinalIgnoreCase) ? storyId.ToString()
+            : route.Contains("Stories", StringComparison.OrdinalIgnoreCase) ? storyId.ToString()
             : route.Contains("Admin/Contributions", StringComparison.OrdinalIgnoreCase) ? linkId.ToString() : item.Id.ToString();
         var url = route
             .Replace("{token}", token)

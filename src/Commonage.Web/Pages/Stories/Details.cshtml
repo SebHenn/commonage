@@ -1,0 +1,18 @@
+@page "/stories/{id:int}"
+@model Commonage.Web.Pages.Stories.DetailsModel
+@{
+    ViewData["Title"] = Model.Body.Title;
+    var address = $"{HttpContext.Request.BaseAddress()}/stories/{Model.StoryId}";
+    ViewData["Canonical"] = address;
+    // The words of the story and nothing from an item, and no picture: a preview travels, an item's rights may not. An empty
+    // summary gives an empty description, never the first lines of a block.
+    ViewData["LinkPreview"] = new LinkPreview(Model.Body.Title, LinkPreview.Shorten(Model.Body.Summary), address);
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="/Stories/Index">@T["Stories"]</a></li>
+    </ol>
+</nav>
+
+<partial name="_StoryBody" model="Model.Body" />

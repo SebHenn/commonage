@@ -9,7 +9,7 @@ namespace Commonage.BrowserTests;
 public class AccessibilityTests(BrowserFixture app)
 {
     public static TheoryData<string, int> PublicPages() => Widths(
-        "/", "/collections", "/collections/1", "/items/1", "/items/1/tell", "/help", "/items/2", "/items/6", "/search", "/search?q=flood", "/search?q=1950s", "/search?q=zzzznothing", "/items/99999", "/places", "/people",
+        "/", "/collections", "/collections/1", "/stories", "/stories/1", "/items/1", "/items/1/tell", "/help", "/items/2", "/items/6", "/search", "/search?q=flood", "/search?q=1950s", "/search?q=zzzznothing", "/items/99999", "/places", "/people",
         "/Account/Login", "CONTRIBUTE", "/contribute/no-such-link", "/about", "/contact", "/privacy");
 
     public static TheoryData<string, int> CuratorPages() => Widths(
@@ -76,7 +76,7 @@ public class AccessibilityTests(BrowserFixture app)
         Assert.True(overflow <= 0, $"{path} scrolls sideways by {overflow} px: {string.Join(" | ", tooWide)}");
     }
 
-    public static TheoryData<string> MainPages() => new() { "/", "/collections", "/collections/1", "/items/1", "/search?q=flood", "CONTRIBUTE", "/privacy" };
+    public static TheoryData<string> MainPages() => new() { "/", "/collections", "/collections/1", "/stories/1", "/items/1", "/search?q=flood", "CONTRIBUTE", "/privacy" };
 
     /// <summary>For states a page only reaches by using it, as well as for each page as it loads.</summary>
     internal static async Task AssertNoViolationsAsync(IPage page, string what)

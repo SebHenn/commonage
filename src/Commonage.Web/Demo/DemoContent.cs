@@ -170,14 +170,15 @@ public static class DemoContent
         }
 
         db.ArchiveItems.AddRange(items);
-        // A story that curators can open under Stories: words between three published items, and one part that names the draft,
-        // which visitors will not see.
+        // A published story: words between three published items, and one part that names the draft. Visitors read the story
+        // without that part, and curators see it under Stories with the reason.
         var story = new Story
         {
             Title = T("Mill Street over thirty years", "Die Mühlenstraße in dreißig Jahren"),
             Summary = T("From the winter of 1952 to the street party of 1971, told with a few of the photos.",
                 "Vom Winter 1952 bis zum Straßenfest 1971, erzählt mit einigen der Fotos."),
-            Status = StoryStatus.Draft,
+            Status = StoryStatus.Published,
+            PublishedAt = now,
             CreatedAt = now,
             UpdatedAt = now,
             Position = 0,

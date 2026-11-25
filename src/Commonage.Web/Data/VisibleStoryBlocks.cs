@@ -46,12 +46,46 @@ public static class VisibleStoryBlocks
         foreach (var block in blocks)
         {
             if (block.Kind == StoryBlockKind.Text)
-                result.Add(new StoryBlockView.Text(block.Text ?? ""));
+            {
+                if (!string.IsNullOrWhiteSpace(block.Text))
+                    result.Add(new StoryBlockView.Text(block.Text));
+            }
             else if (block.ArchiveItemId is { } id && items.TryGetValue(id, out var summary))
                 result.Add(new StoryBlockView.Item(summary, block.Caption));
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// The picture each story shows in a list: that of its first block whose item visitors may see and that has a picture (never
+    /// one for a record-only item). Two queries for all <paramref name="storyIds"/>, whatever their number. A story without such a
+    /// block is not in the result.
+    /// </summary>
+    public static async Task<Dictionary<int, int>> CoversAsync(CommonageDbContext db, IReadOnlyCollection<int> storyIds, CancellationToken ct = default)
+    {
+        if (storyIds.Count == 0)
+            return [];
+
+        var blocks = await db.StoryBlocks.AsNoTracking()
+            .Where(b => storyIds.Contains(b.StoryId) && b.Kind == StoryBlockKind.Item && b.ArchiveItemId != null)
+            .Join(db.VisibleItems, b => b.ArchiveItemId!.Value, i => i.Id, (b, i) => new { b.StoryId, b.Position, BlockId = b.Id, ItemId = i.Id })
+            .OrderBy(b => b.StoryId).ThenBy(b => b.Position).ThenBy(b => b.BlockId)
+            .ToListAsync(ct);
+        var itemIds = blocks.Select(b => b.ItemId).Distinct().ToList();
+        if (itemIds.Count == 0)
+            return [];
+
+        var pictures = await db.VisibleItems
+            .Where(i => itemIds.Contains(i.Id))
+            .Select(ItemSummary.FromItem)
+            .ToDictionaryAsync(i => i.Id, i => i.ThumbnailMediaFileId, ct);
+
+        var covers = new Dictionary<int, int>();
+        foreach (var block in blocks)
+            if (!covers.ContainsKey(block.StoryId) && pictures.TryGetValue(block.ItemId, out var picture) && picture is { } file)
+                covers[block.StoryId] = file;
+        return covers;
     }
 }
 

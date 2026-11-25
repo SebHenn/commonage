@@ -21,7 +21,7 @@
                 break;
             case Commonage.Web.Data.StoryBlockView.Item item:
                 <figure class="story-figure">
-                    <partial name="_ItemCards" model="new[] { item.Summary }" />
+                    <partial name="_ItemCard" model="item.Summary" />
                     @if (!string.IsNullOrWhiteSpace(item.Caption))
                     {
                         <figcaption class="text-preserve-lines" lang="@material">@item.Caption</figcaption>

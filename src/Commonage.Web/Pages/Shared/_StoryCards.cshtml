@@ -1,0 +1,29 @@
+@model IEnumerable<StoryCard>
+@inject Commonage.Web.Operations.ArchiveProfile Profile
+@{
+    var material = (await Profile.GetAsync()).MaterialLanguage;
+}
+
+<ul class="list-unstyled row g-4">
+    @foreach (var story in Model)
+    {
+        <li class="col-12 col-sm-6 col-lg-4">
+            <a asp-page="/Stories/Details" asp-route-id="@story.Id" class="collection-card">
+                @if (story.CoverMediaFileId is { } cover)
+                {
+                    <img src="/media/@cover/thumbnail" srcset="/media/@cover/thumbnail 400w, /media/@cover/card 800w"
+                         sizes="(min-width: 992px) 33vw, (min-width: 576px) 50vw, 100vw" alt="" class="media-thumbnail" loading="lazy" />
+                }
+                else
+                {
+                    <span class="media-thumbnail text-tile" aria-hidden="true"><span>@T["Text"]</span></span>
+                }
+                <span class="collection-card-title" lang="@material">@story.Title</span>
+            </a>
+            @if (!string.IsNullOrWhiteSpace(story.Summary))
+            {
+                <p class="mb-1 text-preserve-lines" lang="@material">@story.Summary</p>
+            }
+        </li>
+    }
+</ul>

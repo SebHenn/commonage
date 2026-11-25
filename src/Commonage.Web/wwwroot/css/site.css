@@ -805,15 +805,6 @@ main:focus {
   max-inline-size: 16rem;
 }
 
-.story-figure .row {
-  margin: 0;
-}
-
-.story-figure .row > * {
-  inline-size: 100%;
-  padding: 0;
-}
-
 .story-block-thumbnail {
   inline-size: 6rem;
   block-size: 6rem;
