@@ -82,7 +82,7 @@
   <data name="Deleted a visitor's note" xml:space="preserve"><value>Hinweis einer besuchenden Person gelöscht</value></data>
   <data name="Deleted activity log entries older than the archive keeps them" xml:space="preserve"><value>Einträge im Aktivitätsprotokoll gelöscht, die älter sind, als das Archiv sie aufbewahrt</value></data>
   <data name="Deleted all unused tags" xml:space="preserve"><value>Alle unbenutzten Schlagwörter gelöscht</value></data>
-  <data name="Deleted items and photos stay here for {0, plural, one {# day} other {# days}}, hidden from everyone but curators. You can restore them until then. After that they are deleted for good, with their original files." xml:space="preserve"><value>Gelöschte Einträge und Fotos bleiben {0, plural, one {# Tag} other {# Tage}} hier und sind nur für Kuratoren sichtbar. Bis dahin können Sie sie wiederherstellen. Danach werden sie mit ihren Originaldateien endgültig gelöscht.</value></data>
+  <data name="Deleted items, photos and stories stay here for {0, plural, one {# day} other {# days}}, hidden from everyone but curators. You can restore them until then. After that they are deleted for good, with their original files." xml:space="preserve"><value>Gelöschte Objekte, Fotos und Geschichten bleiben {0, plural, one {# Tag} other {# Tage}} hier und sind nur für Kuratoren sichtbar. Bis dahin können Sie sie wiederherstellen. Danach werden sie mit ihren Originaldateien endgültig gelöscht.</value></data>
   <data name="Deleted the empty collection" xml:space="preserve"><value>Leere Sammlung gelöscht</value></data>
   <data name="Deleted the unused tag" xml:space="preserve"><value>Unbenutztes Schlagwort gelöscht</value></data>
   <data name="Disk" xml:space="preserve"><value>Speicher</value></data>
@@ -1086,7 +1086,7 @@
   <data name="&quot;stories&quot; in archive.json lists the stories: each has its parts in order, and a part is either a text or the number of an item under &quot;items&quot; with a caption." xml:space="preserve"><value>„stories“ in archive.json listet die Geschichten auf: Jede hat ihre Teile in der Reihenfolge, und ein Teil ist entweder ein Text oder die Nummer eines Objekts unter „items“ mit einer Bildunterschrift.</value></data>
   <data name="A few words that open the story and describe it in a list." xml:space="preserve"><value>Ein paar Worte, die die Geschichte eröffnen und sie in einer Liste beschreiben.</value></data>
   <data name="A story can have at most {0, plural, one {# part} other {# parts}}." xml:space="preserve"><value>Eine Geschichte kann höchstens {0, plural, one {# Teil} other {# Teile}} haben.</value></data>
-  <data name="A story puts text and items in an order of your choice. Visitors cannot read stories yet." xml:space="preserve"><value>Eine Geschichte bringt Texte und Objekte in eine Reihenfolge Ihrer Wahl. Besucher können Geschichten noch nicht lesen.</value></data>
+  <data name="A story puts text and items in an order of your choice. Visitors read the published ones under Stories." xml:space="preserve"><value>Eine Geschichte bringt Texte und Objekte in eine Reihenfolge Ihrer Wahl. Besucher lesen die veröffentlichten unter „Geschichten“.</value></data>
   <data name="Add an item" xml:space="preserve"><value>Objekt hinzufügen</value></data>
   <data name="Add text" xml:space="preserve"><value>Text hinzufügen</value></data>
   <data name="Added an item to the story" xml:space="preserve"><value>Hat der Geschichte ein Objekt hinzugefügt</value></data>
@@ -1137,7 +1137,7 @@
   <data name="Title of the new story" xml:space="preserve"><value>Titel der neuen Geschichte</value></data>
   <data name="Took the story out of the bin" xml:space="preserve"><value>Hat die Geschichte aus dem Papierkorb geholt</value></data>
   <data name="Unpublished the story" xml:space="preserve"><value>Hat die Veröffentlichung der Geschichte zurückgenommen</value></data>
-  <data name="Visitors cannot read stories yet. A published story is the first thing they will see once they can." xml:space="preserve"><value>Besucher können Geschichten noch nicht lesen. Eine veröffentlichte Geschichte sehen sie als Erstes, sobald sie es können.</value></data>
+  <data name="A published story is public as soon as it has a text, or an item that visitors may see." xml:space="preserve"><value>Eine veröffentlichte Geschichte ist öffentlich, sobald sie einen Text oder ein Objekt hat, das Besucher sehen dürfen.</value></data>
   <data name="Visitors do not see this item until {0}." xml:space="preserve"><value>Besucher sehen dieses Objekt erst ab {0}.</value></data>
   <data name="Visitors do not see this item: it is in the bin." xml:space="preserve"><value>Besucher sehen dieses Objekt nicht: Es ist im Papierkorb.</value></data>
   <data name="Visitors do not see this item: it is not published." xml:space="preserve"><value>Besucher sehen dieses Objekt nicht: Es ist nicht veröffentlicht.</value></data>
@@ -1147,4 +1147,14 @@
   <data name="{0, plural, one {# part} other {# parts}}" xml:space="preserve"><value>{0, plural, one {# Teil} other {# Teile}}</value></data>
   <data name="No stories yet." xml:space="preserve"><value>Noch keine Geschichten.</value></data>
   <data name="All stories" xml:space="preserve"><value>Alle Geschichten</value></data>
+  <data name="The story leaves the website at once. You can restore it from the bin for {0, plural, one {# day} other {# days}}." xml:space="preserve"><value>Die Geschichte verschwindet sofort von der Website. Sie können sie {0, plural, one {# Tag} other {# Tage}} lang aus dem Papierkorb wiederherstellen.</value></data>
+  <data name="The story is in the bin. You can restore it there for {0, plural, one {# day} other {# days}}." xml:space="preserve"><value>Die Geschichte liegt im Papierkorb. Sie können sie dort {0, plural, one {# Tag} other {# Tage}} lang wiederherstellen.</value></data>
+  <data name="The story is restored and public again." xml:space="preserve"><value>Die Geschichte ist wiederhergestellt und wieder öffentlich.</value></data>
+  <data name="The story is restored." xml:space="preserve"><value>Die Geschichte ist wiederhergestellt.</value></data>
+  <data name="The story is deleted for good." xml:space="preserve"><value>Die Geschichte ist endgültig gelöscht.</value></data>
+  <data name="Delete this story for good, with all its parts? This cannot be undone. The items in it stay in the archive." xml:space="preserve"><value>Diese Geschichte mit allen ihren Teilen endgültig löschen? Das lässt sich nicht rückgängig machen. Die Objekte darin bleiben im Archiv.</value></data>
+  <data name="{0, plural, one {Used in # story} other {Used in # stories}}" xml:space="preserve"><value>{0, plural, one {Kommt in # Geschichte vor} other {Kommt in # Geschichten vor}}</value></data>
+  <data name="Showing the first {0}." xml:space="preserve"><value>Die ersten {0} werden gezeigt.</value></data>
+  <data name="Visitors see this item in a story only while it is public. If you unpublish it or move it to the bin, it leaves the published stories, and a story with nothing left to show disappears for visitors." xml:space="preserve"><value>Besucher sehen dieses Objekt in einer Geschichte nur, solange es öffentlich ist. Wenn Sie die Veröffentlichung zurücknehmen oder es in den Papierkorb legen, verschwindet es aus den veröffentlichten Geschichten, und eine Geschichte, in der nichts mehr zu zeigen ist, verschwindet für Besucher ganz.</value></data>
+  <data name="This item is not public, so visitors do not see it in these stories yet." xml:space="preserve"><value>Dieses Objekt ist nicht öffentlich, deshalb sehen Besucher es in diesen Geschichten noch nicht.</value></data>
 </root>

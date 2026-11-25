@@ -9,7 +9,7 @@ using Microsoft.Extensions.Localization;
 
 namespace Commonage.Web.Pages.Admin;
 
-/// <summary>Deleted items and photos: restore them, or delete them for good before their time is up.</summary>
+/// <summary>Deleted items, photos and stories: restore them, or delete them for good before their time is up.</summary>
 public class BinModel(
     CommonageDbContext db,
     ArchiveBin bin,
@@ -21,6 +21,9 @@ public class BinModel(
 
     public IReadOnlyList<ArchiveItem> Items { get; private set; } = [];
     public IReadOnlyList<MediaFile> Photos { get; private set; } = [];
+    public IReadOnlyList<StoryRow> Stories { get; private set; } = [];
+
+    public record StoryRow(int Id, string Title, StoryStatus Status, DateTime DeletedAt, int BlockCount);
 
     public async Task OnGetAsync(CancellationToken cancellationToken)
     {
@@ -36,6 +39,13 @@ public class BinModel(
             .Include(f => f.ArchiveItem)
             .OrderByDescending(f => f.DeletedAt)
             .Take(MaxShown)
+            .ToListAsync(cancellationToken);
+        // The parts of a story in the bin are hidden by the query filter, so they are counted past it.
+        Stories = await db.BinnedStories
+            .AsNoTracking()
+            .OrderByDescending(s => s.DeletedAt)
+            .Take(MaxShown)
+            .Select(s => new StoryRow(s.Id, s.Title, s.Status, s.DeletedAt!.Value, db.StoryBlocks.IgnoreQueryFilters().Count(b => b.StoryId == s.Id)))
             .ToListAsync(cancellationToken);
     }
 
@@ -93,6 +103,33 @@ public class BinModel(
 
         await bin.DeletePhotoAsync(file, AuditAction.PhotoDeleted, cancellationToken);
         TempData["Message"] = localizer["The photo is deleted for good."].Value;
+        return RedirectToPage();
+    }
+
+    public async Task<IActionResult> OnPostRestoreStoryAsync(int id, CancellationToken cancellationToken)
+    {
+        var story = await db.BinnedStories.FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
+        if (story is null)
+            return NotFound();
+
+        story.RestoreFromBin(clock.GetUtcNow().UtcDateTime);
+        audit.Record(AuditAction.StoryRestored, story.Title, story: story);
+        await db.SaveChangesAsync(cancellationToken);
+
+        TempData["Message"] = story.Status == StoryStatus.Published
+            ? localizer["The story is restored and public again."].Value
+            : localizer["The story is restored."].Value;
+        return RedirectToPage("/Admin/Stories/Edit", new { id });
+    }
+
+    public async Task<IActionResult> OnPostDeleteStoryAsync(int id, CancellationToken cancellationToken)
+    {
+        var story = await db.BinnedStories.FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
+        if (story is null)
+            return NotFound();
+
+        await bin.DeleteStoryAsync(story, AuditAction.StoryDeleted, cancellationToken);
+        TempData["Message"] = localizer["The story is deleted for good."].Value;
         return RedirectToPage();
     }
 }

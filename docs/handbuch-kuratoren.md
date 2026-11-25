@@ -51,6 +51,31 @@ einen Platz; eine neue Sammlung kommt ans Ende. Öffnen Sie eine, um:
 Besucher sehen auf der Seite und der Karte einer Sammlung, aus welchen Jahren ihre veröffentlichten Einträge stammen, etwa
 „1930–1965“. Dafür muss nichts eingetragen werden.
 
+## Geschichten
+
+Eine Geschichte ordnet Texte und Objekte in einer Reihenfolge Ihrer Wahl, etwa eine Straße, eine Familie oder ein
+Hochwasser. Unter **Geschichten** im Verwaltungsbereich stehen sie; „Neue Geschichte“ fragt nur nach dem Titel.
+
+- **Schreiben.** Eine Geschichte hat einen Titel, eine kurze Zusammenfassung und Teile: einen Text oder ein Objekt des
+  Archivs mit einer Bildunterschrift. Ein Objekt fügen Sie mit seiner Nummer oder mit seiner Adresse auf dieser Seite hinzu.
+  Teile und Geschichten verschieben Sie mit den Schaltflächen nach oben oder unten.
+- **Vorschau.** Sie zeigt die Geschichte, wie Besucher sie sehen. Ein Teil mit einem nicht öffentlichen Objekt fehlt dort;
+  die Seite weist nur Sie darauf hin.
+- **Veröffentlichen**, wenn sie fertig ist. Eine veröffentlichte Geschichte ist öffentlich, sobald sie einen Text oder ein
+  Objekt hat, das Besucher sehen dürfen. Ein verborgenes, noch nicht veröffentlichtes oder gelöschtes Objekt hinterlässt für
+  Besucher keine Spur; eine Geschichte ohne etwas Sichtbares verschwindet für sie.
+- **Was Sie schreiben, wird nicht geprüft.** Titel, Zusammenfassung, Texte und Bildunterschriften erscheinen, wie Sie sie
+  schreiben. Nennen Sie dort kein verborgenes Objekt und keine Person, die nicht genannt werden soll.
+- **Entfernen gilt sofort.** Ein entfernter Teil oder Text ist sofort weg; der Text einer Geschichte hat keinen Verlauf.
+  Kopieren Sie, was Sie noch brauchen könnten.
+- **Der Papierkorb.** „In den Papierkorb“ nimmt die Geschichte sofort von der Website. Im **Papierkorb** können Sie sie mit
+  ihren Teilen 30 Tage lang wiederherstellen oder endgültig löschen. Nach 30 Tagen wird sie von selbst endgültig gelöscht.
+  Ihre Objekte bleiben.
+- **Auf der Seite eines Objekts** steht „In N Geschichten verwendet“ mit Links, damit Sie wissen, wo es vorkommt, bevor Sie
+  es zurückziehen.
+
+Helfer sehen keine Geschichten.
+
 ## Mehrere Fotos und Briefe
 
 - **Reihenfolge:** „Nach vorne“ und „Nach hinten“ verschieben ein Foto, und zwar sofort auch für Besucher. Das erste Foto ist das

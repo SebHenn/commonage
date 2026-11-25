@@ -532,7 +532,7 @@ public class ArchiveSettingsTests(CommonageAppFactory app)
         var german = await curator.GetStringAsync("/Admin/Bin");
 
         Assert.Contains("<html lang=\"pl\"", bin);
-        Assert.Contains("Deleted items and photos stay here for 30 days,", bin);
+        Assert.Contains("Deleted items, photos and stories stay here for 30 days,", bin);
         Assert.Contains("bleiben 30 Tage hier", german);
     }
 }

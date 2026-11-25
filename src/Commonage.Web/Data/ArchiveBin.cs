@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Commonage.Web.Data;
 
 /// <summary>
-/// Deleted items and photos wait in the bin before they are gone for good, so a mistake can be undone. Nothing else in
+/// Deleted items, photos and stories wait in the bin before they are gone for good, so a mistake can be undone. Nothing else in
 /// the app sees them, because the query filters in <see cref="CommonageDbContext"/> leave them out.
 /// </summary>
 public class ArchiveBin(CommonageDbContext db, MediaUploadService uploads, AuditLog audit, TimeProvider clock)
@@ -32,6 +32,17 @@ public class ArchiveBin(CommonageDbContext db, MediaUploadService uploads, Audit
         await uploads.DeleteAsync(file, cancellationToken);
     }
 
+    /// <summary>
+    /// Deletes a story in the bin with its parts (the database removes them with it). The entry keeps the title and loses its link
+    /// to the story; nothing about who wrote the parts or what they said is kept anywhere else.
+    /// </summary>
+    public async Task DeleteStoryAsync(Story story, AuditAction action, CancellationToken cancellationToken = default)
+    {
+        audit.Record(action, story.Title);
+        db.Stories.Remove(story);
+        await db.SaveChangesAsync(cancellationToken);
+    }
+
     /// <summary>Deletes what has been in the bin for longer than <see cref="RetentionDays"/>.</summary>
     public async Task PurgeExpiredAsync(CancellationToken cancellationToken = default)
     {
@@ -50,6 +61,12 @@ public class ArchiveBin(CommonageDbContext db, MediaUploadService uploads, Audit
             .ToListAsync(cancellationToken);
         foreach (var photo in photos)
             await DeletePhotoAsync(photo, AuditAction.PhotoPurged, cancellationToken);
+
+        var stories = await db.BinnedStories
+            .Where(s => s.DeletedAt <= cutoff)
+            .ToListAsync(cancellationToken);
+        foreach (var story in stories)
+            await DeleteStoryAsync(story, AuditAction.StoryPurged, cancellationToken);
     }
 }
 

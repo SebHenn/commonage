@@ -32,7 +32,7 @@
         }
     </form>
 </div>
-<p class="text-muted col-lg-8">@T["Visitors cannot read stories yet. A published story is the first thing they will see once they can."]</p>
+<p class="text-muted col-lg-8">@T["A published story is public as soon as it has a text, or an item that visitors may see."]</p>
 
 @if (Model.SavedByOthers is { } saved)
 {
@@ -183,3 +183,8 @@ else
 {
     <p class="text-muted">@T.Plural("A story can have at most {0, plural, one {# part} other {# parts}}.", Story.MaxBlocks)</p>
 }
+
+<form method="post" asp-page="/Admin/Stories/Edit" asp-page-handler="MoveToBin" asp-route-id="@story.Id" class="mt-5" data-send-once>
+    <button type="submit" class="btn btn-outline-danger">@T["Move to bin"]</button>
+    <span class="form-text d-block">@T.Plural("The story leaves the website at once. You can restore it from the bin for {0, plural, one {# day} other {# days}}.", Commonage.Web.Data.ArchiveBin.RetentionDays)</span>
+</form>
