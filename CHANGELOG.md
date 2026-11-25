@@ -10,8 +10,8 @@ version may change things that need attention when updating, and these notes say
 - **Stories, second part.** Published stories are public. `/stories` lists them with a picture and a few words, the start
   page shows the first three, and `/stories/{number}` reads one: the curator's texts, and the items of the story as cards with
   the curator's captions. An item that visitors may not see (a draft, not yet public, in the bin, withdrawn) is left out
-  without a trace, and a story with nothing to read answers "not found" like an unknown page. A record-only item has no picture.
-  The sitemap lists the stories. A link to a story shows its title and its summary, no picture and nothing from an item.
+  without a trace, and a story with nothing to read (no item visitors may see, no text with words in it) answers "not found" like an unknown page. A record-only item has no picture.
+  The sitemap lists the stories. A link to a story shows its title and its summary and nothing from an item: no item picture, the archive logo as on every other page.
   Stories are not in the feed or in search. The demo archive's story is published.
 
 ### For curators

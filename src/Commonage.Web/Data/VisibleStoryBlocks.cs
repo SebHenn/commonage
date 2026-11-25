@@ -46,7 +46,10 @@ public static class VisibleStoryBlocks
         foreach (var block in blocks)
         {
             if (block.Kind == StoryBlockKind.Text)
-                result.Add(new StoryBlockView.Text(block.Text ?? ""));
+            {
+                if (!string.IsNullOrWhiteSpace(block.Text))
+                    result.Add(new StoryBlockView.Text(block.Text));
+            }
             else if (block.ArchiveItemId is { } id && items.TryGetValue(id, out var summary))
                 result.Add(new StoryBlockView.Item(summary, block.Caption));
         }

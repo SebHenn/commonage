@@ -101,6 +101,47 @@ public partial class StoryVisibilityMatrixTests(CommonageAppFactory app)
 
     private static string MetaTags(string page) => string.Concat(Regex.Matches(page, @"<meta[^>]*(og:|name=""description"")[^>]*>").Select(m => m.Value + "\n"));
 
+    /// <summary>The archive gets a logo, as most do: a page without a picture of its own then shows the logo, as on every other page.</summary>
+    private static async Task<Guid> GiveLogoAsync(WebApplicationFactory<Program> archive)
+    {
+        var logo = Guid.NewGuid();
+        await archive.WithDbAsync(async db =>
+        {
+            var settings = await db.ArchiveSettings.FirstOrDefaultAsync();
+            if (settings is null)
+                db.ArchiveSettings.Add(settings = new ArchiveSettings());
+            settings.LogoId = logo;
+            return await db.SaveChangesAsync();
+        });
+        archive.Services.GetRequiredService<Commonage.Web.Operations.ArchiveProfile>().Forget();
+        return logo;
+    }
+
+    /// <summary>
+    /// A link preview of a story has no picture of an item: its og:image is the archive logo or nothing, never a file under /media,
+    /// and the large card is announced exactly when there is an image.
+    /// </summary>
+    private static void AssertNoItemPicture(string page, Guid logo)
+    {
+        var images = Regex.Matches(page, @"<meta property=""og:image"" content=""([^""]*)""").Select(m => m.Groups[1].Value).ToList();
+        Assert.All(images, image =>
+        {
+            Assert.DoesNotContain("/media/", image);
+            Assert.EndsWith($"/branding/{logo}/icon", image);
+        });
+        Assert.Equal(images.Count > 0, page.Contains("twitter:card"));
+        Assert.DoesNotContain("og:image:alt", page);
+    }
+
+    /// <summary>The card of one story in a list, from its list item to the end of it.</summary>
+    private static string Card(string page, int storyId)
+    {
+        var at = page.IndexOf($"/stories/{storyId}\"", StringComparison.Ordinal);
+        Assert.True(at > 0, $"Story {storyId} is not listed.");
+        var start = page.LastIndexOf("<li", at, StringComparison.Ordinal);
+        return page[start..(page.IndexOf("</li>", at, StringComparison.Ordinal) + 5)];
+    }
+
     private static string[] Addresses(Seeded s) =>
         ["/stories", $"/stories/{s.StoryId}", "/", "/sitemap.xml", "/feed.xml", $"/items/{s.BId}", $"/media/{s.BFileId}/thumbnail",
          $"/media/{s.BFileId}/card"];
@@ -193,6 +234,7 @@ public partial class StoryVisibilityMatrixTests(CommonageAppFactory app)
     public async Task A_contributor_who_did_not_agree_to_sharing_beyond_the_website_has_nothing_in_a_preview_or_the_feed()
     {
         await using var archive = await NewArchiveAsync(app);
+        var logo = await GiveLogoAsync(archive);
         var seeded = await SeedAsync(archive, "notsharing", (i, now) =>
         {
             i.Publish(now);
@@ -209,15 +251,16 @@ public partial class StoryVisibilityMatrixTests(CommonageAppFactory app)
         // On the website the item shows as it does anywhere else.
         Assert.Contains($"Title {seeded.BWord}", story);
         Assert.DoesNotContain(seeded.BWord, MetaTags(story));
-        Assert.DoesNotContain("og:image", story);
+        AssertNoItemPicture(story, logo);
         Assert.DoesNotContain(seeded.BWord, await TextAsync(visitor, "/feed.xml"));
         Assert.DoesNotContain("Erika", story);
     }
 
     [Fact]
-    public async Task The_preview_of_a_story_has_its_title_and_summary_and_no_picture_and_no_description_without_a_summary()
+    public async Task The_preview_of_a_story_has_its_title_and_summary_and_no_item_picture_and_no_description_without_a_summary()
     {
         await using var archive = await NewArchiveAsync(app);
+        var logo = await GiveLogoAsync(archive);
         var seeded = await SeedAsync(archive, "preview", (i, now) => i.Publish(now));
         var without = await archive.WithDbAsync(async db =>
         {
@@ -234,8 +277,8 @@ public partial class StoryVisibilityMatrixTests(CommonageAppFactory app)
         var with = MetaTags(await TextAsync(visitor, $"/stories/{seeded.StoryId}"));
         Assert.Contains($"content=\"Story {seeded.StoryWord}\"", with);
         Assert.Contains($"og:description\" content=\"Summary {seeded.StoryWord}\"", with);
-        Assert.DoesNotContain("og:image", with);
-        Assert.DoesNotContain("twitter:card", await TextAsync(visitor, $"/stories/{seeded.StoryId}"));
+        AssertNoItemPicture(await TextAsync(visitor, $"/stories/{seeded.StoryId}"), logo);
+        Assert.Contains($"/branding/{logo}/icon", with);
         Assert.DoesNotContain(seeded.BWord, with);
         Assert.DoesNotContain("Alpha", with);
 
@@ -243,6 +286,7 @@ public partial class StoryVisibilityMatrixTests(CommonageAppFactory app)
         Assert.Contains("og:title\" content=\"Without summary\"", empty);
         Assert.DoesNotContain("description", empty);
         Assert.DoesNotContain(seeded.StoryWord, empty);
+        AssertNoItemPicture(await TextAsync(visitor, $"/stories/{without}"), logo);
     }
 
     [Fact]
@@ -432,6 +476,175 @@ public partial class StoryVisibilityMatrixTests(CommonageAppFactory app)
         }
         Assert.Contains("<section class=\"home-section\" aria-labelledby=\"stories-heading\"", start);
         Assert.Equal(HttpStatusCode.OK, (await visitor.GetAsync("/stories?page=999")).StatusCode);
+    }
+
+    private sealed record CoverSeed(int StoryId, int BFileId, int? AFileId, string BWord);
+
+    /// <summary>A published story whose item blocks come in this order: B (in the state given), then A, a visible item, if asked for. A text only if asked for.</summary>
+    private static async Task<CoverSeed> SeedCoverAsync(WebApplicationFactory<Program> archive, string kind, Action<ArchiveItem, DateTime> stateOfB, bool withA, bool withText)
+    {
+        var bWord = TestData.UniqueWord(kind);
+        return await archive.WithDbAsync(async db =>
+        {
+            var now = DateTime.UtcNow;
+            var collection = new Collection { Title = $"Box {TestData.UniqueWord("box")}", CreatedAt = now };
+            var b = NewItem(collection, $"Title {bWord}", now, true, bWord);
+            stateOfB(b, now);
+            var a = NewItem(collection, $"Alpha {TestData.UniqueWord("a")}", now, true, "alpha");
+            a.Publish(now);
+            var story = new Story { Title = $"Cover {bWord}", CreatedAt = now, UpdatedAt = now };
+            story.Publish(now);
+            story.Blocks.Add(new StoryBlock { Position = 0, Kind = StoryBlockKind.Item, ArchiveItem = b });
+            if (withA)
+                story.Blocks.Add(new StoryBlock { Position = 1, Kind = StoryBlockKind.Item, ArchiveItem = a });
+            if (withText)
+                story.Blocks.Add(new StoryBlock { Position = 2, Kind = StoryBlockKind.Text, Text = $"Only words {bWord}" });
+            db.AddRange(collection, b, a, story);
+            await db.SaveChangesAsync();
+            return new CoverSeed(story.Id, b.MediaFiles.Single().Id, withA ? a.MediaFiles.Single().Id : null, bWord);
+        });
+    }
+
+    private static Dictionary<string, Action<ArchiveItem, DateTime>> StatesWithoutPicture() => new()
+    {
+        ["draft"] = (_, _) => { },
+        ["embargoed"] = (i, now) => { i.Publish(now); i.SetPublicFrom(DateOnly.FromDateTime(now).AddDays(3), now); },
+        ["binned"] = (i, now) => { i.Publish(now); i.MoveToBin(now); },
+        ["recordonly"] = (i, now) => { i.Publish(now); i.MediaLevel = MediaLevel.RecordOnly; },
+    };
+
+    [Fact]
+    public async Task The_cover_is_the_picture_of_the_first_item_visitors_may_see_even_when_a_hidden_or_record_only_item_comes_first()
+    {
+        await using var archive = await NewArchiveAsync(app);
+        using var visitor = archive.CreateClient();
+        var seeds = new List<(string Kind, CoverSeed Seed)>();
+        foreach (var (kind, state) in StatesWithoutPicture())
+            seeds.Add((kind, await SeedCoverAsync(archive, kind, state, withA: true, withText: false)));
+        // Positive case: the first item is visible and has a picture, and it is the cover.
+        var visible = await SeedCoverAsync(archive, "visiblefirst", (i, now) => i.Publish(now), withA: true, withText: false);
+
+        var list = await TextAsync(visitor, "/stories");
+        var start = await TextAsync(visitor, "/");
+        foreach (var page in new[] { list, start })
+        {
+            foreach (var (kind, seed) in seeds)
+            {
+                Assert.True(!page.Contains($"/media/{seed.BFileId}/"), $"{kind}: the picture of the first item shows.");
+                Assert.Contains($"/media/{seed.AFileId}/thumbnail", Card(page, seed.StoryId));
+            }
+            Assert.Contains($"/media/{visible.BFileId}/thumbnail", Card(page, visible.StoryId));
+        }
+    }
+
+    [Fact]
+    public async Task A_story_whose_only_item_is_hidden_or_record_only_is_kept_by_a_text_and_its_cover_is_the_text_tile()
+    {
+        await using var archive = await NewArchiveAsync(app);
+        using var visitor = archive.CreateClient();
+        var seeds = new List<(string Kind, CoverSeed Seed)>();
+        foreach (var (kind, state) in StatesWithoutPicture())
+            seeds.Add((kind, await SeedCoverAsync(archive, kind, state, withA: false, withText: true)));
+
+        var list = await TextAsync(visitor, "/stories");
+        var start = await TextAsync(visitor, "/");
+        foreach (var page in new[] { list, start })
+            foreach (var (kind, seed) in seeds)
+            {
+                var card = Card(page, seed.StoryId);
+                Assert.True(card.Contains("text-tile") && !card.Contains("<img"), $"{kind}: the cover is not the text tile.");
+                Assert.True(!page.Contains($"/media/{seed.BFileId}/"), $"{kind}: the picture of the item shows.");
+            }
+    }
+
+    [Fact]
+    public async Task Hidden_stories_change_neither_the_pages_nor_the_totals_of_the_list()
+    {
+        await using var archive = await NewArchiveAsync(app);
+        const int visibleStories = Commonage.Web.Search.StoryCards.PageSize + 2;
+        await archive.WithDbAsync(async db =>
+        {
+            var now = DateTime.UtcNow;
+            for (var n = 0; n < visibleStories; n++)
+            {
+                var story = new Story { Title = $"Paged {n:00}", CreatedAt = now, UpdatedAt = now, Position = n };
+                story.Publish(now);
+                story.Blocks.Add(new StoryBlock { Position = 0, Kind = StoryBlockKind.Text, Text = $"Words of {n}" });
+                db.Stories.Add(story);
+            }
+            return await db.SaveChangesAsync();
+        });
+        using var visitor = archive.CreateClient();
+        async Task<string[]> PagesAsync() =>
+        [
+            WithoutToken(await TextAsync(visitor, "/stories")), WithoutToken(await TextAsync(visitor, "/stories?page=2")),
+            WithoutToken(await TextAsync(visitor, "/")), WithoutToken(await TextAsync(visitor, "/sitemap.xml")),
+        ];
+        static int Cards(string page) => Regex.Matches(page, "class=\"collection-card\"").Count;
+
+        var before = await PagesAsync();
+        Assert.Equal(Commonage.Web.Search.StoryCards.PageSize, Cards(before[0]));
+        Assert.Equal(2, Cards(before[1]));
+
+        // A draft, a story in the bin and one whose only item is hidden and first in the order. Their items are hidden too,
+        // because a visible item would show on the start page and in the sitemap whatever the story is.
+        await SeedAsync(archive, "pagedraft", (_, _) => { }, publishStory: false, siblingsVisible: false);
+        var binned = await SeedAsync(archive, "pagebinned", (_, _) => { }, siblingsVisible: false);
+        var onlyHidden = await SeedAsync(archive, "pagehidden", (_, _) => { }, siblingsVisible: false);
+        await archive.WithDbAsync(async db =>
+        {
+            await db.StoryBlocks.Where(b => b.StoryId == onlyHidden.StoryId && b.ArchiveItemId != onlyHidden.BId).ExecuteDeleteAsync();
+            await db.Stories.Where(s => s.Id == onlyHidden.StoryId).ExecuteUpdateAsync(s => s.SetProperty(x => x.Position, -1));
+            var story = await db.Stories.SingleAsync(s => s.Id == binned.StoryId);
+            story.MoveToBin(DateTime.UtcNow);
+            return await db.SaveChangesAsync();
+        });
+
+        var after = await PagesAsync();
+        for (var i = 0; i < before.Length; i++)
+            Assert.True(before[i] == after[i], $"Page {i} changed with hidden stories.");
+    }
+
+    [Fact]
+    public async Task A_text_of_nothing_but_white_space_does_not_keep_a_story_visible_or_show_up_in_it()
+    {
+        await using var archive = await NewArchiveAsync(app);
+        var ids = await archive.WithDbAsync(async db =>
+        {
+            var now = DateTime.UtcNow;
+            Story Make(string title, params string[] texts)
+            {
+                var story = new Story { Title = title, CreatedAt = now, UpdatedAt = now };
+                story.Publish(now);
+                foreach (var text in texts)
+                    story.Blocks.Add(new StoryBlock { Position = story.Blocks.Count, Kind = StoryBlockKind.Text, Text = text });
+                return story;
+            }
+            var onlyBlank = Make("Blank only", "   ", "\n\t \r\n");
+            var withWords = Make("Blank and words", " ", "Real words here");
+            var hiddenItem = NewItem(new Collection { Title = "Box", CreatedAt = now }, "Hidden one", now, false, "hid");
+            var blankAndHidden = Make("Blank and hidden item", "  ");
+            blankAndHidden.Blocks.Add(new StoryBlock { Position = 1, Kind = StoryBlockKind.Item, ArchiveItem = hiddenItem });
+            db.AddRange(onlyBlank, withWords, hiddenItem, blankAndHidden);
+            await db.SaveChangesAsync();
+            return (OnlyBlank: onlyBlank.Id, WithWords: withWords.Id, BlankAndHidden: blankAndHidden.Id);
+        });
+        using var visitor = archive.CreateClient();
+
+        Assert.Equal(HttpStatusCode.NotFound, (await visitor.GetAsync($"/stories/{ids.OnlyBlank}")).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await visitor.GetAsync($"/stories/{ids.BlankAndHidden}")).StatusCode);
+        var list = await TextAsync(visitor, "/stories");
+        Assert.DoesNotContain("Blank only", list);
+        Assert.DoesNotContain("Blank and hidden item", list);
+        Assert.Contains("Blank and words", list);
+        var sitemap = await TextAsync(visitor, "/sitemap.xml");
+        Assert.DoesNotContain($"/stories/{ids.OnlyBlank}<", sitemap);
+        Assert.DoesNotContain($"/stories/{ids.BlankAndHidden}<", sitemap);
+
+        var page = await TextAsync(visitor, $"/stories/{ids.WithWords}");
+        Assert.Contains("Real words here", page);
+        var article = page[page.IndexOf("<article class=\"story\"", StringComparison.Ordinal)..page.IndexOf("</article>", StringComparison.Ordinal)];
+        Assert.DoesNotMatch(@"<p[^>]*>\s*</p>", article);
     }
 
     /// <summary>Loads a story or an item for a test that changes it.</summary>

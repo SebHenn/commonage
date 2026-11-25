@@ -24,7 +24,7 @@ A block whose item is hidden is left out without a trace: no placeholder, no cap
 
 The rule lives in `Data/` only, as it does for M27:
 
-- `Visibility.Story(DateOnly today)` in `Data/Visibility.cs`: published, and at least one text block or one item block whose item
+- `Visibility.Story(DateOnly today)` in `Data/Visibility.cs`: published, and at least one text block with words in it (not only white space; a blank text is also left out of the page) or one item block whose item
   passes the item rule. The item condition is built from `Visibility.Item`, never a second spelling of `ItemStatus.Published`.
   The explicit `DeletedAt == null` is belt and braces on top of the query filter.
 - `CommonageDbContext.VisibleStories` and `BinnedStories` (`IgnoreQueryFilters`, `DeletedAt != null`).
@@ -205,7 +205,7 @@ The `privacy-reviewer` found no design-level leak and asked for these, which are
    its other blocks in order.
 5. **`/stories` is computed from visible rows only**: total, paging and covers. Covers come from one query, not one per story,
    and the page size is capped. Test: `/stories` is byte-identical with and without a hidden story.
-6. **Link preview and sitemap.** The preview holds no item text, id or picture; when the summary is empty the description is empty
+6. **Link preview and sitemap.** The preview holds no item text, id or picture (the archive logo, as on every other page, may be its image); when the summary is empty the description is empty
    (never the first text block). A story cover must never go into `og:image` without a `MayTravel` check (comment in the code).
    Story ids are sequential, so a gap is visible, as for items: listed under known limits.
 7. **A published-only export is a public copy**, so captions of visible items travel with it; this is intended (the items do too).
