@@ -42,6 +42,18 @@
     }
 </section>
 
+@if (Model.Stories.Count > 0)
+{
+    <section class="home-section" aria-labelledby="stories-heading">
+        <h2 id="stories-heading">@T["Stories"]</h2>
+        <partial name="_StoryCards" model="Model.Stories" />
+        @if (Model.MoreStories)
+        {
+            <p><a asp-page="/Stories/Index">@T["All stories"]</a></p>
+        }
+    </section>
+}
+
 @* A single decade is no timeline. *@
 @if (Model.Decades.Count > 1)
 {

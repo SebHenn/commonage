@@ -91,4 +91,22 @@ public class StoryBrowserTests(BrowserFixture app)
         Assert.Equal(["beforeunload"], dialogs);
         Assert.Equal("Changed but not saved", await page.InputValueAsync("textarea[id^=text-] >> nth=0"));
     }
+
+    [Fact]
+    public async Task The_demo_story_reads_without_its_draft_item_and_curators_see_the_draft_with_its_reason()
+    {
+        const string draft = "Unsorted photos from the club house";
+        var visitor = await app.NewPageAsync();
+        await visitor.GotoAsync("/stories/1");
+        Assert.Contains("Mill Street over thirty years", await visitor.InnerTextAsync("h1"));
+        Assert.DoesNotContain(draft, await visitor.ContentAsync());
+        Assert.DoesNotContain("Still to be sorted", await visitor.ContentAsync());
+        await visitor.GotoAsync("/stories");
+        Assert.True(await visitor.Locator("main a:has-text('Mill Street over thirty years')").IsVisibleAsync());
+
+        var curator = await app.LogInAsync();
+        await curator.GotoAsync("/Admin/Stories/Edit/1");
+        Assert.Contains(draft, await curator.InnerTextAsync("main"));
+        Assert.Contains("Visitors do not see this item: it is not published.", await curator.InnerTextAsync("main"));
+    }
 }

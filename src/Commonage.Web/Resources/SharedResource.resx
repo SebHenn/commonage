@@ -71,6 +71,7 @@
   <data name="All places" xml:space="preserve"><value>All places</value></data>
   <data name="All right" xml:space="preserve"><value>All right</value></data>
   <data name="All statuses" xml:space="preserve"><value>All statuses</value></data>
+  <data name="All stories" xml:space="preserve"><value>All stories</value></data>
   <data name="Almost done: the archive is saving what you sent." xml:space="preserve"><value>Almost done: the archive is saving what you sent.</value></data>
   <data name="Also add files the archive already has" xml:space="preserve"><value>Also add files the archive already has</value></data>
   <data name="Always" xml:space="preserve"><value>Always</value></data>
@@ -492,6 +493,7 @@
   <data name="No preview could be created." xml:space="preserve"><value>No preview could be created.</value></data>
   <data name="No previews have failed." xml:space="preserve"><value>No previews have failed.</value></data>
   <data name="No role" xml:space="preserve"><value>No role</value></data>
+  <data name="No stories yet." xml:space="preserve"><value>No stories yet.</value></data>
   <data name="No tags match." xml:space="preserve"><value>No tags match.</value></data>
   <data name="No: they should ask first" xml:space="preserve"><value>No: they should ask first</value></data>
   <data name="None" xml:space="preserve"><value>None</value></data>

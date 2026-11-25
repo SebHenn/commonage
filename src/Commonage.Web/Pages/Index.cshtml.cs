@@ -17,6 +17,12 @@ public class IndexModel(CommonageDbContext db, Commonage.Web.Operations.ArchiveP
 
     public IReadOnlyList<ItemSummary> Recent { get; private set; } = [];
 
+    /// <summary>The first stories visitors may read, and whether there are more than shown. No count: a count would tell of hidden ones.</summary>
+    public IReadOnlyList<StoryCard> Stories { get; private set; } = [];
+    public bool MoreStories { get; private set; }
+
+    private const int StoryCount = 3;
+
     /// <summary>How many published items each decade has.</summary>
     public IReadOnlyList<DecadeCount> Decades { get; private set; } = [];
 
@@ -40,6 +46,10 @@ public class IndexModel(CommonageDbContext db, Commonage.Web.Operations.ArchiveP
             .Take(RecentCount)
             .Select(ItemSummary.FromItem)
             .ToListAsync();
+
+        var stories = await db.LoadFirstAsync(StoryCount + 1, HttpContext.RequestAborted);
+        MoreStories = stories.Count > StoryCount;
+        Stories = stories.Take(StoryCount).ToList();
 
         Decades = await DecadeTimeline.LoadAsync(db.VisibleItems, HttpContext.RequestAborted);
 

@@ -5,14 +5,22 @@ version may change things that need attention when updating, and these notes say
 
 ## Unreleased
 
+### For visitors
+
+- **Stories, second part.** Published stories are public. `/stories` lists them with a picture and a few words, the start
+  page shows the first three, and `/stories/{number}` reads one: the curator's texts, and the items of the story as cards with
+  the curator's captions. An item that visitors may not see (a draft, not yet public, in the bin, withdrawn) is left out
+  without a trace, and a story with nothing to read answers "not found" like an unknown page. A record-only item has no picture.
+  The sitemap lists the stories. A link to a story shows its title and its summary, no picture and nothing from an item.
+  Stories are not in the feed or in search. The demo archive's story is published.
+
 ### For curators
 
 - **Stories, first part.** Under "Stories" in the admin area, curators write a story: a title, a few words of summary, and
   parts in order, each a text or one of the items of the archive with a caption. A story can be moved up and down in the
   list, and its parts within it, with buttons that work without JavaScript and keep the place on the page. The preview shows
   it as visitors will see it: a part with an item that is not public is left out. A story with parts that visitors cannot
-  see says so on the page, only here. Publishing a story changes nothing for visitors yet; the public pages come in a later
-  part. Helpers do not see stories.
+  see says so on the page, only here. Helpers do not see stories.
 - **Export format 9** has `stories` after `items`. An export of published items has only published stories and the parts
   whose item is in it. An import counts the stories in the dry run and does not import them. The demo archive has a story.
 

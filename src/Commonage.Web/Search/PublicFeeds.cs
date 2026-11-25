@@ -42,6 +42,7 @@ public static class PublicFeeds
 
     // A sitemap may hold at most 50,000 addresses.
     private const int MaxSitemapItems = 49_000;
+    private const int MaxSitemapStories = 500;
     private const string CacheControl = "public, max-age=600";
 
     private static readonly XNamespace Atom = "http://www.w3.org/2005/Atom";
@@ -133,6 +134,13 @@ public static class PublicFeeds
             .Select(i => new { i.Id, i.UpdatedAt })
             .ToListAsync(cancellationToken);
 
+        // No lastmod for a story: it would follow the blocks and so the items, which a story must not tell.
+        var stories = await db.VisibleStories
+            .OrderBy(s => s.Id)
+            .Select(s => s.Id)
+            .Take(MaxSitemapStories)
+            .ToListAsync(cancellationToken);
+
         static XElement Page(string url, DateTime? changed = null) => new(Sitemap + "url",
             new XElement(Sitemap + "loc", url),
             changed is { } at ? new XElement(Sitemap + "lastmod", at.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)) : null);
@@ -141,6 +149,8 @@ public static class PublicFeeds
             Page($"{address}/"),
             Page($"{address}/collections"),
             collections.Select(id => Page($"{address}/collections/{id}")),
+            stories.Count > 0 ? Page($"{address}/stories") : null,
+            stories.Select(id => Page($"{address}/stories/{id}")),
             items.Select(item => Page($"{address}/items/{item.Id}", item.UpdatedAt)));
 
         context.Response.Headers.CacheControl = CacheControl;

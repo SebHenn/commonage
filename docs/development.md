@@ -142,6 +142,11 @@ the request, so behind Caddy they depend on `ASPNETCORE_FORWARDEDHEADERS_ENABLED
 tries that setting. Text goes into XML through `XmlText`, because one pasted control character would make a whole feed unreadable.
 `ArchiveItem.MayTravel` decides what goes along with a link, and it needs the contribution to be loaded.
 
+Stories (`Pages/Stories`, `Search/StoryCards.cs`): public pages start from `db.VisibleStories` and read parts only through
+`VisibleStoryBlocks` (`LoadAsync` for the page, `CoversAsync` for the list). `_StoryBody` is shared with the curator preview and
+must stay free of ids, anchors and `data-` attributes; `_ItemCard` is the one item card, also used by `_ItemCards`. The link
+preview of a story has no image and no item text, and the sitemap has no `lastmod` for stories.
+
 `Search/PublicItemRecord.cs` is what an item says to programs: `/items/{id}.json` and the `DC.*` tags (`Pages/Shared/_DublinCore.cshtml`,
 written by the layout when the page set `ViewData["Record"]`). `PublicItemRecord` is an allow-list: add a field there on purpose,
 and never serialise `ArchiveItem` or `MediaFile`. It follows the link-preview rules, so description and files go with `MayTravel`,

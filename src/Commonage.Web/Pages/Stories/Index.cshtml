@@ -1,0 +1,17 @@
+@page "/stories"
+@model Commonage.Web.Pages.Stories.IndexModel
+@{
+    ViewData["Title"] = T["Stories"];
+}
+
+<h1>@T["Stories"]</h1>
+
+@if (Model.Stories.TotalCount == 0)
+{
+    <p class="text-muted">@T["No stories yet."]</p>
+}
+else
+{
+    <partial name="_StoryCards" model="Model.Stories.Items" />
+    <partial name="_Pager" model="Model.Stories" />
+}

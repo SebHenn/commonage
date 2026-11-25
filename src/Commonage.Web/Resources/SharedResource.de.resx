@@ -1145,4 +1145,6 @@
   <data name="Visitors see this item without its photos." xml:space="preserve"><value>Besucher sehen dieses Objekt ohne seine Fotos.</value></data>
   <data name="{0, plural, one {# item not shown to visitors} other {# items not shown to visitors}}" xml:space="preserve"><value>{0, plural, one {# Objekt, das Besuchern nicht gezeigt wird} other {# Objekte, die Besuchern nicht gezeigt werden}}</value></data>
   <data name="{0, plural, one {# part} other {# parts}}" xml:space="preserve"><value>{0, plural, one {# Teil} other {# Teile}}</value></data>
+  <data name="No stories yet." xml:space="preserve"><value>Noch keine Geschichten.</value></data>
+  <data name="All stories" xml:space="preserve"><value>Alle Geschichten</value></data>
 </root>
