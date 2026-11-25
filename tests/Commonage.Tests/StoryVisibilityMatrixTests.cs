@@ -154,7 +154,15 @@ public partial class StoryVisibilityMatrixTests(CommonageAppFactory app)
             ["draft"] = (_, _) => { },
             ["waiting"] = (i, _) => i.Status = ItemStatus.Submitted,
             ["rejected"] = (i, now) => i.Reject(now),
-            ["withdrawn"] = (i, now) => i.Withdraw(now),
+            ["withdrawn"] = (i, now) =>
+            {
+                i.Contribution = new Contribution
+                {
+                    ContributorName = "Someone", ShowName = false, Rights = RightsStatement.PermissionFromRightsHolder,
+                    ConsentText = "I agree.", SubmittedAt = now,
+                };
+                i.Withdraw(now);
+            },
             ["embargoed"] = (i, now) => { i.Publish(now); i.SetPublicFrom(DateOnly.FromDateTime(now).AddDays(3), now); },
             ["binned"] = (i, now) => { i.Publish(now); i.MoveToBin(now); },
         };
@@ -475,7 +483,7 @@ public partial class StoryVisibilityMatrixTests(CommonageAppFactory app)
             Assert.DoesNotContain($"/media/{hiddenFirst.BFileId}/", page);
         }
         Assert.Contains("<section class=\"home-section\" aria-labelledby=\"stories-heading\"", start);
-        Assert.Equal(HttpStatusCode.OK, (await visitor.GetAsync("/stories?page=999")).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await visitor.GetAsync("/stories?p=999")).StatusCode);
     }
 
     private sealed record CoverSeed(int StoryId, int BFileId, int? AFileId, string BWord);
@@ -531,9 +539,12 @@ public partial class StoryVisibilityMatrixTests(CommonageAppFactory app)
             foreach (var (kind, seed) in seeds)
             {
                 Assert.True(!page.Contains($"/media/{seed.BFileId}/"), $"{kind}: the picture of the first item shows.");
-                Assert.Contains($"/media/{seed.AFileId}/thumbnail", Card(page, seed.StoryId));
+                // The start page shows the first three stories only; the list shows all of them.
+                if (page == list || page.Contains($"/stories/{seed.StoryId}\""))
+                    Assert.Contains($"/media/{seed.AFileId}/thumbnail", Card(page, seed.StoryId));
             }
-            Assert.Contains($"/media/{visible.BFileId}/thumbnail", Card(page, visible.StoryId));
+            if (page == list || page.Contains($"/stories/{visible.StoryId}\""))
+                Assert.Contains($"/media/{visible.BFileId}/thumbnail", Card(page, visible.StoryId));
         }
     }
 
@@ -551,8 +562,11 @@ public partial class StoryVisibilityMatrixTests(CommonageAppFactory app)
         foreach (var page in new[] { list, start })
             foreach (var (kind, seed) in seeds)
             {
-                var card = Card(page, seed.StoryId);
-                Assert.True(card.Contains("text-tile") && !card.Contains("<img"), $"{kind}: the cover is not the text tile.");
+                if (page == list || page.Contains($"/stories/{seed.StoryId}\""))
+                {
+                    var card = Card(page, seed.StoryId);
+                    Assert.True(card.Contains("text-tile") && !card.Contains("<img"), $"{kind}: the cover is not the text tile.");
+                }
                 Assert.True(!page.Contains($"/media/{seed.BFileId}/"), $"{kind}: the picture of the item shows.");
             }
     }
@@ -577,7 +591,7 @@ public partial class StoryVisibilityMatrixTests(CommonageAppFactory app)
         using var visitor = archive.CreateClient();
         async Task<string[]> PagesAsync() =>
         [
-            WithoutToken(await TextAsync(visitor, "/stories")), WithoutToken(await TextAsync(visitor, "/stories?page=2")),
+            WithoutToken(await TextAsync(visitor, "/stories")), WithoutToken(await TextAsync(visitor, "/stories?p=2")),
             WithoutToken(await TextAsync(visitor, "/")), WithoutToken(await TextAsync(visitor, "/sitemap.xml")),
         ];
         static int Cards(string page) => Regex.Matches(page, "class=\"collection-card\"").Count;
