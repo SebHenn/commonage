@@ -85,7 +85,7 @@ else
             var block = Model.Blocks[index];
             var typed = Model.TypedText.GetValueOrDefault(block.Id);
             var label = block.Kind == StoryBlockKind.Text ? T["Text {0} of {1}", index + 1, total] : T["Item {0} of {1}", index + 1, total];
-            <li id="block-@block.Id" class="card mb-3" tabindex="-1" data-focus-on-load="@(Model.FocusBlockId == block.Id ? "true" : null)">
+            <li id="block-@block.Id" class="card mb-3" tabindex="-1" @(Model.FocusBlockId == block.Id ? Html.Raw("data-focus-on-load") : null)>
                 <div class="card-body">
                     <p class="fw-semibold mb-2">@label</p>
                     @if (block.Kind == StoryBlockKind.Text)
