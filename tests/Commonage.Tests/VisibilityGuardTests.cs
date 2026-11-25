@@ -45,8 +45,39 @@ public partial class VisibilityGuardTests
             + string.Join('\n', offenders));
     }
 
-    [GeneratedRegex(@"ItemStatus\.Published|\bArchiveItems\b|IgnoreQueryFilters|\bdb\.MediaFiles\b")]
+    [GeneratedRegex(@"ItemStatus\.Published|\bArchiveItems\b|IgnoreQueryFilters|\bdb\.MediaFiles\b|StoryStatus\.Published|\bdb\.Stories\b|\bdb\.StoryBlocks\b|\bstory\.Blocks\b")]
     private static partial Regex Forbidden();
+
+    /// <summary>
+    /// A story page must not follow a block to its item: that would show an item the rule hides. The blocks come from
+    /// <c>VisibleStoryBlocks</c>, which loads the items through <c>VisibleItems</c>.
+    /// </summary>
+    [Fact]
+    public void Public_story_pages_never_follow_a_block_to_its_item()
+    {
+        var root = SourceRoot();
+        var offenders = new List<string>();
+        foreach (var folder in new[] { "Pages/Stories", "Pages/Index.cshtml", "Pages/Index.cshtml.cs" })
+        {
+            var path = Path.Combine(root, folder);
+            var files = Directory.Exists(path) ? Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories) : File.Exists(path) ? [path] : [];
+            offenders.AddRange(files.Where(f => FollowsBlockToItem().IsMatch(File.ReadAllText(f))).Select(f => Path.GetRelativePath(root, f)));
+        }
+
+        Assert.Empty(offenders);
+    }
+
+    [GeneratedRegex(@"\.ArchiveItem")]
+    private static partial Regex FollowsBlockToItem();
+
+    [Fact]
+    public void The_guard_catches_the_ways_to_reach_a_story_or_a_block_around_the_visible_queries()
+    {
+        foreach (var line in new[] { "s.Status == StoryStatus.Published", "db.Stories.Where(x)", "db.StoryBlocks.ToList()", "story.Blocks.Select(b => 1)" })
+            Assert.Matches(Forbidden(), line);
+        Assert.DoesNotMatch(Forbidden(), "await VisibleStoryBlocks.LoadAsync(db, id)");
+        Assert.DoesNotMatch(Forbidden(), "db.VisibleStories.Where(x)");
+    }
 
     private static string SourceRoot()
     {

@@ -25,4 +25,15 @@ public static class Visibility
     public static Expression<Func<MediaFile, bool>> Media(DateOnly today) =>
         f => f.ArchiveItem.Status == ItemStatus.Published && (f.ArchiveItem.PublicFrom == null || f.ArchiveItem.PublicFrom <= today)
             && f.ArchiveItem.MediaLevel == MediaLevel.Everything;
+
+    /// <summary>
+    /// The stories visitors may read: published, not in the bin, and with at least one text block or one item block whose item
+    /// <see cref="Item"/> allows (so embargo and withdrawal come with it). This is the only place that writes
+    /// <see cref="StoryStatus.Published"/> in a query. The explicit <c>DeletedAt</c> test is belt and braces on the query filter.
+    /// A method on the context rather than an expression: it cannot be applied to a navigation from a block to its item.
+    /// </summary>
+    public static IQueryable<Story> Story(CommonageDbContext db, DateOnly today) =>
+        db.Stories.Where(s => s.Status == StoryStatus.Published && s.DeletedAt == null
+            && s.Blocks.Any(b => b.Kind == StoryBlockKind.Text
+                || db.ArchiveItems.Where(Item(today)).Any(i => i.Id == b.ArchiveItemId)));
 }

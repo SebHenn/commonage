@@ -69,7 +69,11 @@ else
                             @AuditText.Describe(T, entry.Action)@if (entry.Subject is not null)
                             {
                                 <text>: </text>
-                                @if (entry.ArchiveItemId is { } itemId)
+                                @if (entry.StoryId is { } storyId)
+                                {
+                                    <a asp-page="/Admin/Stories/Edit" asp-route-id="@storyId">@ArchiveItem.ShownTitle(T, entry.Subject)</a>
+                                }
+                                else if (entry.ArchiveItemId is { } itemId)
                                 {
                                     <a asp-page="/Admin/Items/Edit" asp-route-id="@itemId">@ArchiveItem.ShownTitle(T, entry.Subject)</a>
                                 }

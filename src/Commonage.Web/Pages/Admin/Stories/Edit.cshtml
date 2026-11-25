@@ -1,0 +1,185 @@
+@page "{id:int}"
+@model Commonage.Web.Pages.Admin.Stories.EditModel
+@using Commonage.Web.Pages.Admin.Stories
+@using Commonage.Web.Domain
+@inject Commonage.Web.Operations.ArchiveProfile Profile
+@{
+    ViewData["Title"] = T["Edit story"];
+    var material = (await Profile.GetAsync()).MaterialLanguage;
+    var story = Model.Story;
+    var total = Model.Blocks.Count;
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="/Admin/Index">@T["Items"]</a></li>
+        <li class="breadcrumb-item"><a asp-page="/Admin/Stories/Index">@T["Stories"]</a></li>
+    </ol>
+</nav>
+
+<div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+    <h1 class="me-auto mb-0">@ViewData["Title"]</h1>
+    <span class="badge @(story.Status == StoryStatus.Published ? "text-bg-success" : "text-bg-secondary")">@(story.Status == StoryStatus.Published ? T["Published"] : T["Draft"])</span>
+    <a asp-page="/Admin/Stories/Preview" asp-route-id="@story.Id" class="btn btn-outline-primary">@T["Preview"]</a>
+    <form method="post" asp-page="/Admin/Stories/Edit" class="d-inline">
+        @if (story.Status == StoryStatus.Published)
+        {
+            <button type="submit" asp-page-handler="Unpublish" asp-route-id="@story.Id" class="btn btn-outline-secondary">@T["Unpublish"]</button>
+        }
+        else
+        {
+            <button type="submit" asp-page-handler="Publish" asp-route-id="@story.Id" class="btn btn-success">@T["Publish"]</button>
+        }
+    </form>
+</div>
+<p class="text-muted col-lg-8">@T["Visitors cannot read stories yet. A published story is the first thing they will see once they can."]</p>
+
+@if (Model.SavedByOthers is { } saved)
+{
+    <section class="alert alert-warning col-lg-8" role="alert" aria-labelledby="conflict-heading">
+        <h2 id="conflict-heading" class="h5">@T["Someone else changed this story while you were working on it"]</h2>
+        <p>@T["Your changes are not saved yet. They are still in the form below. Compare them with the version saved by the other person. If you save again, your version replaces theirs."]</p>
+        <dl class="row mb-0">
+            <dt class="col-sm-3">@T["Title"]</dt>
+            <dd class="col-sm-9">@saved.Title</dd>
+            <dt class="col-sm-3">@T["Summary"]</dt>
+            <dd class="col-sm-9 mb-0 text-preserve-lines">@saved.Summary</dd>
+        </dl>
+    </section>
+}
+
+<form method="post" asp-page="/Admin/Stories/Edit" asp-route-id="@story.Id" class="col-lg-8 mb-5" data-warn-unsaved="@(ModelState.IsValid ? "" : "dirty")" data-send-once>
+    @if (!ViewData.ModelState.ContainsKey("newText") && !ViewData.ModelState.ContainsKey("item") && !ViewData.ModelState.ContainsKey("caption"))
+    {
+        <partial name="_ErrorSummary" />
+    }
+    <input type="hidden" asp-for="Input.Version" />
+    <div class="mb-3">
+        <label asp-for="Input.Title" class="form-label"></label>
+        <input asp-for="Input.Title" class="form-control" maxlength="@Story.TitleMaxLength" />
+        <span asp-validation-for="Input.Title" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Input.Summary" class="form-label"></label>
+        <textarea asp-for="Input.Summary" class="form-control" rows="3" maxlength="@Story.SummaryMaxLength" aria-describedby="summary-help"></textarea>
+        <span asp-validation-for="Input.Summary" class="text-danger"></span>
+        <div id="summary-help" class="form-text">@T["A few words that open the story and describe it in a list."]</div>
+    </div>
+    <button type="submit" class="btn btn-primary">@T["Save"]</button>
+</form>
+
+<h2 class="h4">@T["Parts of the story"]</h2>
+@if (ViewData.ModelState.ContainsKey("newText") || ViewData.ModelState.ContainsKey("item") || ViewData.ModelState.ContainsKey("caption") || Model.TypedText.Count > 0)
+{
+    <partial name="_ErrorSummary" />
+}
+@if (total == 0)
+{
+    <p class="text-muted">@T["This story has no parts yet. Add text or an item below."]</p>
+}
+else
+{
+    <ol class="list-unstyled col-lg-8">
+        @for (var index = 0; index < total; index++)
+        {
+            var block = Model.Blocks[index];
+            var typed = Model.TypedText.GetValueOrDefault(block.Id);
+            var label = block.Kind == StoryBlockKind.Text ? T["Text {0} of {1}", index + 1, total] : T["Item {0} of {1}", index + 1, total];
+            <li id="block-@block.Id" class="card mb-3" tabindex="-1" data-focus-on-load="@(Model.FocusBlockId == block.Id ? "true" : null)">
+                <div class="card-body">
+                    <p class="fw-semibold mb-2">@label</p>
+                    @if (block.Kind == StoryBlockKind.Text)
+                    {
+                        var textId = $"text-{block.Id}";
+                        <form method="post" asp-page="/Admin/Stories/Edit" asp-page-handler="SaveText" asp-route-id="@story.Id" asp-route-blockId="@block.Id" data-warn-unsaved data-send-once>
+                            <label for="@textId" class="form-label">@T["Text"]</label>
+                            <textarea id="@textId" name="text" rows="5" maxlength="@StoryBlock.TextMaxLength" lang="@material" class="form-control mb-2">@(typed ?? block.Text)</textarea>
+                            <span class="text-danger">@Html.ValidationMessage(textId)</span>
+                            <button type="submit" class="btn btn-sm btn-outline-primary">@T["Save text"]</button>
+                        </form>
+                    }
+                    else if (block.State == EditModel.ItemState.Missing)
+                    {
+                        <p class="text-muted">@T["This item no longer exists."]</p>
+                    }
+                    else
+                    {
+                        var captionId = $"caption-{block.Id}";
+                        <div class="d-flex gap-3 mb-2">
+                            @if (block.ThumbnailMediaFileId is { } mediaFileId)
+                            {
+                                <img src="/admin/media/@mediaFileId/thumbnail" alt="" class="media-thumbnail story-block-thumbnail" loading="lazy" />
+                            }
+                            <div>
+                                <a asp-page="/Admin/Items/Edit" asp-route-id="@block.ItemId" class="text-break" lang="@material">@ArchiveItem.ShownTitle(T, block.ItemTitle ?? "")</a>
+                                <small class="d-block text-muted">@T["Item number {0}", block.ItemId!.Value]@(block.DateText is null ? "" : " · ")<span lang="@material">@block.DateText</span></small>
+                                @switch (block.State)
+                                {
+                                    case EditModel.ItemState.Draft:
+                                        <small class="d-block text-warning-emphasis">@T["Visitors do not see this item: it is not published."]</small>
+                                        break;
+                                    case EditModel.ItemState.PublicFrom:
+                                        <small class="d-block text-warning-emphasis">@T["Visitors do not see this item until {0}.", block.PublicFrom!.Value.ToString("d", System.Globalization.CultureInfo.CurrentCulture)]</small>
+                                        break;
+                                    case EditModel.ItemState.InBin:
+                                        <small class="d-block text-warning-emphasis">@T["Visitors do not see this item: it is in the bin."]</small>
+                                        break;
+                                    case EditModel.ItemState.Withdrawn:
+                                        <small class="d-block text-warning-emphasis">@T["Visitors do not see this item: it was turned down or withdrawn."]</small>
+                                        break;
+                                    case EditModel.ItemState.ShownWithoutPhotos:
+                                        <small class="d-block text-muted">@T["Visitors see this item without its photos."]</small>
+                                        break;
+                                }
+                            </div>
+                        </div>
+                        <form method="post" asp-page="/Admin/Stories/Edit" asp-page-handler="SaveCaption" asp-route-id="@story.Id" asp-route-blockId="@block.Id" data-warn-unsaved data-send-once>
+                            <label for="@captionId" class="form-label">@T["Caption"]</label>
+                            <textarea id="@captionId" name="caption" rows="2" maxlength="@StoryBlock.CaptionMaxLength" lang="@material" class="form-control mb-2">@(typed ?? block.Caption)</textarea>
+                            <span class="text-danger">@Html.ValidationMessage(captionId)</span>
+                            <button type="submit" class="btn btn-sm btn-outline-primary">@T["Save caption"]</button>
+                        </form>
+                    }
+                    <div class="d-flex flex-wrap gap-1 mt-2">
+                        <form method="post" asp-page="/Admin/Stories/Edit" asp-page-handler="MoveBlock" asp-route-id="@story.Id" asp-route-blockId="@block.Id" class="d-flex flex-wrap gap-1">
+                            <button type="submit" name="direction" value="earlier" class="btn btn-sm btn-outline-secondary" disabled="@(index == 0)" aria-label="@T["Earlier: {0}", label]">@T["Earlier"]</button>
+                            <button type="submit" name="direction" value="later" class="btn btn-sm btn-outline-secondary" disabled="@(index == total - 1)" aria-label="@T["Later: {0}", label]">@T["Later"]</button>
+                        </form>
+                        <form method="post" asp-page="/Admin/Stories/Edit" asp-page-handler="RemoveBlock" asp-route-id="@story.Id" asp-route-blockId="@block.Id"
+                              data-confirm="@(block.Kind == StoryBlockKind.Text ? T["Remove this text from the story? It cannot be brought back."] : T["Remove this item from the story? The item itself stays in the archive."])">
+                            <button type="submit" class="btn btn-sm btn-outline-danger" aria-label="@T["Remove: {0}", label]">@T["Remove"]</button>
+                        </form>
+                    </div>
+                </div>
+            </li>
+        }
+    </ol>
+}
+
+@if (total < Story.MaxBlocks)
+{
+    <div class="row g-4 col-lg-8">
+        <form method="post" asp-page="/Admin/Stories/Edit" asp-page-handler="AddText" asp-route-id="@story.Id" class="col-12" data-warn-unsaved data-send-once>
+            <h3 class="h5">@T["Add text"]</h3>
+            <label for="newText" class="form-label">@T["Text"]</label>
+            <textarea id="newText" name="text" rows="4" maxlength="@StoryBlock.TextMaxLength" lang="@material" class="form-control mb-2">@Model.TypedNewText</textarea>
+            <span class="text-danger">@Html.ValidationMessage("newText")</span>
+            <button type="submit" class="btn btn-outline-primary">@T["Add text"]</button>
+        </form>
+        <form method="post" asp-page="/Admin/Stories/Edit" asp-page-handler="AddItem" asp-route-id="@story.Id" class="col-12" data-send-once>
+            <h3 class="h5">@T["Add an item"]</h3>
+            <label for="item" class="form-label">@T["Number or address of the item"]</label>
+            <input id="item" name="item" value="@Model.TypedItemReference" class="form-control mb-2" aria-describedby="item-help" autocomplete="off" />
+            <div id="item-help" class="form-text mb-2">@T["The number of the item, or the address of its page, for example /items/12."]</div>
+            <span class="text-danger">@Html.ValidationMessage("item")</span>
+            <label for="caption" class="form-label">@T["Caption (optional)"]</label>
+            <textarea id="caption" name="caption" rows="2" maxlength="@StoryBlock.CaptionMaxLength" lang="@material" class="form-control mb-2">@Model.TypedItemCaption</textarea>
+            <span class="text-danger">@Html.ValidationMessage("caption")</span>
+            <button type="submit" class="btn btn-outline-primary">@T["Add item"]</button>
+        </form>
+    </div>
+}
+else
+{
+    <p class="text-muted">@T.Plural("A story can have at most {0, plural, one {# part} other {# parts}}.", Story.MaxBlocks)</p>
+}

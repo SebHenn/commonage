@@ -115,9 +115,14 @@ public class ExportTests(CommonageAppFactory app)
     [InlineData(typeof(Collection), "collection", "id title description createdAt position sort coverFileId", "Items: each item names its collection. CoverMediaFileId: as coverFileId.")]
     [InlineData(typeof(Tag), "tag", "name kind", "Id: items name their tags. NormalizedName: follows from the name. Items: each item lists its tags.")]
     [InlineData(typeof(VisitorNote), "note", "kind message name email receivedAt handledAt personalDetailsRemovedAt", "Id, ArchiveItemId, ArchiveItem: listed under its item. RemovePersonalDetails: a method.")]
+    [InlineData(typeof(Story), "story", "id title summary status createdAt publishedAt position blocks",
+        "UpdatedAt: made again where the story arrives. DeletedAt: the bin is not exported. Version: only for open forms. IsUntitled: follows from the empty title. CanBePublished: follows from the blocks and the title.")]
+    [InlineData(typeof(StoryBlock), "block", "kind text itemId caption",
+        "Id, StoryId, Story: the block is listed under its story. ArchiveItemId: as itemId. Position: follows from the order they are listed in. ArchiveItem: as itemId, and only when that item is in the export.")]
     public async Task Every_field_is_exported_or_left_out_on_purpose(Type type, string part, string exported, string leftOut)
     {
         var item = await app.CreateContributionAsync(ItemStatus.Published);
+        var storyTitle = TestData.Unique("Fields story");
         using var admin = app.CreateClient();
         await Browser.LogInAsCuratorAsync(admin);
         await Browser.UploadAsync(admin, $"/Admin/Items/Edit/{item.Id}", "Upload", "photo.jpg", TestData.Photo);
@@ -127,10 +132,15 @@ public class ExportTests(CommonageAppFactory app)
             var name = TestData.Unique("place");
             tagged.SetTags([new Tag { Name = name, NormalizedName = Tag.Normalize(name), Kind = TagKind.Place }]);
             db.VisitorNotes.Add(new VisitorNote { ArchiveItemId = item.Id, Kind = VisitorNoteKind.Information, Message = "A note", ReceivedAt = DateTime.UtcNow });
+            var story = new Story { Title = storyTitle, Status = StoryStatus.Draft, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow };
+            story.Blocks.Add(new StoryBlock { Position = 0, Kind = StoryBlockKind.Item, ArchiveItemId = item.Id, Caption = "A caption" });
+            db.Stories.Add(story);
             return await db.SaveChangesAsync();
         });
         using var zip = await ExportAsync(admin, publishedOnly: false, includePersonalData: true);
         var exportedItem = FindItem(zip, item.Id);
+        var exportedStory = JsonDocument.Parse(Read(zip, "archive.json")).RootElement.GetProperty("stories").EnumerateArray()
+            .Single(s => s.GetProperty("title").GetString() == storyTitle);
         var json = part switch
         {
             "item" => exportedItem,
@@ -138,6 +148,8 @@ public class ExportTests(CommonageAppFactory app)
             "contribution" => exportedItem.GetProperty("contribution"),
             "settings" => JsonDocument.Parse(Read(zip, "archive.json")).RootElement.GetProperty("settings"),
             "note" => exportedItem.GetProperty("notes")[0],
+            "story" => exportedStory,
+            "block" => exportedStory.GetProperty("blocks")[0],
             "tag" => JsonDocument.Parse(Read(zip, "archive.json")).RootElement.GetProperty("tags")[0],
             _ => JsonDocument.Parse(Read(zip, "archive.json")).RootElement.GetProperty("collections")[0],
         };
@@ -203,7 +215,7 @@ public class ExportTests(CommonageAppFactory app)
         Assert.Contains(published.Id, ids);
         Assert.DoesNotContain(waiting.Id, ids);
         Assert.Equal(["Published"], statuses);
-        Assert.Equal(8, document.GetProperty("version").GetInt32());
+        Assert.Equal(9, document.GetProperty("version").GetInt32());
     }
 
     [Fact]
@@ -314,6 +326,88 @@ public class ExportTests(CommonageAppFactory app)
         Assert.StartsWith("Export eines Commonage-Archivs\n", Encoding.UTF8.GetString(Read(german, "README.txt")));
         Assert.Contains("files/<item id>/<file id>-<original file name>", Encoding.UTF8.GetString(Read(german, "README.txt")));
         Assert.Equal(readme, Encoding.UTF8.GetString(Read(german, "README.en.txt")));
+    }
+
+    /// <summary>
+    /// What a copy holds of stories: a copy of what is public holds the published stories that visitors could find, with only the
+    /// parts whose item is in the copy; a copy of everything holds drafts too, but nothing from the bin. No part names an item
+    /// that is not in the same file.
+    /// </summary>
+    [Fact]
+    public async Task Stories_travel_with_the_rules_of_what_is_public_and_name_only_items_that_are_exported()
+    {
+        await using var archive = await app.NewArchiveAsync();
+        using var admin = archive.CreateClient();
+        await Browser.LogInAsCuratorAsync(admin);
+        var shownId = await archive.WithDbAsync(async db =>
+        {
+            var now = DateTime.UtcNow;
+            var collection = new Collection { Title = "Streets", CreatedAt = now };
+            ArchiveItem Item(string title, bool published, DateOnly? from = null)
+            {
+                var item = new ArchiveItem { Title = title, Collection = collection, CreatedAt = now, UpdatedAt = now, Status = ItemStatus.Draft, PublicFrom = from };
+                if (published)
+                    item.Publish(now);
+                return item;
+            }
+
+            var shown = Item("Shown flood", true);
+            var draft = Item("Draft flood", false);
+            var embargoed = Item("Embargoed flood", true, DateOnly.FromDateTime(DateTime.UtcNow).AddDays(30));
+            var binned = Item("Binned flood", true);
+            binned.MoveToBin(now);
+            db.ArchiveItems.AddRange(shown, draft, embargoed, binned);
+            Story Make(string title, StoryStatus status, params (StoryBlockKind Kind, string? Text, ArchiveItem? Item, string? Caption)[] blocks)
+            {
+                var story = new Story { Title = title, Status = StoryStatus.Draft, CreatedAt = now, UpdatedAt = now };
+                if (status == StoryStatus.Published)
+                    story.Publish(now);
+                foreach (var (kind, text, item, caption) in blocks)
+                    story.Blocks.Add(new StoryBlock { Position = story.Blocks.Count, Kind = kind, Text = text, ArchiveItem = item, Caption = caption });
+                db.Stories.Add(story);
+                return story;
+            }
+
+            const StoryBlockKind T = StoryBlockKind.Text, I = StoryBlockKind.Item;
+            Make("Public story", StoryStatus.Published, (T, "Opening words", null, null), (I, null, shown, "Shown caption"), (I, null, draft, "Draft caption"),
+                (I, null, embargoed, "Embargoed caption"), (I, null, binned, "Binned caption"));
+            Make("Only hidden items", StoryStatus.Published, (I, null, draft, "Hidden one"), (I, null, embargoed, "Hidden two"));
+            Make("A draft story", StoryStatus.Draft, (T, "Draft words", null, null), (I, null, draft, "Draft story caption"));
+            var gone = Make("A story in the bin", StoryStatus.Published, (T, "Bin words", null, null));
+            gone.MoveToBin(now);
+            await db.SaveChangesAsync();
+            return shown.Id;
+        });
+
+        using var publicZip = await ExportAsync(admin, publishedOnly: true, includePersonalData: false);
+        using var fullZip = await ExportAsync(admin, publishedOnly: false, includePersonalData: true);
+
+        var publicJson = JsonDocument.Parse(Read(publicZip, "archive.json")).RootElement;
+        var publicStories = publicJson.GetProperty("stories").EnumerateArray().ToList();
+        Assert.Equal(["Public story"], publicStories.Select(s => s.GetProperty("title").GetString()));
+        var parts = publicStories[0].GetProperty("blocks").EnumerateArray().ToList();
+        Assert.Equal(["Text", "Item"], parts.Select(p => p.GetProperty("kind").GetString()));
+        Assert.Equal(shownId, parts[1].GetProperty("itemId").GetInt32());
+        Assert.Equal("Shown caption", parts[1].GetProperty("caption").GetString());
+        var publicText = Encoding.UTF8.GetString(Read(publicZip, "archive.json"));
+        foreach (var hidden in new[] { "Draft caption", "Embargoed caption", "Binned caption", "Hidden one", "Hidden two", "Draft words", "Draft story caption", "Bin words", "Only hidden items", "A draft story" })
+            Assert.DoesNotContain(hidden, publicText);
+
+        var fullJson = JsonDocument.Parse(Read(fullZip, "archive.json")).RootElement;
+        var fullStories = fullJson.GetProperty("stories").EnumerateArray().ToList();
+        Assert.Equal(["Public story", "Only hidden items", "A draft story"], fullStories.Select(s => s.GetProperty("title").GetString()));
+        var fullParts = fullStories[0].GetProperty("blocks").EnumerateArray().Select(p => p.GetProperty("caption").GetString() ?? p.GetProperty("text").GetString()).ToList();
+        Assert.Equal(["Opening words", "Shown caption", "Draft caption", "Embargoed caption"], fullParts);
+        Assert.DoesNotContain("Bin words", Encoding.UTF8.GetString(Read(fullZip, "archive.json")));
+        Assert.DoesNotContain("Binned caption", Encoding.UTF8.GetString(Read(fullZip, "archive.json")));
+
+        foreach (var document in new[] { publicJson, fullJson })
+        {
+            var exported = document.GetProperty("items").EnumerateArray().Select(i => i.GetProperty("id").GetInt32()).ToHashSet();
+            foreach (var story in document.GetProperty("stories").EnumerateArray())
+                foreach (var part in story.GetProperty("blocks").EnumerateArray().Where(p => p.GetProperty("kind").GetString() == "Item"))
+                    Assert.Contains(part.GetProperty("itemId").GetInt32(), exported);
+        }
     }
 
     private static async Task<ZipArchive> ExportAsync(HttpClient admin, bool publishedOnly, bool includePersonalData)

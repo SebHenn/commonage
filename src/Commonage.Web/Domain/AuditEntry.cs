@@ -65,6 +65,18 @@ public enum AuditAction
     ArchiveImported,
     CollectionCreatedByImport,
     ImportPhotosMissing,
+    StoryCreated,
+    StoryChanged,
+    StoryPublished,
+    StoryUnpublished,
+    StoryItemAdded,
+    StoryItemRemoved,
+    StoryBlocksArranged,
+    StoriesArranged,
+    StoryMovedToBin,
+    StoryRestored,
+    StoryDeleted,
+    StoryPurged,
 }
 
 /// <summary>
@@ -90,6 +102,10 @@ public class AuditEntry
     /// <summary>The item concerned, if any. Set to null when the item is deleted; <see cref="Subject"/> keeps its title.</summary>
     public int? ArchiveItemId { get; set; }
     public ArchiveItem? ArchiveItem { get; set; }
+
+    /// <summary>The story concerned, if any. Set to null when the story is deleted; <see cref="Subject"/> keeps its title.</summary>
+    public int? StoryId { get; set; }
+    public Story? Story { get; set; }
 
     /// <summary>What the action was about, as it was called at the time: an item's or collection's title, an account name.</summary>
     public string? Subject { get; set; }

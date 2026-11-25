@@ -76,6 +76,10 @@ public static class ExportImportTable
         Add("ExportNote", ExportFieldDecision.Dropped, "Notes from visitors are for the curators of the archive they were sent to.",
             "Kind", "Message", "Name", "Email", "ReceivedAt", "HandledAt", "PersonalDetailsRemovedAt");
 
+        const string StoryNotImported = "Stories are not imported: they are made of the items of the other archive, and an import makes new items with new numbers. The dry run only counts them.";
+        Add("ExportStory", ExportFieldDecision.Dropped, StoryNotImported, "Id", "Title", "Summary", "Status", "CreatedAt", "PublishedAt", "Position", "Blocks");
+        Add("ExportStoryBlock", ExportFieldDecision.Dropped, StoryNotImported, "Kind", "Text", "ItemId", "Caption");
+
         Add("ExportFile", ExportFieldDecision.ReadForDecision, "Only the key that the path of the file is checked against.", "Id");
         Add("ExportFile", ExportFieldDecision.Read, "Comes with the photo; the path is only a key into the ZIP file and never a path on disk.",
             "Path", "OriginalFileName", "Sha256", "AltText", "Caption", "Position", "Rotation");
@@ -97,6 +101,38 @@ public sealed class ImportedArchive
     public List<ImportedCollection>? Collections { get; set; }
     public List<ImportedTag>? Tags { get; set; }
     public List<ImportedItem>? Items { get; set; }
+
+    /// <summary>Only how many stories there are: they are never read, see <see cref="ExportImportTable"/>.</summary>
+    public StoryCount? Stories { get; set; }
+}
+
+/// <summary>The number of stories of an export. Reading skips every story without making an object of it.</summary>
+[JsonConverter(typeof(StoryCountConverter))]
+public sealed record StoryCount(int Count);
+
+internal sealed class StoryCountConverter : JsonConverter<StoryCount>
+{
+    /// <summary>The count stops here; the stories beyond it are skipped all the same.</summary>
+    public const int Cap = 1_000_000;
+
+    public override StoryCount? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType == JsonTokenType.Null)
+            return null;
+        if (reader.TokenType != JsonTokenType.StartArray)
+            throw new JsonException();
+        var count = 0;
+        while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+        {
+            reader.Skip();
+            if (count < Cap)
+                count++;
+        }
+
+        return new StoryCount(count);
+    }
+
+    public override void Write(Utf8JsonWriter writer, StoryCount value, JsonSerializerOptions options) => throw new NotSupportedException();
 }
 
 public sealed class ImportedCollection
