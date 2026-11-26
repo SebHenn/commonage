@@ -29,7 +29,7 @@ public class ArchiveExporter(
     ILogger<ArchiveExporter> logger)
 {
     public const string Format = "commonage-export";
-    public const int Version = 9;
+    public const int Version = 10;
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -54,6 +54,8 @@ public class ArchiveExporter(
         // One day for every decision of the export: items, stories and their blocks agree on what is embargoed.
         var today = db.Today;
         var source = (options.PublishedOnly ? db.ArchiveItems.Where(Visibility.Item(today)) : db.ArchiveItems).AsNoTracking();
+        // The people of this export, decided once: the list under "people", the lists of the items and the spreadsheet column all use it.
+        var people = PeopleExport.Select(db, options.PublishedOnly, options.IncludePersonalData, today);
         if (options.PublishedOnly)
         {
             var used = await source.Select(i => i.CollectionId).Distinct().ToListAsync(cancellationToken);
@@ -123,7 +125,7 @@ public class ArchiveExporter(
             Property(json, "tags", tags);
             json.WritePropertyName("items");
             json.WriteStartArray();
-            await foreach (var item in DescribeItemsAsync(source, options, problems, cancellationToken))
+            await foreach (var item in DescribeItemsAsync(source, people, options, problems, cancellationToken))
             {
                 JsonSerializer.Serialize(json, item, JsonOptions);
                 if (json.BytesPending > 64 * 1024)
@@ -141,14 +143,25 @@ public class ArchiveExporter(
             }
 
             json.WriteEndArray();
+            json.WritePropertyName("people");
+            json.WriteStartArray();
+            await foreach (var person in DescribePeopleAsync(people, options, cancellationToken))
+            {
+                JsonSerializer.Serialize(json, person, JsonOptions);
+                if (json.BytesPending > 64 * 1024)
+                    await json.FlushAsync(cancellationToken);
+            }
+
+            json.WriteEndArray();
             Property(json, "settings", new ExportSettings(
                 settings.DefaultLanguage, settings.ContentLanguage, settings.OtherContentLanguages, settings.AccentColor, settings.TimeZone, settings.DefaultRightsUri, settings.AllowSearchEngines, settings.RequireTwoFactor, settings.LargePhotos, settings.PrivacyReviewed,
                 settings.ImprintNotNeeded, settings.RestoreTestedAt, settings.ActivityLogKeptYears, settings.RejectedKeptMonths, settings.AcceptVisitorNotes, logoPath,
                 texts.Select(t => new ExportText(t.Language, t.Kind, t.Text)).ToList()));
             json.WriteEndObject();
         }, cancellationToken);
+        var peopleNames = await PeopleExport.NamesAsync(people, cancellationToken);
         await WriteEntryAsync(zip, "items.csv", CompressionLevel.Optimal,
-            stream => ItemsCsv.WriteAsync(stream, exportedCollections.ToDictionary(c => c.Id, c => c.Title), DescribeItemsAsync(source, options, problems, cancellationToken), cancellationToken), cancellationToken);
+            stream => ItemsCsv.WriteAsync(stream, exportedCollections.ToDictionary(c => c.Id, c => c.Title), peopleNames, DescribeItemsAsync(source, people, options, problems, cancellationToken), cancellationToken), cancellationToken);
         var readme = Readme(localizer);
         await WriteEntryAsync(zip, "README.txt", CompressionLevel.Optimal,
             stream => stream.WriteAsync(Encoding.UTF8.GetBytes(readme), cancellationToken).AsTask(), cancellationToken);
@@ -214,9 +227,50 @@ public class ArchiveExporter(
         }
     }
 
+    /// <summary>
+    /// The people in the order of their ids, a batch at a time. A copy of what is public holds the name, the other names marked
+    /// for visitors and the biography, and dates only for someone marked as having died: no note, no choice, no sort name and no
+    /// address. A copy of everything without personal data also leaves out every other name not marked for visitors, the note,
+    /// and the dates of anyone who may be living. A copy with personal data holds everything.
+    /// </summary>
+    private async IAsyncEnumerable<ExportPerson> DescribePeopleAsync(
+        IQueryable<Person> people, ExportOptions options,
+        [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken)
+    {
+        var last = 0;
+        while (true)
+        {
+            var batch = await PeopleExport.BatchAsync(people, last, 100, cancellationToken);
+            if (batch.Count == 0)
+                yield break;
+            last = batch[^1].Id;
+            foreach (var person in batch)
+            {
+                var everything = options.IncludePersonalData && !options.PublishedOnly;
+                var dates = everything || person.HasDied;
+                var names = person.Names
+                    .Where(n => everything || n.ShownToVisitors)
+                    .OrderBy(n => n.Id)
+                    .Select(n => new ExportPersonName(n.Name, n.Kind, n.Language, n.ShownToVisitors)).ToList();
+                yield return new ExportPerson(
+                    person.Id,
+                    options.PublishedOnly ? null : person.PublicId,
+                    person.Name,
+                    options.PublishedOnly ? null : person.SortName,
+                    options.PublishedOnly ? null : person.Disclosure.ToString(),
+                    dates && person.BornText is not null ? new ExportDate(person.BornText, person.BornFrom, person.BornTo) : null,
+                    dates && person.DiedText is not null ? new ExportDate(person.DiedText, person.DiedFrom, person.DiedTo) : null,
+                    person.Biography,
+                    everything ? person.CuratorNote : null,
+                    person.CreatedAt,
+                    names);
+            }
+        }
+    }
+
     /// <summary>The items in the order of their ids, read a batch at a time.</summary>
     private async IAsyncEnumerable<ExportItem> DescribeItemsAsync(
-        IQueryable<ArchiveItem> source, ExportOptions options, Dictionary<int, string> problems,
+        IQueryable<ArchiveItem> source, IQueryable<Person> people, ExportOptions options, Dictionary<int, string> problems,
         [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken)
     {
         await foreach (var ids in ItemBatchesAsync(source.Select(i => i.Id), cancellationToken))
@@ -233,6 +287,7 @@ public class ArchiveExporter(
             var notes = options.PublishedOnly
                 ? null
                 : (await db.VisitorNotes.AsNoTracking().Where(n => ids.Contains(n.ArchiveItemId)).OrderBy(n => n.Id).ToListAsync(cancellationToken)).ToLookup(n => n.ArchiveItemId);
+            var links = await PeopleExport.LinksAsync(db, people, ids, cancellationToken);
             foreach (var item in items)
             {
                 var files = (options.PublishedOnly && item.MediaLevel == MediaLevel.RecordOnly ? [] : item.MediaFiles).OrderBy(f => f.Position).ThenBy(f => f.Id).Select(file =>
@@ -240,7 +295,7 @@ public class ArchiveExporter(
                     var problem = problems.GetValueOrDefault(file.Id);
                     return Describe(file, problem == "missing" ? null : PathOf(item.Id, file), problem);
                 }).ToList();
-                yield return Describe(item, files, notes?[item.Id], options);
+                yield return Describe(item, files, notes?[item.Id], links[item.Id].ToList(), options);
             }
         }
     }
@@ -292,7 +347,7 @@ public class ArchiveExporter(
     private static ExportFile Describe(MediaFile file, string? path, string? problem) =>
         new(file.Id, path, file.OriginalFileName, file.ContentType, file.SizeBytes, file.Sha256, file.UploadedAt, file.AltText, file.Caption, file.Position, file.Rotation, file.PageCount, problem);
 
-    private static ExportItem Describe(ArchiveItem item, List<ExportFile> files, IEnumerable<VisitorNote>? notes, ExportOptions options) => new(
+    private static ExportItem Describe(ArchiveItem item, List<ExportFile> files, IEnumerable<VisitorNote>? notes, IReadOnlyList<int> people, ExportOptions options) => new(
         item.Id,
         item.CollectionId,
         item.Title,
@@ -300,6 +355,7 @@ public class ArchiveExporter(
         item.Status,
         item.DateText is null ? null : new ExportDate(item.DateText, item.DateFrom, item.DateTo),
         item.Tags.Select(t => t.Name).Order(StringComparer.Ordinal).ToList(),
+        people,
         item.CreatedAt,
         item.UpdatedAt,
         item.PublishedAt,
@@ -399,6 +455,7 @@ public class ArchiveExporter(
         Paragraph(localizer["Curators may have turned a photo: archive.json gives its \"rotation\" in degrees clockwise, and its \"position\" among the photos of the item."], "    ");
         Entry("branding/", localizer["The archive's logo, if it has one. Its name and pages are under \"settings\" in archive.json."]);
         Paragraph(localizer["\"stories\" in archive.json lists the stories: each has its parts in order, and a part is either a text or the number of an item under \"items\" with a caption."]);
+        Paragraph(localizer["\"people\" in archive.json lists the people with their names, other names, dates as written and biography. Each item lists the people it names by the number of the person. A copy of what is public holds only the people that visitors may see, and a copy without personal data holds no person who is only for curators. Where a person may be living, their dates and their other names that visitors do not see are left out."]);
         Paragraph(localizer["\"includesPersonalData\" in archive.json says whether the names of contributors, photographers and authors and contributors' email addresses are included. If they are, keep this file as carefully as the archive itself."]);
         Paragraph(localizer["\"contentLanguage\" under \"settings\" says which language most of the material is written in, as a code such as \"de\" or \"pl\". \"mul\" means several languages, none of them most."]);
         Paragraph(localizer["A file with \"problem\": \"missing\" was not found on the server; \"checksumMismatch\" means it no longer matches the checksum taken when it was uploaded. Both should be looked into."]);
@@ -450,6 +507,22 @@ internal record ExportStory(int Id, string Title, string? Summary, StoryStatus S
 
 internal record ExportStoryBlock(StoryBlockKind Kind, string? Text, int? ItemId, string? Caption);
 
+/// <summary>A person: the names, dates as written and a biography. What is left out depends on the kind of export. Items list people by this id.</summary>
+internal record ExportPerson(
+    int Id,
+    string? PublicId,
+    string Name,
+    string? SortName,
+    string? Disclosure,
+    ExportDate? Born,
+    ExportDate? Died,
+    string? Biography,
+    string? CuratorNote,
+    DateTime CreatedAt,
+    IReadOnlyList<ExportPersonName> Names);
+
+internal record ExportPersonName(string Name, PersonNameKind Kind, string? Language, bool ShownToVisitors);
+
 /// <summary>A tag and what it names. Items list their tags by name.</summary>
 internal record ExportTag(string Name, TagKind Kind);
 
@@ -461,6 +534,7 @@ internal record ExportItem(
     ItemStatus Status,
     ExportDate? Date,
     IReadOnlyList<string> Tags,
+    IReadOnlyList<int> People,
     DateTime CreatedAt,
     DateTime UpdatedAt,
     DateTime? PublishedAt,
@@ -530,11 +604,11 @@ internal static class ItemsCsv
     [
         "id", "collection", "title", "status", "date", "date_from", "date_to", "tags", "description",
         "rights", "rights_holder", "credit", "reference_number", "contributor_rights", "contributor_rights_holder",
-        "contributor_name", "contributor_email", "files",
+        "contributor_name", "contributor_email", "files", "people",
     ];
 
     public static async Task WriteAsync(
-        Stream stream, IReadOnlyDictionary<int, string> collections, IAsyncEnumerable<ExportItem> items, CancellationToken cancellationToken)
+        Stream stream, IReadOnlyDictionary<int, string> collections, IReadOnlyDictionary<int, string> people, IAsyncEnumerable<ExportItem> items, CancellationToken cancellationToken)
     {
         // The byte order mark tells spreadsheet programs that the file is UTF-8.
         await using var writer = new StreamWriter(stream, new UTF8Encoding(encoderShouldEmitUTF8Identifier: true), leaveOpen: true);
@@ -561,6 +635,7 @@ internal static class ItemsCsv
                 item.Contribution?.ContributorName,
                 item.Contribution?.ContributorEmail,
                 string.Join("; ", item.Files.Select(f => f.Path ?? f.OriginalFileName)),
+                string.Join("; ", item.People.Select(id => people.GetValueOrDefault(id)).Where(n => n is not null)),
             ]);
         }
     }
