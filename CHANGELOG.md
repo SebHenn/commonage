@@ -5,6 +5,14 @@ version may change things that need attention when updating, and these notes say
 
 ## Unreleased
 
+Parts 1 to 3 of "People" (M30) must not be released without part 4: a release in between fails `ReleaseGuardTests`.
+
+### For curators
+
+- **People, first part.** Under "People" in the admin area, curators keep a list of the people who appear in the archive: a name, a sort name, dates of birth and death, a biography, other names (birth name, married name, nickname, other spelling or script, with a language) and a note that only curators see. A new person is seen by curators only. Showing a person to visitors is a second step that lists what they will see; only a person marked as having died shows dates, and every other name is hidden from visitors until it is ticked. The page of an item has an "Add a person" step that works without JavaScript: one match links at once, several ask which one is meant, none asks whether to make a new person. A note says when a public tag of the same name still exists. The personal-data search under Contributors also finds people. The preview shows a person as visitors will see them. Helpers see nothing of people. Visitors cannot see people yet.
+- **Export format 10** lists people and the people of each item; the spreadsheet has a "people" column. A copy of what is public holds only people visitors may see, without address, sort name, choice or note. An import brings people in as new people that only curators see, with their other names hidden from visitors, and never matches them with people that are here. Formats 4 to 9 still import.
+- The demo archive has two people: one who has died (shown to visitors once the pages for people exist) with an other name marked for visitors, and one who stays with curators only.
+
 ## 0.7.0 (2026-11-26)
 
 **Updating:** this version adds a migration (the story tables); it runs when the app starts, and `update.sh` makes a backup first as always. Pictures need no regeneration. The export format is now 9; an export of format 4 to 8 still imports (the import does not read stories).
