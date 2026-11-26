@@ -45,6 +45,28 @@ last. Open one to:
 Visitors see the years a collection's published items are from, such as "1930–1965", on its page and its card. Nothing
 needs to be entered for that.
 
+## Stories
+
+A story puts texts and items in an order you choose, for example a street, a family or a flood. **Stories** in the admin
+area lists them; "New story" asks for a title only.
+
+- **Write it.** A story has a title, a few words of summary, and parts: a text, or an item of the archive with a caption.
+  Add an item by its number or by pasting its address on this site. Move parts and stories earlier or later with the buttons.
+- **Preview** shows it as visitors will see it. A part whose item is not public is left out there, and the page says so
+  here, only for you.
+- **Publish** when it is ready. A published story is public as soon as it has a text, or an item visitors may see. An item
+  that is hidden, not published yet or in the bin leaves no trace for visitors; a story with nothing left to show
+  disappears for them.
+- **What you write is not checked.** The title, summary, texts and captions are shown as you wrote them. Do not name a
+  hidden item or a person who should not be named there.
+- **Removing is immediate.** A removed part or text is gone at once, and story text has no history. Copy what you may need
+  again.
+- **The bin.** "Move to bin" takes the story off the website at once. On the **Bin** page you can restore it, with its
+  parts, for 30 days, or delete it for good. After 30 days it is deleted for good by itself. Its items stay.
+- **On an item's page** you see "Used in N stories" with links, so you know where an item appears before you unpublish it.
+
+Helpers do not see stories.
+
 ## Several photos, and letters
 
 - **Order:** "Earlier" and "Later" move a photo, and it happens at once for visitors too. The first photo is the cover, the one seen

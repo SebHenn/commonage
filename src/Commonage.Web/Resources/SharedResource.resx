@@ -24,10 +24,11 @@
   <data name="A new name changes the tag on every item that has it, also in the search." xml:space="preserve"><value>A new name changes the tag on every item that has it, also in the search.</value></data>
   <data name="A new setup link lets the person choose a new password, for example when they forgot theirs. Earlier links stop working. A disabled account cannot log in, but its history stays in the activity log." xml:space="preserve"><value>A new setup link lets the person choose a new password, for example when they forgot theirs. Earlier links stop working. A disabled account cannot log in, but its history stays in the activity log.</value></data>
   <data name="A photo description can be at most {0, plural, one {# character} other {# characters}} long." xml:space="preserve"><value>A photo description can be at most {0, plural, one {# character} other {# characters}} long.</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
+  <data name="A published story is public as soon as it has a text, or an item that visitors may see." xml:space="preserve"><value>A published story is public as soon as it has a text, or an item that visitors may see.</value></data>
   <data name="A recording needs its transcript in the description before it is published, or tick that a transcript will follow." xml:space="preserve"><value>A recording needs its transcript in the description before it is published, or tick that a transcript will follow.</value></data>
   <data name="A rights statement" xml:space="preserve"><value>A rights statement</value></data>
   <data name="A story can have at most {0, plural, one {# part} other {# parts}}." xml:space="preserve"><value>A story can have at most {0, plural, one {# part} other {# parts}}.</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
-  <data name="A story puts text and items in an order of your choice. Visitors cannot read stories yet." xml:space="preserve"><value>A story puts text and items in an order of your choice. Visitors cannot read stories yet.</value></data>
+  <data name="A story puts text and items in an order of your choice. Visitors read the published ones under Stories." xml:space="preserve"><value>A story puts text and items in an order of your choice. Visitors read the published ones under Stories.</value></data>
   <data name="A tag can be at most {0, plural, one {# character} other {# characters}} long." xml:space="preserve"><value>A tag can be at most {0, plural, one {# character} other {# characters}} long.</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="A tag can be at most {1} characters long." xml:space="preserve"><value>A tag can be at most {1} characters long.</value></data>
   <data name="A tag name cannot contain commas or semicolons." xml:space="preserve"><value>A tag name cannot contain commas or semicolons.</value></data>
@@ -221,13 +222,14 @@
   <data name="Delete this item for good, with all its photos and original files? This cannot be undone." xml:space="preserve"><value>Delete this item for good, with all its photos and original files? This cannot be undone.</value></data>
   <data name="Delete this note for good? This cannot be undone." xml:space="preserve"><value>Delete this note for good? This cannot be undone.</value></data>
   <data name="Delete this photo and its original file for good? This cannot be undone." xml:space="preserve"><value>Delete this photo and its original file for good? This cannot be undone.</value></data>
+  <data name="Delete this story for good, with all its parts? This cannot be undone. The items in it stay in the archive." xml:space="preserve"><value>Delete this story for good, with all its parts? This cannot be undone. The items in it stay in the archive.</value></data>
   <data name="Deleted a photo for good" xml:space="preserve"><value>Deleted a photo for good</value></data>
   <data name="Deleted a photo for good after its time in the bin" xml:space="preserve"><value>Deleted a photo for good after its time in the bin</value></data>
   <data name="Deleted a visitor's note" xml:space="preserve"><value>Deleted a visitor's note</value></data>
   <data name="Deleted activity log entries older than the archive keeps them" xml:space="preserve"><value>Deleted activity log entries older than the archive keeps them</value></data>
   <data name="Deleted all unused tags" xml:space="preserve"><value>Deleted all unused tags</value></data>
   <data name="Deleted for good on {0}" xml:space="preserve"><value>Deleted for good on {0}</value></data>
-  <data name="Deleted items and photos stay here for {0, plural, one {# day} other {# days}}, hidden from everyone but curators. You can restore them until then. After that they are deleted for good, with their original files." xml:space="preserve"><value>Deleted items and photos stay here for {0, plural, one {# day} other {# days}}, hidden from everyone but curators. You can restore them until then. After that they are deleted for good, with their original files.</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
+  <data name="Deleted items, photos and stories stay here for {0, plural, one {# day} other {# days}}, hidden from everyone but curators. You can restore them until then. After that they are deleted for good, with their original files." xml:space="preserve"><value>Deleted items, photos and stories stay here for {0, plural, one {# day} other {# days}}, hidden from everyone but curators. You can restore them until then. After that they are deleted for good, with their original files.</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="Deleted the account" xml:space="preserve"><value>Deleted the account</value></data>
   <data name="Deleted the empty collection" xml:space="preserve"><value>Deleted the empty collection</value></data>
   <data name="Deleted the item for good" xml:space="preserve"><value>Deleted the item for good</value></data>
@@ -738,6 +740,7 @@
   <data name="Show all tags" xml:space="preserve"><value>Show all tags</value></data>
   <data name="Show everything" xml:space="preserve"><value>Show everything</value></data>
   <data name="Show my name with what I send in" xml:space="preserve"><value>Show my name with what I send in</value></data>
+  <data name="Showing the first {0}." xml:space="preserve"><value>Showing the first {0}.</value></data>
   <data name="Showing the newest {0}." xml:space="preserve"><value>Showing the newest {0}.</value></data>
   <data name="Shown as a record only" xml:space="preserve"><value>Shown as a record only</value></data>
   <data name="Shown to admins on this page and in the list of accounts. Never to visitors." xml:space="preserve"><value>Shown to admins on this page and in the list of accounts. Never to visitors.</value></data>
@@ -900,7 +903,12 @@
   <data name="The spreadsheet is too large." xml:space="preserve"><value>The spreadsheet is too large.</value></data>
   <data name="The spreadsheet names files, but no ZIP file or folder was given to find them in." xml:space="preserve"><value>The spreadsheet names files, but no ZIP file or folder was given to find them in.</value></data>
   <data name="The story is a draft again." xml:space="preserve"><value>The story is a draft again.</value></data>
+  <data name="The story is deleted for good." xml:space="preserve"><value>The story is deleted for good.</value></data>
+  <data name="The story is in the bin. You can restore it there for {0, plural, one {# day} other {# days}}." xml:space="preserve"><value>The story is in the bin. You can restore it there for {0, plural, one {# day} other {# days}}.</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="The story is published." xml:space="preserve"><value>The story is published.</value></data>
+  <data name="The story is restored and public again." xml:space="preserve"><value>The story is restored and public again.</value></data>
+  <data name="The story is restored." xml:space="preserve"><value>The story is restored.</value></data>
+  <data name="The story leaves the website at once. You can restore it from the bin for {0, plural, one {# day} other {# days}}." xml:space="preserve"><value>The story leaves the website at once. You can restore it from the bin for {0, plural, one {# day} other {# days}}.</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="The summary can be at most {1} characters long." xml:space="preserve"><value>The summary can be at most {1} characters long.</value></data>
   <data name="The tag “{0}” is deleted." xml:space="preserve"><value>The tag “{0}” is deleted.</value></data>
   <data name="The text can be at most {0} characters long." xml:space="preserve"><value>The text can be at most {0} characters long.</value></data>
@@ -952,6 +960,7 @@
   <data name="This is your own account. Another admin can change its role, disable or delete it." xml:space="preserve"><value>This is your own account. Another admin can change its role, disable or delete it.</value></data>
   <data name="This item is in the bin." xml:space="preserve"><value>This item is in the bin.</value></data>
   <data name="This item is in the bin. Take it out of the bin first." xml:space="preserve"><value>This item is in the bin. Take it out of the bin first.</value></data>
+  <data name="This item is not public, so visitors do not see it in these stories yet." xml:space="preserve"><value>This item is not public, so visitors do not see it in these stories yet.</value></data>
   <data name="This item no longer exists." xml:space="preserve"><value>This item no longer exists.</value></data>
   <data name="This item was turned down or withdrawn, and cannot be part of a story." xml:space="preserve"><value>This item was turned down or withdrawn, and cannot be part of a story.</value></data>
   <data name="This link is closed" xml:space="preserve"><value>This link is closed</value></data>
@@ -1021,7 +1030,6 @@
   <data name="Visitor" xml:space="preserve"><value>Visitor</value></data>
   <data name="Visitors can open a photo at about 3000 pixels, to read a letter or look at a face. Without this they only get a smaller one, about 1600 pixels, and the archive saves the disk space. The original stays private either way, and larger versions have no location data or other embedded details either." xml:space="preserve"><value>Visitors can open a photo at about 3000 pixels, to read a letter or look at a face. Without this they only get a smaller one, about 1600 pixels, and the archive saves the disk space. The original stays private either way, and larger versions have no location data or other embedded details either.</value></data>
   <data name="Visitors can then send the curators more about an item, a correction, or a request to take it down. Only curators read it, under “Notes from visitors”. Name and email address are optional, and the privacy page should say that the archive keeps them." xml:space="preserve"><value>Visitors can then send the curators more about an item, a correction, or a request to take it down. Only curators read it, under “Notes from visitors”. Name and email address are optional, and the privacy page should say that the archive keeps them.</value></data>
-  <data name="Visitors cannot read stories yet. A published story is the first thing they will see once they can." xml:space="preserve"><value>Visitors cannot read stories yet. A published story is the first thing they will see once they can.</value></data>
   <data name="Visitors do not see this item until {0}." xml:space="preserve"><value>Visitors do not see this item until {0}.</value></data>
   <data name="Visitors do not see this item: it is in the bin." xml:space="preserve"><value>Visitors do not see this item: it is in the bin.</value></data>
   <data name="Visitors do not see this item: it is not published." xml:space="preserve"><value>Visitors do not see this item: it is not published.</value></data>
@@ -1029,6 +1037,7 @@
   <data name="Visitors do not see this photo yet or at all" xml:space="preserve"><value>Visitors do not see this photo yet or at all</value></data>
   <data name="Visitors find all places and all people on pages of their own, once an item with the tag is published. That page lists every person's name, so name living people only when they agree." xml:space="preserve"><value>Visitors find all places and all people on pages of their own, once an item with the tag is published. That page lists every person's name, so name living people only when they agree.</value></data>
   <data name="Visitors find the collections in this order." xml:space="preserve"><value>Visitors find the collections in this order.</value></data>
+  <data name="Visitors see this item in a story only while it is public. If you unpublish it or move it to the bin, it leaves the published stories, and a story with nothing left to show disappears for visitors." xml:space="preserve"><value>Visitors see this item in a story only while it is public. If you unpublish it or move it to the bin, it leaves the published stories, and a story with nothing left to show disappears for visitors.</value></data>
   <data name="Visitors see this item without its photos." xml:space="preserve"><value>Visitors see this item without its photos.</value></data>
   <data name="Waiting" xml:space="preserve"><value>Waiting</value></data>
   <data name="Waiting for review: {0}" xml:space="preserve"><value>Waiting for review: {0}</value></data>
@@ -1130,6 +1139,7 @@
   <data name="{0, plural, one {One tag is not on any item, not even one in the bin.} other {# tags are not on any item, not even one in the bin.}}" xml:space="preserve"><value>{0, plural, one {One tag is not on any item, not even one in the bin.} other {# tags are not on any item, not even one in the bin.}}</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="{0, plural, one {Only one photo is shown: the chosen one, or else that of the newest published item.} other {At most # photos are shown: the chosen one, then those of published items, the newest items first.}}" xml:space="preserve"><value>{0, plural, one {Only one photo is shown: the chosen one, or else that of the newest published item.} other {At most # photos are shown: the chosen one, then those of published items, the newest items first.}}</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="{0, plural, one {The preview is being made again.} other {# previews are being made again.}}" xml:space="preserve"><value>{0, plural, one {The preview is being made again.} other {# previews are being made again.}}</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
+  <data name="{0, plural, one {Used in # story} other {Used in # stories}}" xml:space="preserve"><value>{0, plural, one {Used in # story} other {Used in # stories}}</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="{0} GB" xml:space="preserve"><value>{0} GB</value></data>
   <data name="{0} KB" xml:space="preserve"><value>{0} KB</value></data>
   <data name="{0} MB" xml:space="preserve"><value>{0} MB</value></data>

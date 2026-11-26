@@ -6,9 +6,9 @@
 }
 
 <h1>@ViewData["Title"]</h1>
-<p class="col-lg-8">@T.Plural("Deleted items and photos stay here for {0, plural, one {# day} other {# days}}, hidden from everyone but curators. You can restore them until then. After that they are deleted for good, with their original files.", ArchiveBin.RetentionDays)</p>
+<p class="col-lg-8">@T.Plural("Deleted items, photos and stories stay here for {0, plural, one {# day} other {# days}}, hidden from everyone but curators. You can restore them until then. After that they are deleted for good, with their original files.", ArchiveBin.RetentionDays)</p>
 
-@if (Model.Items.Count == 0 && Model.Photos.Count == 0)
+@if (Model.Items.Count == 0 && Model.Photos.Count == 0 && Model.Stories.Count == 0)
 {
     <p class="text-muted">@T["The bin is empty."]</p>
 }
@@ -56,7 +56,7 @@
 
 @if (Model.Photos.Count > 0)
 {
-    <section aria-labelledby="bin-photos-heading">
+    <section class="mb-5" aria-labelledby="bin-photos-heading">
         <h2 id="bin-photos-heading" class="h4">@T["Photos"]</h2>
         @if (Model.Photos.Count == BinModel.MaxShown)
         {
@@ -84,6 +84,43 @@
                                 </form>
                                 <form method="post" asp-page-handler="DeletePhoto" asp-route-id="@file.Id"
                                       data-confirm="@T["Delete this photo and its original file for good? This cannot be undone."]">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">@T["Delete for good"]</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+}
+
+@if (Model.Stories.Count > 0)
+{
+    <section aria-labelledby="bin-stories-heading">
+        <h2 id="bin-stories-heading" class="h4">@T["Stories"]</h2>
+        @if (Model.Stories.Count == BinModel.MaxShown)
+        {
+            <p class="text-muted small">@T["Showing the newest {0}.", BinModel.MaxShown]</p>
+        }
+        <div class="row g-3">
+            @foreach (var story in Model.Stories)
+            {
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3 class="h6 text-break">@story.Title</h3>
+                            <p class="small text-muted mb-2">
+                                @(story.Status == StoryStatus.Published ? T["Published"] : T["Draft"]) · @T.Plural("{0, plural, one {# part} other {# parts}}", story.BlockCount)<br />
+                                @T["Moved to the bin on {0}", Dates.Day(story.DeletedAt)]<br />
+                                @T["Deleted for good on {0}", Dates.Day(ArchiveBin.GoneForGoodOn(story.DeletedAt))]
+                            </p>
+                            <div class="d-flex flex-wrap gap-2">
+                                <form method="post" asp-page-handler="RestoreStory" asp-route-id="@story.Id">
+                                    <button type="submit" class="btn btn-sm btn-primary">@T["Restore"]</button>
+                                </form>
+                                <form method="post" asp-page-handler="DeleteStory" asp-route-id="@story.Id"
+                                      data-confirm="@T["Delete this story for good, with all its parts? This cannot be undone. The items in it stay in the archive."]">
                                     <button type="submit" class="btn btn-sm btn-outline-danger">@T["Delete for good"]</button>
                                 </form>
                             </div>

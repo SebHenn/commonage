@@ -1,6 +1,6 @@
 # Plan for M29: stories and exhibitions
 
-Status: **decided (see "Decisions"); part 1 not started.** Three parts, in this order, each its own pull request, all three in
+Status: **decided (see "Decisions"); all three parts built.** Three parts, in this order, each its own pull request, all three in
 one release. The plan goes to the `privacy-reviewer` agent before part 1 starts, because part 2 adds public addresses that show
 items by reference. The agent runs again after each part. Run `/gate` before each push and `/walkthrough` for the pages. Commit
 subjects follow `M29, first part: ...`.

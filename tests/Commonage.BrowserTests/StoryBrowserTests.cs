@@ -42,6 +42,18 @@ public class StoryBrowserTests(BrowserFixture app)
     }
 
     [Fact]
+    public async Task Opening_the_editor_does_not_move_focus_into_a_part()
+    {
+        var page = await app.LogInAsync();
+        await StoryWithTwoTextsAsync(page, "Quiet story");
+
+        await page.GotoAsync(page.Url.Split('#')[0].Split('?')[0]);
+
+        Assert.Equal(0, await page.Locator("[data-focus-on-load]").CountAsync());
+        Assert.DoesNotContain("block-", await page.EvaluateAsync<string>("document.activeElement.id"));
+    }
+
+    [Fact]
     public async Task Without_javascript_a_part_can_be_moved_and_removed()
     {
         var page = await app.LogInAsync(javaScript: false);

@@ -59,6 +59,16 @@ public class EditModel(
     /// <summary>Notes from visitors about this item that no curator has dealt with yet.</summary>
     public int OpenNotes { get; private set; }
 
+    /// <summary>The stories that name this item, for curators only: helpers do not see stories.</summary>
+    public IReadOnlyList<StoryUse> UsedInStories { get; private set; } = [];
+
+    /// <summary>How many stories name the item, also when the list is cut short.</summary>
+    public int UsedInStoryCount { get; private set; }
+
+    public const int MaxStoriesShown = 50;
+
+    public record StoryUse(int Id, string Title, StoryStatus Status);
+
     /// <summary>The latest entries of the activity log about this item, newest first.</summary>
     public IReadOnlyList<AuditEntry> History { get; private set; } = [];
     public IReadOnlyList<ItemRevision> Revisions { get; private set; } = [];
@@ -756,6 +766,14 @@ public class EditModel(
         Contribution = item?.Contribution;
         if (item is not null)
         {
+            if (User.MayManage())
+            {
+                // Stories in the bin are hidden by the query filter of their parts.
+                var stories = db.StoryBlocks.Where(b => b.ArchiveItemId == item.Id).Select(b => b.Story).Distinct();
+                UsedInStoryCount = await stories.CountAsync();
+                UsedInStories = await stories.OrderBy(s => s.Position).ThenBy(s => s.Id).Take(MaxStoriesShown)
+                    .Select(s => new StoryUse(s.Id, s.Title, s.Status)).ToListAsync();
+            }
             OpenNotes = await db.VisitorNotes.CountAsync(n => n.ArchiveItemId == item.Id && n.HandledAt == null);
             MediaFiles = await db.MediaFiles.Where(f => f.ArchiveItemId == item.Id).OrderBy(f => f.Position).ThenBy(f => f.Id).ToListAsync();
             IdenticalFiles = await FindIdenticalFilesAsync(MediaFiles);

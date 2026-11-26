@@ -166,6 +166,21 @@ public partial class EditModel(CommonageDbContext db, AuditLog audit, IStringLoc
         return RedirectToPage(new { id });
     }
 
+    /// <summary>Moves the story to the bin: visitors lose it at once, and it can be restored there for 30 days. Its parts stay with it.</summary>
+    public async Task<IActionResult> OnPostMoveToBinAsync(int id, CancellationToken cancellationToken)
+    {
+        var story = await db.Stories.FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
+        if (story is null)
+            return NotFound();
+
+        story.MoveToBin(clock.GetUtcNow().UtcDateTime);
+        audit.Record(AuditAction.StoryMovedToBin, story.Title, story: story);
+        await db.SaveChangesAsync(cancellationToken);
+
+        TempData["Message"] = localizer.Plural("The story is in the bin. You can restore it there for {0, plural, one {# day} other {# days}}.", ArchiveBin.RetentionDays);
+        return RedirectToPage("/Admin/Stories/Index");
+    }
+
     public async Task<IActionResult> OnPostAddTextAsync(int id, string? text, CancellationToken cancellationToken)
     {
         var story = await db.Stories.FindAsync([id], cancellationToken);

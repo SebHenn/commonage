@@ -144,7 +144,7 @@ tries that setting. Text goes into XML through `XmlText`, because one pasted con
 
 Stories (`Pages/Stories`, `Search/StoryCards.cs`): public pages start from `db.VisibleStories` and read parts only through
 `VisibleStoryBlocks` (`LoadAsync` for the page, `CoversAsync` for the list). `_StoryBody` is shared with the curator preview and
-must stay free of ids, anchors and `data-` attributes; `_ItemCard` is the one item card, also used by `_ItemCards`. The link
+must stay free of ids, anchors and `data-` attributes; a story goes to the bin like an item (`Story.MoveToBin`, `db.BinnedStories`, `ArchiveBin.DeleteStoryAsync`, also used by the purge) and its parts go with it by cascade; `_ItemCard` is the one item card, also used by `_ItemCards`. The link
 preview of a story has no image and no item text, and the sitemap has no `lastmod` for stories.
 
 `Search/PublicItemRecord.cs` is what an item says to programs: `/items/{id}.json` and the `DC.*` tags (`Pages/Shared/_DublinCore.cshtml`,

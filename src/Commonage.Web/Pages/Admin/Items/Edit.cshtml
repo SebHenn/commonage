@@ -409,6 +409,29 @@
         </section>
     }
 
+    @if (mayManage && Model.UsedInStoryCount > 0)
+    {
+        <section class="mt-5 col-lg-8" aria-labelledby="used-in-stories-heading">
+            <h2 id="used-in-stories-heading" class="h4">@T.Plural("{0, plural, one {Used in # story} other {Used in # stories}}", Model.UsedInStoryCount)</h2>
+            @if (Model.UsedInStoryCount > Model.UsedInStories.Count)
+            {
+                <p class="text-muted small">@T["Showing the first {0}.", Model.UsedInStories.Count]</p>
+            }
+            <ul>
+                @foreach (var use in Model.UsedInStories)
+                {
+                    <li>
+                        <a asp-page="/Admin/Stories/Edit" asp-route-id="@use.Id" class="text-break">@use.Title</a>
+                        <span class="badge @(use.Status == StoryStatus.Published ? "text-bg-success" : "text-bg-secondary")">@(use.Status == StoryStatus.Published ? T["Published"] : T["Draft"])</span>
+                    </li>
+                }
+            </ul>
+            <p class="text-muted">@(Model.CurrentStatus == ItemStatus.Published
+                ? T["Visitors see this item in a story only while it is public. If you unpublish it or move it to the bin, it leaves the published stories, and a story with nothing left to show disappears for visitors."]
+                : T["This item is not public, so visitors do not see it in these stories yet."])</p>
+        </section>
+    }
+
     @if (mayManage)
     {
     <form method="post" asp-page-handler="Delete" asp-route-id="@Model.ItemId" class="mt-5"
