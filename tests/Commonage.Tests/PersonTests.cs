@@ -311,4 +311,77 @@ public partial class PersonTests(CommonageAppFactory app)
         Assert.Equal([AuditAction.PersonCreated], entries.Select(e => e.Action));
         Assert.DoesNotContain(name, string.Join(' ', entries.Select(e => e.Subject)));
     }
+
+    [Fact]
+    public async Task A_person_in_the_bin_cannot_be_edited_or_have_their_choice_changed_and_nothing_is_saved()
+    {
+        var token = Guid.NewGuid().ToString("N")[..10];
+        var binned = await NewPersonAsync($"Binned{token}", p => p.MoveToBin(DateTime.UtcNow));
+        var live = await NewPersonAsync();
+        using var curator = await CuratorAsync();
+        var tokenPage = $"/Admin/People/Edit/{live}";
+        var before = await app.WithDbAsync(db => db.People.IgnoreQueryFilters().SingleAsync(p => p.Id == binned));
+
+        var edit = await Browser.SendFormAsync(curator, $"/Admin/People/Edit/{binned}", new() { ["Input.Name"] = "Renamed in the bin", ["Input.Biography"] = "New text" }, tokenPage);
+        var show = await Browser.SendFormAsync(curator, $"/Admin/People/Edit/{binned}?handler=Disclosure", new() { ["choice"] = "Deceased", ["confirmed"] = "true" }, tokenPage);
+        var addName = await Browser.SendFormAsync(curator, $"/Admin/People/Edit/{binned}?handler=AddName", new() { ["name"] = "Other", ["kind"] = "Other" }, tokenPage);
+
+        Assert.Equal([HttpStatusCode.NotFound, HttpStatusCode.NotFound, HttpStatusCode.NotFound], [edit.StatusCode, show.StatusCode, addName.StatusCode]);
+        var after = await app.WithDbAsync(db => db.People.IgnoreQueryFilters().Include(p => p.Names).SingleAsync(p => p.Id == binned));
+        Assert.Equal((before.Name, before.Biography, PersonDisclosure.Hidden, before.Version, 0), (after.Name, after.Biography, after.Disclosure, after.Version, after.Names.Count));
+        Assert.Equal(0, await app.WithDbAsync(db => db.AuditEntries.CountAsync(e => e.PersonId == binned)));
+    }
+
+    [Theory]
+    [InlineData(PersonDisclosure.Deceased)]
+    [InlineData(PersonDisclosure.MayBeShown)]
+    public async Task The_question_before_showing_a_person_names_the_biography_the_visitor_names_and_the_dates_only_for_someone_who_has_died(PersonDisclosure choice)
+    {
+        var token = Guid.NewGuid().ToString("N")[..10];
+        var id = await NewPersonAsync($"Subject{token}", p =>
+        {
+            p.Biography = $"Biography-{token} second line";
+            p.TrySetBorn("1931");
+            p.TrySetDied("2009");
+            p.Names.Add(new PersonName { Name = $"Shown-{token}", Kind = PersonNameKind.Nickname, ShownToVisitors = true });
+            p.Names.Add(new PersonName { Name = $"Private-{token}", Kind = PersonNameKind.BirthName, ShownToVisitors = false });
+        });
+        using var curator = await CuratorAsync();
+        var page = $"/Admin/People/Edit/{id}";
+
+        var html = await (await Browser.PostFormAsync(curator, $"{page}?handler=Disclosure", new() { ["choice"] = choice.ToString() }, page)).Content.ReadAsStringAsync();
+
+        // Only the question itself: the form further up shows the same text for editing.
+        var question = Regex.Match(html, "<div class=\"alert alert-warning\".*?</form>", RegexOptions.Singleline).Value;
+        Assert.Contains("Yes, show this person", question);
+        Assert.Contains($"Biography-{token}", question);
+        Assert.Contains($"Shown-{token}", question);
+        Assert.DoesNotContain($"Private-{token}", question);
+        if (choice == PersonDisclosure.Deceased)
+        {
+            Assert.Contains("Born: 1931", question);
+            Assert.Contains("Died: 2009", question);
+        }
+        else
+        {
+            Assert.DoesNotContain("1931", question);
+            Assert.DoesNotContain("2009", question);
+        }
+    }
+
+    [Fact]
+    public async Task What_curators_type_into_the_people_search_and_suggestions_is_cut_at_200_characters()
+    {
+        // A name of exactly 200 characters, searched with 300 more after it: it is found only if the text is cut at 200.
+        var name = (TestData.Unique("Long") + new string('a', 200))[..200];
+        var id = await NewPersonAsync(name);
+        using var curator = await CuratorAsync();
+        var typed = Uri.EscapeDataString(name + new string('z', 300));
+
+        var suggestions = await curator.GetStringAsync($"/Admin/People?handler=Suggest&q={typed}");
+        var list = await curator.GetStringAsync($"/Admin/People?q={typed}");
+
+        Assert.Contains(name, suggestions);
+        Assert.Contains($"/Admin/People/Edit/{id}", list);
+    }
 }

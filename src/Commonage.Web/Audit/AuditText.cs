@@ -74,6 +74,7 @@ public static class AuditText
         AuditAction.PersonDeleted => localizer["Deleted the person for good"],
         AuditAction.PersonPurged => localizer["Deleted the person after their time in the bin"],
         AuditAction.PersonTagsConverted => localizer["Made people from tags"],
+        AuditAction.PeopleImported => localizer["Created people while importing"],
         AuditAction.VisitorNoteReceived => localizer["A visitor sent a note about the item"],
         AuditAction.VisitorNoteHandled => localizer["Marked a visitor's note as dealt with"],
         AuditAction.VisitorNoteReopened => localizer["Opened a visitor's note again"],
@@ -133,7 +134,7 @@ public static class AuditText
         AuditAction.PersonCreated or AuditAction.PersonChanged or AuditAction.PersonDisclosureChanged or AuditAction.PersonNameAdded
             or AuditAction.PersonNameRemoved or AuditAction.PersonLinked or AuditAction.PersonUnlinked or AuditAction.PeopleMerged
             or AuditAction.PersonItemsMoved or AuditAction.PersonMovedToBin or AuditAction.PersonRestored or AuditAction.PersonDeleted
-            or AuditAction.PersonPurged or AuditAction.PersonTagsConverted => AuditKind.People,
+            or AuditAction.PersonPurged or AuditAction.PersonTagsConverted or AuditAction.PeopleImported => AuditKind.People,
         AuditAction.TagChanged or AuditAction.TagsMerged or AuditAction.TagDeleted or AuditAction.UnusedTagsDeleted => AuditKind.Tags,
         AuditAction.AccountCreated or AuditAction.AccountRoleChanged or AuditAction.AccountNameChanged or AuditAction.AccountDisabled or AuditAction.AccountEnabled
             or AuditAction.AccountDeleted or AuditAction.SetupLinkCreated or AuditAction.PasswordChanged

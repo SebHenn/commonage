@@ -1188,6 +1188,9 @@
   <data name="Language (optional)" xml:space="preserve"><value>Sprache (optional)</value></data>
   <data name="Linked the person to an item" xml:space="preserve"><value>Die Person mit einem Objekt verknüpft</value></data>
   <data name="Made people from tags" xml:space="preserve"><value>Personen aus Schlagwörtern angelegt</value></data>
+  <data name="Created people while importing" xml:space="preserve"><value>Personen beim Import angelegt</value></data>
+  <data name="Born: {0}" xml:space="preserve"><value>Geboren: {0}</value></data>
+  <data name="Died: {0}" xml:space="preserve"><value>Gestorben: {0}</value></data>
   <data name="Married name" xml:space="preserve"><value>Ehename</value></data>
   <data name="May be living, and may be shown" xml:space="preserve"><value>Könnte noch leben und darf gezeigt werden</value></data>
   <data name="Merged two people" xml:space="preserve"><value>Zwei Personen zusammengeführt</value></data>
@@ -1227,7 +1230,6 @@
   <data name="Sort name" xml:space="preserve"><value>Sortiername</value></data>
   <data name="Unlink: {0}" xml:space="preserve"><value>Verknüpfung lösen: {0}</value></data>
   <data name="The biography" xml:space="preserve"><value>Die Biografie</value></data>
-  <data name="The dates of birth and death, as far as they are written" xml:space="preserve"><value>Die Geburts- und Sterbedaten, soweit sie eingetragen sind</value></data>
   <data name="The name the person is sorted by in lists. Leave it empty to sort by the name." xml:space="preserve"><value>Der Name, nach dem die Person in Listen sortiert wird. Leer lassen, um nach dem Namen zu sortieren.</value></data>
   <data name="The name: {0}" xml:space="preserve"><value>Der Name: {0}</value></data>
   <data name="The person is added. Only curators can see them until you choose otherwise." xml:space="preserve"><value>Die Person ist hinzugefügt. Nur Kuratoren sehen sie, bis Sie etwas anderes wählen.</value></data>

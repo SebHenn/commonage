@@ -863,12 +863,12 @@ public partial class ExportImportTests(CommonageAppFactory app)
         Assert.Equal("ExportContribution.ConsentCoversSharing", Assert.Single(contribution).Key);
     }
 
-    private static object PersonJson(int id, string? name, object? died = null, object[]? names = null) => new
+    private static object PersonJson(int id, string? name, object? died = null, object[]? names = null, string sortName = "Sorted, Name") => new
     {
         id,
         publicId = "ABCDEFGHJKMN",
         name,
-        sortName = "Sorted, Name",
+        sortName,
         disclosure = "Deceased",
         born = (object?)null,
         died,
@@ -911,6 +911,44 @@ public partial class ExportImportTests(CommonageAppFactory app)
         Assert.Equal(("What this archive knows", PersonDisclosure.Deceased), (here2.Biography, here2.Disclosure));
         var item = Assert.Single(await ItemsAsync(word + " Goalkeeper"));
         Assert.Equal([person.Id], await app.WithDbAsync(db => db.ItemPeople.Where(l => l.ArchiveItemId == item.Id).Select(l => l.PersonId).ToListAsync()));
+    }
+
+    [Fact]
+    public async Task Imported_people_are_one_line_in_the_activity_log_with_their_number()
+    {
+        using var curator = await CuratorAsync(app);
+        var word = Word();
+        object[] people = [PersonJson(1, $"{word} One"), PersonJson(2, $"{word} Two"), PersonJson(3, $"{word} Three")];
+        var zip = Zip(("archive.json", ArchiveJson([Item(1, $"{word} Item", people: [1, 2, 3])], [Collection(1, $"{word} Collection")], 10, people: people)));
+        var started = DateTime.UtcNow.AddSeconds(-1);
+
+        await RunAsync(curator, zip);
+
+        var ids = await app.WithDbAsync(db => db.People.Where(p => p.Name.StartsWith(word)).Select(p => p.Id).ToListAsync());
+        Assert.Equal(3, ids.Count);
+        var entries = await app.WithDbAsync(db => db.AuditEntries.Where(e => e.At >= started && e.Action == AuditAction.PeopleImported || e.PersonId != null && ids.Contains(e.PersonId.Value)).ToListAsync());
+        var line = Assert.Single(entries);
+        Assert.Equal((AuditAction.PeopleImported, "3", null), (line.Action, line.Subject, line.PersonId));
+    }
+
+    [Fact]
+    public async Task Imported_names_are_cleaned_like_names_typed_in_the_form()
+    {
+        using var curator = await CuratorAsync(app);
+        var word = Word();
+        // "e" and "a" with a combining accent, padded and spaced twice: the same as the composed letters, once cleaned.
+        var messy = $"  {word}  José   Márquez ";
+        object[] others = [new { name = "  José	 María ", kind = "Nickname", shownToVisitors = false }];
+        var zip = Zip(("archive.json", ArchiveJson([Item(1, $"{word} Item", people: [1])], [Collection(1, $"{word} Collection")], 10,
+            people: [PersonJson(1, messy, names: others, sortName: " Márquez ,  José ")])));
+
+        await RunAsync(curator, zip);
+
+        var person = await app.WithDbAsync(db => db.People.Include(p => p.Names).SingleAsync(p => p.Name.Contains(word)));
+        Assert.Equal($"{word} José Márquez", person.Name);
+        Assert.Equal("Márquez , José", person.SortName);
+        Assert.Equal("José María", Assert.Single(person.Names).Name);
+        Assert.True(person.Name.IsNormalized());
     }
 
     [Fact]

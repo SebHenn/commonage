@@ -53,7 +53,7 @@ public static class PeopleImport
         if (born is not null && !person.TrySetBorn(born) || died is not null && !person.TrySetDied(died))
             throw new InvalidOperationException("A date of the demo cannot be read.");
         if (hasDied)
-            person.SetDisclosure(PersonDisclosure.Deceased, now);
+            person.MarkAsDied(now);
         foreach (var other in otherNamesForVisitors)
             person.Names.Add(new PersonName { Name = other.Name, Kind = other.Kind, Language = other.Language, ShownToVisitors = true });
         item.People.Add(new ItemPerson { Person = person, CreatedAt = now });

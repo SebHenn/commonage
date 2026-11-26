@@ -104,12 +104,40 @@
             <p>@T["Visitors will see this person on the pages of the items below that visitors may see. They will see:"]</p>
             <ul>
                 <li>@T["The name: {0}", person.Name]</li>
-                <li>@T.Plural("{0, plural, =0 {No other names} one {# other name that is marked for visitors} other {# other names that are marked for visitors}}", Model.Names.Count(n => n.ShownToVisitors))</li>
-                <li>@(string.IsNullOrWhiteSpace(person.Biography) ? T["No biography"] : T["The biography"])</li>
+                <li>
+                    @T.Plural("{0, plural, =0 {No other names} one {# other name that is marked for visitors} other {# other names that are marked for visitors}}", Model.Names.Count(n => n.ShownToVisitors))
+                    @if (Model.Names.Any(n => n.ShownToVisitors))
+                    {
+                        <ul>
+                            @foreach (var shownName in Model.Names.Where(n => n.ShownToVisitors))
+                            {
+                                <li><bdi lang="@(shownName.Language ?? material)">@shownName.Name</bdi></li>
+                            }
+                        </ul>
+                    }
+                </li>
+                <li>
+                    @(string.IsNullOrWhiteSpace(person.Biography) ? T["No biography"] : T["The biography"])
+                    @if (!string.IsNullOrWhiteSpace(person.Biography))
+                    {
+                        <blockquote class="text-preserve-lines mb-0" lang="@material">@person.Biography</blockquote>
+                    }
+                </li>
                 <li>@T.Plural("{0, plural, =0 {No items yet} one {# item that visitors may see} other {# items that visitors may see}}", Model.VisibleItemCount)</li>
                 @if (choice == PersonDisclosure.Deceased)
                 {
-                    <li>@(person.BornText is null && person.DiedText is null ? T["No dates"] : T["The dates of birth and death, as far as they are written"])</li>
+                    if (person.BornText is null && person.DiedText is null)
+                    {
+                        <li>@T["No dates"]</li>
+                    }
+                    if (person.BornText is not null)
+                    {
+                        <li>@T["Born: {0}", person.BornText]</li>
+                    }
+                    if (person.DiedText is not null)
+                    {
+                        <li>@T["Died: {0}", person.DiedText]</li>
+                    }
                 }
                 else
                 {

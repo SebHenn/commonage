@@ -425,14 +425,14 @@ public partial class ExportImport(
     /// </summary>
     private static PlannedPerson? PlanPerson(int key, ImportedPerson person)
     {
-        if (Text(person.Name) is not { } name || name.Length > Person.NameMaxLength)
+        if (Person.Clean(person.Name) is not { } name || name.Length > Person.NameMaxLength)
             return null;
-        var sortName = Text(person.SortName);
+        var sortName = Person.Clean(person.SortName);
         var biography = Text(person.Biography);
         var others = new List<ImportedPersonOtherName>();
         foreach (var other in person.Names ?? [])
         {
-            if (Text(other?.Name) is not { } otherName || otherName.Length > Person.NameMaxLength || others.Count >= Person.MaxNames)
+            if (Person.Clean(other?.Name) is not { } otherName || otherName.Length > Person.NameMaxLength || others.Count >= Person.MaxNames)
                 continue;
             var kind = TryEnum(other!.Kind, out PersonNameKind written) ? written : PersonNameKind.Other;
             others.Add(new ImportedPersonOtherName(otherName, kind, Person.TryCleanLanguage(other.Language, out var language) ? language : null));
@@ -794,13 +794,18 @@ public partial class ExportImport(
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 var added = batch.Select(p => (p.Key, Person: db.AddImportedPerson(p.Data, now))).ToList();
-                foreach (var (_, person) in added)
-                    audit.Record(AuditAction.PersonCreated, null, person: person);
                 await db.SaveChangesAsync(cancellationToken);
                 foreach (var (key, person) in added)
                     personIds[key] = person.Id;
                 people += added.Count;
                 db.ChangeTracker.Clear();
+            }
+
+            // One line for all of them, with the number only: thousands of people would drown the log, and the people are new and hidden.
+            if (people > 0)
+            {
+                audit.Record(AuditAction.PeopleImported, people.ToString(CultureInfo.InvariantCulture));
+                await db.SaveChangesAsync(cancellationToken);
             }
 
             foreach (var row in ready)

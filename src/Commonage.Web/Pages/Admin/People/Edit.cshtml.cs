@@ -101,7 +101,7 @@ public class EditModel(CommonageDbContext db, AuditLog audit, IStringLocalizer<S
     /// <summary>Saves the person's own form. If someone else saved the person since it was opened, nothing is overwritten.</summary>
     public async Task<IActionResult> OnPostAsync(int id, [Bind(Prefix = "Input")] InputModel input, CancellationToken cancellationToken)
     {
-        var person = await db.People.FindAsync([id], cancellationToken);
+        var person = await db.People.FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
         if (person is null)
             return NotFound();
 
@@ -176,7 +176,7 @@ public class EditModel(CommonageDbContext db, AuditLog audit, IStringLocalizer<S
     /// </summary>
     public async Task<IActionResult> OnPostDisclosureAsync(int id, PersonDisclosure choice, bool confirmed, CancellationToken cancellationToken)
     {
-        var person = await db.People.FindAsync([id], cancellationToken);
+        var person = await db.People.FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
         if (person is null)
             return NotFound();
         if (!Enum.IsDefined(choice))
@@ -246,7 +246,7 @@ public class EditModel(CommonageDbContext db, AuditLog audit, IStringLocalizer<S
         if (name.ShownToVisitors != shown)
         {
             name.ShownToVisitors = shown;
-            var person = await db.People.FindAsync([id], cancellationToken);
+            var person = await db.People.FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
             audit.Record(AuditAction.PersonChanged, null, person: person);
             await db.SaveChangesAsync(cancellationToken);
         }
@@ -260,7 +260,7 @@ public class EditModel(CommonageDbContext db, AuditLog audit, IStringLocalizer<S
         if (name is null)
             return NotFound();
 
-        var person = await db.People.FindAsync([id], cancellationToken);
+        var person = await db.People.FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
         db.PersonNames.Remove(name);
         audit.Record(AuditAction.PersonNameRemoved, null, person: person);
         await db.SaveChangesAsync(cancellationToken);
@@ -274,7 +274,7 @@ public class EditModel(CommonageDbContext db, AuditLog audit, IStringLocalizer<S
         if (link is null)
             return NotFound();
 
-        var person = await db.People.FindAsync([id], cancellationToken);
+        var person = await db.People.FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
         db.ItemPeople.Remove(link);
         audit.Record(AuditAction.PersonUnlinked, null, person: person);
         await db.SaveChangesAsync(cancellationToken);

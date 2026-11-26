@@ -91,6 +91,7 @@ public enum AuditAction
     PersonDeleted,
     PersonPurged,
     PersonTagsConverted,
+    PeopleImported,
 }
 
 /// <summary>

@@ -99,6 +99,9 @@ public class Person
 
     public bool IsHidden => Disclosure == PersonDisclosure.Hidden;
 
+    /// <summary>Marks the person as having died, which is what lets visitors see their dates. For the demo and tests; pages use <see cref="SetDisclosure"/>.</summary>
+    public void MarkAsDied(DateTime now) => SetDisclosure(PersonDisclosure.Deceased, now);
+
     public void SetDisclosure(PersonDisclosure value, DateTime now)
     {
         if (Disclosure == value)

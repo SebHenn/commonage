@@ -122,6 +122,7 @@
   <data name="Biography" xml:space="preserve"><value>Biography</value></data>
   <data name="Birth name" xml:space="preserve"><value>Birth name</value></data>
   <data name="Born" xml:space="preserve"><value>Born</value></data>
+  <data name="Born: {0}" xml:space="preserve"><value>Born: {0}</value></data>
   <data name="Browse by tag" xml:space="preserve"><value>Browse by tag</value></data>
   <data name="Browse the archive" xml:space="preserve"><value>Browse the archive</value></data>
   <data name="Can also manage accounts, export the archive and read the activity log." xml:space="preserve"><value>Can also manage accounts, export the archive and read the activity log.</value></data>
@@ -212,6 +213,7 @@
   <data name="Create your first collection" xml:space="preserve"><value>Create your first collection</value></data>
   <data name="Created a setup link for the account" xml:space="preserve"><value>Created a setup link for the account</value></data>
   <data name="Created new recovery codes" xml:space="preserve"><value>Created new recovery codes</value></data>
+  <data name="Created people while importing" xml:space="preserve"><value>Created people while importing</value></data>
   <data name="Created the account" xml:space="preserve"><value>Created the account</value></data>
   <data name="Created the collection" xml:space="preserve"><value>Created the collection</value></data>
   <data name="Created the collection while importing" xml:space="preserve"><value>Created the collection while importing</value></data>
@@ -263,6 +265,7 @@
   <data name="Describes items and adds photos. Cannot publish, delete, review contributions or see contributors' details." xml:space="preserve"><value>Describes items and adds photos. Cannot publish, delete, review contributions or see contributors' details.</value></data>
   <data name="Description" xml:space="preserve"><value>Description</value></data>
   <data name="Died" xml:space="preserve"><value>Died</value></data>
+  <data name="Died: {0}" xml:space="preserve"><value>Died: {0}</value></data>
   <data name="Disable account" xml:space="preserve"><value>Disable account</value></data>
   <data name="Disabled" xml:space="preserve"><value>Disabled</value></data>
   <data name="Disabled the account" xml:space="preserve"><value>Disabled the account</value></data>
@@ -898,7 +901,6 @@
   <data name="The current password is incorrect." xml:space="preserve"><value>The current password is incorrect.</value></data>
   <data name="The date can be at most {0, plural, one {# character} other {# characters}} long." xml:space="preserve"><value>The date can be at most {0, plural, one {# character} other {# characters}} long.</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="The date can be at most {1} characters long." xml:space="preserve"><value>The date can be at most {1} characters long.</value></data>
-  <data name="The dates of birth and death, as far as they are written" xml:space="preserve"><value>The dates of birth and death, as far as they are written</value></data>
   <data name="The days in the export differ from what this text means here. The days of the export are used." xml:space="preserve"><value>The days in the export differ from what this text means here. The days of the export are used.</value></data>
   <data name="The description can be at most {1} characters long." xml:space="preserve"><value>The description can be at most {1} characters long.</value></data>
   <data name="The disk is filling up, or uploads have already stopped." xml:space="preserve"><value>The disk is filling up, or uploads have already stopped.</value></data>

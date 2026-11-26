@@ -14,6 +14,9 @@ public class IndexModel(CommonageDbContext db, AuditLog audit, TimeProvider cloc
 {
     public const int PageSize = 50;
 
+    /// <summary>The longest text a search or a suggestion looks for; a name is at most 200 characters.</summary>
+    public const int MaxSearchLength = 200;
+
     /// <summary>Whom a list shows: everyone, or those with one choice of who may see them.</summary>
     public enum Filter
     {
@@ -54,8 +57,14 @@ public class IndexModel(CommonageDbContext db, AuditLog audit, TimeProvider cloc
     {
         if (string.IsNullOrWhiteSpace(q))
             return new JsonResult(Array.Empty<string>());
-        var matches = await db.SuggestAsync(q.Trim(), 8, cancellationToken);
+        var matches = await db.SuggestAsync(Capped(q), 8, cancellationToken);
         return new JsonResult(matches.Select(m => m.Name).Distinct().ToList());
+    }
+
+    private static string Capped(string? text)
+    {
+        var trimmed = text?.Trim() ?? "";
+        return trimmed.Length <= MaxSearchLength ? trimmed : trimmed[..MaxSearchLength].TrimEnd();
     }
 
     public async Task<IActionResult> OnPostCreateAsync(CancellationToken cancellationToken)
@@ -83,7 +92,7 @@ public class IndexModel(CommonageDbContext db, AuditLog audit, TimeProvider cloc
             Filter.MayBeShown => people.Where(p => p.Disclosure == PersonDisclosure.MayBeShown),
             _ => people,
         };
-        if (Text?.Trim() is { Length: > 0 } text)
+        if (Capped(Text) is { Length: > 0 } text)
         {
             var pattern = PeopleEditing.LikePrefix(await db.FoldAsync(text, cancellationToken));
             people = people.Where(p => EF.Functions.Like(p.FoldedName, pattern, "\\") || p.Names.Any(n => EF.Functions.Like(n.FoldedName, pattern, "\\")));
