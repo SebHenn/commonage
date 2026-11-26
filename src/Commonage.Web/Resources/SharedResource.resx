@@ -8,6 +8,7 @@
   <data name="&quot;Needs attention&quot; still answers with HTTP status 200, so an uptime monitor only notices it if it looks for the word Healthy. docs/operations.md says how." xml:space="preserve"><value>"Needs attention" still answers with HTTP status 200, so an uptime monitor only notices it if it looks for the word Healthy. docs/operations.md says how.</value></data>
   <data name="&quot;contentLanguage&quot; under &quot;settings&quot; says which language most of the material is written in, as a code such as &quot;de&quot; or &quot;pl&quot;. &quot;mul&quot; means several languages, none of them most." xml:space="preserve"><value>"contentLanguage" under "settings" says which language most of the material is written in, as a code such as "de" or "pl". "mul" means several languages, none of them most.</value></data>
   <data name="&quot;includesPersonalData&quot; in archive.json says whether the names of contributors, photographers and authors and contributors' email addresses are included. If they are, keep this file as carefully as the archive itself." xml:space="preserve"><value>"includesPersonalData" in archive.json says whether the names of contributors, photographers and authors and contributors' email addresses are included. If they are, keep this file as carefully as the archive itself.</value></data>
+  <data name="&quot;people&quot; in archive.json lists the people with their names, other names, dates as written and biography. Each item lists the people it names by the number of the person. A copy of what is public holds only the people that visitors may see, and a copy without personal data holds no person who is only for curators. Where a person may be living, their dates and their other names that visitors do not see are left out." xml:space="preserve"><value>"people" in archive.json lists the people with their names, other names, dates as written and biography. Each item lists the people it names by the number of the person. A copy of what is public holds only the people that visitors may see, and a copy without personal data holds no person who is only for curators. Where a person may be living, their dates and their other names that visitors do not see are left out.</value></data>
   <data name="&quot;stories&quot; in archive.json lists the stories: each has its parts in order, and a part is either a text or the number of an item under &quot;items&quot; with a caption." xml:space="preserve"><value>"stories" in archive.json lists the stories: each has its parts in order, and a part is either a text or the number of an item under "items" with a caption.</value></data>
   <data name="/health answers:" xml:space="preserve"><value>/health answers:</value></data>
   <data name="A built-in folding that covers most, but not all, letters. With the PostgreSQL extension unaccent on the database server, the archive uses it from the next start." xml:space="preserve"><value>A built-in folding that covers most, but not all, letters. With the PostgreSQL extension unaccent on the database server, the archive uses it from the next start.</value></data>
@@ -23,7 +24,11 @@
   <data name="A lot has been sent through this link today. Please try again tomorrow, or send this without photos." xml:space="preserve"><value>A lot has been sent through this link today. Please try again tomorrow, or send this without photos.</value></data>
   <data name="A new name changes the tag on every item that has it, also in the search." xml:space="preserve"><value>A new name changes the tag on every item that has it, also in the search.</value></data>
   <data name="A new setup link lets the person choose a new password, for example when they forgot theirs. Earlier links stop working. A disabled account cannot log in, but its history stays in the activity log." xml:space="preserve"><value>A new setup link lets the person choose a new password, for example when they forgot theirs. Earlier links stop working. A disabled account cannot log in, but its history stays in the activity log.</value></data>
+  <data name="A person can have at most {0, plural, one {# other name} other {# other names}}." xml:space="preserve"><value>A person can have at most {0, plural, one {# other name} other {# other names}}.</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
+  <data name="A person is only public while at least one item they are linked to is public, too." xml:space="preserve"><value>A person is only public while at least one item they are linked to is public, too.</value></data>
+  <data name="A person since deleted" xml:space="preserve"><value>A person since deleted</value></data>
   <data name="A photo description can be at most {0, plural, one {# character} other {# characters}} long." xml:space="preserve"><value>A photo description can be at most {0, plural, one {# character} other {# characters}} long.</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
+  <data name="A public tag with this name still exists" xml:space="preserve"><value>A public tag with this name still exists</value></data>
   <data name="A published story is public as soon as it has a text, or an item that visitors may see." xml:space="preserve"><value>A published story is public as soon as it has a text, or an item that visitors may see.</value></data>
   <data name="A recording needs its transcript in the description before it is published, or tick that a transcript will follow." xml:space="preserve"><value>A recording needs its transcript in the description before it is published, or tick that a transcript will follow.</value></data>
   <data name="A rights statement" xml:space="preserve"><value>A rights statement</value></data>
@@ -47,17 +52,24 @@
   <data name="Accounts and logins" xml:space="preserve"><value>Accounts and logins</value></data>
   <data name="Active" xml:space="preserve"><value>Active</value></data>
   <data name="Activity log" xml:space="preserve"><value>Activity log</value></data>
+  <data name="Add" xml:space="preserve"><value>Add</value></data>
+  <data name="Add a person" xml:space="preserve"><value>Add a person</value></data>
   <data name="Add an item" xml:space="preserve"><value>Add an item</value></data>
   <data name="Add anyway" xml:space="preserve"><value>Add anyway</value></data>
   <data name="Add item" xml:space="preserve"><value>Add item</value></data>
   <data name="Add many photos" xml:space="preserve"><value>Add many photos</value></data>
   <data name="Add more photos" xml:space="preserve"><value>Add more photos</value></data>
+  <data name="Add name" xml:space="preserve"><value>Add name</value></data>
   <data name="Add tags" xml:space="preserve"><value>Add tags</value></data>
   <data name="Add tags to many at once" xml:space="preserve"><value>Add tags to many at once</value></data>
   <data name="Add text" xml:space="preserve"><value>Add text</value></data>
   <data name="Add these photos" xml:space="preserve"><value>Add these photos</value></data>
+  <data name="Add this person" xml:space="preserve"><value>Add this person</value></data>
+  <data name="Add {0}" xml:space="preserve"><value>Add {0}</value></data>
+  <data name="Add “{0}” as a new person?" xml:space="preserve"><value>Add “{0}” as a new person?</value></data>
   <data name="Added" xml:space="preserve"><value>Added</value></data>
   <data name="Added an item to the story" xml:space="preserve"><value>Added an item to the story</value></data>
+  <data name="Added another name to the person" xml:space="preserve"><value>Added another name to the person</value></data>
   <data name="Added in the last 30 days" xml:space="preserve"><value>Added in the last 30 days</value></data>
   <data name="Added photos" xml:space="preserve"><value>Added photos</value></data>
   <data name="Address of the link" xml:space="preserve"><value>Address of the link</value></data>
@@ -75,7 +87,9 @@
   <data name="All stories" xml:space="preserve"><value>All stories</value></data>
   <data name="Almost done: the archive is saving what you sent." xml:space="preserve"><value>Almost done: the archive is saving what you sent.</value></data>
   <data name="Also add files the archive already has" xml:space="preserve"><value>Also add files the archive already has</value></data>
+  <data name="Also known as" xml:space="preserve"><value>Also known as</value></data>
   <data name="Always" xml:space="preserve"><value>Always</value></data>
+  <data name="An item can have at most {0, plural, one {# person} other {# people}}." xml:space="preserve"><value>An item can have at most {0, plural, one {# person} other {# people}}.</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="An item can have at most {0, plural, one {# tag} other {# tags}}." xml:space="preserve"><value>An item can have at most {0, plural, one {# tag} other {# tags}}.</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="An item with this tag was changed at the same moment. Nothing was changed; please try again." xml:space="preserve"><value>An item with this tag was changed at the same moment. Nothing was changed; please try again.</value></data>
   <data name="An item with this title and date is already in this collection, with a different description. It is not changed, and photos it lacks are not added." xml:space="preserve"><value>An item with this title and date is already in this collection, with a different description. It is not changed, and photos it lacks are not added.</value></data>
@@ -105,6 +119,9 @@
   <data name="Before this change" xml:space="preserve"><value>Before this change</value></data>
   <data name="Best match" xml:space="preserve"><value>Best match</value></data>
   <data name="Bin" xml:space="preserve"><value>Bin</value></data>
+  <data name="Biography" xml:space="preserve"><value>Biography</value></data>
+  <data name="Birth name" xml:space="preserve"><value>Birth name</value></data>
+  <data name="Born" xml:space="preserve"><value>Born</value></data>
   <data name="Browse by tag" xml:space="preserve"><value>Browse by tag</value></data>
   <data name="Browse the archive" xml:space="preserve"><value>Browse the archive</value></data>
   <data name="Can also manage accounts, export the archive and read the activity log." xml:space="preserve"><value>Can also manage accounts, export the archive and read the activity log.</value></data>
@@ -128,10 +145,12 @@
   <data name="Changed the order of the parts of the story" xml:space="preserve"><value>Changed the order of the parts of the story</value></data>
   <data name="Changed the order of the stories" xml:space="preserve"><value>Changed the order of the stories</value></data>
   <data name="Changed the order or direction of photos" xml:space="preserve"><value>Changed the order or direction of photos</value></data>
+  <data name="Changed the person" xml:space="preserve"><value>Changed the person</value></data>
   <data name="Changed the story" xml:space="preserve"><value>Changed the story</value></data>
   <data name="Changed the tag" xml:space="preserve"><value>Changed the tag</value></data>
   <data name="Changed their password" xml:space="preserve"><value>Changed their password</value></data>
   <data name="Changed what visitors get of the item" xml:space="preserve"><value>Changed what visitors get of the item</value></data>
+  <data name="Changed who may see the person" xml:space="preserve"><value>Changed who may see the person</value></data>
   <data name="Check the contribution, complete the details below, then publish it, accept it as a draft or reject it." xml:space="preserve"><value>Check the contribution, complete the details below, then publish it, accept it as a draft or reject it.</value></data>
   <data name="Check the export" xml:space="preserve"><value>Check the export</value></data>
   <data name="Check the spreadsheet" xml:space="preserve"><value>Check the spreadsheet</value></data>
@@ -144,6 +163,7 @@
   <data name="Choose your password" xml:space="preserve"><value>Choose your password</value></data>
   <data name="Choose: {0}" xml:space="preserve"><value>Choose: {0}</value></data>
   <data name="Cite this item" xml:space="preserve"><value>Cite this item</value></data>
+  <data name="Clear" xml:space="preserve"><value>Clear</value></data>
   <data name="Clear filters" xml:space="preserve"><value>Clear filters</value></data>
   <data name="Clear this draft" xml:space="preserve"><value>Clear this draft</value></data>
   <data name="Closed" xml:space="preserve"><value>Closed</value></data>
@@ -197,6 +217,7 @@
   <data name="Created the collection while importing" xml:space="preserve"><value>Created the collection while importing</value></data>
   <data name="Created the contribution link" xml:space="preserve"><value>Created the contribution link</value></data>
   <data name="Created the item" xml:space="preserve"><value>Created the item</value></data>
+  <data name="Created the person" xml:space="preserve"><value>Created the person</value></data>
   <data name="Created the story" xml:space="preserve"><value>Created the story</value></data>
   <data name="Creating preview…" xml:space="preserve"><value>Creating preview…</value></data>
   <data name="Credit" xml:space="preserve"><value>Credit</value></data>
@@ -234,11 +255,14 @@
   <data name="Deleted the empty collection" xml:space="preserve"><value>Deleted the empty collection</value></data>
   <data name="Deleted the item for good" xml:space="preserve"><value>Deleted the item for good</value></data>
   <data name="Deleted the item for good after its time in the bin" xml:space="preserve"><value>Deleted the item for good after its time in the bin</value></data>
+  <data name="Deleted the person after their time in the bin" xml:space="preserve"><value>Deleted the person after their time in the bin</value></data>
+  <data name="Deleted the person for good" xml:space="preserve"><value>Deleted the person for good</value></data>
   <data name="Deleted the story after its time in the bin" xml:space="preserve"><value>Deleted the story after its time in the bin</value></data>
   <data name="Deleted the story for good" xml:space="preserve"><value>Deleted the story for good</value></data>
   <data name="Deleted the unused tag" xml:space="preserve"><value>Deleted the unused tag</value></data>
   <data name="Describes items and adds photos. Cannot publish, delete, review contributions or see contributors' details." xml:space="preserve"><value>Describes items and adds photos. Cannot publish, delete, review contributions or see contributors' details.</value></data>
   <data name="Description" xml:space="preserve"><value>Description</value></data>
+  <data name="Died" xml:space="preserve"><value>Died</value></data>
   <data name="Disable account" xml:space="preserve"><value>Disable account</value></data>
   <data name="Disabled" xml:space="preserve"><value>Disabled</value></data>
   <data name="Disabled the account" xml:space="preserve"><value>Disabled the account</value></data>
@@ -264,6 +288,7 @@
   <data name="Earlier: {0}" xml:space="preserve"><value>Earlier: {0}</value></data>
   <data name="Edit collection" xml:space="preserve"><value>Edit collection</value></data>
   <data name="Edit contribution link" xml:space="preserve"><value>Edit contribution link</value></data>
+  <data name="Edit person" xml:space="preserve"><value>Edit person</value></data>
   <data name="Edit story" xml:space="preserve"><value>Edit story</value></data>
   <data name="Edit: {0}" xml:space="preserve"><value>Edit: {0}</value></data>
   <data name="Email" xml:space="preserve"><value>Email</value></data>
@@ -327,6 +352,7 @@
   <data name="Go to the start page" xml:space="preserve"><value>Go to the start page</value></data>
   <data name="Good to know" xml:space="preserve"><value>Good to know</value></data>
   <data name="Handbook" xml:space="preserve"><value>Handbook</value></data>
+  <data name="Has died: visitors may see them" xml:space="preserve"><value>Has died: visitors may see them</value></data>
   <data name="Help from visitors" xml:space="preserve"><value>Help from visitors</value></data>
   <data name="Helper" xml:space="preserve"><value>Helper</value></data>
   <data name="Helpers describe items and add photos. Curators review contributions and look after the archive. Admins can also manage accounts, export the archive and read the activity log." xml:space="preserve"><value>Helpers describe items and add photos. Curators review contributions and look after the archive. Admins can also manage accounts, export the archive and read the activity log.</value></data>
@@ -351,11 +377,13 @@
   <data name="Imported items from a spreadsheet" xml:space="preserve"><value>Imported items from a spreadsheet</value></data>
   <data name="Imported rows become drafts, whatever the spreadsheet says. A large import takes a while: keep this page open. If it breaks off, run it again: what is already there is left out." xml:space="preserve"><value>Imported rows become drafts, whatever the spreadsheet says. A large import takes a while: keep this page open. If it breaks off, run it again: what is already there is left out.</value></data>
   <data name="Imprint" xml:space="preserve"><value>Imprint</value></data>
+  <data name="In another script" xml:space="preserve"><value>In another script</value></data>
   <data name="In copyright, but we do not know who holds it" xml:space="preserve"><value>In copyright, but we do not know who holds it</value></data>
   <data name="In copyright: ask before reusing" xml:space="preserve"><value>In copyright: ask before reusing</value></data>
   <data name="In copyright: free for non-commercial use" xml:space="preserve"><value>In copyright: free for non-commercial use</value></data>
   <data name="In the app, add an account and scan this code." xml:space="preserve"><value>In the app, add an account and scan this code.</value></data>
   <data name="In the bin" xml:space="preserve"><value>In the bin</value></data>
+  <data name="In the name, another name or the note for curators of these people. Correct or remove the text on the person." xml:space="preserve"><value>In the name, another name or the note for curators of these people. Correct or remove the text on the person.</value></data>
   <data name="In the rights holder, credit, received from or internal notes of these items. Correct or remove the text on the item." xml:space="preserve"><value>In the rights holder, credit, received from or internal notes of these items. Correct or remove the text on the item.</value></data>
   <data name="Include the names of contributors, photographers and authors, and contributors' email addresses" xml:space="preserve"><value>Include the names of contributors, photographers and authors, and contributors' email addresses</value></data>
   <data name="Install an authenticator app on your phone, if you have none yet. Many work, for example Aegis, 2FAS, Google Authenticator or Microsoft Authenticator." xml:space="preserve"><value>Install an authenticator app on your phone, if you have none yet. Many work, for example Aegis, 2FAS, Google Authenticator or Microsoft Authenticator.</value></data>
@@ -385,6 +413,7 @@
   <data name="Kept back from visitors" xml:space="preserve"><value>Kept back from visitors</value></data>
   <data name="Kind" xml:space="preserve"><value>Kind</value></data>
   <data name="Language" xml:space="preserve"><value>Language</value></data>
+  <data name="Language (optional)" xml:space="preserve"><value>Language (optional)</value></data>
   <data name="Language of the archive" xml:space="preserve"><value>Language of the archive</value></data>
   <data name="Language of the material" xml:space="preserve"><value>Language of the material</value></data>
   <data name="Language, time and visibility" xml:space="preserve"><value>Language, time and visibility</value></data>
@@ -410,6 +439,7 @@
   <data name="Let visitors open photos at a large size" xml:space="preserve"><value>Let visitors open photos at a large size</value></data>
   <data name="Letters" xml:space="preserve"><value>Letters</value></data>
   <data name="Link copied" xml:space="preserve"><value>Link copied</value></data>
+  <data name="Linked the person to an item" xml:space="preserve"><value>Linked the person to an item</value></data>
   <data name="Lists the item on the page that asks visitors for help, once it is published and the archive asks visitors." xml:space="preserve"><value>Lists the item on the page that asks visitors for help, once it is published and the archive asks visitors.</value></data>
   <data name="Log in" xml:space="preserve"><value>Log in</value></data>
   <data name="Log in with an authenticator app" xml:space="preserve"><value>Log in with an authenticator app</value></data>
@@ -419,6 +449,7 @@
   <data name="Login keys" xml:space="preserve"><value>Login keys</value></data>
   <data name="Logo" xml:space="preserve"><value>Logo</value></data>
   <data name="Lost your phone and your recovery codes? An admin can turn the app off for your account." xml:space="preserve"><value>Lost your phone and your recovery codes? An admin can turn the app off for your account.</value></data>
+  <data name="Made people from tags" xml:space="preserve"><value>Made people from tags</value></data>
   <data name="Made with {0}" xml:space="preserve"><value>Made with {0}</value></data>
   <data name="Manage archive" xml:space="preserve"><value>Manage archive</value></data>
   <data name="Many contributions were sent from your network in the last hour. Please try again later." xml:space="preserve"><value>Many contributions were sent from your network in the last hour. Please try again later.</value></data>
@@ -428,8 +459,10 @@
   <data name="Mark this contribution as withdrawn? It is hidden at once and cannot be published again." xml:space="preserve"><value>Mark this contribution as withdrawn? It is hidden at once and cannot be published again.</value></data>
   <data name="Marked a visitor's note as dealt with" xml:space="preserve"><value>Marked a visitor's note as dealt with</value></data>
   <data name="Marked the contribution as withdrawn" xml:space="preserve"><value>Marked the contribution as withdrawn</value></data>
+  <data name="Married name" xml:space="preserve"><value>Married name</value></data>
   <data name="May I reuse this?" xml:space="preserve"><value>May I reuse this?</value></data>
   <data name="May be empty: the draft then waits for a title." xml:space="preserve"><value>May be empty: the draft then waits for a title.</value></data>
+  <data name="May be living, and may be shown" xml:space="preserve"><value>May be living, and may be shown</value></data>
   <data name="May be named on public pages" xml:space="preserve"><value>May be named on public pages</value></data>
   <data name="May others reuse it?" xml:space="preserve"><value>May others reuse it?</value></data>
   <data name="May others reuse it? (optional)" xml:space="preserve"><value>May others reuse it? (optional)</value></data>
@@ -437,19 +470,23 @@
   <data name="Merge" xml:space="preserve"><value>Merge</value></data>
   <data name="Merge into" xml:space="preserve"><value>Merge into</value></data>
   <data name="Merge into another tag" xml:space="preserve"><value>Merge into another tag</value></data>
+  <data name="Merged two people" xml:space="preserve"><value>Merged two people</value></data>
   <data name="Merged two tags into one" xml:space="preserve"><value>Merged two tags into one</value></data>
   <data name="More about it" xml:space="preserve"><value>More about it</value></data>
   <data name="More from {0}" xml:space="preserve"><value>More from {0}</value></data>
   <data name="More lines than are listed here: {0}" xml:space="preserve"><value>More lines than are listed here: {0}</value></data>
   <data name="More problems than are listed here: {0}" xml:space="preserve"><value>More problems than are listed here: {0}</value></data>
   <data name="More than one collection has this name. Rename one of them first." xml:space="preserve"><value>More than one collection has this name. Rename one of them first.</value></data>
+  <data name="More than one person has this name. Which one is meant?" xml:space="preserve"><value>More than one person has this name. Which one is meant?</value></data>
   <data name="Move many to a collection" xml:space="preserve"><value>Move many to a collection</value></data>
   <data name="Move this item to the bin? It disappears from the archive at once. You can restore it there for {0, plural, one {# day} other {# days}}." xml:space="preserve"><value>Move this item to the bin? It disappears from the archive at once. You can restore it there for {0, plural, one {# day} other {# days}}.</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="Move this photo to the bin? You can restore it there for {0, plural, one {# day} other {# days}}." xml:space="preserve"><value>Move this photo to the bin? You can restore it there for {0, plural, one {# day} other {# days}}.</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="Move to a collection" xml:space="preserve"><value>Move to a collection</value></data>
   <data name="Move to bin" xml:space="preserve"><value>Move to bin</value></data>
   <data name="Moved a photo to the bin" xml:space="preserve"><value>Moved a photo to the bin</value></data>
+  <data name="Moved items from one person to another" xml:space="preserve"><value>Moved items from one person to another</value></data>
   <data name="Moved the item to the bin" xml:space="preserve"><value>Moved the item to the bin</value></data>
+  <data name="Moved the person to the bin" xml:space="preserve"><value>Moved the person to the bin</value></data>
   <data name="Moved the rejected or withdrawn contribution to the bin, at the end of the time the archive keeps them" xml:space="preserve"><value>Moved the rejected or withdrawn contribution to the bin, at the end of the time the archive keeps them</value></data>
   <data name="Moved the story to the bin" xml:space="preserve"><value>Moved the story to the bin</value></data>
   <data name="Moved to the bin on {0}" xml:space="preserve"><value>Moved to the bin on {0}</value></data>
@@ -457,6 +494,8 @@
   <data name="Name and email address removed on {0}" xml:space="preserve"><value>Name and email address removed on {0}</value></data>
   <data name="Name and email address removed on {0}." xml:space="preserve"><value>Name and email address removed on {0}.</value></data>
   <data name="Name of the archive" xml:space="preserve"><value>Name of the archive</value></data>
+  <data name="Name of the new person" xml:space="preserve"><value>Name of the new person</value></data>
+  <data name="Name of the person" xml:space="preserve"><value>Name of the person</value></data>
   <data name="Name of the photographer or author, if known" xml:space="preserve"><value>Name of the photographer or author, if known</value></data>
   <data name="Name or email address" xml:space="preserve"><value>Name or email address</value></data>
   <data name="Named in what curators wrote" xml:space="preserve"><value>Named in what curators wrote</value></data>
@@ -471,16 +510,21 @@
   <data name="New link" xml:space="preserve"><value>New link</value></data>
   <data name="New password" xml:space="preserve"><value>New password</value></data>
   <data name="New password again" xml:space="preserve"><value>New password again</value></data>
+  <data name="New person" xml:space="preserve"><value>New person</value></data>
   <data name="New recovery codes replace the old ones." xml:space="preserve"><value>New recovery codes replace the old ones.</value></data>
   <data name="New story" xml:space="preserve"><value>New story</value></data>
   <data name="Newest first" xml:space="preserve"><value>Newest first</value></data>
   <data name="Next" xml:space="preserve"><value>Next</value></data>
   <data name="Next item" xml:space="preserve"><value>Next item</value></data>
   <data name="Next: {0}" xml:space="preserve"><value>Next: {0}</value></data>
+  <data name="Nickname" xml:space="preserve"><value>Nickname</value></data>
   <data name="No" xml:space="preserve"><value>No</value></data>
   <data name="No access" xml:space="preserve"><value>No access</value></data>
+  <data name="No biography" xml:space="preserve"><value>No biography</value></data>
   <data name="No collection is named, and none was chosen for rows without one." xml:space="preserve"><value>No collection is named, and none was chosen for rows without one.</value></data>
   <data name="No contributions match." xml:space="preserve"><value>No contributions match.</value></data>
+  <data name="No dates" xml:space="preserve"><value>No dates</value></data>
+  <data name="No dates: for a person who may be living, dates are never shown" xml:space="preserve"><value>No dates: for a person who may be living, dates are never shown</value></data>
   <data name="No entries match." xml:space="preserve"><value>No entries match.</value></data>
   <data name="No file chosen" xml:space="preserve"><value>No file chosen</value></data>
   <data name="No folder" xml:space="preserve"><value>No folder</value></data>
@@ -489,7 +533,10 @@
   <data name="No name or email address given." xml:space="preserve"><value>No name or email address given.</value></data>
   <data name="No notes." xml:space="preserve"><value>No notes.</value></data>
   <data name="No open notes." xml:space="preserve"><value>No open notes.</value></data>
+  <data name="No other names yet." xml:space="preserve"><value>No other names yet.</value></data>
+  <data name="No people are linked to this item." xml:space="preserve"><value>No people are linked to this item.</value></data>
   <data name="No people are named in the archive yet." xml:space="preserve"><value>No people are named in the archive yet.</value></data>
+  <data name="No person matches." xml:space="preserve"><value>No person matches.</value></data>
   <data name="No photos chosen" xml:space="preserve"><value>No photos chosen</value></data>
   <data name="No places are named in the archive yet." xml:space="preserve"><value>No places are named in the archive yet.</value></data>
   <data name="No preview could be created." xml:space="preserve"><value>No preview could be created.</value></data>
@@ -499,6 +546,7 @@
   <data name="No tags match." xml:space="preserve"><value>No tags match.</value></data>
   <data name="No: they should ask first" xml:space="preserve"><value>No: they should ask first</value></data>
   <data name="None" xml:space="preserve"><value>None</value></data>
+  <data name="None of them: add a new person" xml:space="preserve"><value>None of them: add a new person</value></data>
   <data name="None yet. docs/deployment.md says how to set up the nightly backup." xml:space="preserve"><value>None yet. docs/deployment.md says how to set up the nightly backup.</value></data>
   <data name="Not checked yet: ask before reusing" xml:space="preserve"><value>Not checked yet: ask before reusing</value></data>
   <data name="Not decided yet" xml:space="preserve"><value>Not decided yet</value></data>
@@ -508,6 +556,7 @@
   <data name="Not on any item." xml:space="preserve"><value>Not on any item.</value></data>
   <data name="Not published" xml:space="preserve"><value>Not published</value></data>
   <data name="Not working" xml:space="preserve"><value>Not working</value></data>
+  <data name="Note for curators" xml:space="preserve"><value>Note for curators</value></data>
   <data name="Noted that a restore was tested" xml:space="preserve"><value>Noted that a restore was tested</value></data>
   <data name="Notes from visitors" xml:space="preserve"><value>Notes from visitors</value></data>
   <data name="Nothing has been decided yet: please ask the archive before reusing it" xml:space="preserve"><value>Nothing has been decided yet: please ask the archive before reusing it</value></data>
@@ -525,8 +574,11 @@
   <data name="Only a tag that no item has can be deleted. To move its items to another tag, merge it." xml:space="preserve"><value>Only a tag that no item has can be deleted. To move its items to another tag, merge it.</value></data>
   <data name="Only an empty collection can be deleted. Move its items to another collection first." xml:space="preserve"><value>Only an empty collection can be deleted. Move its items to another collection first.</value></data>
   <data name="Only an empty collection can be deleted: without items, also in the bin, and without contribution links that send material to it." xml:space="preserve"><value>Only an empty collection can be deleted: without items, also in the bin, and without contribution links that send material to it.</value></data>
+  <data name="Only curators" xml:space="preserve"><value>Only curators</value></data>
+  <data name="Only curators see the new person until you choose otherwise." xml:space="preserve"><value>Only curators see the new person until you choose otherwise.</value></data>
   <data name="Only curators see these, unless you choose to show your name. Your email address is only for questions about what you send in." xml:space="preserve"><value>Only curators see these, unless you choose to show your name. Your email address is only for questions about what you send in.</value></data>
   <data name="Only curators see these. They stay out of public pages and public search." xml:space="preserve"><value>Only curators see these. They stay out of public pages and public search.</value></data>
+  <data name="Only curators see this note. It is never shown to visitors or put into a copy made for them." xml:space="preserve"><value>Only curators see this note. It is never shown to visitors or put into a copy made for them.</value></data>
   <data name="Only curators see this." xml:space="preserve"><value>Only curators see this.</value></data>
   <data name="Only for a complete copy, such as a move to another server. Keep such a file as carefully as the archive itself." xml:space="preserve"><value>Only for a complete copy, such as a move to another server. Keep such a file as carefully as the archive itself.</value></data>
   <data name="Only if you would like an answer. Your name and email address are only used for that, and you can ask for them to be removed at any time." xml:space="preserve"><value>Only if you would like an answer. Your name and email address are only used for that, and you can ask for them to be removed at any time.</value></data>
@@ -545,7 +597,11 @@
   <data name="Order of the items" xml:space="preserve"><value>Order of the items</value></data>
   <data name="Original" xml:space="preserve"><value>Original</value></data>
   <data name="Original location" xml:space="preserve"><value>Original location</value></data>
+  <data name="Other" xml:space="preserve"><value>Other</value></data>
   <data name="Other items in {0}" xml:space="preserve"><value>Other items in {0}</value></data>
+  <data name="Other name" xml:space="preserve"><value>Other name</value></data>
+  <data name="Other names" xml:space="preserve"><value>Other names</value></data>
+  <data name="Other spelling" xml:space="preserve"><value>Other spelling</value></data>
   <data name="Our archive needs no imprint." xml:space="preserve"><value>Our archive needs no imprint.</value></data>
   <data name="Page not found" xml:space="preserve"><value>Page not found</value></data>
   <data name="Page {0} of {1}" xml:space="preserve"><value>Page {0} of {1}</value></data>
@@ -554,6 +610,7 @@
   <data name="Parts of the story" xml:space="preserve"><value>Parts of the story</value></data>
   <data name="Password" xml:space="preserve"><value>Password</value></data>
   <data name="People" xml:space="preserve"><value>People</value></data>
+  <data name="People who appear in the archive. A new person is seen by curators only. You choose for each person whether visitors may see their name." xml:space="preserve"><value>People who appear in the archive. A new person is seen by curators only. You choose for each person whether visitors may see their name.</value></data>
   <data name="Period" xml:space="preserve"><value>Period</value></data>
   <data name="Person" xml:space="preserve"><value>Person</value></data>
   <data name="Photo descriptions" xml:space="preserve"><value>Photo descriptions</value></data>
@@ -618,6 +675,8 @@
   <data name="Poster: {0}" xml:space="preserve"><value>Poster: {0}</value></data>
   <data name="Preparing the recording…" xml:space="preserve"><value>Preparing the recording…</value></data>
   <data name="Preview" xml:space="preserve"><value>Preview</value></data>
+  <data name="Preview. None of this person's items is public yet, so visitors cannot find them." xml:space="preserve"><value>Preview. None of this person's items is public yet, so visitors cannot find them.</value></data>
+  <data name="Preview. Only curators see this person: visitors cannot see this page." xml:space="preserve"><value>Preview. Only curators see this person: visitors cannot see this page.</value></data>
   <data name="Preview. Public from {0}." xml:space="preserve"><value>Preview. Public from {0}.</value></data>
   <data name="Preview. This is what visitors will see, without the items they may not see." xml:space="preserve"><value>Preview. This is what visitors will see, without the items they may not see.</value></data>
   <data name="Preview. This item is public." xml:space="preserve"><value>Preview. This item is public.</value></data>
@@ -668,10 +727,12 @@
   <data name="Remove the name and email address from this note? The message stays. This cannot be undone." xml:space="preserve"><value>Remove the name and email address from this note? The message stays. This cannot be undone.</value></data>
   <data name="Remove this filter" xml:space="preserve"><value>Remove this filter</value></data>
   <data name="Remove this item from the story? The item itself stays in the archive." xml:space="preserve"><value>Remove this item from the story? The item itself stays in the archive.</value></data>
+  <data name="Remove this name?" xml:space="preserve"><value>Remove this name?</value></data>
   <data name="Remove this text from the story? It cannot be brought back." xml:space="preserve"><value>Remove this text from the story? It cannot be brought back.</value></data>
   <data name="Remove {0}" xml:space="preserve"><value>Remove {0}</value></data>
   <data name="Remove: {0}" xml:space="preserve"><value>Remove: {0}</value></data>
   <data name="Removed an item from the story" xml:space="preserve"><value>Removed an item from the story</value></data>
+  <data name="Removed another name from the person" xml:space="preserve"><value>Removed another name from the person</value></data>
   <data name="Removed the contributor's name and email address" xml:space="preserve"><value>Removed the contributor's name and email address</value></data>
   <data name="Removed the name and email address from a visitor's note" xml:space="preserve"><value>Removed the name and email address from a visitor's note</value></data>
   <data name="Request to take it down" xml:space="preserve"><value>Request to take it down</value></data>
@@ -696,14 +757,17 @@
   <data name="Save and publish" xml:space="preserve"><value>Save and publish</value></data>
   <data name="Save as draft" xml:space="preserve"><value>Save as draft</value></data>
   <data name="Save caption" xml:space="preserve"><value>Save caption</value></data>
+  <data name="Save for {0}" xml:space="preserve"><value>Save for {0}</value></data>
   <data name="Save name" xml:space="preserve"><value>Save name</value></data>
   <data name="Save password" xml:space="preserve"><value>Save password</value></data>
   <data name="Save role" xml:space="preserve"><value>Save role</value></data>
   <data name="Save text" xml:space="preserve"><value>Save text</value></data>
   <data name="Save these details" xml:space="preserve"><value>Save these details</value></data>
+  <data name="Save this choice" xml:space="preserve"><value>Save this choice</value></data>
   <data name="Say how people can reach you" xml:space="preserve"><value>Say how people can reach you</value></data>
   <data name="Scan the code with your phone's camera, or type this address:" xml:space="preserve"><value>Scan the code with your phone's camera, or type this address:</value></data>
   <data name="Search" xml:space="preserve"><value>Search</value></data>
+  <data name="Search by name" xml:space="preserve"><value>Search by name</value></data>
   <data name="Search ignores accents with" xml:space="preserve"><value>Search ignores accents with</value></data>
   <data name="Search items" xml:space="preserve"><value>Search items</value></data>
   <data name="Search the archive" xml:space="preserve"><value>Search the archive</value></data>
@@ -740,6 +804,8 @@
   <data name="Show all tags" xml:space="preserve"><value>Show all tags</value></data>
   <data name="Show everything" xml:space="preserve"><value>Show everything</value></data>
   <data name="Show my name with what I send in" xml:space="preserve"><value>Show my name with what I send in</value></data>
+  <data name="Show this person to visitors as someone who has died?" xml:space="preserve"><value>Show this person to visitors as someone who has died?</value></data>
+  <data name="Show this person to visitors, who may be living?" xml:space="preserve"><value>Show this person to visitors, who may be living?</value></data>
   <data name="Showing the first {0}." xml:space="preserve"><value>Showing the first {0}.</value></data>
   <data name="Showing the newest {0}." xml:space="preserve"><value>Showing the newest {0}.</value></data>
   <data name="Shown as a record only" xml:space="preserve"><value>Shown as a record only</value></data>
@@ -751,6 +817,7 @@
   <data name="Some items wait for someone who knows more about them." xml:space="preserve"><value>Some items wait for someone who knows more about them.</value></data>
   <data name="Someone else changed one of these items just now, so nothing was changed. Please try again." xml:space="preserve"><value>Someone else changed one of these items just now, so nothing was changed. Please try again.</value></data>
   <data name="Someone else changed this item while you were working on it" xml:space="preserve"><value>Someone else changed this item while you were working on it</value></data>
+  <data name="Someone else changed this person while you were working on it" xml:space="preserve"><value>Someone else changed this person while you were working on it</value></data>
   <data name="Someone else changed this story while you were working on it" xml:space="preserve"><value>Someone else changed this story while you were working on it</value></data>
   <data name="Someone else made it, and I have their permission or inherited the rights." xml:space="preserve"><value>Someone else made it, and I have their permission or inherited the rights.</value></data>
   <data name="Someone else; the contributor has permission or inherited the rights" xml:space="preserve"><value>Someone else; the contributor has permission or inherited the rights</value></data>
@@ -758,6 +825,7 @@
   <data name="Something is wrong" xml:space="preserve"><value>Something is wrong</value></data>
   <data name="Something went wrong" xml:space="preserve"><value>Something went wrong</value></data>
   <data name="Sort by" xml:space="preserve"><value>Sort by</value></data>
+  <data name="Sort name" xml:space="preserve"><value>Sort name</value></data>
   <data name="Source code" xml:space="preserve"><value>Source code</value></data>
   <data name="Spreadsheet, saved as CSV (UTF-8)" xml:space="preserve"><value>Spreadsheet, saved as CSV (UTF-8)</value></data>
   <data name="Start again" xml:space="preserve"><value>Start again</value></data>
@@ -780,6 +848,8 @@
   <data name="Tags" xml:space="preserve"><value>Tags</value></data>
   <data name="Tags the items already have stay." xml:space="preserve"><value>Tags the items already have stay.</value></data>
   <data name="Tags to add" xml:space="preserve"><value>Tags to add</value></data>
+  <data name="Take {0} off this item" xml:space="preserve"><value>Take {0} off this item</value></data>
+  <data name="Take {0} off this person" xml:space="preserve"><value>Take {0} off this person</value></data>
   <data name="Tell us" xml:space="preserve"><value>Tell us</value></data>
   <data name="Test restoring a backup, on another machine (docs/deployment.md)" xml:space="preserve"><value>Test restoring a backup, on another machine (docs/deployment.md)</value></data>
   <data name="Text" xml:space="preserve"><value>Text</value></data>
@@ -805,6 +875,7 @@
   <data name="The archive's storage is full" xml:space="preserve"><value>The archive's storage is full</value></data>
   <data name="The authenticator app is turned off for this account. The person logs in with their password now." xml:space="preserve"><value>The authenticator app is turned off for this account. The person logs in with their password now.</value></data>
   <data name="The bin is empty." xml:space="preserve"><value>The bin is empty.</value></data>
+  <data name="The biography" xml:space="preserve"><value>The biography</value></data>
   <data name="The caption can be at most {0} characters long." xml:space="preserve"><value>The caption can be at most {0} characters long.</value></data>
   <data name="The collection is empty, so it can be deleted." xml:space="preserve"><value>The collection is empty, so it can be deleted.</value></data>
   <data name="The collection of this item is not in the export." xml:space="preserve"><value>The collection of this item is not in the export.</value></data>
@@ -829,6 +900,7 @@
   <data name="The current password is incorrect." xml:space="preserve"><value>The current password is incorrect.</value></data>
   <data name="The date can be at most {0, plural, one {# character} other {# characters}} long." xml:space="preserve"><value>The date can be at most {0, plural, one {# character} other {# characters}} long.</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="The date can be at most {1} characters long." xml:space="preserve"><value>The date can be at most {1} characters long.</value></data>
+  <data name="The dates of birth and death, as far as they are written" xml:space="preserve"><value>The dates of birth and death, as far as they are written</value></data>
   <data name="The days in the export differ from what this text means here. The days of the export are used." xml:space="preserve"><value>The days in the export differ from what this text means here. The days of the export are used.</value></data>
   <data name="The description can be at most {1} characters long." xml:space="preserve"><value>The description can be at most {1} characters long.</value></data>
   <data name="The disk is filling up, or uploads have already stopped." xml:space="preserve"><value>The disk is filling up, or uploads have already stopped.</value></data>
@@ -866,6 +938,8 @@
   <data name="The name can be at most {0, plural, one {# character} other {# characters}} long." xml:space="preserve"><value>The name can be at most {0, plural, one {# character} other {# characters}} long.</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="The name can be at most {1} characters long." xml:space="preserve"><value>The name can be at most {1} characters long.</value></data>
   <data name="The name of an existing collection. May be left out when you choose one below." xml:space="preserve"><value>The name of an existing collection. May be left out when you choose one below.</value></data>
+  <data name="The name the person is sorted by in lists. Leave it empty to sort by the name." xml:space="preserve"><value>The name the person is sorted by in lists. Leave it empty to sort by the name.</value></data>
+  <data name="The name: {0}" xml:space="preserve"><value>The name: {0}</value></data>
   <data name="The new account gets a setup link instead of a password. Commonage sends no emails, so you pass the link on yourself." xml:space="preserve"><value>The new account gets a setup link instead of a password. Commonage sends no emails, so you pass the link on yourself.</value></data>
   <data name="The note is deleted." xml:space="preserve"><value>The note is deleted.</value></data>
   <data name="The note is marked as dealt with." xml:space="preserve"><value>The note is marked as dealt with.</value></data>
@@ -882,6 +956,7 @@
   <data name="The password must contain a lowercase letter." xml:space="preserve"><value>The password must contain a lowercase letter.</value></data>
   <data name="The password must contain an uppercase letter." xml:space="preserve"><value>The password must contain an uppercase letter.</value></data>
   <data name="The password must contain at least {0, plural, one {# different character} other {# different characters}}." xml:space="preserve"><value>The password must contain at least {0, plural, one {# different character} other {# different characters}}.</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
+  <data name="The person is added. Only curators can see them until you choose otherwise." xml:space="preserve"><value>The person is added. Only curators can see them until you choose otherwise.</value></data>
   <data name="The photo is deleted for good." xml:space="preserve"><value>The photo is deleted for good.</value></data>
   <data name="The photo is in the bin. You can restore it there for {0, plural, one {# day} other {# days}}." xml:space="preserve"><value>The photo is in the bin. You can restore it there for {0, plural, one {# day} other {# days}}.</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="The photo is restored." xml:space="preserve"><value>The photo is restored.</value></data>
@@ -912,6 +987,7 @@
   <data name="The summary can be at most {1} characters long." xml:space="preserve"><value>The summary can be at most {1} characters long.</value></data>
   <data name="The tag “{0}” is deleted." xml:space="preserve"><value>The tag “{0}” is deleted.</value></data>
   <data name="The text can be at most {0} characters long." xml:space="preserve"><value>The text can be at most {0} characters long.</value></data>
+  <data name="The text can be at most {1} characters long." xml:space="preserve"><value>The text can be at most {1} characters long.</value></data>
   <data name="The title can be at most {1} characters long." xml:space="preserve"><value>The title can be at most {1} characters long.</value></data>
   <data name="The title, date and description are kept on this device for three days, in case you have to stop. Your name and email address are not." xml:space="preserve"><value>The title, date and description are kept on this device for three days, in case you have to stop. Your name and email address are not.</value></data>
   <data name="The two passwords are not the same." xml:space="preserve"><value>The two passwords are not the same.</value></data>
@@ -919,6 +995,7 @@
   <data name="There are no collections yet." xml:space="preserve"><value>There are no collections yet.</value></data>
   <data name="There are no contribution links yet." xml:space="preserve"><value>There are no contribution links yet.</value></data>
   <data name="There are no items yet." xml:space="preserve"><value>There are no items yet.</value></data>
+  <data name="There are no people yet." xml:space="preserve"><value>There are no people yet.</value></data>
   <data name="There are no stories yet." xml:space="preserve"><value>There are no stories yet.</value></data>
   <data name="There are no tags yet. Tags are added on each item." xml:space="preserve"><value>There are no tags yet. Tags are added on each item.</value></data>
   <data name="There has been no backup for too long, or none yet." xml:space="preserve"><value>There has been no backup for too long, or none yet.</value></data>
@@ -956,6 +1033,7 @@
   <data name="This is a demo archive. Everything in it, people and pictures included, is made up." xml:space="preserve"><value>This is a demo archive. Everything in it, people and pictures included, is made up.</value></data>
   <data name="This is not a Commonage export." xml:space="preserve"><value>This is not a Commonage export.</value></data>
   <data name="This is not a ZIP file, or it holds too many files." xml:space="preserve"><value>This is not a ZIP file, or it holds too many files.</value></data>
+  <data name="This is not a language code. Examples: de, en, ar, zh-Hans." xml:space="preserve"><value>This is not a language code. Examples: de, en, ar, zh-Hans.</value></data>
   <data name="This is not one of the archive's rights statements. Write its web address as an export does, or leave the cell empty." xml:space="preserve"><value>This is not one of the archive's rights statements. Write its web address as an export does, or leave the cell empty.</value></data>
   <data name="This is your own account. Another admin can change its role, disable or delete it." xml:space="preserve"><value>This is your own account. Another admin can change its role, disable or delete it.</value></data>
   <data name="This item is in the bin." xml:space="preserve"><value>This item is in the bin.</value></data>
@@ -967,6 +1045,7 @@
   <data name="This link is closed. The poster would send people to a page that says so. Open the link first." xml:space="preserve"><value>This link is closed. The poster would send people to a page that says so. Open the link first.</value></data>
   <data name="This link is no longer valid. Please ask an admin for a new one." xml:space="preserve"><value>This link is no longer valid. Please ask an admin for a new one.</value></data>
   <data name="This page does not exist, or it is not public (any more)." xml:space="preserve"><value>This page does not exist, or it is not public (any more).</value></data>
+  <data name="This person is not linked to any item. Link people on the edit page of an item." xml:space="preserve"><value>This person is not linked to any item. Link people on the edit page of an item.</value></data>
   <data name="This person logs in with a code from an authenticator app as well as their password." xml:space="preserve"><value>This person logs in with a code from an authenticator app as well as their password.</value></data>
   <data name="This person logs in with their password only." xml:space="preserve"><value>This person logs in with their password only.</value></data>
   <data name="This recovery code is not right, or it has been used already." xml:space="preserve"><value>This recovery code is not right, or it has been used already.</value></data>
@@ -995,6 +1074,8 @@
   <data name="Too many attempts" xml:space="preserve"><value>Too many attempts</value></data>
   <data name="Too many attempts came from your network in the last hour. Please try again later." xml:space="preserve"><value>Too many attempts came from your network in the last hour. Please try again later.</value></data>
   <data name="Too many failed attempts. Please try again in a few minutes." xml:space="preserve"><value>Too many failed attempts. Please try again in a few minutes.</value></data>
+  <data name="Took the person off an item" xml:space="preserve"><value>Took the person off an item</value></data>
+  <data name="Took the person out of the bin" xml:space="preserve"><value>Took the person out of the bin</value></data>
   <data name="Took the story out of the bin" xml:space="preserve"><value>Took the story out of the bin</value></data>
   <data name="Topic" xml:space="preserve"><value>Topic</value></data>
   <data name="Topics" xml:space="preserve"><value>Topics</value></data>
@@ -1012,6 +1093,7 @@
   <data name="Under embargo" xml:space="preserve"><value>Under embargo</value></data>
   <data name="Understood as: {0}" xml:space="preserve"><value>Understood as: {0}</value></data>
   <data name="Unknown" xml:space="preserve"><value>Unknown</value></data>
+  <data name="Unlink" xml:space="preserve"><value>Unlink</value></data>
   <data name="Unpublish" xml:space="preserve"><value>Unpublish</value></data>
   <data name="Unpublished the item" xml:space="preserve"><value>Unpublished the item</value></data>
   <data name="Unpublished the story" xml:space="preserve"><value>Unpublished the story</value></data>
@@ -1037,8 +1119,11 @@
   <data name="Visitors do not see this photo yet or at all" xml:space="preserve"><value>Visitors do not see this photo yet or at all</value></data>
   <data name="Visitors find all places and all people on pages of their own, once an item with the tag is published. That page lists every person's name, so name living people only when they agree." xml:space="preserve"><value>Visitors find all places and all people on pages of their own, once an item with the tag is published. That page lists every person's name, so name living people only when they agree.</value></data>
   <data name="Visitors find the collections in this order." xml:space="preserve"><value>Visitors find the collections in this order.</value></data>
+  <data name="Visitors see no item of this person." xml:space="preserve"><value>Visitors see no item of this person.</value></data>
   <data name="Visitors see this item in a story only while it is public. If you unpublish it or move it to the bin, it leaves the published stories, and a story with nothing left to show disappears for visitors." xml:space="preserve"><value>Visitors see this item in a story only while it is public. If you unpublish it or move it to the bin, it leaves the published stories, and a story with nothing left to show disappears for visitors.</value></data>
   <data name="Visitors see this item without its photos." xml:space="preserve"><value>Visitors see this item without its photos.</value></data>
+  <data name="Visitors see this name" xml:space="preserve"><value>Visitors see this name</value></data>
+  <data name="Visitors will see this person on the pages of the items below that visitors may see. They will see:" xml:space="preserve"><value>Visitors will see this person on the pages of the items below that visitors may see. They will see:</value></data>
   <data name="Waiting" xml:space="preserve"><value>Waiting</value></data>
   <data name="Waiting for review: {0}" xml:space="preserve"><value>Waiting for review: {0}</value></data>
   <data name="Waiting for setup" xml:space="preserve"><value>Waiting for setup</value></data>
@@ -1055,6 +1140,7 @@
   <data name="What is left out: the names, email addresses and consent texts of contributors, notes from visitors, internal notes, who gave an item, users, settings, and the activity log. Items that were rejected or withdrawn, or whose contributor did not agree to sharing, are not imported. An item that is already here is never changed." xml:space="preserve"><value>What is left out: the names, email addresses and consent texts of contributors, notes from visitors, internal notes, who gave an item, users, settings, and the activity log. Items that were rejected or withdrawn, or whose contributor did not agree to sharing, are not imported. An item that is already here is never changed.</value></data>
   <data name="What is new in {0}" xml:space="preserve"><value>What is new in {0}</value></data>
   <data name="What is wrong" xml:space="preserve"><value>What is wrong</value></data>
+  <data name="What kind of name" xml:space="preserve"><value>What kind of name</value></data>
   <data name="What may others do with it?" xml:space="preserve"><value>What may others do with it?</value></data>
   <data name="What may others do with your items, unless an item says otherwise?" xml:space="preserve"><value>What may others do with your items, unless an item says otherwise?</value></data>
   <data name="What needs attention" xml:space="preserve"><value>What needs attention</value></data>
@@ -1078,6 +1164,8 @@
   <data name="Who is in the picture, where was it, is something wrong? Tell the curators." xml:space="preserve"><value>Who is in the picture, where was it, is something wrong? Tell the curators.</value></data>
   <data name="Who made it" xml:space="preserve"><value>Who made it</value></data>
   <data name="Who made it?" xml:space="preserve"><value>Who made it?</value></data>
+  <data name="Who may see them" xml:space="preserve"><value>Who may see them</value></data>
+  <data name="Who may see this person" xml:space="preserve"><value>Who may see this person</value></data>
   <data name="Who or what can be seen, where and when, and how it came to you." xml:space="preserve"><value>Who or what can be seen, where and when, and how it came to you.</value></data>
   <data name="Why" xml:space="preserve"><value>Why</value></data>
   <data name="With an app on your phone, a password alone is not enough to log in as you." xml:space="preserve"><value>With an app on your phone, a password alone is not enough to log in as you.</value></data>
@@ -1086,10 +1174,13 @@
   <data name="Without this, search engines are asked to leave the archive out. Anyone with a link can still open it." xml:space="preserve"><value>Without this, search engines are asked to leave the archive out. Anyone with a link can still open it.</value></data>
   <data name="Without your phone, each of these codes lets you log in once. Write them down or print them, and keep them somewhere safe, away from your phone. They are shown only now." xml:space="preserve"><value>Without your phone, each of these codes lets you log in once. Write them down or print them, and keep them somewhere safe, away from your phone. They are shown only now.</value></data>
   <data name="Write an imprint, or note that you need none" xml:space="preserve"><value>Write an imprint, or note that you need none</value></data>
+  <data name="Write dates as precisely as they are known, for example: 1953, 12.03.1953, circa 1950. Visitors see them only for a person marked as having died." xml:space="preserve"><value>Write dates as precisely as they are known, for example: 1953, 12.03.1953, circa 1950. Visitors see them only for a person marked as having died.</value></data>
   <data name="Write the date as precisely as it is known, for example: 1953, 12.03.1953, March 1953, circa 1950, 1950s, 1950–1955, before 1945." xml:space="preserve"><value>Write the date as precisely as it is known, for example: 1953, 12.03.1953, March 1953, circa 1950, 1950s, 1950–1955, before 1945.</value></data>
   <data name="Yes" xml:space="preserve"><value>Yes</value></data>
+  <data name="Yes, add the person" xml:space="preserve"><value>Yes, add the person</value></data>
   <data name="Yes, for any purpose, with credit" xml:space="preserve"><value>Yes, for any purpose, with credit</value></data>
   <data name="Yes, for non-commercial purposes, with credit" xml:space="preserve"><value>Yes, for non-commercial purposes, with credit</value></data>
+  <data name="Yes, show this person" xml:space="preserve"><value>Yes, show this person</value></data>
   <data name="You are no longer logged in. Log in again in another tab, then continue." xml:space="preserve"><value>You are no longer logged in. Log in again in another tab, then continue.</value></data>
   <data name="You can send at most {0, plural, one {# photo} other {# photos}} at once." xml:space="preserve"><value>You can send at most {0, plural, one {# photo} other {# photos}} at once.</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="You log in with your password only now." xml:space="preserve"><value>You log in with your password only now.</value></data>
@@ -1113,18 +1204,23 @@
   <data name="accessed {0}" xml:space="preserve"><value>accessed {0}</value></data>
   <data name="may be named publicly" xml:space="preserve"><value>may be named publicly</value></data>
   <data name="not to be named publicly" xml:space="preserve"><value>not to be named publicly</value></data>
+  <data name="{0, plural, =0 {No items yet} one {# item that visitors may see} other {# items that visitors may see}}" xml:space="preserve"><value>{0, plural, =0 {No items yet} one {# item that visitors may see} other {# items that visitors may see}}</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
+  <data name="{0, plural, =0 {No other names} one {# other name that is marked for visitors} other {# other names that are marked for visitors}}" xml:space="preserve"><value>{0, plural, =0 {No other names} one {# other name that is marked for visitors} other {# other names that are marked for visitors}}</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="{0, plural, =0 {No photos are waiting for their previews.} one {One photo is waiting for its previews.} other {# photos are waiting for their previews.}}" xml:space="preserve"><value>{0, plural, =0 {No photos are waiting for their previews.} one {One photo is waiting for its previews.} other {# photos are waiting for their previews.}}</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="{0, plural, =0 {No tags were unused.} one {# unused tag deleted.} other {# unused tags deleted.}}" xml:space="preserve"><value>{0, plural, =0 {No tags were unused.} one {# unused tag deleted.} other {# unused tags deleted.}}</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="{0, plural, =0 {You have no recovery codes left. Create new ones, in case you lose your phone.} one {You have one recovery code left.} other {You have # recovery codes left.}}" xml:space="preserve"><value>{0, plural, =0 {You have no recovery codes left. Create new ones, in case you lose your phone.} one {You have one recovery code left.} other {You have # recovery codes left.}}</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="{0, plural, one {# asks for removal} other {# ask for removal}}" xml:space="preserve"><value>{0, plural, one {# asks for removal} other {# ask for removal}}</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="{0, plural, one {# item asks visitors for help} other {# items ask visitors for help}}" xml:space="preserve"><value>{0, plural, one {# item asks visitors for help} other {# items ask visitors for help}}</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="{0, plural, one {# item not shown to visitors} other {# items not shown to visitors}}" xml:space="preserve"><value>{0, plural, one {# item not shown to visitors} other {# items not shown to visitors}}</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
+  <data name="{0, plural, one {# item visitors may see} other {# items visitors may see}}" xml:space="preserve"><value>{0, plural, one {# item visitors may see} other {# items visitors may see}}</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="{0, plural, one {# item waits for a transcription} other {# items wait for a transcription}}" xml:space="preserve"><value>{0, plural, one {# item waits for a transcription} other {# items wait for a transcription}}</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="{0, plural, one {# item} other {# items}}" xml:space="preserve"><value>{0, plural, one {# item} other {# items}}</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="{0, plural, one {# item} other {# items}} could not be created." xml:space="preserve"><value>{0, plural, one {# item} other {# items}} could not be created.</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="{0, plural, one {# note from visitors to deal with} other {# notes from visitors to deal with}}" xml:space="preserve"><value>{0, plural, one {# note from visitors to deal with} other {# notes from visitors to deal with}}</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="{0, plural, one {# of them is not published yet} other {# of them are not published yet}}" xml:space="preserve"><value>{0, plural, one {# of them is not published yet} other {# of them are not published yet}}</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="{0, plural, one {# part} other {# parts}}" xml:space="preserve"><value>{0, plural, one {# part} other {# parts}}</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
+  <data name="{0, plural, one {# person was created, who only curators see.} other {# people were created, who only curators see.}}" xml:space="preserve"><value>{0, plural, one {# person was created, who only curators see.} other {# people were created, who only curators see.}}</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
+  <data name="{0, plural, one {# person would be created, who only curators see.} other {# people would be created, who only curators see.}}" xml:space="preserve"><value>{0, plural, one {# person would be created, who only curators see.} other {# people would be created, who only curators see.}}</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="{0, plural, one {A visitor sent a note about this item.} other {Visitors sent # notes about this item.}}" xml:space="preserve"><value>{0, plural, one {A visitor sent a note about this item.} other {Visitors sent # notes about this item.}}</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="{0, plural, one {And # more thing found, which is not listed.} other {And # more things found, which are not listed.}}" xml:space="preserve"><value>{0, plural, one {And # more thing found, which is not listed.} other {And # more things found, which are not listed.}}</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>
   <data name="{0, plural, one {Delete the unused tag} other {Delete the # unused tags}}" xml:space="preserve"><value>{0, plural, one {Delete the unused tag} other {Delete the # unused tags}}</value><comment>Has a count. Write a form for each one your language needs, in ICU MessageFormat.</comment></data>

@@ -3,6 +3,7 @@ using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using Commonage.Web.Data;
 using Commonage.Web.Domain;
 using Commonage.Web.Export;
 using Microsoft.EntityFrameworkCore;
@@ -102,8 +103,8 @@ public class ExportTests(CommonageAppFactory app)
     /// and nobody would notice until then. Names are as they appear in archive.json.
     /// </summary>
     [Theory]
-    [InlineData(typeof(ArchiveItem), "item", "id collectionId title description status createdAt updatedAt publishedAt rejectedOrWithdrawnAt contribution files tags rightsUri rightsHolder credit referenceNumber originalLocation receivedFrom receivedOn internalNotes needsTranscription helpWanted mediaLevel publicFrom notes",
-        "Collection: by collectionId. MediaFiles: as files. DateText, DateFrom, DateTo: as date. TagNames: repeats tags. "
+    [InlineData(typeof(ArchiveItem), "item", "id collectionId title description status createdAt updatedAt publishedAt rejectedOrWithdrawnAt contribution files tags people rightsUri rightsHolder credit referenceNumber originalLocation receivedFrom receivedOn internalNotes needsTranscription helpWanted mediaLevel publicFrom notes",
+        "Collection: by collectionId. MediaFiles: as files. People: as people, the numbers of the people in the list \"people\". DateText, DateFrom, DateTo: as date. TagNames: repeats tags. "
         + "CanBePublished: follows from status. IsUntitled: follows from the empty title. MayTravel: follows from the contribution. FileText: the text of the PDFs, found again from the files. DeletedAt: the bin is not exported. Version: only for open forms.")]
     [InlineData(typeof(MediaFile), "file", "id originalFileName contentType sizeBytes sha256 uploadedAt altText caption position rotation pageCount",
         "ArchiveItemId, ArchiveItem: the file is listed under its item. StorageId, OriginalKey, PreviewKey, ThumbnailKey: storage details. DerivativeKeys, StoredKeys, PageKey, AudioKey, IsAudio, IsPdf, PdfContentType, MaxPdfPages: follow from the file or are fixed values. ExtractedText: the text of a PDF, found again from the file. "
@@ -119,6 +120,10 @@ public class ExportTests(CommonageAppFactory app)
         "UpdatedAt: made again where the story arrives. DeletedAt: the bin is not exported. Version: only for open forms. IsUntitled: follows from the empty title. CanBePublished: follows from the blocks and the title.")]
     [InlineData(typeof(StoryBlock), "block", "kind text itemId caption",
         "Id, StoryId, Story: the block is listed under its story. ArchiveItemId: as itemId. Position: follows from the order they are listed in. ArchiveItem: as itemId, and only when that item is in the export.")]
+    [InlineData(typeof(Person), "person", "id publicId name sortName disclosure born died biography curatorNote createdAt names",
+        "FoldedName: follows from the name. DisclosureChangedAt, UpdatedAt, Version: only for open forms and the order of the work. BornText, BornFrom, BornTo: as born. DiedText, DiedFrom, DiedTo: as died. DeletedAt: the bin is not exported. "
+        + "Links: each item lists its people. HasDied, IsHidden, MayBeShown: follow from disclosure.")]
+    [InlineData(typeof(PersonName), "personName", "name kind language shownToVisitors", "Id, PersonId, Person: the name is listed under its person. FoldedName: follows from the name.")]
     public async Task Every_field_is_exported_or_left_out_on_purpose(Type type, string part, string exported, string leftOut)
     {
         var item = await app.CreateContributionAsync(ItemStatus.Published);
@@ -131,6 +136,10 @@ public class ExportTests(CommonageAppFactory app)
             var tagged = await db.ArchiveItems.Include(i => i.Tags).SingleAsync(i => i.Id == item.Id);
             var name = TestData.Unique("place");
             tagged.SetTags([new Tag { Name = name, NormalizedName = Tag.Normalize(name), Kind = TagKind.Place }]);
+            var someone = db.AddHiddenPerson(TestData.Unique("Someone"), DateTime.UtcNow);
+            someone.Names.Add(new PersonName { Name = TestData.Unique("Other"), Kind = PersonNameKind.Nickname, Language = "de", ShownToVisitors = true });
+            someone.CuratorNote = "A note for curators";
+            db.ItemPeople.Add(new ItemPerson { ArchiveItemId = item.Id, Person = someone, CreatedAt = DateTime.UtcNow });
             db.VisitorNotes.Add(new VisitorNote { ArchiveItemId = item.Id, Kind = VisitorNoteKind.Information, Message = "A note", ReceivedAt = DateTime.UtcNow });
             var story = new Story { Title = storyTitle, Status = StoryStatus.Draft, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow };
             story.Blocks.Add(new StoryBlock { Position = 0, Kind = StoryBlockKind.Item, ArchiveItemId = item.Id, Caption = "A caption" });
@@ -151,6 +160,10 @@ public class ExportTests(CommonageAppFactory app)
             "story" => exportedStory,
             "block" => exportedStory.GetProperty("blocks")[0],
             "tag" => JsonDocument.Parse(Read(zip, "archive.json")).RootElement.GetProperty("tags")[0],
+            "person" => JsonDocument.Parse(Read(zip, "archive.json")).RootElement.GetProperty("people").EnumerateArray()
+                .First(p => p.GetProperty("id").GetInt32() == exportedItem.GetProperty("people")[0].GetInt32()),
+            "personName" => JsonDocument.Parse(Read(zip, "archive.json")).RootElement.GetProperty("people").EnumerateArray()
+                .First(p => p.GetProperty("id").GetInt32() == exportedItem.GetProperty("people")[0].GetInt32()).GetProperty("names")[0],
             _ => JsonDocument.Parse(Read(zip, "archive.json")).RootElement.GetProperty("collections")[0],
         };
 
@@ -215,7 +228,7 @@ public class ExportTests(CommonageAppFactory app)
         Assert.Contains(published.Id, ids);
         Assert.DoesNotContain(waiting.Id, ids);
         Assert.Equal(["Published"], statuses);
-        Assert.Equal(9, document.GetProperty("version").GetInt32());
+        Assert.Equal(10, document.GetProperty("version").GetInt32());
     }
 
     [Fact]

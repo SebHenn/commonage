@@ -1157,4 +1157,100 @@
   <data name="Showing the first {0}." xml:space="preserve"><value>Die ersten {0} werden gezeigt.</value></data>
   <data name="Visitors see this item in a story only while it is public. If you unpublish it or move it to the bin, it leaves the published stories, and a story with nothing left to show disappears for visitors." xml:space="preserve"><value>Besucher sehen dieses Objekt in einer Geschichte nur, solange es öffentlich ist. Wenn Sie die Veröffentlichung zurücknehmen oder es in den Papierkorb legen, verschwindet es aus den veröffentlichten Geschichten, und eine Geschichte, in der nichts mehr zu zeigen ist, verschwindet für Besucher ganz.</value></data>
   <data name="This item is not public, so visitors do not see it in these stories yet." xml:space="preserve"><value>Dieses Objekt ist nicht öffentlich, deshalb sehen Besucher es in diesen Geschichten noch nicht.</value></data>
+  <data name="&quot;people&quot; in archive.json lists the people with their names, other names, dates as written and biography. Each item lists the people it names by the number of the person. A copy of what is public holds only the people that visitors may see, and a copy without personal data holds no person who is only for curators. Where a person may be living, their dates and their other names that visitors do not see are left out." xml:space="preserve"><value>"people" in archive.json listet die Personen mit ihren Namen, weiteren Namen, Daten wie geschrieben und ihrer Biografie. Jedes Objekt nennt die Personen, die es betrifft, mit der Nummer der Person. Eine Kopie des Öffentlichen enthält nur die Personen, die Besucher sehen dürfen, und eine Kopie ohne persönliche Daten enthält keine Person, die nur für Kuratoren sichtbar ist. Wo eine Person noch leben könnte, fehlen ihre Daten und ihre weiteren Namen, die Besucher nicht sehen.</value></data>
+  <data name="A person can have at most {0, plural, one {# other name} other {# other names}}." xml:space="preserve"><value>Eine Person kann höchstens {0, plural, one {# weiteren Namen} other {# weitere Namen}} haben.</value></data>
+  <data name="A person is only public while at least one item they are linked to is public, too." xml:space="preserve"><value>Eine Person ist nur öffentlich, solange mindestens ein Objekt, mit dem sie verknüpft ist, ebenfalls öffentlich ist.</value></data>
+  <data name="A person since deleted" xml:space="preserve"><value>Eine inzwischen gelöschte Person</value></data>
+  <data name="A public tag with this name still exists" xml:space="preserve"><value>Ein öffentliches Schlagwort mit diesem Namen gibt es noch</value></data>
+  <data name="Add" xml:space="preserve"><value>Hinzufügen</value></data>
+  <data name="Add a person" xml:space="preserve"><value>Person hinzufügen</value></data>
+  <data name="Add name" xml:space="preserve"><value>Namen hinzufügen</value></data>
+  <data name="Add this person" xml:space="preserve"><value>Diese Person hinzufügen</value></data>
+  <data name="Add {0}" xml:space="preserve"><value>{0} hinzufügen</value></data>
+  <data name="Add “{0}” as a new person?" xml:space="preserve"><value>„{0}“ als neue Person hinzufügen?</value></data>
+  <data name="Added another name to the person" xml:space="preserve"><value>Der Person einen weiteren Namen hinzugefügt</value></data>
+  <data name="Also known as" xml:space="preserve"><value>Auch bekannt als</value></data>
+  <data name="An item can have at most {0, plural, one {# person} other {# people}}." xml:space="preserve"><value>Ein Objekt kann höchstens {0, plural, one {# Person} other {# Personen}} haben.</value></data>
+  <data name="Biography" xml:space="preserve"><value>Biografie</value></data>
+  <data name="Birth name" xml:space="preserve"><value>Geburtsname</value></data>
+  <data name="Born" xml:space="preserve"><value>Geboren</value></data>
+  <data name="Changed the person" xml:space="preserve"><value>Die Person geändert</value></data>
+  <data name="Changed who may see the person" xml:space="preserve"><value>Geändert, wer die Person sehen darf</value></data>
+  <data name="Clear" xml:space="preserve"><value>Leeren</value></data>
+  <data name="Created the person" xml:space="preserve"><value>Die Person angelegt</value></data>
+  <data name="Deleted the person after their time in the bin" xml:space="preserve"><value>Die Person nach der Zeit im Papierkorb gelöscht</value></data>
+  <data name="Deleted the person for good" xml:space="preserve"><value>Die Person endgültig gelöscht</value></data>
+  <data name="Died" xml:space="preserve"><value>Gestorben</value></data>
+  <data name="Edit person" xml:space="preserve"><value>Person bearbeiten</value></data>
+  <data name="Has died: visitors may see them" xml:space="preserve"><value>Verstorben: Besucher dürfen sie sehen</value></data>
+  <data name="In another script" xml:space="preserve"><value>In einer anderen Schrift</value></data>
+  <data name="In the name, another name or the note for curators of these people. Correct or remove the text on the person." xml:space="preserve"><value>Im Namen, in einem weiteren Namen oder in der Notiz für Kuratoren dieser Personen. Korrigieren oder entfernen Sie den Text bei der Person.</value></data>
+  <data name="Language (optional)" xml:space="preserve"><value>Sprache (optional)</value></data>
+  <data name="Linked the person to an item" xml:space="preserve"><value>Die Person mit einem Objekt verknüpft</value></data>
+  <data name="Made people from tags" xml:space="preserve"><value>Personen aus Schlagwörtern angelegt</value></data>
+  <data name="Married name" xml:space="preserve"><value>Ehename</value></data>
+  <data name="May be living, and may be shown" xml:space="preserve"><value>Könnte noch leben und darf gezeigt werden</value></data>
+  <data name="Merged two people" xml:space="preserve"><value>Zwei Personen zusammengeführt</value></data>
+  <data name="More than one person has this name. Which one is meant?" xml:space="preserve"><value>Mehrere Personen haben diesen Namen. Welche ist gemeint?</value></data>
+  <data name="Moved items from one person to another" xml:space="preserve"><value>Objekte von einer Person zu einer anderen verschoben</value></data>
+  <data name="Moved the person to the bin" xml:space="preserve"><value>Die Person in den Papierkorb gelegt</value></data>
+  <data name="Name of the new person" xml:space="preserve"><value>Name der neuen Person</value></data>
+  <data name="Name of the person" xml:space="preserve"><value>Name der Person</value></data>
+  <data name="New person" xml:space="preserve"><value>Neue Person</value></data>
+  <data name="Nickname" xml:space="preserve"><value>Spitzname</value></data>
+  <data name="No biography" xml:space="preserve"><value>Keine Biografie</value></data>
+  <data name="No dates" xml:space="preserve"><value>Keine Daten</value></data>
+  <data name="No dates: for a person who may be living, dates are never shown" xml:space="preserve"><value>Keine Daten: Bei einer Person, die noch leben könnte, werden Daten nie gezeigt</value></data>
+  <data name="No other names yet." xml:space="preserve"><value>Noch keine weiteren Namen.</value></data>
+  <data name="No people are linked to this item." xml:space="preserve"><value>Mit diesem Objekt sind keine Personen verknüpft.</value></data>
+  <data name="No person matches." xml:space="preserve"><value>Keine Person passt.</value></data>
+  <data name="None of them: add a new person" xml:space="preserve"><value>Keine von ihnen: neue Person hinzufügen</value></data>
+  <data name="Note for curators" xml:space="preserve"><value>Notiz für Kuratoren</value></data>
+  <data name="Only curators" xml:space="preserve"><value>Nur Kuratoren</value></data>
+  <data name="Only curators see the new person until you choose otherwise." xml:space="preserve"><value>Nur Kuratoren sehen die neue Person, bis Sie etwas anderes wählen.</value></data>
+  <data name="Only curators see this note. It is never shown to visitors or put into a copy made for them." xml:space="preserve"><value>Nur Kuratoren sehen diese Notiz. Sie wird Besuchern nie gezeigt und kommt in keine Kopie für sie.</value></data>
+  <data name="Other" xml:space="preserve"><value>Sonstiges</value></data>
+  <data name="Other name" xml:space="preserve"><value>Weiterer Name</value></data>
+  <data name="Other names" xml:space="preserve"><value>Weitere Namen</value></data>
+  <data name="Other spelling" xml:space="preserve"><value>Andere Schreibweise</value></data>
+  <data name="People who appear in the archive. A new person is seen by curators only. You choose for each person whether visitors may see their name." xml:space="preserve"><value>Personen, die im Archiv vorkommen. Eine neue Person sehen nur Kuratoren. Sie entscheiden für jede Person, ob Besucher ihren Namen sehen dürfen.</value></data>
+  <data name="Preview. None of this person's items is public yet, so visitors cannot find them." xml:space="preserve"><value>Vorschau. Noch kein Objekt dieser Person ist öffentlich, deshalb können Besucher sie nicht finden.</value></data>
+  <data name="Preview. Only curators see this person: visitors cannot see this page." xml:space="preserve"><value>Vorschau. Nur Kuratoren sehen diese Person: Besucher können diese Seite nicht sehen.</value></data>
+  <data name="Remove this name?" xml:space="preserve"><value>Diesen Namen entfernen?</value></data>
+  <data name="Removed another name from the person" xml:space="preserve"><value>Einen weiteren Namen der Person entfernt</value></data>
+  <data name="Save for {0}" xml:space="preserve"><value>Für {0} speichern</value></data>
+  <data name="Save this choice" xml:space="preserve"><value>Diese Auswahl speichern</value></data>
+  <data name="Search by name" xml:space="preserve"><value>Nach Namen suchen</value></data>
+  <data name="Show this person to visitors as someone who has died?" xml:space="preserve"><value>Diese Person Besuchern als verstorben zeigen?</value></data>
+  <data name="Show this person to visitors, who may be living?" xml:space="preserve"><value>Diese Person Besuchern zeigen, obwohl sie noch leben könnte?</value></data>
+  <data name="Someone else changed this person while you were working on it" xml:space="preserve"><value>Jemand anderes hat diese Person geändert, während Sie daran gearbeitet haben</value></data>
+  <data name="Sort name" xml:space="preserve"><value>Sortiername</value></data>
+  <data name="Take {0} off this item" xml:space="preserve"><value>{0} von diesem Objekt entfernen</value></data>
+  <data name="Take {0} off this person" xml:space="preserve"><value>{0} von dieser Person entfernen</value></data>
+  <data name="The biography" xml:space="preserve"><value>Die Biografie</value></data>
+  <data name="The dates of birth and death, as far as they are written" xml:space="preserve"><value>Die Geburts- und Sterbedaten, soweit sie eingetragen sind</value></data>
+  <data name="The name the person is sorted by in lists. Leave it empty to sort by the name." xml:space="preserve"><value>Der Name, nach dem die Person in Listen sortiert wird. Leer lassen, um nach dem Namen zu sortieren.</value></data>
+  <data name="The name: {0}" xml:space="preserve"><value>Der Name: {0}</value></data>
+  <data name="The person is added. Only curators can see them until you choose otherwise." xml:space="preserve"><value>Die Person ist hinzugefügt. Nur Kuratoren sehen sie, bis Sie etwas anderes wählen.</value></data>
+  <data name="The text can be at most {1} characters long." xml:space="preserve"><value>Der Text darf höchstens {1} Zeichen lang sein.</value></data>
+  <data name="There are no people yet." xml:space="preserve"><value>Es gibt noch keine Personen.</value></data>
+  <data name="This is not a language code. Examples: de, en, ar, zh-Hans." xml:space="preserve"><value>Das ist kein Sprachcode. Beispiele: de, en, ar, zh-Hans.</value></data>
+  <data name="This person is not linked to any item. Link people on the edit page of an item." xml:space="preserve"><value>Diese Person ist mit keinem Objekt verknüpft. Verknüpfen Sie Personen auf der Bearbeitungsseite eines Objekts.</value></data>
+  <data name="Took the person off an item" xml:space="preserve"><value>Die Person von einem Objekt entfernt</value></data>
+  <data name="Took the person out of the bin" xml:space="preserve"><value>Die Person aus dem Papierkorb geholt</value></data>
+  <data name="Unlink" xml:space="preserve"><value>Verknüpfung lösen</value></data>
+  <data name="Visitors see no item of this person." xml:space="preserve"><value>Besucher sehen kein Objekt dieser Person.</value></data>
+  <data name="Visitors see this name" xml:space="preserve"><value>Besucher sehen diesen Namen</value></data>
+  <data name="Visitors will see this person on the pages of the items below that visitors may see. They will see:" xml:space="preserve"><value>Besucher sehen diese Person auf den Seiten der folgenden Objekte, die sie sehen dürfen. Sie sehen:</value></data>
+  <data name="What kind of name" xml:space="preserve"><value>Welche Art von Name</value></data>
+  <data name="Who may see them" xml:space="preserve"><value>Wer sie sehen darf</value></data>
+  <data name="Who may see this person" xml:space="preserve"><value>Wer diese Person sehen darf</value></data>
+  <data name="Write dates as precisely as they are known, for example: 1953, 12.03.1953, circa 1950. Visitors see them only for a person marked as having died." xml:space="preserve"><value>Schreiben Sie Daten so genau, wie sie bekannt sind, zum Beispiel: 1953, 12.03.1953, um 1950. Besucher sehen sie nur bei einer Person, die als verstorben markiert ist.</value></data>
+  <data name="Yes, add the person" xml:space="preserve"><value>Ja, Person hinzufügen</value></data>
+  <data name="Yes, show this person" xml:space="preserve"><value>Ja, diese Person zeigen</value></data>
+  <data name="{0, plural, =0 {No items yet} one {# item that visitors may see} other {# items that visitors may see}}" xml:space="preserve"><value>{0, plural, =0 {Noch keine Objekte} one {# Objekt, das Besucher sehen dürfen} other {# Objekte, die Besucher sehen dürfen}}</value></data>
+  <data name="{0, plural, =0 {No other names} one {# other name that is marked for visitors} other {# other names that are marked for visitors}}" xml:space="preserve"><value>{0, plural, =0 {Keine weiteren Namen} one {# weiterer Name, der für Besucher markiert ist} other {# weitere Namen, die für Besucher markiert sind}}</value></data>
+  <data name="{0, plural, one {# item visitors may see} other {# items visitors may see}}" xml:space="preserve"><value>{0, plural, one {# Objekt, das Besucher sehen dürfen} other {# Objekte, die Besucher sehen dürfen}}</value></data>
+  <data name="{0, plural, one {# person was created, who only curators see.} other {# people were created, who only curators see.}}" xml:space="preserve"><value>{0, plural, one {# Person wurde angelegt, die nur Kuratoren sehen.} other {# Personen wurden angelegt, die nur Kuratoren sehen.}}</value></data>
+  <data name="{0, plural, one {# person would be created, who only curators see.} other {# people would be created, who only curators see.}}" xml:space="preserve"><value>{0, plural, one {# Person würde angelegt, die nur Kuratoren sieht.} other {# Personen würden angelegt, die nur Kuratoren sehen.}}</value></data>
 </root>

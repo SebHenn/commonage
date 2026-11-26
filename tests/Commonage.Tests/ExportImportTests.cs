@@ -238,6 +238,7 @@ public partial class ExportImportTests(CommonageAppFactory app)
     [InlineData(4)]
     [InlineData(8)]
     [InlineData(9)]
+    [InlineData(10)]
     public async Task Versions_four_to_the_current_one_are_read(int version)
     {
         using var curator = await CuratorAsync(app);
@@ -252,7 +253,7 @@ public partial class ExportImportTests(CommonageAppFactory app)
 
     [Theory]
     [InlineData(3, "format version 3")]
-    [InlineData(10, "format version 10")]
+    [InlineData(11, "format version 11")]
     public async Task Other_versions_and_other_files_are_refused_with_a_sentence(int version, string expected)
     {
         using var curator = await CuratorAsync(app);
@@ -825,7 +826,7 @@ public partial class ExportImportTests(CommonageAppFactory app)
     public void Every_property_of_the_export_has_a_decision_and_the_reader_holds_exactly_what_is_not_dropped()
     {
         var assembly = typeof(ArchiveExporter).Assembly;
-        string[] types = ["ExportSettings", "ExportText", "ExportCollection", "ExportTag", "ExportItem", "ExportDate", "ExportContribution", "ExportNote", "ExportFile", "ExportStory", "ExportStoryBlock"];
+        string[] types = ["ExportSettings", "ExportText", "ExportCollection", "ExportTag", "ExportItem", "ExportDate", "ExportContribution", "ExportNote", "ExportFile", "ExportStory", "ExportStoryBlock", "ExportPerson", "ExportPersonName"];
         var missing = new List<string>();
         var found = new HashSet<string>();
         foreach (var name in types)
@@ -846,7 +847,7 @@ public partial class ExportImportTests(CommonageAppFactory app)
         (string Export, Type Imported)[] pairs =
         [
             ("ExportCollection", typeof(ImportedCollection)), ("ExportTag", typeof(ImportedTag)), ("ExportItem", typeof(ImportedItem)),
-            ("ExportDate", typeof(ImportedDate)), ("ExportContribution", typeof(ImportedContribution)), ("ExportFile", typeof(ImportedFile)),
+            ("ExportPerson", typeof(ImportedPerson)), ("ExportPersonName", typeof(ImportedPersonName)), ("ExportDate", typeof(ImportedDate)), ("ExportContribution", typeof(ImportedContribution)), ("ExportFile", typeof(ImportedFile)),
         ];
         foreach (var (export, imported) in pairs)
         {
