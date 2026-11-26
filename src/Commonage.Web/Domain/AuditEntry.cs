@@ -77,6 +77,20 @@ public enum AuditAction
     StoryRestored,
     StoryDeleted,
     StoryPurged,
+    PersonCreated,
+    PersonChanged,
+    PersonDisclosureChanged,
+    PersonNameAdded,
+    PersonNameRemoved,
+    PersonLinked,
+    PersonUnlinked,
+    PeopleMerged,
+    PersonItemsMoved,
+    PersonMovedToBin,
+    PersonRestored,
+    PersonDeleted,
+    PersonPurged,
+    PersonTagsConverted,
 }
 
 /// <summary>
@@ -106,6 +120,10 @@ public class AuditEntry
     /// <summary>The story concerned, if any. Set to null when the story is deleted; <see cref="Subject"/> keeps its title.</summary>
     public int? StoryId { get; set; }
     public Story? Story { get; set; }
+
+    /// <summary>The person concerned, if any. Set to null when the person is deleted. The log keeps the id and never the name: the line shows the current name to curators.</summary>
+    public int? PersonId { get; set; }
+    public Person? Person { get; set; }
 
     /// <summary>What the action was about, as it was called at the time: an item's or collection's title, an account name.</summary>
     public string? Subject { get; set; }
