@@ -427,7 +427,7 @@
                             <partial name="/Pages/Admin/People/_DisclosureBadge.cshtml" model="linked.Disclosure" />
                             <form method="post" asp-page="/Admin/People/AddToItem" asp-page-handler="Remove" asp-route-itemId="@Model.ItemId" data-send-once>
                                 <input type="hidden" name="personId" value="@linked.Id" />
-                                <button type="submit" class="btn btn-sm btn-outline-secondary" aria-label="@T["Take {0} off this item", linked.Name]">@T["Remove"]</button>
+                                <button type="submit" class="btn btn-sm btn-outline-secondary" aria-label="@T["Remove: {0}", linked.Name]">@T["Remove"]</button>
                             </form>
                         </li>
                     }

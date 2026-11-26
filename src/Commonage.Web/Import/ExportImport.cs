@@ -985,7 +985,7 @@ public partial class ExportImport(
         ExportRefusal.VersionNotUnderstood =>
             localizer["This export has the format version {0}. This archive reads the versions {1} to {2}.", foundVersion?.ToString(CultureInfo.InvariantCulture) ?? "?", MinVersion, ArchiveExporter.Version],
         ExportRefusal.NotReadable => localizer["The file archive.json in this export could not be read."],
-        ExportRefusal.TooMany => localizer["This export holds more items, files, tags or collections than one import can read."],
+        ExportRefusal.TooMany => localizer["This export holds more items, files, tags, people or collections than one import can read."],
         ExportRefusal.TooMuchData => localizer["This export holds more data than one import can read."],
         _ => "",
     };

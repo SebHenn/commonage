@@ -259,7 +259,7 @@
                         }
                     </span>
                     <form method="post" asp-page-handler="Unlink" asp-route-id="@person.Id" asp-route-itemId="@item.Id" data-send-once>
-                        <button type="submit" class="btn btn-sm btn-outline-secondary" aria-label="@T["Take {0} off this person", ArchiveItem.ShownTitle(T, item.Title)]">@T["Unlink"]</button>
+                        <button type="submit" class="btn btn-sm btn-outline-secondary" aria-label="@T["Unlink: {0}", ArchiveItem.ShownTitle(T, item.Title)]">@T["Unlink"]</button>
                     </form>
                 </li>
             }

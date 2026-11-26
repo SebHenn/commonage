@@ -1068,7 +1068,7 @@
   <data name="This ZIP file is not a Commonage export: it has no archive.json." xml:space="preserve"><value>Diese ZIP-Datei ist kein Commonage-Export: Sie enthält keine archive.json.</value></data>
   <data name="This export has the format version {0}. This archive reads the versions {1} to {2}." xml:space="preserve"><value>Dieser Export hat die Formatversion {0}. Dieses Archiv liest die Versionen {1} bis {2}.</value></data>
   <data name="This export holds more data than one import can read." xml:space="preserve"><value>Dieser Export enthält mehr Daten, als ein Import lesen kann.</value></data>
-  <data name="This export holds more items, files, tags or collections than one import can read." xml:space="preserve"><value>Dieser Export enthält mehr Objekte, Dateien, Schlagwörter oder Sammlungen, als ein Import lesen kann.</value></data>
+  <data name="This export holds more items, files, tags, people or collections than one import can read." xml:space="preserve"><value>Dieser Export enthält mehr Objekte, Dateien, Schlagwörter, Personen oder Sammlungen, als ein Import lesen kann.</value></data>
   <data name="This file does not match its checksum, so it is left out." xml:space="preserve"><value>Diese Datei passt nicht zu ihrer Prüfsumme, daher wird sie ausgelassen.</value></data>
   <data name="This file is not in the ZIP file." xml:space="preserve"><value>Diese Datei ist nicht in der ZIP-Datei.</value></data>
   <data name="This is not a Commonage export." xml:space="preserve"><value>Das ist kein Commonage-Export.</value></data>
@@ -1225,8 +1225,7 @@
   <data name="Show this person to visitors, who may be living?" xml:space="preserve"><value>Diese Person Besuchern zeigen, obwohl sie noch leben könnte?</value></data>
   <data name="Someone else changed this person while you were working on it" xml:space="preserve"><value>Jemand anderes hat diese Person geändert, während Sie daran gearbeitet haben</value></data>
   <data name="Sort name" xml:space="preserve"><value>Sortiername</value></data>
-  <data name="Take {0} off this item" xml:space="preserve"><value>{0} von diesem Objekt entfernen</value></data>
-  <data name="Take {0} off this person" xml:space="preserve"><value>{0} von dieser Person entfernen</value></data>
+  <data name="Unlink: {0}" xml:space="preserve"><value>Verknüpfung lösen: {0}</value></data>
   <data name="The biography" xml:space="preserve"><value>Die Biografie</value></data>
   <data name="The dates of birth and death, as far as they are written" xml:space="preserve"><value>Die Geburts- und Sterbedaten, soweit sie eingetragen sind</value></data>
   <data name="The name the person is sorted by in lists. Leave it empty to sort by the name." xml:space="preserve"><value>Der Name, nach dem die Person in Listen sortiert wird. Leer lassen, um nach dem Namen zu sortieren.</value></data>

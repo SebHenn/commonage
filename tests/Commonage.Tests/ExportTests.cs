@@ -180,6 +180,59 @@ public class ExportTests(CommonageAppFactory app)
     }
 
     [Fact]
+    public async Task People_are_exported_by_the_kind_of_copy_and_never_with_what_is_only_for_curators_in_a_public_copy()
+    {
+        await using var archive = await app.NewArchiveAsync();
+        using var admin = archive.CreateClient();
+        await Browser.LogInAsCuratorAsync(admin);
+        await archive.WithDbAsync(async db =>
+        {
+            var now = DateTime.UtcNow;
+            var collection = new Collection { Title = "Club", CreatedAt = now };
+            ArchiveItem Item(string title, bool published)
+            {
+                var item = new ArchiveItem { Title = title, Collection = collection, CreatedAt = now, UpdatedAt = now, Status = ItemStatus.Draft };
+                if (published)
+                    item.Publish(now);
+                return item;
+            }
+
+            var shown = Item("Shown match", true);
+            var draft = Item("Draft match", false);
+            db.ArchiveItems.AddRange(shown, draft);
+            db.AddDemoPerson("Zora Quillfeather", hasDied: true, born: "1931", died: "2009", "Zora wrote the club songs.", note: "Note-for-curators-Zora",
+                [new ImportedPersonOtherName("Zorchen", PersonNameKind.Nickname, "de")], shown, now);
+            db.AddDemoPerson("Ulf Marrowby", hasDied: false, born: "1950", died: null, "Biography-of-Ulf", note: "Note-for-curators-Ulf",
+                [], draft, now);
+            await db.SaveChangesAsync();
+            return 0;
+        });
+
+        using var publicZip = await ExportAsync(admin, publishedOnly: true, includePersonalData: false);
+        using var plainZip = await ExportAsync(admin, publishedOnly: false, includePersonalData: false);
+        using var fullZip = await ExportAsync(admin, publishedOnly: false, includePersonalData: true);
+
+        var publicText = Encoding.UTF8.GetString(Read(publicZip, "archive.json"));
+        var publicPeople = JsonDocument.Parse(publicText).RootElement.GetProperty("people").EnumerateArray().ToList();
+        var zora = Assert.Single(publicPeople);
+        Assert.Equal("Zora Quillfeather", zora.GetProperty("name").GetString());
+        Assert.Contains("Zorchen", publicText);
+        foreach (var hidden in new[] { "Ulf Marrowby", "Biography-of-Ulf", "Note-for-curators-Zora", "Note-for-curators-Ulf" })
+            Assert.DoesNotContain(hidden, publicText);
+        Assert.False(zora.TryGetProperty("curatorNote", out var note) && note.ValueKind == JsonValueKind.String);
+        Assert.False(zora.TryGetProperty("publicId", out var publicId) && publicId.ValueKind == JsonValueKind.String);
+
+        var plainText = Encoding.UTF8.GetString(Read(plainZip, "archive.json"));
+        Assert.DoesNotContain("Ulf Marrowby", plainText);
+        Assert.DoesNotContain("Note-for-curators", plainText);
+
+        var fullText = Encoding.UTF8.GetString(Read(fullZip, "archive.json"));
+        var fullPeople = JsonDocument.Parse(fullText).RootElement.GetProperty("people").EnumerateArray().Select(p => p.GetProperty("name").GetString()).ToList();
+        Assert.Equal(["Ulf Marrowby", "Zora Quillfeather"], fullPeople.Order().ToList());
+        Assert.Contains("Note-for-curators-Ulf", fullText);
+    }
+
+    [Fact]
     public async Task Items_in_the_bin_are_not_exported()
     {
         var binned = await app.CreateContributionAsync(ItemStatus.Published);

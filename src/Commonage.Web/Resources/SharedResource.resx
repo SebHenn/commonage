@@ -848,8 +848,6 @@
   <data name="Tags" xml:space="preserve"><value>Tags</value></data>
   <data name="Tags the items already have stay." xml:space="preserve"><value>Tags the items already have stay.</value></data>
   <data name="Tags to add" xml:space="preserve"><value>Tags to add</value></data>
-  <data name="Take {0} off this item" xml:space="preserve"><value>Take {0} off this item</value></data>
-  <data name="Take {0} off this person" xml:space="preserve"><value>Take {0} off this person</value></data>
   <data name="Tell us" xml:space="preserve"><value>Tell us</value></data>
   <data name="Test restoring a backup, on another machine (docs/deployment.md)" xml:space="preserve"><value>Test restoring a backup, on another machine (docs/deployment.md)</value></data>
   <data name="Text" xml:space="preserve"><value>Text</value></data>
@@ -1023,7 +1021,7 @@
   <data name="This draft has no title yet, and cannot be published without one. Give it a title that says what the photo shows." xml:space="preserve"><value>This draft has no title yet, and cannot be published without one. Give it a title that says what the photo shows.</value></data>
   <data name="This export has the format version {0}. This archive reads the versions {1} to {2}." xml:space="preserve"><value>This export has the format version {0}. This archive reads the versions {1} to {2}.</value></data>
   <data name="This export holds more data than one import can read." xml:space="preserve"><value>This export holds more data than one import can read.</value></data>
-  <data name="This export holds more items, files, tags or collections than one import can read." xml:space="preserve"><value>This export holds more items, files, tags or collections than one import can read.</value></data>
+  <data name="This export holds more items, files, tags, people or collections than one import can read." xml:space="preserve"><value>This export holds more items, files, tags, people or collections than one import can read.</value></data>
   <data name="This file does not match its checksum, so it is left out." xml:space="preserve"><value>This file does not match its checksum, so it is left out.</value></data>
   <data name="This file is not in the ZIP file or the folder." xml:space="preserve"><value>This file is not in the ZIP file or the folder.</value></data>
   <data name="This file is not in the ZIP file." xml:space="preserve"><value>This file is not in the ZIP file.</value></data>
@@ -1094,6 +1092,7 @@
   <data name="Understood as: {0}" xml:space="preserve"><value>Understood as: {0}</value></data>
   <data name="Unknown" xml:space="preserve"><value>Unknown</value></data>
   <data name="Unlink" xml:space="preserve"><value>Unlink</value></data>
+  <data name="Unlink: {0}" xml:space="preserve"><value>Unlink: {0}</value></data>
   <data name="Unpublish" xml:space="preserve"><value>Unpublish</value></data>
   <data name="Unpublished the item" xml:space="preserve"><value>Unpublished the item</value></data>
   <data name="Unpublished the story" xml:space="preserve"><value>Unpublished the story</value></data>
