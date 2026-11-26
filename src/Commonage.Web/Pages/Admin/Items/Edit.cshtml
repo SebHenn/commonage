@@ -409,6 +409,43 @@
         </section>
     }
 
+    @if (mayManage && Model.ItemId is not null)
+    {
+        <section class="mt-5 col-lg-8" id="people" aria-labelledby="people-heading">
+            <h2 id="people-heading" class="h4">@T["People"]</h2>
+            @if (Model.People.Count == 0)
+            {
+                <p class="text-muted">@T["No people are linked to this item."]</p>
+            }
+            else
+            {
+                <ul class="list-group mb-3">
+                    @foreach (var linked in Model.People)
+                    {
+                        <li class="list-group-item d-flex flex-wrap gap-2 align-items-center">
+                            <span class="me-auto text-break"><a asp-page="/Admin/People/Edit" asp-route-id="@linked.Id">@linked.Name</a></span>
+                            <partial name="/Pages/Admin/People/_DisclosureBadge.cshtml" model="linked.Disclosure" />
+                            <form method="post" asp-page="/Admin/People/AddToItem" asp-page-handler="Remove" asp-route-itemId="@Model.ItemId" data-send-once>
+                                <input type="hidden" name="personId" value="@linked.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-secondary" aria-label="@T["Take {0} off this item", linked.Name]">@T["Remove"]</button>
+                            </form>
+                        </li>
+                    }
+                </ul>
+            }
+            <form method="post" asp-page="/Admin/People/AddToItem" asp-route-itemId="@Model.ItemId" class="row g-2 align-items-end" data-send-once>
+                <div class="col-sm-8">
+                    <label for="person-name" class="form-label">@T["Add a person"]</label>
+                    <input id="person-name" name="Name" class="form-control" maxlength="@Person.NameMaxLength" autocomplete="off" list="person-suggestions" data-person-suggest="@Url.Page("/Admin/People/Index", "Suggest")" required />
+                    <datalist id="person-suggestions"></datalist>
+                </div>
+                <div class="col-sm-4">
+                    <button type="submit" class="btn btn-outline-primary">@T["Add"]</button>
+                </div>
+            </form>
+        </section>
+    }
+
     @if (mayManage && Model.UsedInStoryCount > 0)
     {
         <section class="mt-5 col-lg-8" aria-labelledby="used-in-stories-heading">

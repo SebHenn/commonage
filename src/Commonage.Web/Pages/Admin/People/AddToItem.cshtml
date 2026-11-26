@@ -1,0 +1,74 @@
+@page "{itemId:int}"
+@model Commonage.Web.Pages.Admin.People.AddToItemModel
+@using Commonage.Web.Pages.Admin.People
+@inject Commonage.Web.Operations.ArchiveProfile Profile
+@{
+    ViewData["Title"] = T["Add a person"];
+    var material = (await Profile.GetAsync()).MaterialLanguage;
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="/Admin/Items/Edit" asp-route-id="@Model.ItemId" lang="@material">@ArchiveItem.ShownTitle(T, Model.ItemTitle)</a></li>
+    </ol>
+</nav>
+
+<h1>@ViewData["Title"]</h1>
+
+@switch (Model.Current)
+{
+    case AddToItemModel.Step.Choose:
+        <p class="col-lg-8">@T["More than one person has this name. Which one is meant?"]</p>
+        <ul class="list-group col-lg-8 mb-3">
+            @foreach (var match in Model.Matches)
+            {
+                <li class="list-group-item d-flex flex-wrap gap-2 align-items-center">
+                    <span class="me-auto">
+                        <span class="text-break" lang="@material">@match.Name</span>
+                        @if (match.BornText is not null || match.DiedText is not null)
+                        {
+                            <small class="d-block text-muted" lang="@material">@match.BornText – @match.DiedText</small>
+                        }
+                        <small class="d-block text-muted">@T.Plural("{0, plural, one {# item} other {# items}}", match.Items)</small>
+                    </span>
+                    <form method="post" asp-page-handler="Link" asp-route-itemId="@Model.ItemId" data-send-once>
+                        <input type="hidden" name="personId" value="@match.Id" />
+                        <button type="submit" class="btn btn-sm btn-primary" aria-label="@T["Add {0}", match.Name]">@T["Add this person"]</button>
+                    </form>
+                </li>
+            }
+        </ul>
+        <form method="post" asp-page-handler="Create" asp-route-itemId="@Model.ItemId" data-send-once>
+            <input type="hidden" asp-for="Name" />
+            <button type="submit" class="btn btn-outline-primary">@T["None of them: add a new person"]</button>
+            <a asp-page="/Admin/Items/Edit" asp-route-id="@Model.ItemId" class="btn btn-link">@T["Cancel"]</a>
+        </form>
+        break;
+
+    case AddToItemModel.Step.MakeNew:
+        <form method="post" asp-page-handler="Create" asp-route-itemId="@Model.ItemId" class="col-lg-8" data-send-once>
+            <input type="hidden" asp-for="Name" />
+            <p>@T["Add “{0}” as a new person?", Model.Name!]</p>
+            <p class="text-muted">@T["Only curators see the new person until you choose otherwise."]</p>
+            @if (Model.PublicTagStillExists)
+            {
+                <p class="alert alert-warning" role="status">@T["A public tag with this name still exists"]</p>
+            }
+            <button type="submit" class="btn btn-primary">@T["Yes, add the person"]</button>
+            <a asp-page="/Admin/Items/Edit" asp-route-id="@Model.ItemId" class="btn btn-link">@T["Cancel"]</a>
+        </form>
+        break;
+
+    default:
+        <form method="post" asp-route-itemId="@Model.ItemId" class="col-lg-8" data-send-once>
+            <partial name="_ErrorSummary" />
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label">@T["Name of the person"]</label>
+                <input asp-for="Name" class="form-control" maxlength="@Person.NameMaxLength" lang="@material" required />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">@T["Add"]</button>
+            <a asp-page="/Admin/Items/Edit" asp-route-id="@Model.ItemId" class="btn btn-link">@T["Cancel"]</a>
+        </form>
+        break;
+}

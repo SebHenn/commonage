@@ -63,6 +63,16 @@ public static class PeopleEditing
             .SingleAsync(cancellationToken);
     }
 
+    /// <summary>The folded names of every tag of the kind Person, to compare with the names of people without asking once for each.</summary>
+    public static async Task<HashSet<string>> PublicPersonTagNamesAsync(this CommonageDbContext db, CancellationToken cancellationToken = default)
+    {
+        var kind = (int)TagKind.Person;
+        var names = await db.Database
+            .SqlQuery<string>($"SELECT lower(commonage_fold(\"Name\")) AS \"Value\" FROM \"Tags\" WHERE \"Kind\" = {kind}")
+            .ToListAsync(cancellationToken);
+        return names.ToHashSet(StringComparer.Ordinal);
+    }
+
     public enum LinkOutcome
     {
         Linked,

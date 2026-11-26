@@ -1,0 +1,69 @@
+@page
+@model Commonage.Web.Pages.Admin.People.IndexModel
+@using Commonage.Web.Domain
+@inject Commonage.Web.Operations.ArchiveProfile Profile
+@{
+    ViewData["Title"] = T["People"];
+    var material = (await Profile.GetAsync()).MaterialLanguage;
+}
+
+<h1>@ViewData["Title"]</h1>
+<p class="text-muted col-lg-8">@T["People who appear in the archive. A new person is seen by curators only. You choose for each person whether visitors may see their name."]</p>
+
+<form method="post" asp-page-handler="Create" class="row g-2 align-items-end col-lg-8 mb-4" data-send-once>
+    <partial name="_ErrorSummary" />
+    <div class="col-sm-8">
+        <label asp-for="NewName" class="form-label">@T["Name of the new person"]</label>
+        <input asp-for="NewName" class="form-control" maxlength="@Person.NameMaxLength" required lang="@material" />
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">@T["New person"]</button>
+    </div>
+</form>
+
+<form method="get" class="row g-2 align-items-end mb-3" role="search">
+    <div class="col-sm-5 col-lg-4">
+        <label asp-for="Text" class="form-label">@T["Search by name"]</label>
+        <input asp-for="Text" name="q" class="form-control" lang="@material" />
+    </div>
+    <div class="col-sm-4 col-lg-3">
+        <label asp-for="Who" class="form-label">@T["Who may see them"]</label>
+        <select asp-for="Who" name="who" class="form-select">
+            <option value="@IndexModel.Filter.All">@T["Everyone"]</option>
+            <option value="@IndexModel.Filter.Hidden">@T["Only curators"]</option>
+            <option value="@IndexModel.Filter.Deceased">@T["Has died: visitors may see them"]</option>
+            <option value="@IndexModel.Filter.MayBeShown">@T["May be living, and may be shown"]</option>
+        </select>
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-outline-primary">@T["Search"]</button>
+        @if (Model.IsFiltered)
+        {
+            <a asp-page="/Admin/People/Index" class="btn btn-link">@T["Clear"]</a>
+        }
+    </div>
+</form>
+
+@if (Model.People.TotalCount == 0)
+{
+    <p class="text-muted">@(Model.IsFiltered ? T["No person matches."] : T["There are no people yet."])</p>
+}
+else
+{
+    <ul class="list-group">
+        @foreach (var person in Model.People.Items)
+        {
+            <li class="list-group-item d-flex flex-wrap gap-2 align-items-baseline">
+                <a asp-page="/Admin/People/Edit" asp-route-id="@person.Id" class="text-break me-auto" lang="@material">@person.Name</a>
+                <partial name="_DisclosureBadge" model="person.Disclosure" />
+                <small class="text-muted">@T.Plural("{0, plural, one {# item} other {# items}}", person.Items)</small>
+                <small class="text-muted">@T.Plural("{0, plural, one {# item visitors may see} other {# items visitors may see}}", person.VisibleItems)</small>
+                @if (Model.PublicTagNames.Contains(person.FoldedName))
+                {
+                    <small class="w-100 text-warning-emphasis">@T["A public tag with this name still exists"]</small>
+                }
+            </li>
+        }
+    </ul>
+    <partial name="_Pager" model="Model.People" />
+}

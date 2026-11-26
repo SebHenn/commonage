@@ -26,6 +26,11 @@ public class ContributorsModel(CommonageDbContext db) : PageModel
     /// <summary>Notes from visitors with this name or email address.</summary>
     public IReadOnlyList<VisitorNote> Notes { get; private set; } = [];
 
+    /// <summary>People whose name, other names or note for curators contain the text.</summary>
+    public IReadOnlyList<PersonHit> People { get; private set; } = [];
+
+    public record PersonHit(int Id, string Name, bool InBin);
+
     public async Task OnGetAsync(CancellationToken cancellationToken)
     {
         var text = Text?.Trim();
@@ -53,6 +58,18 @@ public class ContributorsModel(CommonageDbContext db) : PageModel
             .Where(n => EF.Functions.ILike(n.Name!, pattern) || EF.Functions.ILike(n.Email!, pattern))
             .OrderByDescending(n => n.ReceivedAt)
             .Take(MaxResults)
+            .ToListAsync(cancellationToken);
+
+        // People in the bin included, for the same reason.
+        People = await db.People
+            .IgnoreQueryFilters()
+            .AsNoTracking()
+            .Where(p => EF.Functions.ILike(p.Name, pattern)
+                || EF.Functions.ILike(p.CuratorNote!, pattern)
+                || db.PersonNames.IgnoreQueryFilters().Any(n => n.PersonId == p.Id && EF.Functions.ILike(n.Name, pattern)))
+            .OrderBy(p => p.SortName ?? p.Name).ThenBy(p => p.Id)
+            .Take(MaxResults)
+            .Select(p => new PersonHit(p.Id, p.Name, p.DeletedAt != null))
             .ToListAsync(cancellationToken);
 
         NamedInItems = await db.ArchiveItems

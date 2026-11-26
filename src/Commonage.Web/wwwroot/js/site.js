@@ -60,6 +60,37 @@ window.addEventListener('pageshow', () => {
     }
 });
 
+// Suggests names of people while a curator types one on an item's page. Without JavaScript, the step after sending asks instead.
+for (const input of document.querySelectorAll('input[data-person-suggest]')) {
+    const list = document.getElementById(input.getAttribute('list'));
+    let timer;
+    let latest = 0;
+    input.addEventListener('input', () => {
+        clearTimeout(timer);
+        timer = setTimeout(async () => {
+            const asked = ++latest;
+            const text = input.value.trim();
+            if (!text) {
+                list.replaceChildren();
+                return;
+            }
+            try {
+                const response = await fetch(`${input.dataset.personSuggest}&q=${encodeURIComponent(text)}`);
+                if (!response.ok || asked !== latest)
+                    return;
+                const names = await response.json();
+                list.replaceChildren(...names.map(name => {
+                    const option = document.createElement('option');
+                    option.value = name;
+                    return option;
+                }));
+            } catch {
+                // Only a convenience: the name is looked up when the form is sent.
+            }
+        }, 250);
+    });
+}
+
 // Says how a date will be understood while it is typed. Without JavaScript, the form says so after sending.
 for (const input of document.querySelectorAll('input[data-date-result]')) {
     const result = document.getElementById(input.dataset.dateResult);

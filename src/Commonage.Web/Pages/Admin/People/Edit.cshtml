@@ -1,0 +1,268 @@
+@page "{id:int}"
+@model Commonage.Web.Pages.Admin.People.EditModel
+@using Commonage.Web.Domain
+@using Commonage.Web.Pages.Admin.People
+@inject Commonage.Web.Operations.ArchiveProfile Profile
+@{
+    ViewData["Title"] = T["Edit person"];
+    var material = (await Profile.GetAsync()).MaterialLanguage;
+    var person = Model.Person;
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="/Admin/Index">@T["Items"]</a></li>
+        <li class="breadcrumb-item"><a asp-page="/Admin/People/Index">@T["People"]</a></li>
+    </ol>
+</nav>
+
+<div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+    <h1 class="me-auto mb-0">@ViewData["Title"]</h1>
+    <partial name="_DisclosureBadge" model="person.Disclosure" />
+    <a asp-page="/Admin/People/Preview" asp-route-id="@person.Id" class="btn btn-outline-primary">@T["Preview"]</a>
+</div>
+
+@if (Model.PublicTagStillExists)
+{
+    <p class="alert alert-warning col-lg-8" role="status">@T["A public tag with this name still exists"]</p>
+}
+
+@if (Model.SavedByOthers is { } saved)
+{
+    <section class="alert alert-warning col-lg-8" role="alert" aria-labelledby="conflict-heading">
+        <h2 id="conflict-heading" class="h5">@T["Someone else changed this person while you were working on it"]</h2>
+        <p>@T["Your changes are not saved yet. They are still in the form below. Compare them with the version saved by the other person. If you save again, your version replaces theirs."]</p>
+        <dl class="row mb-0">
+            <dt class="col-sm-3">@T["Name"]</dt>
+            <dd class="col-sm-9" lang="@material">@saved.Name</dd>
+            <dt class="col-sm-3">@T["Sort name"]</dt>
+            <dd class="col-sm-9" lang="@material">@saved.SortName</dd>
+            <dt class="col-sm-3">@T["Born"]</dt>
+            <dd class="col-sm-9" lang="@material">@saved.BornText</dd>
+            <dt class="col-sm-3">@T["Died"]</dt>
+            <dd class="col-sm-9" lang="@material">@saved.DiedText</dd>
+            <dt class="col-sm-3">@T["Biography"]</dt>
+            <dd class="col-sm-9 text-preserve-lines" lang="@material">@saved.Biography</dd>
+            <dt class="col-sm-3">@T["Note for curators"]</dt>
+            <dd class="col-sm-9 mb-0 text-preserve-lines" lang="@material">@saved.CuratorNote</dd>
+        </dl>
+    </section>
+}
+
+<form method="post" asp-page="/Admin/People/Edit" asp-route-id="@person.Id" class="col-lg-8 mb-5" data-warn-unsaved="@(ModelState.IsValid ? "" : "dirty")" data-send-once>
+    @if (!ViewData.ModelState.ContainsKey("otherName") && !ViewData.ModelState.ContainsKey("language"))
+    {
+        <partial name="_ErrorSummary" />
+    }
+    <input type="hidden" asp-for="Input.Version" />
+    <div class="mb-3">
+        <label asp-for="Input.Name" class="form-label"></label>
+        <input asp-for="Input.Name" class="form-control" maxlength="@Person.NameMaxLength" lang="@material" />
+        <span asp-validation-for="Input.Name" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Input.SortName" class="form-label"></label>
+        <input asp-for="Input.SortName" class="form-control" maxlength="@Person.NameMaxLength" lang="@material" aria-describedby="sortname-help" />
+        <div id="sortname-help" class="form-text">@T["The name the person is sorted by in lists. Leave it empty to sort by the name."]</div>
+        <span asp-validation-for="Input.SortName" class="text-danger"></span>
+    </div>
+    <div class="row">
+        <div class="col-sm-6 mb-3">
+            <label asp-for="Input.Born" class="form-label"></label>
+            <input asp-for="Input.Born" class="form-control" aria-describedby="born-result" data-date-result="born-result" lang="@material" />
+            <div id="born-result" class="form-text" role="status"></div>
+            <span asp-validation-for="Input.Born" class="text-danger"></span>
+        </div>
+        <div class="col-sm-6 mb-3">
+            <label asp-for="Input.Died" class="form-label"></label>
+            <input asp-for="Input.Died" class="form-control" aria-describedby="died-result" data-date-result="died-result" lang="@material" />
+            <div id="died-result" class="form-text" role="status"></div>
+            <span asp-validation-for="Input.Died" class="text-danger"></span>
+        </div>
+    </div>
+    <p class="form-text">@T["Write dates as precisely as they are known, for example: 1953, 12.03.1953, circa 1950. Visitors see them only for a person marked as having died."]</p>
+    <div class="mb-3">
+        <label asp-for="Input.Biography" class="form-label"></label>
+        <textarea asp-for="Input.Biography" class="form-control" rows="6" maxlength="@Person.BiographyMaxLength" lang="@material"></textarea>
+        <span asp-validation-for="Input.Biography" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Input.CuratorNote" class="form-label"></label>
+        <textarea asp-for="Input.CuratorNote" class="form-control" rows="3" maxlength="@Person.NoteMaxLength" lang="@material" aria-describedby="note-help"></textarea>
+        <div id="note-help" class="form-text">@T["Only curators see this note. It is never shown to visitors or put into a copy made for them."]</div>
+        <span asp-validation-for="Input.CuratorNote" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">@T["Save"]</button>
+</form>
+
+<section class="col-lg-8 mb-5" aria-labelledby="disclosure-heading">
+    <h2 id="disclosure-heading" class="h4">@T["Who may see this person"]</h2>
+    @if (Model.ConfirmChoice is { } choice)
+    {
+        <div class="alert alert-warning" role="alert" data-focus-on-load tabindex="-1">
+            <h3 class="h5">@(choice == PersonDisclosure.Deceased ? T["Show this person to visitors as someone who has died?"] : T["Show this person to visitors, who may be living?"])</h3>
+            <p>@T["Visitors will see this person on the pages of the items below that visitors may see. They will see:"]</p>
+            <ul>
+                <li>@T["The name: {0}", person.Name]</li>
+                <li>@T.Plural("{0, plural, =0 {No other names} one {# other name that is marked for visitors} other {# other names that are marked for visitors}}", Model.Names.Count(n => n.ShownToVisitors))</li>
+                <li>@(string.IsNullOrWhiteSpace(person.Biography) ? T["No biography"] : T["The biography"])</li>
+                <li>@T.Plural("{0, plural, =0 {No items yet} one {# item that visitors may see} other {# items that visitors may see}}", Model.VisibleItemCount)</li>
+                @if (choice == PersonDisclosure.Deceased)
+                {
+                    <li>@(person.BornText is null && person.DiedText is null ? T["No dates"] : T["The dates of birth and death, as far as they are written"])</li>
+                }
+                else
+                {
+                    <li>@T["No dates: for a person who may be living, dates are never shown"]</li>
+                }
+            </ul>
+            <form method="post" asp-page-handler="Disclosure" asp-route-id="@person.Id" class="d-flex flex-wrap gap-2" data-send-once>
+                <input type="hidden" name="choice" value="@choice" />
+                <input type="hidden" name="confirmed" value="true" />
+                <button type="submit" class="btn btn-warning">@T["Yes, show this person"]</button>
+                <a asp-page="/Admin/People/Edit" asp-route-id="@person.Id" class="btn btn-outline-secondary">@T["Cancel"]</a>
+            </form>
+        </div>
+    }
+    else
+    {
+        <form method="post" asp-page-handler="Disclosure" asp-route-id="@person.Id" data-send-once>
+            <fieldset class="mb-3">
+                <legend class="visually-hidden">@T["Who may see this person"]</legend>
+                @foreach (var option in new[] { PersonDisclosure.Hidden, PersonDisclosure.Deceased, PersonDisclosure.MayBeShown })
+                {
+                    var optionId = $"choice-{option}";
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="choice" id="@optionId" value="@option" checked="@(person.Disclosure == option)" />
+                        <label class="form-check-label" for="@optionId">
+                            @(option switch
+                            {
+                                PersonDisclosure.Deceased => T["Has died: visitors may see them"],
+                                PersonDisclosure.MayBeShown => T["May be living, and may be shown"],
+                                _ => T["Only curators"],
+                            })
+                        </label>
+                    </div>
+                }
+            </fieldset>
+            <p class="form-text">@T["A person is only public while at least one item they are linked to is public, too."]</p>
+            <button type="submit" class="btn btn-outline-primary">@T["Save this choice"]</button>
+        </form>
+    }
+</section>
+
+<section class="col-lg-8 mb-5" id="other-names" aria-labelledby="names-heading">
+    <h2 id="names-heading" class="h4">@T["Other names"]</h2>
+    @if (Model.Names.Count == 0)
+    {
+        <p class="text-muted">@T["No other names yet."]</p>
+    }
+    else
+    {
+        <ul class="list-group mb-3">
+            @foreach (var name in Model.Names)
+            {
+                <li class="list-group-item d-flex flex-wrap gap-2 align-items-center">
+                    <span class="me-auto text-break"><span lang="@(name.Language ?? material)">@name.Name</span>
+                        <small class="text-muted">@(name.Kind switch
+                        {
+                            PersonNameKind.BirthName => T["Birth name"],
+                            PersonNameKind.MarriedName => T["Married name"],
+                            PersonNameKind.Nickname => T["Nickname"],
+                            PersonNameKind.OtherSpelling => T["Other spelling"],
+                            PersonNameKind.OtherScript => T["In another script"],
+                            _ => T["Other"],
+                        })@(name.Language is null ? "" : $" · {name.Language}")</small></span>
+                    <form method="post" asp-page-handler="ShowName" asp-route-id="@person.Id" asp-route-nameId="@name.Id" class="d-flex gap-2 align-items-center" data-send-once>
+                        <div class="form-check mb-0">
+                            <input class="form-check-input" type="checkbox" name="shown" value="true" id="shown-@name.Id" checked="@name.ShownToVisitors" />
+                            <label class="form-check-label" for="shown-@name.Id">@T["Visitors see this name"]</label>
+                        </div>
+                        <button type="submit" class="btn btn-sm btn-outline-secondary" aria-label="@T["Save for {0}", name.Name]">@T["Save"]</button>
+                    </form>
+                    <form method="post" asp-page-handler="RemoveName" asp-route-id="@person.Id" asp-route-nameId="@name.Id"
+                          data-confirm="@T["Remove this name?"]">
+                        <button type="submit" class="btn btn-sm btn-outline-danger" aria-label="@T["Remove {0}", name.Name]">@T["Remove"]</button>
+                    </form>
+                </li>
+            }
+        </ul>
+    }
+
+    @if (Model.Names.Count < Person.MaxNames)
+    {
+        <form method="post" asp-page-handler="AddName" asp-route-id="@person.Id" class="row g-2 align-items-end" data-send-once>
+            @if (ViewData.ModelState.ContainsKey("otherName") || ViewData.ModelState.ContainsKey("language"))
+            {
+                <partial name="_ErrorSummary" />
+            }
+            <div class="col-sm-5">
+                <label for="otherName" class="form-label">@T["Other name"]</label>
+                <input id="otherName" name="name" value="@Model.TypedOtherName" class="form-control" maxlength="@Person.NameMaxLength" required lang="@material" />
+                <span class="text-danger">@Html.ValidationMessage("otherName")</span>
+            </div>
+            <div class="col-sm-4">
+                <label for="kind" class="form-label">@T["What kind of name"]</label>
+                <select id="kind" name="kind" class="form-select">
+                    <option value="@PersonNameKind.BirthName">@T["Birth name"]</option>
+                    <option value="@PersonNameKind.MarriedName">@T["Married name"]</option>
+                    <option value="@PersonNameKind.Nickname">@T["Nickname"]</option>
+                    <option value="@PersonNameKind.OtherSpelling">@T["Other spelling"]</option>
+                    <option value="@PersonNameKind.OtherScript">@T["In another script"]</option>
+                    <option value="@PersonNameKind.Other">@T["Other"]</option>
+                </select>
+            </div>
+            <div class="col-sm-3">
+                <label for="language" class="form-label">@T["Language (optional)"]</label>
+                <input id="language" name="language" value="@Model.TypedLanguage" class="form-control" maxlength="@PersonName.LanguageMaxLength" dir="ltr" />
+                <span class="text-danger">@Html.ValidationMessage("language")</span>
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-outline-primary">@T["Add name"]</button>
+            </div>
+        </form>
+    }
+</section>
+
+<section class="col-lg-8 mb-5" id="items" aria-labelledby="items-heading">
+    <h2 id="items-heading" class="h4">@T["Items"]</h2>
+    @if (Model.Items.Count == 0)
+    {
+        <p class="text-muted">@T["This person is not linked to any item. Link people on the edit page of an item."]</p>
+    }
+    else
+    {
+        <ul class="list-group">
+            @foreach (var item in Model.Items)
+            {
+                <li class="list-group-item d-flex flex-wrap gap-2 align-items-center">
+                    <span class="me-auto">
+                        <a asp-page="/Admin/Items/Edit" asp-route-id="@item.Id" class="text-break" lang="@material">@ArchiveItem.ShownTitle(T, item.Title)</a>
+                        @if (item.DateText is not null)
+                        {
+                            <small class="d-block text-muted" lang="@material">@item.DateText</small>
+                        }
+                        @switch (item.State)
+                        {
+                            case EditModel.ItemState.Draft:
+                                <small class="d-block text-warning-emphasis">@T["Visitors do not see this item: it is not published."]</small>
+                                break;
+                            case EditModel.ItemState.PublicFrom:
+                                <small class="d-block text-warning-emphasis">@T["Visitors do not see this item until {0}.", item.PublicFrom!.Value.ToString("d", System.Globalization.CultureInfo.CurrentCulture)]</small>
+                                break;
+                            case EditModel.ItemState.InBin:
+                                <small class="d-block text-warning-emphasis">@T["Visitors do not see this item: it is in the bin."]</small>
+                                break;
+                            case EditModel.ItemState.Withdrawn:
+                                <small class="d-block text-warning-emphasis">@T["Visitors do not see this item: it was turned down or withdrawn."]</small>
+                                break;
+                        }
+                    </span>
+                    <form method="post" asp-page-handler="Unlink" asp-route-id="@person.Id" asp-route-itemId="@item.Id" data-send-once>
+                        <button type="submit" class="btn btn-sm btn-outline-secondary" aria-label="@T["Take {0} off this person", ArchiveItem.ShownTitle(T, item.Title)]">@T["Unlink"]</button>
+                    </form>
+                </li>
+            }
+        </ul>
+    }
+</section>

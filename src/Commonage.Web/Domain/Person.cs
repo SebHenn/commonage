@@ -166,6 +166,14 @@ public class Person
         return new string(chars);
     }
 
+    /// <summary>A name as it is kept: white space made single, in NFC, and null when nothing is left.</summary>
+    public static string? Clean(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return null;
+        return string.Join(' ', value.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries)).Normalize(System.Text.NormalizationForm.FormC);
+    }
+
     public static bool IsPublicId(string? value) =>
         value is { Length: PublicIdLength } && value.All(c => Alphabet.Contains(c));
 
