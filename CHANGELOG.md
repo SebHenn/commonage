@@ -5,6 +5,10 @@ version may change things that need attention when updating, and these notes say
 
 ## Unreleased
 
+## 0.7.0 (2026-11-26)
+
+**Updating:** this version adds a migration (the story tables); it runs when the app starts, and `update.sh` makes a backup first as always. Pictures need no regeneration. The export format is now 9; an export of format 4 to 8 still imports (the import does not read stories).
+
 ### For visitors
 
 - **Stories.** Published stories are public. `/stories` lists them with a picture and a few words, the start
