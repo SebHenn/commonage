@@ -50,6 +50,15 @@ public static class ExportImportTable
         Add("ExportCollection", ExportFieldDecision.Read, "Collections are matched by title, and created with this when there is none.", "Title", "Description");
         Add("ExportCollection", ExportFieldDecision.Dropped, NotTrusted, "CreatedAt", "Position", "Sort", "CoverFileId");
 
+        Add("ExportPerson", ExportFieldDecision.ReadForDecision, "Only the key that the items of the export name their people by.", "Id");
+        Add("ExportPerson", ExportFieldDecision.Read, "Comes with the person, who arrives as a new person that only curators see. Nothing is matched with a person that is here.",
+            "Name", "SortName", "Born", "Died", "Biography", "Names");
+        Add("ExportPerson", ExportFieldDecision.Dropped, "Who may see a person is this archive's decision; the address is the other archive's.", "PublicId", "Disclosure");
+        Add("ExportPerson", ExportFieldDecision.Dropped, "The other curators' words about the person, like the internal notes of an item.", "CuratorNote");
+        Add("ExportPerson", ExportFieldDecision.Dropped, NotTrusted, "CreatedAt");
+        Add("ExportPersonName", ExportFieldDecision.Read, "Comes with the person, and is never shown to visitors until a curator here ticks it.", "Name", "Kind", "Language");
+        Add("ExportPersonName", ExportFieldDecision.Dropped, "Who may see a name is this archive's decision, so every imported name starts hidden from visitors.", "ShownToVisitors");
+
         Add("ExportTag", ExportFieldDecision.Read, "Tags are matched by name, and created with this kind when there is none.", "Name", "Kind");
 
         Add("ExportItem", ExportFieldDecision.ReadForDecision, "Only the key that the files of the item are checked against.", "Id");
@@ -57,7 +66,7 @@ public static class ExportImportTable
         Add("ExportItem", ExportFieldDecision.ReadForDecision,
             "Rejected and withdrawn items are left out, so a withdrawal is not undone. Whatever the status, an item arrives as a draft.", "Status");
         Add("ExportItem", ExportFieldDecision.Read, "Comes with the item.",
-            "Title", "Description", "Date", "Tags", "RightsUri", "RightsHolder", "Credit", "ReferenceNumber", "OriginalLocation",
+            "Title", "Description", "Date", "Tags", "People", "RightsUri", "RightsHolder", "Credit", "ReferenceNumber", "OriginalLocation",
             "NeedsTranscription", "HelpWanted", "Files");
         Add("ExportItem", ExportFieldDecision.Read, "Kept, so that what a curator held back in one archive is not lost by moving it. Shown in the dry run.", "MediaLevel", "PublicFrom");
         Add("ExportItem", ExportFieldDecision.Dropped, "Made again: the item is new here, and a draft.", "CreatedAt", "UpdatedAt", "PublishedAt", "RejectedOrWithdrawnAt");
@@ -101,6 +110,7 @@ public sealed class ImportedArchive
     public List<ImportedCollection>? Collections { get; set; }
     public List<ImportedTag>? Tags { get; set; }
     public List<ImportedItem>? Items { get; set; }
+    public List<ImportedPerson>? People { get; set; }
 
     /// <summary>Only how many stories there are: they are never read, see <see cref="ExportImportTable"/>.</summary>
     public StoryCount? Stories { get; set; }
@@ -157,6 +167,7 @@ public sealed class ImportedItem
     public string? Status { get; set; }
     public ImportedDate? Date { get; set; }
     public List<string?>? Tags { get; set; }
+    public List<int>? People { get; set; }
     public string? RightsUri { get; set; }
     public string? RightsHolder { get; set; }
     public string? Credit { get; set; }
@@ -168,6 +179,24 @@ public sealed class ImportedItem
     public string? PublicFrom { get; set; }
     public ImportedContribution? Contribution { get; set; }
     public List<ImportedFile?>? Files { get; set; }
+}
+
+public sealed class ImportedPerson
+{
+    public int? Id { get; set; }
+    public string? Name { get; set; }
+    public string? SortName { get; set; }
+    public ImportedDate? Born { get; set; }
+    public ImportedDate? Died { get; set; }
+    public string? Biography { get; set; }
+    public List<ImportedPersonName>? Names { get; set; }
+}
+
+public sealed class ImportedPersonName
+{
+    public string? Name { get; set; }
+    public string? Kind { get; set; }
+    public string? Language { get; set; }
 }
 
 public sealed class ImportedDate

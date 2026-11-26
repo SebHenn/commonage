@@ -142,10 +142,11 @@ public static class DemoContent
         waiting.TrySetDate(T("1970s", "1970er Jahre"));
         items.Add(waiting);
         // Last, so that the items before it keep their numbers. A story without a picture, as many are.
-        items.Add(Published(club, T("What the old goalkeeper told us", "Was der alte Torwart uns erzählte"), T("1950s", "1950er Jahre"),
+        var keeper = Published(club, T("What the old goalkeeper told us", "Was der alte Torwart uns erzählte"), T("1950s", "1950er Jahre"),
                 T("Karl kept goal for eleven seasons. He says the pitch sloped so much that you could only see the far goal from the top of the hill. No photo of him has been found yet.",
                   "Karl stand elf Spielzeiten im Tor. Er sagt, der Platz sei so schief gewesen, dass man das andere Tor nur von oben sehen konnte. Ein Foto von ihm ist noch nicht gefunden."),
-                [T("football", "Fußball"), T("memories", "Erinnerungen"), "Karl"], scene: null));
+                [T("football", "Fußball"), T("memories", "Erinnerungen")], scene: null);
+        items.Add(keeper);
         await AddPhotoAsync(waiting, "grandmother-shop", DemoImages.Render("grandmother-shop"));
 
         foreach (var (item, scene) in scenes)
@@ -170,6 +171,16 @@ public static class DemoContent
         }
 
         db.ArchiveItems.AddRange(items);
+        // Two people: Karl has died, so visitors may see him, with the German name that curators marked for them; the second person
+        // stays with the curators only, as everyone does until a curator chooses otherwise.
+        db.AddDemoPerson(T("Karl Becker", "Karl Becker"), hasDied: true, born: "1931", died: "2009",
+            T("Karl kept goal for the football club for eleven seasons and ran the club's kiosk afterwards.",
+              "Karl stand elf Spielzeiten im Tor des Fußballvereins und führte danach den Kiosk des Vereins."),
+            note: null,
+            [new ImportedPersonOtherName(T("Karlchen", "Karlchen"), PersonNameKind.Nickname, "de")], keeper, now);
+        db.AddDemoPerson(T("Hans Lindner", "Hans Lindner"), hasDied: false, born: null, died: null, biography: null,
+            note: T("Asked us not to show his name yet.", "Möchte, dass sein Name noch nicht gezeigt wird."),
+            [], items[1], now);
         // A published story: words between three published items, and one part that names the draft. Visitors read the story
         // without that part, and curators see it under Stories with the reason.
         var story = new Story
@@ -266,7 +277,7 @@ public static class DemoContent
             var normalized = Tag.Normalize(name);
             if (!tags.TryGetValue(normalized, out var tag))
             {
-                var kind = normalized == Tag.Normalize(T("Mill Street", "Mühlenstraße")) ? TagKind.Place : normalized == "karl" ? TagKind.Person : TagKind.Topic;
+                var kind = normalized == Tag.Normalize(T("Mill Street", "Mühlenstraße")) ? TagKind.Place : TagKind.Topic;
                 tags[normalized] = tag = new Tag { Name = name, NormalizedName = normalized, Kind = kind };
             }
             return tag;
