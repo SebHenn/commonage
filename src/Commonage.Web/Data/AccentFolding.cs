@@ -53,6 +53,8 @@ public static class AccentFolding
                         format($f$SELECT regexp_replace(%s.unaccent(%L::regdictionary, normalize($1, NFC)), '[\u0640\u064b-\u065f\u0670]', '', 'g')$f$,
                             s, s || '.unaccent'));
                     UPDATE "ArchiveItems" SET "Title" = "Title";
+                    UPDATE "People" SET "Name" = "Name";
+                    UPDATE "PersonNames" SET "Name" = "Name";
                 END
                 $do$
                 """, cancellationToken);

@@ -14,6 +14,9 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options, Ti
     public DbSet<ArchiveItem> ArchiveItems => Set<ArchiveItem>();
     public DbSet<Story> Stories => Set<Story>();
     public DbSet<StoryBlock> StoryBlocks => Set<StoryBlock>();
+    public DbSet<Person> People => Set<Person>();
+    public DbSet<PersonName> PersonNames => Set<PersonName>();
+    public DbSet<ItemPerson> ItemPeople => Set<ItemPerson>();
     public DbSet<MediaFile> MediaFiles => Set<MediaFile>();
     public DbSet<ItemFileText> ItemFileTexts => Set<ItemFileText>();
     public DbSet<StaffProfile> StaffProfiles => Set<StaffProfile>();
@@ -64,6 +67,15 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options, Ti
     /// page must start from this query, and show blocks only through <see cref="VisibleStoryBlocks"/>.
     /// </summary>
     public IQueryable<Story> VisibleStories => Visibility.Story(this, Today);
+
+    /// <summary>
+    /// People the public may see: not hidden, not in the bin and linked to at least one visible item. Every public people page
+    /// starts from this query and shows only what <see cref="VisiblePeople"/> projects.
+    /// </summary>
+    public IQueryable<Person> VisiblePeople => Visibility.Person(this, Today);
+
+    /// <summary>People in the bin. Query filters hide them from every other query.</summary>
+    public IQueryable<Person> BinnedPeople => People.IgnoreQueryFilters().Where(p => p.DeletedAt != null);
 
     /// <summary>Stories in the bin. Query filters hide them from every other query.</summary>
     public IQueryable<Story> BinnedStories => Stories.IgnoreQueryFilters().Where(s => s.DeletedAt != null);
@@ -119,6 +131,54 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options, Ti
             block.ToTable(t => t.HasCheckConstraint("CK_StoryBlocks_Kind",
                 "(\"Kind\" = 'Text' AND \"ArchiveItemId\" IS NULL AND \"Text\" IS NOT NULL AND \"Caption\" IS NULL) OR " +
                 "(\"Kind\" = 'Item' AND \"ArchiveItemId\" IS NOT NULL AND \"Text\" IS NULL)"));
+        });
+
+        builder.Entity<Person>(person =>
+        {
+            person.HasQueryFilter(p => p.DeletedAt == null);
+            person.Property(p => p.Version).IsRowVersion();
+            person.Property(p => p.PublicId).HasMaxLength(Person.PublicIdLength).IsFixedLength();
+            person.HasIndex(p => p.PublicId).IsUnique();
+            person.Property(p => p.Name).HasMaxLength(Person.NameMaxLength);
+            person.Property(p => p.FoldedName).HasComputedColumnSql($"lower({FoldFunction}(\"Name\"))", stored: true);
+            person.HasIndex(p => p.FoldedName);
+            person.Property(p => p.SortName).HasMaxLength(Person.NameMaxLength);
+            person.Property(p => p.Disclosure).HasConversion<string>().HasMaxLength(20).HasDefaultValue(PersonDisclosure.Hidden);
+            person.Property(p => p.BornText).HasMaxLength(DateRange.MaxTextLength);
+            person.Property(p => p.DiedText).HasMaxLength(DateRange.MaxTextLength);
+            person.Property(p => p.Biography).HasMaxLength(Person.BiographyMaxLength);
+            person.Property(p => p.CuratorNote).HasMaxLength(Person.NoteMaxLength);
+            person.HasMany(p => p.Names)
+                .WithOne(n => n.Person)
+                .HasForeignKey(n => n.PersonId)
+                .OnDelete(DeleteBehavior.Cascade);
+            person.HasMany(p => p.Links)
+                .WithOne(l => l.Person)
+                .HasForeignKey(l => l.PersonId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<PersonName>(name =>
+        {
+            // A person in the bin takes their other names with them, and brings them back.
+            name.HasQueryFilter(n => n.Person.DeletedAt == null);
+            name.Property(n => n.Name).HasMaxLength(Person.NameMaxLength);
+            name.Property(n => n.FoldedName).HasComputedColumnSql($"lower({FoldFunction}(\"Name\"))", stored: true);
+            name.HasIndex(n => n.FoldedName);
+            name.HasIndex(n => n.PersonId);
+            name.Property(n => n.Kind).HasConversion<string>().HasMaxLength(20);
+            name.Property(n => n.Language).HasMaxLength(PersonName.LanguageMaxLength);
+        });
+
+        builder.Entity<ItemPerson>(link =>
+        {
+            link.HasKey(l => new { l.ArchiveItemId, l.PersonId });
+            link.HasQueryFilter(l => l.Person.DeletedAt == null && l.ArchiveItem.DeletedAt == null);
+            link.HasIndex(l => l.PersonId);
+            link.HasOne(l => l.ArchiveItem)
+                .WithMany(i => i.People)
+                .HasForeignKey(l => l.ArchiveItemId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         builder.Entity<ArchiveItem>(item =>
@@ -270,6 +330,9 @@ public class CommonageDbContext(DbContextOptions<CommonageDbContext> options, Ti
                 .WithMany()
                 .OnDelete(DeleteBehavior.SetNull);
             entry.HasOne(e => e.Story)
+                .WithMany()
+                .OnDelete(DeleteBehavior.SetNull);
+            entry.HasOne(e => e.Person)
                 .WithMany()
                 .OnDelete(DeleteBehavior.SetNull);
         });

@@ -37,4 +37,21 @@ public static class Visibility
         db.Stories.Where(s => s.Status == StoryStatus.Published && s.DeletedAt == null
             && s.Blocks.Any(b => (b.Kind == StoryBlockKind.Text && b.Text != null && Regex.IsMatch(b.Text, @"\S"))
                 || db.ArchiveItems.Where(Item(today)).Any(i => i.Id == b.ArchiveItemId)));
+
+    /// <summary>
+    /// The people visitors may see: not hidden, not in the bin, and linked to at least one item <see cref="Item"/> allows, so a
+    /// person whose every item is a draft, embargoed, withdrawn or in the bin is not public either. This file and
+    /// <c>Pages/Admin</c> are the only places that may name <see cref="PersonDisclosure"/>.
+    /// </summary>
+    public static IQueryable<Person> Person(CommonageDbContext db, DateOnly today) =>
+        db.People.Where(p => p.Disclosure != PersonDisclosure.Hidden && p.DeletedAt == null
+            && p.Links.Any(l => db.ArchiveItems.Where(Item(today)).Any(i => i.Id == l.ArchiveItemId)));
+
+    /// <summary>The people who are not hidden, whatever their items are. For exports that carry their own item rules.</summary>
+    public static IQueryable<Person> PersonNotHidden(CommonageDbContext db) =>
+        db.People.Where(p => p.Disclosure != PersonDisclosure.Hidden && p.DeletedAt == null);
+
+    /// <summary>The people marked as having died. Only their dates may be exported or shown.</summary>
+    public static IQueryable<Person> PersonDeceased(IQueryable<Person> people) =>
+        people.Where(p => p.Disclosure == PersonDisclosure.Deceased);
 }

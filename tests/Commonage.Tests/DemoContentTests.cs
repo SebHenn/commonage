@@ -38,6 +38,10 @@ public class DemoContentTests(CommonageAppFactory app)
         Assert.True(await db.ContributionLinks.AnyAsync(l => l.IsActive));
         Assert.Equal(10, await db.MediaFiles.CountAsync());
         Assert.True(await db.ArchiveItems.Where(i => i.Status == ItemStatus.Published).AllAsync(i => i.DateText != null));
+        var people = await db.People.Include(p => p.Names).OrderBy(p => p.Id).ToListAsync();
+        Assert.Equal([PersonDisclosure.Deceased, PersonDisclosure.Hidden], people.Select(p => p.Disclosure));
+        Assert.Equal(["Karlchen"], people[0].Names.Where(n => n.ShownToVisitors).Select(n => n.Name));
+        Assert.Empty(people[1].Names);
     }
 
     [Fact]

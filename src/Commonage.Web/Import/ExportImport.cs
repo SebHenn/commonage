@@ -90,6 +90,9 @@ public record PlannedTag(string Name, TagKind Kind);
 
 public record PlannedNewCollection(string Key, string Title, string? Description);
 
+/// <summary>A person of the export, who arrives as a new person that only curators see.</summary>
+public record PlannedPerson(int Key, ImportedPersonData Data);
+
 /// <summary>How many more lines the dry run records, and how many were found beyond that.</summary>
 public sealed class IssueBudget(int limit)
 {
@@ -116,6 +119,9 @@ public class PlannedExportItem(IssueBudget? budget = null)
     public DateOnly? DateFrom { get; set; }
     public DateOnly? DateTo { get; set; }
     public List<PlannedTag> Tags { get; } = [];
+
+    /// <summary>The keys, in the export, of the people this item names that the export describes.</summary>
+    public List<int> PersonKeys { get; } = [];
     public string? RightsUri { get; set; }
     public string? RightsHolder { get; set; }
     public string? Credit { get; set; }
@@ -154,6 +160,12 @@ public class ExportPlan
 
     /// <summary>How many stories the export holds. They are not imported.</summary>
     public int StoriesNotImported { get; init; }
+
+    /// <summary>The people that arrive: the ones that items to be imported name. Each is new, and only curators see them.</summary>
+    public IReadOnlyList<PlannedPerson> NewPeople { get; init; } = [];
+
+    /// <summary>People of the export that no item to be imported names, or that have no usable name. They are not imported.</summary>
+    public int PeopleNotImported { get; init; }
     public IReadOnlyList<PlannedExportItem> Items { get; init; } = [];
     public IReadOnlyList<PlannedNewCollection> NewCollections { get; init; } = [];
 
@@ -167,7 +179,7 @@ public class ExportPlan
 }
 
 /// <summary><see cref="ItemsNotTried"/> are the items left when the run stopped early; <see cref="ItemsFailed"/> those that could not be created.</summary>
-public record ExportImportResult(int Items, int Files, int FilesFailed, int CollectionsCreated, int ItemsFailed = 0, int ItemsNotTried = 0);
+public record ExportImportResult(int Items, int Files, int FilesFailed, int CollectionsCreated, int ItemsFailed = 0, int ItemsNotTried = 0, int People = 0);
 
 /// <summary>
 /// Brings the ZIP file of Commonage's own export into the archive as drafts. <see cref="PlanAsync"/> only looks and changes
@@ -199,6 +211,8 @@ public partial class ExportImport(
     /// <summary>Lines of the dry run that are kept. What is found beyond this is only counted; each item keeps what decides about it.</summary>
     public const int MaxIssues = 10_000;
     public const int MaxTagsPerItemRead = 200;
+    public const int MaxPeople = 50_000;
+    public const int MaxPeoplePerItemRead = Person.MaxPerItem;
 
     /// <summary>A run creates at most this many collections, so a file full of invented ones cannot flood the list.</summary>
     public const int MaxNewCollections = 50;
@@ -267,6 +281,13 @@ public partial class ExportImport(
         {
             if (Text(tag?.Name) is { } tagName)
                 tagKinds.TryAdd(Tag.Normalize(tagName), tag!.Kind);
+        }
+
+        var exportedPeople = new Dictionary<int, PlannedPerson>();
+        foreach (var exportedPerson in archive.People ?? [])
+        {
+            if (exportedPerson?.Id is { } personKey && PlanPerson(personKey, exportedPerson) is { } plannedPerson)
+                exportedPeople.TryAdd(personKey, plannedPerson);
         }
 
         var existingCollections = (await db.Collections.AsNoTracking().Select(c => new { c.Id, c.Title }).ToListAsync(cancellationToken))
@@ -353,6 +374,8 @@ public partial class ExportImport(
 
             PlanDate(planned, item.Date);
             PlanTags(planned, item, tagKinds);
+            foreach (var key in (item.People ?? []).Distinct().Where(exportedPeople.ContainsKey))
+                planned.PersonKeys.Add(key);
             PlanCollection(planned, item, exportedCollections, existingCollections);
 
             if (!HasProblem(planned))
@@ -386,7 +409,53 @@ public partial class ExportImport(
             }
         }
 
-        return new ExportPlan { Version = ArchiveExporter.Version, Items = items, NewCollections = newCollections.Values.ToList(), IssuesNotListed = budget.Omitted, StoriesNotImported = archive.Stories?.Count ?? 0 };
+        // A person arrives with the items that name them, so that importing the same copy twice does not make everyone twice.
+        var used = items.Where(i => i.IsReady).SelectMany(i => i.PersonKeys).ToHashSet();
+        var newPeople = exportedPeople.Values.Where(p => used.Contains(p.Key)).OrderBy(p => p.Key).ToList();
+        return new ExportPlan
+        {
+            Version = ArchiveExporter.Version, Items = items, NewCollections = newCollections.Values.ToList(), IssuesNotListed = budget.Omitted,
+            StoriesNotImported = archive.Stories?.Count ?? 0, NewPeople = newPeople, PeopleNotImported = (archive.People?.Count ?? 0) - newPeople.Count,
+        };
+    }
+
+    /// <summary>
+    /// A person as far as it can be read: with a name, other names as they are, and dates that can be understood. Anything that
+    /// cannot be used is left out of the person, and a person without a usable name is not imported.
+    /// </summary>
+    private static PlannedPerson? PlanPerson(int key, ImportedPerson person)
+    {
+        if (Person.Clean(person.Name) is not { } name || name.Length > Person.NameMaxLength)
+            return null;
+        var sortName = Person.Clean(person.SortName);
+        var biography = Text(person.Biography);
+        var others = new List<ImportedPersonOtherName>();
+        foreach (var other in person.Names ?? [])
+        {
+            if (Person.Clean(other?.Name) is not { } otherName || otherName.Length > Person.NameMaxLength || others.Count >= Person.MaxNames)
+                continue;
+            var kind = TryEnum(other!.Kind, out PersonNameKind written) ? written : PersonNameKind.Other;
+            others.Add(new ImportedPersonOtherName(otherName, kind, Person.TryCleanLanguage(other.Language, out var language) ? language : null));
+        }
+
+        return new PlannedPerson(key, new ImportedPersonData(
+            name,
+            sortName is not null && sortName.Length <= Person.NameMaxLength ? sortName : null,
+            PersonDate(person.Born),
+            PersonDate(person.Died),
+            biography is not null && biography.Length <= Person.BiographyMaxLength ? biography : null,
+            others));
+    }
+
+    private static ImportedPersonDate? PersonDate(ImportedDate? date)
+    {
+        var text = Text(date?.Text);
+        if (text is null || text.Length > DateRange.MaxTextLength)
+            return null;
+        var readable = DateRange.TryParse(text, out var parsed);
+        if (TryDay(date!.From, out var from) && TryDay(date.To, out var to) && from <= to)
+            return new ImportedPersonDate(text, from, to);
+        return readable && parsed.From is { } earliest && parsed.To is { } latest ? new ImportedPersonDate(text, earliest, latest) : null;
     }
 
     private static bool HasProblem(PlannedExportItem planned) => planned.Issues.Any(i => i.Severity == ExportIssueSeverity.Problem);
@@ -675,6 +744,9 @@ public partial class ExportImport(
             new CappedListConverter<ImportedTag>(MaxTags, limits),
             new CappedListConverter<ImportedFile?>(MaxFilesPerItem, limits, MaxTotalFiles),
             new CappedListConverter<string?>(MaxTagsPerItemRead, limits),
+            new CappedListConverter<ImportedPerson>(MaxPeople, limits),
+            new CappedListConverter<ImportedPersonName>(Person.MaxNames, limits),
+            new CappedListConverter<int>(MaxPeoplePerItemRead, limits),
         },
     };
 
@@ -711,10 +783,31 @@ public partial class ExportImport(
         var failed = 0;
         var itemsFailed = 0;
         var streak = 0;
+        var people = 0;
         var tags = new Dictionary<string, Tag>(StringComparer.Ordinal);
         Exception? error = null;
+        var personIds = new Dictionary<int, int>();
         try
         {
+            // The people first, so that the items can name them. Each is new and only curators see them, whatever the export said.
+            foreach (var batch in plan.NewPeople.Chunk(200))
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var added = batch.Select(p => (p.Key, Person: db.AddImportedPerson(p.Data, now))).ToList();
+                await db.SaveChangesAsync(cancellationToken);
+                foreach (var (key, person) in added)
+                    personIds[key] = person.Id;
+                people += added.Count;
+                db.ChangeTracker.Clear();
+            }
+
+            // One line for all of them, with the number only: thousands of people would drown the log, and the people are new and hidden.
+            if (people > 0)
+            {
+                audit.Record(AuditAction.PeopleImported, people.ToString(CultureInfo.InvariantCulture));
+                await db.SaveChangesAsync(cancellationToken);
+            }
+
             foreach (var row in ready)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -749,6 +842,7 @@ public partial class ExportImport(
                 };
                 if (row.DateText is not null)
                     item.SetDateRange(row.DateText, row.DateFrom!.Value, row.DateTo!.Value);
+                PeopleImport.LinkImported(item, row.PersonKeys.Where(personIds.ContainsKey).Select(k => personIds[k]), stamp);
 
                 try
                 {
@@ -872,7 +966,7 @@ public partial class ExportImport(
             }
         }
 
-        return new ExportImportResult(items, files, failed, created.Count, itemsFailed, ready.Count - tried);
+        return new ExportImportResult(items, files, failed, created.Count, itemsFailed, ready.Count - tried, people);
     }
 
     /// <summary>What a full disk, a broken file system or a lost database throws. Anything else is not something the run can go on after.</summary>
@@ -896,7 +990,7 @@ public partial class ExportImport(
         ExportRefusal.VersionNotUnderstood =>
             localizer["This export has the format version {0}. This archive reads the versions {1} to {2}.", foundVersion?.ToString(CultureInfo.InvariantCulture) ?? "?", MinVersion, ArchiveExporter.Version],
         ExportRefusal.NotReadable => localizer["The file archive.json in this export could not be read."],
-        ExportRefusal.TooMany => localizer["This export holds more items, files, tags or collections than one import can read."],
+        ExportRefusal.TooMany => localizer["This export holds more items, files, tags, people or collections than one import can read."],
         ExportRefusal.TooMuchData => localizer["This export holds more data than one import can read."],
         _ => "",
     };

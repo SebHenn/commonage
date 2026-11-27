@@ -28,6 +28,9 @@ public class ArchiveItem
 
     public List<MediaFile> MediaFiles { get; set; } = [];
 
+    /// <summary>The people curators linked to the item. For curator pages only; public pages go through VisiblePeople.</summary>
+    public List<ItemPerson> People { get; set; } = [];
+
     /// <summary>What the item's PDF files say, for search only. Null when there is none.</summary>
     public ItemFileText? FileText { get; set; }
 

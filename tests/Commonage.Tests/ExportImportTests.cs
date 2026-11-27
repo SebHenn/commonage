@@ -52,8 +52,8 @@ public partial class ExportImportTests(CommonageAppFactory app)
         return stream.ToArray();
     }
 
-    private static byte[] ArchiveJson(object[] items, object[]? collections = null, int version = 8, string format = "commonage-export") =>
-        JsonSerializer.SerializeToUtf8Bytes(new { format, version, collections = collections ?? [], tags = Array.Empty<object>(), items }, Json);
+    private static byte[] ArchiveJson(object[] items, object[]? collections = null, int version = 8, string format = "commonage-export", object[]? people = null) =>
+        JsonSerializer.SerializeToUtf8Bytes(new { format, version, collections = collections ?? [], tags = Array.Empty<object>(), items, people = people ?? [] }, Json);
 
     private static object Collection(int id, string title) => new { id, title, description = (string?)null };
 
@@ -72,7 +72,7 @@ public partial class ExportImportTests(CommonageAppFactory app)
     };
 
     private static object Item(int id, string title, int collectionId = 1, string status = "Published", object? date = null,
-        object? contribution = null, object[]? files = null, string? mediaLevel = null, string? publicFrom = null, string? description = null) => new
+        object? contribution = null, object[]? files = null, string? mediaLevel = null, string? publicFrom = null, string? description = null, int[]? people = null) => new
     {
         id,
         collectionId,
@@ -81,6 +81,7 @@ public partial class ExportImportTests(CommonageAppFactory app)
         status,
         date,
         tags = Array.Empty<string>(),
+        people = people ?? [],
         mediaLevel,
         publicFrom,
         contribution,
@@ -238,6 +239,7 @@ public partial class ExportImportTests(CommonageAppFactory app)
     [InlineData(4)]
     [InlineData(8)]
     [InlineData(9)]
+    [InlineData(10)]
     public async Task Versions_four_to_the_current_one_are_read(int version)
     {
         using var curator = await CuratorAsync(app);
@@ -252,7 +254,7 @@ public partial class ExportImportTests(CommonageAppFactory app)
 
     [Theory]
     [InlineData(3, "format version 3")]
-    [InlineData(10, "format version 10")]
+    [InlineData(11, "format version 11")]
     public async Task Other_versions_and_other_files_are_refused_with_a_sentence(int version, string expected)
     {
         using var curator = await CuratorAsync(app);
@@ -727,7 +729,7 @@ public partial class ExportImportTests(CommonageAppFactory app)
 
         var html = await DryRunAsync(curator, Zip(("archive.json", ArchiveJson(items, [Collection(1, $"{word} Collection")]))));
 
-        Assert.Contains("more items, files, tags or collections than one import can read", html);
+        Assert.Contains("more items, files, tags, people or collections than one import can read", html);
         Assert.DoesNotContain("handler=Import", html);
     }
 
@@ -825,7 +827,7 @@ public partial class ExportImportTests(CommonageAppFactory app)
     public void Every_property_of_the_export_has_a_decision_and_the_reader_holds_exactly_what_is_not_dropped()
     {
         var assembly = typeof(ArchiveExporter).Assembly;
-        string[] types = ["ExportSettings", "ExportText", "ExportCollection", "ExportTag", "ExportItem", "ExportDate", "ExportContribution", "ExportNote", "ExportFile", "ExportStory", "ExportStoryBlock"];
+        string[] types = ["ExportSettings", "ExportText", "ExportCollection", "ExportTag", "ExportItem", "ExportDate", "ExportContribution", "ExportNote", "ExportFile", "ExportStory", "ExportStoryBlock", "ExportPerson", "ExportPersonName"];
         var missing = new List<string>();
         var found = new HashSet<string>();
         foreach (var name in types)
@@ -846,7 +848,7 @@ public partial class ExportImportTests(CommonageAppFactory app)
         (string Export, Type Imported)[] pairs =
         [
             ("ExportCollection", typeof(ImportedCollection)), ("ExportTag", typeof(ImportedTag)), ("ExportItem", typeof(ImportedItem)),
-            ("ExportDate", typeof(ImportedDate)), ("ExportContribution", typeof(ImportedContribution)), ("ExportFile", typeof(ImportedFile)),
+            ("ExportPerson", typeof(ImportedPerson)), ("ExportPersonName", typeof(ImportedPersonName)), ("ExportDate", typeof(ImportedDate)), ("ExportContribution", typeof(ImportedContribution)), ("ExportFile", typeof(ImportedFile)),
         ];
         foreach (var (export, imported) in pairs)
         {
@@ -859,6 +861,156 @@ public partial class ExportImportTests(CommonageAppFactory app)
 
         var contribution = ExportImportTable.Fields.Where(f => f.Key.StartsWith("ExportContribution.") && f.Value.Decision != ExportFieldDecision.Dropped).ToList();
         Assert.Equal("ExportContribution.ConsentCoversSharing", Assert.Single(contribution).Key);
+    }
+
+    private static object PersonJson(int id, string? name, object? died = null, object[]? names = null, string sortName = "Sorted, Name") => new
+    {
+        id,
+        publicId = "ABCDEFGHJKMN",
+        name,
+        sortName,
+        disclosure = "Deceased",
+        born = (object?)null,
+        died,
+        biography = "A life",
+        curatorNote = "Secret note of the other archive",
+        createdAt = DateTime.UtcNow,
+        names = names ?? [],
+    };
+
+    [Fact]
+    public async Task People_arrive_as_new_hidden_people_with_their_other_names_hidden_and_are_never_matched_with_people_here()
+    {
+        using var curator = await CuratorAsync(app);
+        var word = Word();
+        var sameName = $"{word} Karl";
+        var existing = await app.WithDbAsync(async db =>
+        {
+            var here = db.AddHiddenPerson(sameName, DateTime.UtcNow);
+            here.Biography = "What this archive knows";
+            here.SetDisclosure(PersonDisclosure.Deceased, DateTime.UtcNow);
+            await db.SaveChangesAsync();
+            return here.Id;
+        });
+        object[] names = [new { name = $"{word} Karlchen", kind = "Nickname", language = "de", shownToVisitors = true }];
+        object[] people = [PersonJson(7, sameName, new { text = "1990", from = "1990-01-01", to = "1990-12-31" }, names), PersonJson(8, $"{word} Nobody names me")];
+        var zip = Zip(("archive.json", ArchiveJson([Item(1, $"{word} Goalkeeper", people: [7, 7, 99])], [Collection(1, $"{word} Club")], 10, people: people)));
+
+        var html = await DryRunAsync(curator, zip);
+        Assert.Contains("1 person would be created, who only curators see.", html);
+        await ImportAsync(curator, html);
+
+        var imported = await app.WithDbAsync(db => db.People.Include(p => p.Names).Where(p => p.Id != existing && p.Name.StartsWith(word)).ToListAsync());
+        var person = Assert.Single(imported);
+        Assert.Equal((sameName, PersonDisclosure.Hidden, null, "A life", "Sorted, Name"), (person.Name, person.Disclosure, person.CuratorNote, person.Biography, person.SortName));
+        Assert.NotEqual("ABCDEFGHJKMN", person.PublicId);
+        Assert.Equal("1990", person.DiedText);
+        var other = Assert.Single(person.Names);
+        Assert.Equal(($"{word} Karlchen", PersonNameKind.Nickname, "de", false), (other.Name, other.Kind, other.Language, other.ShownToVisitors));
+        var here2 = await app.WithDbAsync(db => db.People.SingleAsync(p => p.Id == existing));
+        Assert.Equal(("What this archive knows", PersonDisclosure.Deceased), (here2.Biography, here2.Disclosure));
+        var item = Assert.Single(await ItemsAsync(word + " Goalkeeper"));
+        Assert.Equal([person.Id], await app.WithDbAsync(db => db.ItemPeople.Where(l => l.ArchiveItemId == item.Id).Select(l => l.PersonId).ToListAsync()));
+    }
+
+    [Fact]
+    public async Task Imported_people_are_one_line_in_the_activity_log_with_their_number()
+    {
+        using var curator = await CuratorAsync(app);
+        var word = Word();
+        object[] people = [PersonJson(1, $"{word} One"), PersonJson(2, $"{word} Two"), PersonJson(3, $"{word} Three")];
+        var zip = Zip(("archive.json", ArchiveJson([Item(1, $"{word} Item", people: [1, 2, 3])], [Collection(1, $"{word} Collection")], 10, people: people)));
+        var started = DateTime.UtcNow.AddSeconds(-1);
+
+        await RunAsync(curator, zip);
+
+        var ids = await app.WithDbAsync(db => db.People.Where(p => p.Name.StartsWith(word)).Select(p => p.Id).ToListAsync());
+        Assert.Equal(3, ids.Count);
+        var entries = await app.WithDbAsync(db => db.AuditEntries.Where(e => e.At >= started && e.Action == AuditAction.PeopleImported || e.PersonId != null && ids.Contains(e.PersonId.Value)).ToListAsync());
+        var line = Assert.Single(entries);
+        Assert.Equal((AuditAction.PeopleImported, "3", null), (line.Action, line.Subject, line.PersonId));
+    }
+
+    [Fact]
+    public async Task Imported_names_are_cleaned_like_names_typed_in_the_form()
+    {
+        using var curator = await CuratorAsync(app);
+        var word = Word();
+        // "e" and "a" with a combining accent, padded and spaced twice: the same as the composed letters, once cleaned.
+        var messy = $"  {word}  José   Márquez ";
+        object[] others = [new { name = "  José	 María ", kind = "Nickname", shownToVisitors = false }];
+        var zip = Zip(("archive.json", ArchiveJson([Item(1, $"{word} Item", people: [1])], [Collection(1, $"{word} Collection")], 10,
+            people: [PersonJson(1, messy, names: others, sortName: " Márquez ,  José ")])));
+
+        await RunAsync(curator, zip);
+
+        var person = await app.WithDbAsync(db => db.People.Include(p => p.Names).SingleAsync(p => p.Name.Contains(word)));
+        Assert.Equal($"{word} José Márquez", person.Name);
+        Assert.Equal("Márquez , José", person.SortName);
+        Assert.Equal("José María", Assert.Single(person.Names).Name);
+        Assert.True(person.Name.IsNormalized());
+    }
+
+    [Fact]
+    public async Task A_person_without_a_usable_name_or_with_too_much_is_left_out_and_nothing_else_goes_wrong()
+    {
+        using var curator = await CuratorAsync(app);
+        var word = Word();
+        object[] people =
+        [
+            PersonJson(1, "   "), PersonJson(2, null), PersonJson(3, new string('x', 500)),
+            PersonJson(4, $"{word} Fine", new { text = "not a date at all !!", from = "x", to = "y" },
+                Enumerable.Range(0, 20).Select(i => (object)new { name = $"{word} other {i}", kind = "Nonsense", language = "not a code!", shownToVisitors = true }).ToArray()),
+        ];
+        var zip = Zip(("archive.json", ArchiveJson([Item(1, $"{word} Item", people: [1, 2, 3, 4])], [Collection(1, $"{word} Collection")], 10, people: people)));
+
+        await RunAsync(curator, zip);
+
+        var imported = await app.WithDbAsync(db => db.People.Include(p => p.Names).Where(p => p.Name.StartsWith(word) || p.Name.StartsWith("xxxx")).ToListAsync());
+        var fine = Assert.Single(imported);
+        Assert.Null(fine.DiedText);
+        Assert.True(fine.Names.Count <= Commonage.Web.Domain.Person.MaxNames);
+        Assert.All(fine.Names, n => Assert.False(n.ShownToVisitors));
+        Assert.All(fine.Names, n => Assert.Null(n.Language));
+        Assert.Single(await ItemsAsync(word + " Item"));
+    }
+
+    [Fact]
+    public async Task A_person_with_more_other_names_than_a_person_can_have_refuses_the_whole_export()
+    {
+        using var curator = await CuratorAsync(app);
+        var word = Word();
+        var names = Enumerable.Range(0, Commonage.Web.Domain.Person.MaxNames + 1).Select(i => (object)new { name = $"{word} other {i}", kind = "Other" }).ToArray();
+        var zip = Zip(("archive.json", ArchiveJson([Item(1, $"{word} Item", people: [1])], [Collection(1, $"{word} Collection")], 10, people: [PersonJson(1, $"{word} Many", names: names)])));
+
+        var html = await RunAsync(curator, zip);
+
+        Assert.Contains("more items, files, tags, people or collections", html);
+        Assert.Empty(await ItemsAsync(word));
+        Assert.False(await app.WithDbAsync(db => db.People.AnyAsync(p => p.Name.StartsWith(word))));
+    }
+
+    [Fact]
+    public async Task An_older_export_without_people_imports_as_before()
+    {
+        using var curator = await CuratorAsync(app);
+        var word = Word();
+        var before = await app.WithDbAsync(db => db.People.CountAsync());
+
+        var html = await RunAsync(curator, Zip(("archive.json", ArchiveJson([Item(1, $"{word} Old")], [Collection(1, $"{word} Collection")], 9))));
+
+        Assert.DoesNotContain("would be created, who only curators see", html);
+        Assert.Single(await ItemsAsync(word));
+        Assert.Equal(before, await app.WithDbAsync(db => db.People.CountAsync()));
+    }
+
+    [Fact]
+    public async Task A_helper_cannot_import_people_or_anything_else()
+    {
+        using var admin = await CuratorAsync(app);
+        var (helper, _, _, _) = await app.CreateAccountAsync(admin, Commonage.Web.Identity.Roles.Helper);
+
+        Assert.Equal(HttpStatusCode.Forbidden, (await helper.GetAsync(Page)).StatusCode);
     }
 
     [Fact]

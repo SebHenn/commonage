@@ -67,6 +67,11 @@ public class EditModel(
 
     public const int MaxStoriesShown = 50;
 
+    /// <summary>The people linked to the item, for curators only: helpers do not see people.</summary>
+    public IReadOnlyList<LinkedPerson> People { get; private set; } = [];
+
+    public record LinkedPerson(int Id, string Name, PersonDisclosure Disclosure);
+
     public record StoryUse(int Id, string Title, StoryStatus Status);
 
     /// <summary>The latest entries of the activity log about this item, newest first.</summary>
@@ -773,6 +778,12 @@ public class EditModel(
                 UsedInStoryCount = await stories.CountAsync();
                 UsedInStories = await stories.OrderBy(s => s.Position).ThenBy(s => s.Id).Take(MaxStoriesShown)
                     .Select(s => new StoryUse(s.Id, s.Title, s.Status)).ToListAsync();
+            }
+            if (User.MayManage())
+            {
+                People = await db.ItemPeople.Where(l => l.ArchiveItemId == item.Id)
+                    .OrderBy(l => l.Person.SortName ?? l.Person.Name).ThenBy(l => l.PersonId)
+                    .Select(l => new LinkedPerson(l.PersonId, l.Person.Name, l.Person.Disclosure)).ToListAsync();
             }
             OpenNotes = await db.VisitorNotes.CountAsync(n => n.ArchiveItemId == item.Id && n.HandledAt == null);
             MediaFiles = await db.MediaFiles.Where(f => f.ArchiveItemId == item.Id).OrderBy(f => f.Position).ThenBy(f => f.Id).ToListAsync();

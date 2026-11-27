@@ -1,0 +1,78 @@
+@page "{id:int}"
+@model Commonage.Web.Pages.Admin.People.PreviewModel
+@using Commonage.Web.Pages.Admin.People
+@inject Commonage.Web.Operations.ArchiveProfile Profile
+@{
+    ViewData["Title"] = T["Preview: {0}", Model.View.Name];
+    var material = (await Profile.GetAsync()).MaterialLanguage;
+    var view = Model.View;
+}
+
+<div class="alert alert-info d-flex flex-wrap gap-2 align-items-center" role="status">
+    <span class="me-auto">
+        @switch (Model.State)
+        {
+            case PreviewModel.Standing.Hidden:
+                @T["Preview. Only curators see this person: visitors cannot see this page."]
+                break;
+            case PreviewModel.Standing.NoPublicItem:
+                @T["Preview. None of this person's items is public yet, so visitors cannot find them."]
+                break;
+            default:
+                @T["Preview. This is what visitors will see, without the items they may not see."]
+                break;
+        }
+    </span>
+    <a asp-page="/Admin/People/Edit" asp-route-id="@Model.PersonId" class="alert-link">@T["Back to editing"]</a>
+</div>
+
+<h1 lang="@material">@view.Name</h1>
+@if (view.OtherNames.Count > 0)
+{
+    <p class="text-muted">
+        @T["Also known as"]
+        @for (var index = 0; index < view.OtherNames.Count; index++)
+        {
+            <span lang="@(view.OtherNames[index].Language ?? material)">@view.OtherNames[index].Name</span>@(index < view.OtherNames.Count - 1 ? " · " : "")
+        }
+    </p>
+}
+@if (view.BornText is not null || view.DiedText is not null)
+{
+    <dl class="row">
+        @if (view.BornText is not null)
+        {
+            <dt class="col-sm-2">@T["Born"]</dt>
+            <dd class="col-sm-10" lang="@material">@view.BornText</dd>
+        }
+        @if (view.DiedText is not null)
+        {
+            <dt class="col-sm-2">@T["Died"]</dt>
+            <dd class="col-sm-10" lang="@material">@view.DiedText</dd>
+        }
+    </dl>
+}
+@if (view.Biography is not null)
+{
+    <p class="text-preserve-lines col-lg-8" lang="@material">@view.Biography</p>
+}
+
+<h2 class="h4">@T["Items"]</h2>
+@if (view.Items.Count == 0)
+{
+    <p class="text-muted">@T["Visitors see no item of this person."]</p>
+}
+else
+{
+    <ul class="list-unstyled">
+        @foreach (var item in view.Items)
+        {
+            <li class="mb-2"><a asp-page="/Items/Details" asp-route-id="@item.Id" lang="@material">@ArchiveItem.ShownTitle(T, item.Title)</a>
+                @if (item.DateText is not null)
+                {
+                    <small class="d-block text-muted" lang="@material">@item.DateText</small>
+                }
+            </li>
+        }
+    </ul>
+}

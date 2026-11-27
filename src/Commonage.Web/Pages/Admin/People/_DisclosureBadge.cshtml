@@ -1,0 +1,13 @@
+@model Commonage.Web.Domain.PersonDisclosure
+@switch (Model)
+{
+    case Commonage.Web.Domain.PersonDisclosure.Deceased:
+        <span class="badge text-bg-success">@T["Has died: visitors may see them"]</span>
+        break;
+    case Commonage.Web.Domain.PersonDisclosure.MayBeShown:
+        <span class="badge text-bg-warning">@T["May be living, and may be shown"]</span>
+        break;
+    default:
+        <span class="badge text-bg-secondary">@T["Only curators"]</span>
+        break;
+}

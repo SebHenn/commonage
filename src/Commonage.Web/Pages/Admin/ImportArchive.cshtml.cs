@@ -144,6 +144,8 @@ public class ImportArchiveModel(
             var result = await import.RunAsync(plan, source, CancellationToken.None);
             TempData["Message"] = localizer["Drafts created: {0}. Photos added: {1}. Previews are being created.", result.Items, result.Files].Value;
             var problems = new List<string>();
+            if (result.People > 0)
+                TempData["Message"] += " " + localizer.Plural("{0, plural, one {# person was created, who only curators see.} other {# people were created, who only curators see.}}", result.People);
             if (result.FilesFailed > 0)
                 problems.Add(localizer["Photos that could not be added: {0}. Their items stay drafts with the photos that did arrive. Add the missing photos by hand, or put the draft in the bin and run the import again.", result.FilesFailed].Value);
             if (result.ItemsFailed > 0)

@@ -67,5 +67,15 @@ public class ActivityModel(CommonageDbContext db) : PageModel
             .OrderByDescending(e => e.At)
             .ThenByDescending(e => e.Id)
             .ToPagedListAsync(PageNumber, PageSize, cancellationToken);
+
+        // The log keeps a person's id and never their name; the line shows the name as it is now, also for a person in the bin.
+        var personIds = Entries.Items.Where(e => e.PersonId != null).Select(e => e.PersonId!.Value).Distinct().ToList();
+        PersonNames = personIds.Count == 0
+            ? []
+            : await db.People.IgnoreQueryFilters().AsNoTracking().Where(p => personIds.Contains(p.Id))
+                .ToDictionaryAsync(p => p.Id, p => p.Name, cancellationToken);
     }
+
+    /// <summary>The current names of the people the shown lines are about.</summary>
+    public IReadOnlyDictionary<int, string> PersonNames { get; private set; } = new Dictionary<int, string>();
 }

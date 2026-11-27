@@ -54,6 +54,16 @@ public partial class SecurityHeaderTests(CommonageAppFactory app)
             return tag.Id;
         });
 
+        var personId = await app.WithDbAsync(async db =>
+        {
+            var person = db.AddHiddenPerson(TestData.Unique("Person"), DateTime.UtcNow);
+            person.Biography = "Some words about them.";
+            person.Names.Add(new PersonName { Name = TestData.Unique("Other"), Kind = PersonNameKind.Nickname, ShownToVisitors = true });
+            db.ItemPeople.Add(new ItemPerson { ArchiveItemId = item.Id, Person = person, CreatedAt = DateTime.UtcNow });
+            await db.SaveChangesAsync();
+            return person.Id;
+        });
+
         var storyId = await app.WithDbAsync(async db =>
         {
             var story = new Story { Title = TestData.Unique("A story"), CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow };
@@ -70,7 +80,7 @@ public partial class SecurityHeaderTests(CommonageAppFactory app)
         var results = new List<string>();
         foreach (var route in routes)
         {
-            var url = FillIn(route, item, token, tagId, linkId, storyId);
+            var url = FillIn(route, item, token, tagId, linkId, storyId, personId);
             using var response = await curator.GetAsync(url);
             var html = await response.Content.ReadAsStringAsync();
             if (InlineScript().IsMatch(html) || EventHandlerAttribute().IsMatch(html) || StyleAttributeOrElement().IsMatch(html))
@@ -97,16 +107,18 @@ public partial class SecurityHeaderTests(CommonageAppFactory app)
         return saved;
     });
 
-    private static string FillIn(string route, ArchiveItem item, string token, int tagId, int linkId, int storyId)
+    private static string FillIn(string route, ArchiveItem item, string token, int tagId, int linkId, int storyId, int personId)
     {
         var id = route.StartsWith("/Collections", StringComparison.OrdinalIgnoreCase) || route.Contains("Admin/Collections", StringComparison.OrdinalIgnoreCase)
             ? item.CollectionId.ToString()
             : route.Contains("Admin/Tags", StringComparison.OrdinalIgnoreCase) ? tagId.ToString()
+            : route.Contains("Admin/People", StringComparison.OrdinalIgnoreCase) ? personId.ToString()
             : route.Contains("Stories", StringComparison.OrdinalIgnoreCase) ? storyId.ToString()
             : route.Contains("Admin/Contributions", StringComparison.OrdinalIgnoreCase) ? linkId.ToString() : item.Id.ToString();
         var url = route
             .Replace("{token}", token)
             .Replace("{id:int}", id)
+            .Replace("{itemId:int}", item.Id.ToString())
             // The pages about the archive: this one always exists.
             .Replace("{slug:regex(^(about|contact|privacy|imprint)$)}", "privacy")
             .Replace("{kind:regex(^(places|people)$)}", "places");

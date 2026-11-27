@@ -22,6 +22,24 @@
 
 @if (!string.IsNullOrWhiteSpace(Model.Text))
 {
+    @if (Model.People.Count > 0)
+    {
+        <h2 class="h5">@T["People"]</h2>
+        <p class="form-text">@T["In the name, another name or the note for curators of these people. Correct or remove the text on the person."]</p>
+        <ul class="mb-4">
+            @foreach (var person in Model.People)
+            {
+                <li>
+                    <a asp-page="/Admin/People/Edit" asp-route-id="@person.Id" class="text-break">@person.Name</a>
+                    @if (person.InBin)
+                    {
+                        <span class="badge text-bg-dark">@T["In the bin"]</span>
+                    }
+                </li>
+            }
+        </ul>
+    }
+
     @if (Model.NamedInItems.Count > 0)
     {
         <h2 class="h5">@T["Named in what curators wrote"]</h2>

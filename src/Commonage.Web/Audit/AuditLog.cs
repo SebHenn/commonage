@@ -52,18 +52,18 @@ public class AuditLog(CommonageDbContext db, IHttpContextAccessor httpContextAcc
         });
     }
 
-    public AuditEntry Record(AuditAction action, string? subject, ArchiveItem? item = null, Story? story = null)
+    public AuditEntry Record(AuditAction action, string? subject, ArchiveItem? item = null, Story? story = null, Person? person = null)
     {
         var user = httpContextAccessor.HttpContext?.User;
         var signedIn = user?.Identity?.IsAuthenticated == true;
-        return Add(action, subject, item, signedIn ? user!.FindFirstValue(ClaimTypes.NameIdentifier) : null, signedIn ? user!.Identity!.Name : null, story);
+        return Add(action, subject, item, signedIn ? user!.FindFirstValue(ClaimTypes.NameIdentifier) : null, signedIn ? user!.Identity!.Name : null, story, person);
     }
 
     /// <summary>For what an account does while it logs in, before the request knows who it is.</summary>
     public void RecordFor(Microsoft.AspNetCore.Identity.IdentityUser account, AuditAction action, string? subject) =>
-        Add(action, subject, null, account.Id, account.UserName, null);
+        Add(action, subject, null, account.Id, account.UserName, null, null);
 
-    private AuditEntry Add(AuditAction action, string? subject, ArchiveItem? item, string? userId, string? userName, Story? story)
+    private AuditEntry Add(AuditAction action, string? subject, ArchiveItem? item, string? userId, string? userName, Story? story, Person? person)
     {
         var entry = new AuditEntry
         {
@@ -73,6 +73,7 @@ public class AuditLog(CommonageDbContext db, IHttpContextAccessor httpContextAcc
             Action = action,
             ArchiveItem = item,
             Story = story,
+            Person = person,
             Subject = subject is { Length: > AuditEntry.SubjectMaxLength } ? subject[..AuditEntry.SubjectMaxLength] : subject,
         };
         db.AuditEntries.Add(entry);

@@ -66,7 +66,16 @@ else
                         <td class="text-nowrap"><time datetime="@entry.At.ToString("O")">@Dates.Moment(entry.At)</time></td>
                         <td class="text-break">@AuditText.Who(T, entry)</td>
                         <td>
-                            @AuditText.Describe(T, entry.Action)@if (entry.Subject is not null)
+                            @AuditText.Describe(T, entry.Action)@if (entry.PersonId is { } personId && Model.PersonNames.TryGetValue(personId, out var personName))
+                            {
+                                <text>: </text>
+                                <a asp-page="/Admin/People/Edit" asp-route-id="@personId">@personName</a>
+                            }
+                            else if (AuditText.KindOf(entry.Action) == AuditKind.People && entry.PersonId is null)
+                            {
+                                <text>: </text>@T["A person since deleted"]
+                            }
+                            else if (entry.Subject is not null)
                             {
                                 <text>: </text>
                                 @if (entry.StoryId is { } storyId)
