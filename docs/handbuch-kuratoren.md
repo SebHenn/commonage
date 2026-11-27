@@ -20,12 +20,19 @@ Helfer können die Liste lesen, aber nichts wiederherstellen. Für Änderungen v
 
 ## Schlagwörter aufräumen
 
+**Personen** führt die Personen des Archivs. Eine Person sehen zunächst nur Kuratoren, bis Sie etwas anderes wählen. „Ist gestorben“
+zeigt Namen, angehakte andere Namen, Daten und Lebensbeschreibung auf einer eigenen Seite, unter „Personen“ und an den Einträgen,
+in denen die Person vorkommt. „Könnte noch leben und darf gezeigt werden“ zeigt Namen, angehakte andere Namen und Lebensbeschreibung,
+aber nie ein Datum, hält die Seite aus Suchmaschinen heraus, und der Name erscheint auf Eintragsseiten und in Suchergebnissen: wählen
+Sie das nur für jemanden, der einverstanden ist. Eine Person ist nur öffentlich, solange mindestens einer ihrer Einträge es ist. Ihre
+Notiz bleibt bei den Kuratoren.
+
 **Schlagwörter** listet jedes Schlagwort auf, mit der Zahl der Einträge, die es haben. Öffnen Sie eines, um:
 
-- **festzulegen, was es nennt:** einen Ort, eine Person oder ein Thema. Besucher finden alle Orte und alle Personen auf eigenen
-  Seiten, „Orte“ und „Personen“, von A bis Z, und ein Eintrag zeigt seine Orte und Personen zuerst. Es zählen nur
-  veröffentlichte Einträge, ein Name, den nur Entwürfe haben, bleibt also unsichtbar. Die Seite „Personen“ listet Namen für sich
-  auf, nennen Sie lebende Menschen also nur, wenn sie einverstanden sind.
+- **festzulegen, was es nennt:** einen Ort, eine Person oder ein Thema. Besucher finden alle Orte auf einer eigenen Seite,
+  „Orte“, von A bis Z, und ein Eintrag zeigt seine Orte zuerst. Es zählen nur veröffentlichte Einträge, ein Name, den nur
+  Entwürfe haben, bleibt also unsichtbar. Personen verwalten Sie unter **Personen**, nicht als Schlagwörter (siehe oben); ein
+  Schlagwort, das eine Person nennt, erscheint am Eintrag, bis die Schlagwörter zu Personen werden.
 - **es umzubenennen:** der neue Name gilt sofort bei jedem Eintrag, auch in der Suche. Einen Namen, den schon ein anderes
   Schlagwort hat, lehnt das Archiv ab; das wäre ein Zusammenführen.
 - **es mit einem anderen zusammenzuführen,** bei einem Tippfehler oder zwei Wörtern für dasselbe: Jeder Eintrag bekommt

@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Commonage.Web.Pages;
 
-/// <summary>Every place, or every person, that published items are tagged with, from A to Z.</summary>
+/// <summary>Every place that published items are tagged with, from A to Z. People have their own pages (<c>Pages/People</c>).</summary>
 public class TagIndexModel(CommonageDbContext db) : PageModel
 {
     /// <summary>Below this many, the letters to jump to would only be in the way.</summary>
@@ -18,22 +18,16 @@ public class TagIndexModel(CommonageDbContext db) : PageModel
 
     public record Letter(string Initial, IReadOnlyList<Entry> Tags);
 
-    public TagKind Kind { get; private set; }
-
     public IReadOnlyList<Letter> Letters { get; private set; } = [];
 
     public int Total { get; private set; }
 
-    public async Task<IActionResult> OnGetAsync(string kind, CancellationToken cancellationToken)
+    public async Task<IActionResult> OnGetAsync(CancellationToken cancellationToken)
     {
-        if (TagKinds.FromSlug(kind) is not { } found)
-            return NotFound();
-        Kind = found;
-
         // Only what visitors can see: a name on drafts alone is not shown.
         var tags = await db.VisibleItems
             .SelectMany(i => i.Tags)
-            .Where(t => t.Kind == Kind)
+            .Where(t => t.Kind == TagKind.Place)
             .GroupBy(t => t.Name)
             .Select(g => new Entry(g.Key, g.Count()))
             .ToListAsync(cancellationToken);

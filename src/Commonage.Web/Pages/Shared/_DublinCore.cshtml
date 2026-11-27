@@ -26,6 +26,10 @@
 {
     <meta name="DC.subject" content="@subject" />
 }
+@foreach (var person in Model.DeceasedPeople)
+{
+    <meta name="DC.subject" content="@person" />
+}
 <meta name="DC.identifier" content="@Model.Identifier" />
 @if (Model.Type is not null)
 {

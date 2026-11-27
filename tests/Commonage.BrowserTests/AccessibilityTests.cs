@@ -10,7 +10,7 @@ public class AccessibilityTests(BrowserFixture app)
 {
     public static TheoryData<string, int> PublicPages() => Widths(
         "/", "/collections", "/collections/1", "/stories", "/stories/1", "/items/1", "/items/1/tell", "/help", "/items/2", "/items/6", "/search", "/search?q=flood", "/search?q=1950s", "/search?q=zzzznothing", "/items/99999", "/places", "/people",
-        "/Account/Login", "CONTRIBUTE", "/contribute/no-such-link", "/about", "/contact", "/privacy");
+        "/Account/Login", "CONTRIBUTE", "PERSON", "/people/0000000000ZZ", "/contribute/no-such-link", "/about", "/contact", "/privacy");
 
     public static TheoryData<string, int> CuratorPages() => Widths(
         "/Admin", "/Admin?status=Submitted", "/Admin/Items/Edit/11", "/Admin/Items/Edit", "/Admin/Items/AddMany", "/Admin/Items/Import", "/Admin/Items/Edit/1", "/Admin/Items/Preview/1", "/Admin/Collections", "/Admin/Collections/Edit/1", "/Admin/Collections/Edit", "/Admin/Tags", "/Admin/Tags/Edit/1", "/Admin/Notes", "/Admin/Notes?show=All", "/Admin/Contributions", "/Admin/Contributions/Poster/1",
@@ -32,7 +32,7 @@ public class AccessibilityTests(BrowserFixture app)
     public async Task A_public_page_works_for_everyone(string path, int width)
     {
         var page = await app.NewPageAsync(width);
-        await CheckAsync(page, path == "CONTRIBUTE" ? app.ContributionPath : path);
+        await CheckAsync(page, app.Resolve(path));
     }
 
     [Theory]
@@ -50,7 +50,7 @@ public class AccessibilityTests(BrowserFixture app)
         var page = await app.NewPageAsync(390);
         await page.Context.AddCookiesAsync([new Cookie { Name = ".AspNetCore.Culture", Value = "c=ar|uic=ar", Url = app.BaseUrl }]);
 
-        await CheckAsync(page, path == "CONTRIBUTE" ? app.ContributionPath : path);
+        await CheckAsync(page, app.Resolve(path));
 
         Assert.Equal("rtl", await page.GetAttributeAsync("html", "dir"));
         // The site name starts on the right, as the reading does.
@@ -65,7 +65,7 @@ public class AccessibilityTests(BrowserFixture app)
         var page = await app.NewPageAsync(320, 640);
         await page.Context.AddCookiesAsync([new Cookie { Name = ".AspNetCore.Culture", Value = $"c={LongTextLanguage.Code}|uic={LongTextLanguage.Code}", Url = app.BaseUrl }]);
 
-        await page.GotoAsync(path == "CONTRIBUTE" ? app.ContributionPath : path);
+        await page.GotoAsync(app.Resolve(path));
 
         var overflow = await page.EvaluateAsync<int>("document.documentElement.scrollWidth - document.documentElement.clientWidth");
         var tooWide = await page.EvaluateAsync<string[]>("""
@@ -76,7 +76,7 @@ public class AccessibilityTests(BrowserFixture app)
         Assert.True(overflow <= 0, $"{path} scrolls sideways by {overflow} px: {string.Join(" | ", tooWide)}");
     }
 
-    public static TheoryData<string> MainPages() => new() { "/", "/collections", "/collections/1", "/stories/1", "/items/1", "/search?q=flood", "CONTRIBUTE", "/privacy" };
+    public static TheoryData<string> MainPages() => new() { "/", "/collections", "/collections/1", "/stories/1", "/items/1", "/search?q=flood", "CONTRIBUTE", "PERSON", "/people", "/privacy" };
 
     /// <summary>For states a page only reaches by using it, as well as for each page as it loads.</summary>
     internal static async Task AssertNoViolationsAsync(IPage page, string what)

@@ -75,7 +75,8 @@ public class SearchModel(CommonageDbContext db) : PageModel
 
         var search = await db.ToSearchAsync(Text, cancellationToken);
         (Query, Dates) = (search.Query, search.Dates);
-        var filter = new ItemFilter(Query, Tag, Collection, From, To, Dates);
+        // Visitors also find an item by the public names of its people, read from the rows as they are now.
+        var filter = new ItemFilter(Query, Tag, Collection, From, To, Dates, ItemsByPeople: query => VisiblePeople.ItemIdsByName(db, query));
         var matches = db.VisibleItems.Filter(filter);
 
         Results = await matches

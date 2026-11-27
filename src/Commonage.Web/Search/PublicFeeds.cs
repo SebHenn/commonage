@@ -41,7 +41,8 @@ public static class PublicFeeds
     private const int FeedLength = 30;
 
     // A sitemap may hold at most 50,000 addresses.
-    private const int MaxSitemapItems = 49_000;
+    private const int MaxSitemapItems = 48_000;
+    private const int MaxSitemapPeople = 1_000;
     private const int MaxSitemapStories = 500;
     private const string CacheControl = "public, max-age=600";
 
@@ -141,6 +142,9 @@ public static class PublicFeeds
             .Take(MaxSitemapStories)
             .ToListAsync(cancellationToken);
 
+        // Only people who have died, and no lastmod: it would follow their items. Someone who may be living is on the website only.
+        var people = await VisiblePeople.DeceasedKeysAsync(db, MaxSitemapPeople, cancellationToken);
+
         static XElement Page(string url, DateTime? changed = null) => new(Sitemap + "url",
             new XElement(Sitemap + "loc", url),
             changed is { } at ? new XElement(Sitemap + "lastmod", at.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)) : null);
@@ -149,6 +153,8 @@ public static class PublicFeeds
             Page($"{address}/"),
             Page($"{address}/collections"),
             collections.Select(id => Page($"{address}/collections/{id}")),
+            people.Count > 0 ? Page($"{address}/people") : null,
+            people.Select(key => Page($"{address}/people/{key}")),
             stories.Count > 0 ? Page($"{address}/stories") : null,
             stories.Select(id => Page($"{address}/stories/{id}")),
             items.Select(item => Page($"{address}/items/{item.Id}", item.UpdatedAt)));

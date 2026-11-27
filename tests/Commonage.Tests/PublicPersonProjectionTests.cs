@@ -25,9 +25,30 @@ public class PublicPersonProjectionTests(CommonageAppFactory app)
     }
 
     [Fact]
+    public async Task The_sql_of_the_search_by_names_reads_only_names_marked_for_visitors_and_nothing_private()
+    {
+        var sql = await app.WithDbAsync(db => Task.FromResult(VisiblePeople.ItemIdsByName(db, "karl:*").ToQueryString()));
+
+        Assert.Contains("ShownToVisitors", sql);
+        Assert.Contains("FoldedName", sql);
+        foreach (var column in NeverPublic.Append("Biography"))
+            Assert.DoesNotContain(column, sql);
+    }
+
+    [Fact]
+    public async Task The_sql_of_the_items_of_a_person_starts_from_the_items_visitors_may_see()
+    {
+        var sql = await app.WithDbAsync(db => Task.FromResult(VisiblePeople.ItemsQuery(db, "abcdefghjkmn").ToQueryString()));
+
+        Assert.Contains("\"Status\"", sql);
+        foreach (var column in NeverPublic)
+            Assert.DoesNotContain(column, sql);
+    }
+
+    [Fact]
     public void The_public_person_records_have_no_field_for_what_stays_with_curators()
     {
-        var types = new[] { typeof(PersonView), typeof(VisiblePeople.PersonRow), typeof(PublicPersonName) };
+        var types = new[] { typeof(PersonView), typeof(VisiblePeople.PersonRow), typeof(PublicPersonName), typeof(PersonCard), typeof(PersonIndexEntry) };
         var members = types.SelectMany(t => t.GetProperties(BindingFlags.Public | BindingFlags.Instance)).Select(p => p.Name).ToList();
 
         Assert.NotEmpty(members);

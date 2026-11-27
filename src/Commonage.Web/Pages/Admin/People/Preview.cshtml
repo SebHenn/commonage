@@ -58,14 +58,14 @@
 }
 
 <h2 class="h4">@T["Items"]</h2>
-@if (view.Items.Count == 0)
+@if (view.Items.TotalCount == 0)
 {
     <p class="text-muted">@T["Visitors see no item of this person."]</p>
 }
 else
 {
     <ul class="list-unstyled">
-        @foreach (var item in view.Items)
+        @foreach (var item in view.Items.Items)
         {
             <li class="mb-2"><a asp-page="/Items/Details" asp-route-id="@item.Id" lang="@material">@ArchiveItem.ShownTitle(T, item.Title)</a>
                 @if (item.DateText is not null)

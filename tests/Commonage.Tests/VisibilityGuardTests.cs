@@ -117,7 +117,7 @@ public partial class VisibilityGuardTests
         Assert.True(offenders.Count == 0, "These files name PersonDisclosure. Ask Visibility instead:\n" + string.Join('\n', offenders));
     }
 
-    [GeneratedRegex(@"\bdb\.People\b|\bdb\.PersonNames\b|\bdb\.ItemPeople\b|(?<!AuditKind)\.People\b|\.Links\b|(?<!TagKind)\.Person\b")]
+    [GeneratedRegex(@"\bdb\.People\b|\bdb\.PersonNames\b|\bdb\.ItemPeople\b|(?<!AuditKind|Pages)\.People\b|\.Links\b|(?<!TagKind)\.Person\b")]
     private static partial Regex PeopleForbidden();
 
     [GeneratedRegex(@"\bPersonDisclosure\b")]
@@ -128,7 +128,7 @@ public partial class VisibilityGuardTests
     {
         foreach (var line in new[] { "db.People.Where(x)", "db.PersonNames.ToList()", "db.ItemPeople.Count()", "item.People.Select(l => l.PersonId)", "person.Links.Count", "l.Person.Name", "x => x.Person" })
             Assert.Matches(PeopleForbidden(), line);
-        foreach (var line in new[] { "TagKind.Person", "AuditKind.People", "await VisiblePeople.ViewAsync(db, db.VisiblePeople, key, token)", "db.VisiblePeople.Where(x)", "Person.Clean(name)" })
+        foreach (var line in new[] { "TagKind.Person", "AuditKind.People", "await VisiblePeople.PageAsync(db, key, 1, token)", "db.VisiblePeople.Where(x)", "Person.Clean(name)" })
             Assert.DoesNotMatch(PeopleForbidden(), line);
         Assert.Matches(DisclosureForbidden(), "p.Disclosure == PersonDisclosure.Deceased");
         Assert.DoesNotMatch(DisclosureForbidden(), "AuditAction.PersonDisclosureChanged");

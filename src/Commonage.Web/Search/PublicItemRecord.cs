@@ -20,6 +20,7 @@ namespace Commonage.Web.Search;
 /// <param name="Credit">Exactly what the page prints as the credit.</param>
 /// <param name="Rights">The address of what others may do with it.</param>
 /// <param name="Type">A DCMI type (Image, Sound, Text), only from files visitors get.</param>
+/// <param name="DeceasedPeople">The main names of the item's public people who have died, and nobody who may be living.</param>
 /// <param name="Description">Left out, with the files, when the contributor did not agree to sharing beyond the website.</param>
 public sealed record PublicItemRecord(
     string Identifier,
@@ -32,12 +33,13 @@ public sealed record PublicItemRecord(
     string? Rights,
     string? Language,
     IReadOnlyList<string> Subjects,
+    [property: JsonPropertyName("people")] IReadOnlyList<string> DeceasedPeople,
     string? Type,
     string Collection,
     IReadOnlyList<PublicFileRecord> Files)
 {
     /// <summary>The page of a visible item. Needs the collection, contribution and tags loaded; the files are the ones visitors may have.</summary>
-    public static PublicItemRecord From(ArchiveItem item, IReadOnlyCollection<MediaFile> visibleFiles, ArchiveIdentity identity, string baseAddress)
+    public static PublicItemRecord From(ArchiveItem item, IReadOnlyCollection<MediaFile> visibleFiles, ArchiveIdentity identity, string baseAddress, IReadOnlyList<string> deceasedPeople)
     {
         var travels = item.MayTravel;
         var files = travels && item.MediaLevel == MediaLevel.Everything
@@ -55,6 +57,7 @@ public sealed record PublicItemRecord(
             item.RightsUri ?? identity.DefaultRightsUri,
             identity.MaterialLanguage,
             item.Tags.OrderBy(t => t.Name, StringComparer.Ordinal).Select(t => t.Name).ToList(),
+            deceasedPeople,
             files.Count == 0 ? null : files[0].Kind switch { "audio" => "Sound", "document" => "Text", _ => "Image" },
             item.Collection.Title,
             files);
@@ -113,7 +116,7 @@ public static class PublicItemJson
             .AsNoTracking()
             .ToListAsync(cancellationToken);
         var identity = await profile.GetAsync();
-        var record = PublicItemRecord.From(item, files, identity, context.Request.BaseAddress());
+        var record = PublicItemRecord.From(item, files, identity, context.Request.BaseAddress(), await VisiblePeople.DeceasedOfItemAsync(db, id, cancellationToken));
 
         context.Response.Headers.CacheControl = CacheControl;
         if (!identity.AllowSearchEngines)

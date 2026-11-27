@@ -36,9 +36,9 @@ public class PreviewModel(CommonageDbContext db) : PageModel
 
         // A hidden person gets the same projection; the banner says that visitors do not see it.
         PersonId = person.Id;
-        var asVisitors = await VisiblePeople.ViewAsync(db, db.People, person.PublicId, cancellationToken);
+        var asVisitors = await VisiblePeople.ViewAsync(db, db.People, person.PublicId, 1, cancellationToken);
         View = asVisitors!;
-        State = person.IsHidden ? Standing.Hidden : View.Items.Count == 0 ? Standing.NoPublicItem : Standing.Shown;
+        State = person.IsHidden ? Standing.Hidden : View.Items.TotalCount == 0 ? Standing.NoPublicItem : Standing.Shown;
         return Page();
     }
 }

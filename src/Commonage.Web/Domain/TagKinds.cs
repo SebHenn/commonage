@@ -19,18 +19,9 @@ public static class TagKinds
         _ => localizer["Topics"],
     };
 
-    /// <summary>The address of the visitors' page with every tag of this kind. Topics have none: the start page and the search show them.</summary>
-    public static string? Slug(TagKind kind) => kind switch
-    {
-        TagKind.Place => "places",
-        TagKind.Person => "people",
-        _ => null,
-    };
-
-    public static TagKind? FromSlug(string? slug) => slug?.ToLowerInvariant() switch
-    {
-        "places" => TagKind.Place,
-        "people" => TagKind.Person,
-        _ => null,
-    };
+    /// <summary>
+    /// The address of the visitors' page with every tag of this kind. Only places have one: topics are found from the start page and
+    /// the search, and people have pages of their own (<c>/people</c>) that do not list tags.
+    /// </summary>
+    public static string? Slug(TagKind kind) => kind == TagKind.Place ? "places" : null;
 }

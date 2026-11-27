@@ -54,6 +54,55 @@ public class AccentFoldingTests(CommonageAppFactory app)
     }
 
     /// <summary>
+    /// People are found the way titles are: accents, composed or decomposed, and the vowel marks of Devanagari never matter, other
+    /// scripts stay whole, and a hidden person with the same folded name as a public one finds nothing.
+    /// </summary>
+    [Fact]
+    public async Task People_are_found_by_name_whatever_the_accents_and_never_through_a_hidden_namesake()
+    {
+        await using var db = await CreateMigratedDatabaseAsync();
+        var now = DateTime.UtcNow;
+        var collection = new Collection { Title = "People", CreatedAt = now };
+        var samples = new (string Name, PersonDisclosure Disclosure)[]
+        {
+            ("Karl Mühle", PersonDisclosure.Deceased), ("Hanna Müller", PersonDisclosure.Deceased), ("Émile Zola", PersonDisclosure.MayBeShown),
+            ("Łukasz Øresund", PersonDisclosure.Deceased), ("राम हिन्दी", PersonDisclosure.Deceased), ("Иван Петров", PersonDisclosure.Deceased),
+            ("Γιώργος Παπάς", PersonDisclosure.Deceased), ("كِتَاب الأحمد", PersonDisclosure.Deceased),
+            // The same folded name as a public person, but hidden: its item must not be found by it.
+            ("Muhle Karl", PersonDisclosure.Hidden),
+        };
+        foreach (var (name, disclosure) in samples)
+        {
+            var item = new ArchiveItem { Title = "Plain " + Guid.NewGuid().ToString("N")[..6] + (disclosure == PersonDisclosure.Hidden ? " hiddenone" : ""), Collection = collection, CreatedAt = now, UpdatedAt = now };
+            item.Publish(now);
+            var person = new Person { Name = name, CreatedAt = now, UpdatedAt = now };
+            person.SetDisclosure(disclosure, now);
+            db.AddRange(item, person, new ItemPerson { ArchiveItem = item, Person = person, CreatedAt = now });
+        }
+        await db.SaveChangesAsync();
+
+        async Task<string[]> FindAsync(string text) =>
+            (await db.VisibleItems
+                .Filter(new ItemFilter(await db.ToSearchQueryAsync(text), ItemsByPeople: q => VisiblePeople.ItemIdsByName(db, q)))
+                .Select(i => i.People.Select(l => l.Person.Name).First())
+                .ToListAsync()).Order().ToArray();
+
+        // "Mühle" composed and decomposed, and "Muhle" typed without the accent, find the public Karl Mühle and not the hidden Muhle Karl.
+        Assert.Equal(["Karl Mühle"], await FindAsync("muhle"));
+        Assert.Equal(["Karl Mühle"], await FindAsync("Mühle"));
+        Assert.Equal(["Hanna Müller"], await FindAsync("muller"));
+        Assert.Equal(["Hanna Müller"], await FindAsync("Müller"));
+        Assert.Equal(["Émile Zola"], await FindAsync("emile"));
+        Assert.Equal(["Łukasz Øresund"], await FindAsync("lukasz oresund"));
+        Assert.Equal(["राम हिन्दी"], await FindAsync("हिन्दी"));
+        Assert.Equal(["Иван Петров"], await FindAsync("петров"));
+        Assert.Equal(["Γιώργος Παπάς"], await FindAsync("παπας"));
+        Assert.Equal(["كِتَاب الأحمد"], await FindAsync("كتاب"));
+        // Neither the main name nor a part of the hidden person's finds their item.
+        Assert.Equal(["Karl Mühle"], await FindAsync("karl"));
+    }
+
+    /// <summary>
     /// Creates and migrates a new database. A restricted owner may create tables, as the app needs,
     /// but not extensions, as on hosts that only allow extensions an administrator installs.
     /// </summary>
