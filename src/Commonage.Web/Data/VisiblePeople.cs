@@ -126,9 +126,10 @@ public static class VisiblePeople
     public static async Task<IReadOnlyList<PersonIndexEntry>> IndexAsync(CommonageDbContext db, CancellationToken cancellationToken)
     {
         var rows = await db.VisiblePeople.AsNoTracking()
-            .Select(p => new Row(p.PublicId, p.Name, p.SortName, p.Links.Count(l => db.VisibleItems.Any(i => i.Id == l.ArchiveItemId)), p.Disclosure != PersonDisclosure.Deceased))
+            .Select(p => new Row(p.PublicId, p.Name, p.SortName, p.Links.Count(l => db.VisibleItems.Any(i => i.Id == l.ArchiveItemId)), false))
             .ToListAsync(cancellationToken);
-        return InNameOrder(rows, r => new PersonIndexEntry(r.PublicId, r.Name, r.Count, r.MayBeLiving));
+        var deceased = (await Visibility.PersonDeceased(db.VisiblePeople).Select(p => p.PublicId).ToListAsync(cancellationToken)).ToHashSet();
+        return InNameOrder(rows, r => new PersonIndexEntry(r.PublicId, r.Name, r.Count, !deceased.Contains(r.PublicId)));
     }
 
     /// <summary>Whether any person is public: what decides if a page offers "All people".</summary>
