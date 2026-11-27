@@ -12,7 +12,7 @@ public record PublicPersonName(string Name, PersonNameKind Kind, string? Languag
 public record PersonCard(string PublicId, string Name);
 
 /// <summary>A person in the index with the number of items visitors may see of them.</summary>
-public record PersonIndexEntry(string PublicId, string Name, int Count);
+public record PersonIndexEntry(string PublicId, string Name, int Count, bool MayBeLiving);
 
 /// <summary>
 /// What visitors may be told about a person. It has no field for the curator's note, when the choice was made, the sort name or
@@ -86,7 +86,7 @@ public static class VisiblePeople
     public static Task<PersonView?> PageAsync(CommonageDbContext db, string publicId, int page, CancellationToken cancellationToken) =>
         ViewAsync(db, db.VisiblePeople, publicId, page, cancellationToken);
 
-    private record Row(string PublicId, string Name, string? Sort, int Count);
+    private record Row(string PublicId, string Name, string? Sort, int Count, bool MayBeLiving = false);
 
     private static List<T> InNameOrder<T>(IEnumerable<Row> rows, Func<Row, T> make)
     {
@@ -126,9 +126,9 @@ public static class VisiblePeople
     public static async Task<IReadOnlyList<PersonIndexEntry>> IndexAsync(CommonageDbContext db, CancellationToken cancellationToken)
     {
         var rows = await db.VisiblePeople.AsNoTracking()
-            .Select(p => new Row(p.PublicId, p.Name, p.SortName, p.Links.Count(l => db.VisibleItems.Any(i => i.Id == l.ArchiveItemId))))
+            .Select(p => new Row(p.PublicId, p.Name, p.SortName, p.Links.Count(l => db.VisibleItems.Any(i => i.Id == l.ArchiveItemId)), p.Disclosure != PersonDisclosure.Deceased))
             .ToListAsync(cancellationToken);
-        return InNameOrder(rows, r => new PersonIndexEntry(r.PublicId, r.Name, r.Count));
+        return InNameOrder(rows, r => new PersonIndexEntry(r.PublicId, r.Name, r.Count, r.MayBeLiving));
     }
 
     /// <summary>Whether any person is public: what decides if a page offers "All people".</summary>

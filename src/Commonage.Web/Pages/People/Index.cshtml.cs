@@ -24,6 +24,13 @@ public class IndexModel(CommonageDbContext db) : PageModel
     {
         var people = await VisiblePeople.IndexAsync(db, cancellationToken);
         Total = people.Count;
+        // The list names everyone who is shown, so it is kept from search engines when it names someone who may be living;
+        // otherwise the page of each such person being noindex would mean nothing.
+        if (people.Any(p => p.MayBeLiving))
+        {
+            Response.Headers["X-Robots-Tag"] = "noindex";
+            ViewData["NoIndex"] = true;
+        }
         // The list is in the order of the name a curator filed it under; the letter is that of the name it is shown with.
         Letters = people
             .GroupBy(p => Pages.TagIndexModel.InitialOf(p.Name))

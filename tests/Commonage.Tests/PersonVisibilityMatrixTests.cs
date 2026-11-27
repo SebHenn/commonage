@@ -129,6 +129,46 @@ public partial class PersonVisibilityMatrixTests(CommonageAppFactory app)
     }
 
     [Fact]
+    public async Task The_list_of_people_is_kept_from_search_engines_when_it_names_someone_who_may_be_living()
+    {
+        await using var archive = await PeopleSeed.NewArchiveAsync(app);
+        using var visitor = archive.CreateClient();
+        var s = await SeedAsync(archive);
+
+        var response = await visitor.GetAsync("/people");
+        var page = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains(s.Living.Name, page);
+        Assert.Equal("noindex", string.Join(',', response.Headers.GetValues("X-Robots-Tag")));
+        Assert.Matches(@"<meta name=""robots"" content=""noindex", page);
+    }
+
+    [Fact]
+    public async Task The_list_of_people_stays_indexable_while_it_names_only_people_who_have_died()
+    {
+        await using var archive = await PeopleSeed.NewArchiveAsync(app);
+        using var visitor = archive.CreateClient();
+        var now = DateTime.UtcNow;
+        var words = PersonWords.New("only");
+        await archive.WithDbAsync(async db =>
+        {
+            var collection = new Collection { Title = "Box", CreatedAt = now };
+            var item = PeopleSeed.NewItem(collection, "Visible", now, true);
+            db.AddRange(collection, item, PeopleSeed.Link(item, PeopleSeed.NewPerson(words, PersonDisclosure.Deceased, now), now));
+            return await db.SaveChangesAsync();
+        });
+
+        var response = await visitor.GetAsync("/people");
+        var page = await response.Content.ReadAsStringAsync();
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains(words.Name, page);
+        Assert.False(response.Headers.Contains("X-Robots-Tag"));
+        Assert.DoesNotContain("noindex", page);
+    }
+
+    [Fact]
     public async Task PeopleInLinkPreview_a_person_who_has_died_has_their_name_and_one_who_may_be_living_the_title_of_the_archive()
     {
         await using var archive = await PeopleSeed.NewArchiveAsync(app);
