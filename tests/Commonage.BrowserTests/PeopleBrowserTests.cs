@@ -47,4 +47,20 @@ public class PeopleBrowserTests(BrowserFixture app)
             Assert.DoesNotContain("Hans Lindner", await response.TextAsync());
         }
     }
+
+    [Fact]
+    public async Task Visitors_without_javascript_go_from_the_item_to_the_person_and_back_to_the_items()
+    {
+        var page = await app.NewPageAsync(390, 844, javaScript: false);
+        await page.GotoAsync("/people");
+        await page.Locator("main a[href^='/people/']").First.ClickAsync();
+
+        Assert.Contains("/people/", page.Url);
+        var name = (await page.Locator("h1").TextContentAsync())?.Trim();
+        Assert.False(string.IsNullOrEmpty(name));
+
+        await page.Locator("main a[href^='/items/']").First.ClickAsync();
+        Assert.Contains("/items/", page.Url);
+        Assert.Contains(name!, await page.TextContentAsync("main"));
+    }
 }

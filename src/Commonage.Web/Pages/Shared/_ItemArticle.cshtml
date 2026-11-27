@@ -1,4 +1,5 @@
 @model ArchiveItem
+@using Commonage.Web.Data
 @inject Commonage.Web.Operations.ArchiveProfile Profile
 @* An item as visitors see it. Curators see the same in a preview, with the pictures from their own address, because the
    public one only serves published items. *@
@@ -132,6 +133,19 @@
         {
             <p class="text-muted">@T["Contributed by {0}", contributorName]</p>
         }
+        @if (ViewData["People"] is IReadOnlyList<PersonCard> { Count: > 0 } named)
+        {
+            @* Only people a curator chose to show, from VisiblePeople. A person who is not shown leaves no line and no count. *@
+            <div class="d-flex flex-wrap gap-2 align-items-baseline mb-2">
+                <h2 class="h6 mb-0 text-muted" id="item-people">@T["People"]</h2>
+                <ul class="list-unstyled d-flex flex-wrap gap-2 mb-0" aria-labelledby="item-people">
+                    @foreach (var person in named)
+                    {
+                        <li><a asp-page="/People/Details" asp-route-key="@person.PublicId" class="badge rounded-pill text-bg-light border tag-link" lang="@material"><bdi>@person.Name</bdi></a></li>
+                    }
+                </ul>
+            </div>
+        }
         @if (Model.Tags.Count > 0)
         {
             <h2 class="visually-hidden">@T["Tags"]</h2>
@@ -143,9 +157,9 @@
                 <div class="d-flex flex-wrap gap-2 align-items-baseline mb-2">
                     @if (label is not null)
                     {
-                        @if (TagKinds.Slug(kind.Key) is { } slug)
+                        @if (TagKinds.Slug(kind.Key) is not null)
                         {
-                            <a asp-page="/TagIndex" asp-route-kind="@slug" class="small text-muted" id="tags-@kind.Key">@label</a>
+                            <a asp-page="/TagIndex" class="small text-muted" id="tags-@kind.Key">@label</a>
                         }
                         else
                         {

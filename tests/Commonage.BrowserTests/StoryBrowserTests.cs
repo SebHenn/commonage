@@ -33,7 +33,16 @@ public class StoryBrowserTests(BrowserFixture app)
 
         await page.FocusAsync("button[aria-label='Later: Text 1 of 2']");
         await page.Keyboard.PressAsync("Enter");
-        await page.WaitForFunctionAsync("document.activeElement.id.startsWith('block-')");
+        // The page reloads once or twice after the move; ask again until it has settled with the focus in a part.
+        var settled = false;
+        for (var i = 0; i < 100 && !settled; i++)
+        {
+            try { settled = await page.EvaluateAsync<bool>("document.activeElement.id.startsWith('block-')"); }
+            catch (PlaywrightException) { }
+            if (!settled) await Task.Delay(50);
+        }
+
+        Assert.True(settled);
 
         Assert.Equal(["Second part", "First part"], await TextsAsync(page));
         var focused = await page.EvaluateAsync<string>("document.activeElement.id");

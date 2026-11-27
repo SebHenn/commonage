@@ -15,7 +15,9 @@ public class EndpointAccessTests(CommonageAppFactory app)
     private static readonly string[] MeantForVisitors =
     [
         "/", "/Index", "/search", "/items/{id:int}", "/items/{id:int}.json", "/items/{id:int}/tell", "/help", "/collections", "/collections/{id:int}", "/stories", "/stories/{id:int}",
-        "/{kind:regex(^(places|people)$)}",
+        // Places, and the people curators chose to show: /people lists them and /people/{key} is a person's page. A key that is not
+        // a public person's answers the same 404 as any other (PersonNotFoundTests).
+        "/places", "/people", "/people/{key}",
         "/{slug:regex(^(about|contact|privacy|imprint)$)}", "/SetLanguage", "/Error/{code:int?}",
         // Published pictures only, see MediaTests.
         "/media/{id:int}/{variant:regex(^(preview|thumbnail|card|large)$)}", "/media/{id:int}/page/{page:int}",

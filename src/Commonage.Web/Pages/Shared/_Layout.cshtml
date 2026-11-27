@@ -17,7 +17,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@(pageTitle == identity.Name ? identity.Name : $"{pageTitle} - {identity.Name}")</title>
-    @if (isPrivatePage || !identity.AllowSearchEngines)
+    @if (isPrivatePage || !identity.AllowSearchEngines || ViewData["NoIndex"] is true)
     {
         <meta name="robots" content="noindex" />
     }

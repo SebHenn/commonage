@@ -266,7 +266,7 @@ public partial class PersonTests(CommonageAppFactory app)
         var view = await app.WithDbAsync(async db =>
         {
             var publicId = (await db.People.SingleAsync(p => p.Id == visible)).PublicId;
-            return await VisiblePeople.ViewAsync(db, Visibility.Person(db, db.Today), publicId, CancellationToken.None);
+            return await VisiblePeople.ViewAsync(db, Visibility.Person(db, db.Today), publicId, 1, CancellationToken.None);
         });
 
         Assert.Contains(visible, ids);

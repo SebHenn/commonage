@@ -27,6 +27,12 @@ public sealed class BrowserFixture : WebApplicationFactory<Program>, IAsyncLifet
     /// <summary>The address of the demo archive's contribution link.</summary>
     public string ContributionPath { get; private set; } = "";
 
+    /// <summary>The address of the demo's public person page (Karl, who has died).</summary>
+    public string PersonPath { get; private set; } = "";
+
+    /// <summary>The address a page in the lists stands for: "CONTRIBUTE" and "PERSON" are only known once the demo archive exists.</summary>
+    public string Resolve(string path) => path switch { "CONTRIBUTE" => ContributionPath, "PERSON" => PersonPath, _ => path };
+
     /// <summary>How many contributions with this title have arrived, and how many photos they have together.</summary>
     public async Task<(long Contributions, long Photos)> CountContributionsAsync(string title)
     {
@@ -56,6 +62,8 @@ public sealed class BrowserFixture : WebApplicationFactory<Program>, IAsyncLifet
             await connection.OpenAsync();
             await using var query = new NpgsqlCommand("""select "Token" from "ContributionLinks" limit 1""", connection);
             ContributionPath = $"/contribute/{await query.ExecuteScalarAsync()}";
+            await using var person = new NpgsqlCommand("""select "PublicId" from "People" where "Disclosure" = 'Deceased' and "DeletedAt" is null limit 1""", connection);
+            PersonPath = $"/people/{await person.ExecuteScalarAsync()}";
 
             // "Do you know more about this?" is off by default; its pages are tested here.
             await using var notes = new NpgsqlCommand("""update "ArchiveSettings" set "AcceptVisitorNotes" = true""", connection);

@@ -97,6 +97,54 @@ public class ScaleTests(CommonageAppFactory app, ITestOutputHelper output)
         output.WriteLine($"{url,-32} {times[0],6} ms first, {times[1],6} ms second");
     }
 
+    /// <summary>5,000 people on 20,000 links: the index, a page of a person, the search by a name and the item page, each timed twice.</summary>
+    [ScaleFact]
+    public async Task Thousands_of_people_keep_the_index_the_person_page_and_the_search_fast()
+    {
+        await Seed();
+        try
+        {
+            await app.WithDbAsync(async db =>
+            {
+                // Two in three are public (half of them have died), the rest hidden; four items each on average, and a name that is findable.
+                await db.Database.ExecuteSqlInterpolatedAsync($"""
+                    INSERT INTO "People" ("PublicId", "Name", "SortName", "Disclosure", "CreatedAt", "UpdatedAt")
+                    SELECT 'sc' || lpad(g::text, 10, '0'), 'Scaleperson' || g || ' Müller', NULL,
+                        CASE WHEN g % 3 = 0 THEN 'Hidden' WHEN g % 2 = 0 THEN 'Deceased' ELSE 'MayBeShown' END, now(), now()
+                    FROM generate_series(1, 5000) AS g
+                    """);
+                await db.Database.ExecuteSqlRawAsync("""
+                    INSERT INTO "PersonNames" ("PersonId", "Name", "Kind", "ShownToVisitors")
+                    SELECT "Id", 'Scalenick' || "Id", 'Nickname', true FROM "People" WHERE "PublicId" LIKE 'sc%'
+                    """);
+                await db.Database.ExecuteSqlRawAsync("""
+                    INSERT INTO "ItemPeople" ("ArchiveItemId", "PersonId", "CreatedAt")
+                    SELECT i."Id", p."Id", now()
+                    FROM "ArchiveItems" i JOIN "People" p ON p."PublicId" = 'sc' || lpad(((substring(i."ReferenceNumber" from 7)::int % 5000) + 1)::text, 10, '0')
+                    WHERE i."ReferenceNumber" LIKE 'scale-%' AND substring(i."ReferenceNumber" from 7)::int % 5 < 2
+                    """);
+                await db.Database.ExecuteSqlRawAsync("ANALYZE"); // what autovacuum does in a real archive, so the planner knows the tables
+                var links = await db.Database.SqlQueryRaw<int>("""SELECT count(*)::int AS "Value" FROM "ItemPeople" l JOIN "People" p ON p."Id" = l."PersonId" WHERE p."PublicId" LIKE 'sc%'""").SingleAsync();
+                output.WriteLine($"seeded 5000 people and {links} links");
+                return 0;
+            });
+            using var visitor = app.CreateClient();
+            var item = await app.WithDbAsync(db => db.Database.SqlQueryRaw<int>("""SELECT l."ArchiveItemId" AS "Value" FROM "ItemPeople" l JOIN "People" p ON p."Id" = l."PersonId" JOIN "ArchiveItems" i ON i."Id" = l."ArchiveItemId" WHERE p."PublicId" LIKE 'sc%' AND p."Disclosure" = 'Deceased' AND i."Status" = 1 LIMIT 1""").SingleAsync());
+            var key = await app.WithDbAsync(db => db.Database.SqlQueryRaw<string>("""SELECT p."PublicId" AS "Value" FROM "People" p WHERE p."PublicId" LIKE 'sc%' AND p."Disclosure" = 'Deceased' ORDER BY p."Id" LIMIT 1""").SingleAsync());
+            foreach (var url in new[] { "/people", $"/people/{key}", "/search?q=scaleperson17", "/search?q=scalenick100", "/search?q=scaleperson", $"/items/{item}", "/sitemap.xml" })
+                await Time(visitor, url);
+        }
+        finally
+        {
+            await app.WithDbAsync(async db =>
+            {
+                await db.Database.ExecuteSqlRawAsync("""DELETE FROM "People" WHERE "PublicId" LIKE 'sc%'""");
+                return 0;
+            });
+            await Remove();
+        }
+    }
+
     private Task<int> Seed() => app.WithDbAsync(async db =>
     {
         var clock = Stopwatch.StartNew();

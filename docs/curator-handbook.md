@@ -20,11 +20,17 @@ but not restore. Nothing is listed for changes made before this version.
 
 ## Tidying up tags
 
+**People** keeps the people of the archive. A person is seen by curators only until you choose otherwise. "Has died" shows their
+name, other names you ticked, dates and biography on a page of their own, in "People" and on the items they are on. "May be living,
+and may be shown" shows the name, the ticked other names and the biography but never a date, keeps the page out of search engines,
+and a name appears on item pages and in search results: choose it only for someone who agreed. A person is public only while
+at least one of their items is. Their note stays with curators.
+
 **Tags** lists every tag with how many items have it. Open one to:
 
-- **Say what it names:** a place, a person or a topic. Visitors find every place and every person on pages of their own,
-  "Places" and "People", from A to Z, and an item shows its places and people first. Only published items count, so a name
-  that only drafts have stays unseen. The People page lists names on their own, so name living people only when they agree.
+- **Say what it names:** a place, a person or a topic. Visitors find every place on a page of its own, "Places", from A to Z,
+  and an item shows its places first. Only published items count, so a name that only drafts have stays unseen. People are
+  kept under **People** and not as tags (see below); a tag that names a person still shows on the item until the tags become people.
 - **Rename it:** the new name reaches every item at once, also in the search. A name another tag already has is refused;
   that is a merge.
 - **Merge it into another tag,** for a misspelling or two words for the same thing: every item gets the other tag instead,

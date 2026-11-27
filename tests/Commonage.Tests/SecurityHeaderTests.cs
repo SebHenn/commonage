@@ -58,11 +58,13 @@ public partial class SecurityHeaderTests(CommonageAppFactory app)
         {
             var person = db.AddHiddenPerson(TestData.Unique("Person"), DateTime.UtcNow);
             person.Biography = "Some words about them.";
+            person.SetDisclosure(PersonDisclosure.Deceased, DateTime.UtcNow); // public, so that the page visitors read is checked too
             person.Names.Add(new PersonName { Name = TestData.Unique("Other"), Kind = PersonNameKind.Nickname, ShownToVisitors = true });
             db.ItemPeople.Add(new ItemPerson { ArchiveItemId = item.Id, Person = person, CreatedAt = DateTime.UtcNow });
             await db.SaveChangesAsync();
             return person.Id;
         });
+        var personKey = await app.WithDbAsync(db => db.People.Where(p => p.Id == personId).Select(p => p.PublicId).SingleAsync());
 
         var storyId = await app.WithDbAsync(async db =>
         {
@@ -80,7 +82,7 @@ public partial class SecurityHeaderTests(CommonageAppFactory app)
         var results = new List<string>();
         foreach (var route in routes)
         {
-            var url = FillIn(route, item, token, tagId, linkId, storyId, personId);
+            var url = FillIn(route, item, token, tagId, linkId, storyId, personId, personKey);
             using var response = await curator.GetAsync(url);
             var html = await response.Content.ReadAsStringAsync();
             if (InlineScript().IsMatch(html) || EventHandlerAttribute().IsMatch(html) || StyleAttributeOrElement().IsMatch(html))
@@ -107,7 +109,7 @@ public partial class SecurityHeaderTests(CommonageAppFactory app)
         return saved;
     });
 
-    private static string FillIn(string route, ArchiveItem item, string token, int tagId, int linkId, int storyId, int personId)
+    private static string FillIn(string route, ArchiveItem item, string token, int tagId, int linkId, int storyId, int personId, string personKey)
     {
         var id = route.StartsWith("/Collections", StringComparison.OrdinalIgnoreCase) || route.Contains("Admin/Collections", StringComparison.OrdinalIgnoreCase)
             ? item.CollectionId.ToString()
@@ -117,6 +119,7 @@ public partial class SecurityHeaderTests(CommonageAppFactory app)
             : route.Contains("Admin/Contributions", StringComparison.OrdinalIgnoreCase) ? linkId.ToString() : item.Id.ToString();
         var url = route
             .Replace("{token}", token)
+            .Replace("{key}", personKey)
             .Replace("{id:int}", id)
             .Replace("{itemId:int}", item.Id.ToString())
             // The pages about the archive: this one always exists.

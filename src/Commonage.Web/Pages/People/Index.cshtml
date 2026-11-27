@@ -1,0 +1,47 @@
+@page "/people"
+@model Commonage.Web.Pages.People.IndexModel
+@inject Commonage.Web.Operations.ArchiveProfile Profile
+@{
+    ViewData["Title"] = T["People"];
+    // The names are in the material's language, which may not be the reader's.
+    var material = (await Profile.GetAsync()).MaterialLanguage;
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@if (Model.Total == 0)
+{
+    <p class="text-muted">@T["No people are named in the archive yet."]</p>
+}
+else
+{
+    <p class="col-lg-8">@T["Everyone named in the archive, with how many items they appear in."]</p>
+
+    @if (Model.Total >= IndexModel.LettersFrom && Model.Letters.Count > 1)
+    {
+        <nav aria-label="@T["Letters"]" class="mb-3">
+            <ul class="list-unstyled d-flex flex-wrap gap-1">
+                @for (var i = 0; i < Model.Letters.Count; i++)
+                {
+                    <li><a href="#letter-@i" class="btn btn-sm btn-outline-secondary">@Model.Letters[i].Initial</a></li>
+                }
+            </ul>
+        </nav>
+    }
+
+    <div class="tag-index" lang="@material">
+        @for (var i = 0; i < Model.Letters.Count; i++)
+        {
+            var letter = Model.Letters[i];
+            <section aria-labelledby="letter-@i" class="tag-index-letter">
+                <h2 id="letter-@i" class="h5">@letter.Initial</h2>
+                <ul class="list-unstyled">
+                    @foreach (var person in letter.Entries)
+                    {
+                        <li><a asp-page="/People/Details" asp-route-key="@person.PublicId"><bdi>@person.Name</bdi></a> <span class="text-muted small" aria-label="@T.Plural("{0, plural, one {# item} other {# items}}", person.Count)">(@person.Count)</span></li>
+                    }
+                </ul>
+            </section>
+        }
+    </div>
+}

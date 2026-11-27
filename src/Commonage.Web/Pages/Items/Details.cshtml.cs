@@ -21,6 +21,9 @@ public class DetailsModel(CommonageDbContext db, ArchiveProfile profile, IString
 
     public ArchiveItem Item { get; private set; } = null!;
 
+    /// <summary>The people of the item that visitors may see, from <c>VisiblePeople</c>: the line on the page. Nobody else is counted or hinted at.</summary>
+    public IReadOnlyList<PersonCard> NamedPeople { get; private set; } = [];
+
     public ItemSurroundings Surroundings { get; private set; } = null!;
 
     public async Task<IActionResult> OnGetAsync(int id, CancellationToken cancellationToken)
@@ -35,7 +38,9 @@ public class DetailsModel(CommonageDbContext db, ArchiveProfile profile, IString
             return NotFound();
 
         Item = item;
-        Record = PublicItemRecord.From(item, item.MediaFiles, await profile.GetAsync(), Request.BaseAddress());
+        NamedPeople = await VisiblePeople.OfItemAsync(db, item.Id, cancellationToken);
+        Record = PublicItemRecord.From(item, item.MediaFiles, await profile.GetAsync(), Request.BaseAddress(),
+            await VisiblePeople.DeceasedOfItemAsync(db, item.Id, cancellationToken));
         Surroundings = await db.LoadSurroundingsAsync(item, cancellationToken);
 
         Address = $"{Request.BaseAddress()}/items/{item.Id}";

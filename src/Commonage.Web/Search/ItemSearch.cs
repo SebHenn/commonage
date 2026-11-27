@@ -17,6 +17,11 @@ public enum ItemSort
 }
 
 /// <param name="Query">A full-text query from <see cref="ItemSearch.ToSearchQueryAsync"/>, or null to match all items.</param>
+/// <param name="ItemsByPeople">
+/// Given the query, the ids of items with a public person of that name (<see cref="VisiblePeople.ItemIdsByName"/>). When given, an
+/// item is also found by the names of its people, read at the moment of the search. Only the visitors' search passes it: curators
+/// have their own page for people.
+/// </param>
 /// <param name="Dates">Dates typed into the search. Each one matches what is dated within it, or has its words.</param>
 /// <param name="SearchAllFileText">
 /// Curators search what the PDFs of every item say. Without it, only the PDFs of items that show their media are searched: what
@@ -24,7 +29,7 @@ public enum ItemSort
 /// </param>
 public record ItemFilter(
     string? Query = null, string? Tag = null, int? CollectionId = null, int? YearFrom = null, int? YearTo = null,
-    IReadOnlyList<DateInSearch>? Dates = null, bool SearchAllFileText = false);
+    IReadOnlyList<DateInSearch>? Dates = null, bool SearchAllFileText = false, Func<string, IQueryable<int>>? ItemsByPeople = null);
 
 /// <param name="Query">The full-text query for the words of the date itself, so that "1958" also finds "Team photo 1958".</param>
 public record DateInSearch(SearchDate Date, string Query);
@@ -49,12 +54,21 @@ public static class ItemSearch
         var searchAllFileText = filter.SearchAllFileText;
         if (filter.Query is { } query)
         {
-            items = items.Where(i => EF.Property<NpgsqlTsVector>(i, CommonageDbContext.SearchVector)
-                .Matches(EF.Functions.ToTsQuery(CommonageDbContext.SearchConfiguration, query))
-                // What the item's PDFs say. All words must be in the item's own text or all in the documents, not split between them.
-                || (i.FileText != null && (searchAllFileText || i.MediaLevel == MediaLevel.Everything)
-                    && EF.Property<NpgsqlTsVector>(i.FileText, CommonageDbContext.SearchVector)
-                    .Matches(EF.Functions.ToTsQuery(CommonageDbContext.SearchConfiguration, query))));
+            var byPeople = filter.ItemsByPeople?.Invoke(query);
+            // What the item's PDFs say: all words must be in the item's own text or all in the documents, not split between them.
+            items = byPeople is null
+                ? items.Where(i => EF.Property<NpgsqlTsVector>(i, CommonageDbContext.SearchVector)
+                    .Matches(EF.Functions.ToTsQuery(CommonageDbContext.SearchConfiguration, query))
+                    || (i.FileText != null && (searchAllFileText || i.MediaLevel == MediaLevel.Everything)
+                        && EF.Property<NpgsqlTsVector>(i.FileText, CommonageDbContext.SearchVector)
+                        .Matches(EF.Functions.ToTsQuery(CommonageDbContext.SearchConfiguration, query))))
+                // Or all words in the names of one public person of the item, so "Karl" finds Karl's photo.
+                : items.Where(i => EF.Property<NpgsqlTsVector>(i, CommonageDbContext.SearchVector)
+                    .Matches(EF.Functions.ToTsQuery(CommonageDbContext.SearchConfiguration, query))
+                    || byPeople.Contains(i.Id)
+                    || (i.FileText != null && (searchAllFileText || i.MediaLevel == MediaLevel.Everything)
+                        && EF.Property<NpgsqlTsVector>(i.FileText, CommonageDbContext.SearchVector)
+                        .Matches(EF.Functions.ToTsQuery(CommonageDbContext.SearchConfiguration, query))));
         }
 
         if (!string.IsNullOrWhiteSpace(filter.Tag))

@@ -29,8 +29,11 @@ public class IndexModel(CommonageDbContext db, Commonage.Web.Operations.ArchiveP
     /// <summary>The most used tags of published items, in alphabetical order.</summary>
     public IReadOnlyList<string> Tags { get; private set; } = [];
 
-    /// <summary>The kinds with a page of their own, places and people, that published items have tags of.</summary>
-    public IReadOnlyList<Domain.TagKind> TagKinds { get; private set; } = [];
+    /// <summary>Whether published items are tagged with a place, which is what the page of all places lists.</summary>
+    public bool HasPlaces { get; private set; }
+
+    /// <summary>Whether any person is public (<c>VisiblePeople</c>), which is what the page of all people lists.</summary>
+    public bool HasPeople { get; private set; }
 
     /// <summary>Whether to invite visitors to "Can you help?": only while the archive asks them, and only if an item waits.</summary>
     public bool HelpWanted { get; private set; }
@@ -62,12 +65,7 @@ public class IndexModel(CommonageDbContext db, Commonage.Web.Operations.ArchiveP
             .Take(MaxTags)
             .ToListAsync();
         Tags = popularTags.Order(StringComparer.CurrentCultureIgnoreCase).ToList();
-        TagKinds = await db.VisibleItems
-            .SelectMany(i => i.Tags)
-            .Where(t => t.Kind != Domain.TagKind.Topic)
-            .Select(t => t.Kind)
-            .Distinct()
-            .OrderBy(k => k)
-            .ToListAsync();
+        HasPlaces = await db.VisibleItems.SelectMany(i => i.Tags).AnyAsync(t => t.Kind == Domain.TagKind.Place);
+        HasPeople = await VisiblePeople.AnyAsync(db, HttpContext.RequestAborted);
     }
 }

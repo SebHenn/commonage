@@ -1,0 +1,60 @@
+@page "/people/{key}"
+@model Commonage.Web.Pages.People.DetailsModel
+@using Commonage.Web.Search
+@inject Commonage.Web.Operations.ArchiveProfile Profile
+@{
+    var person = Model.View;
+    var identity = await Profile.GetAsync();
+    var material = identity.MaterialLanguage;
+    var address = $"{HttpContext.Request.BaseAddress()}/people/{person.PublicId}";
+    ViewData["Title"] = person.Name;
+    ViewData["Canonical"] = address;
+    // Someone who has died: their name and nothing else. Someone who may be living: the archive's title, no name, no text, no picture.
+    ViewData["LinkPreview"] = person.HasDied
+        ? new LinkPreview(person.Name, null, address)
+        : new LinkPreview(identity.Name, null, address);
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="/People/Index">@T["People"]</a></li>
+    </ol>
+</nav>
+
+<article class="person">
+    <h1 lang="@material"><bdi>@person.Name</bdi></h1>
+    @if (person.OtherNames.Count > 0)
+    {
+        <p class="text-muted">
+            @T["Also known as"]
+            @for (var index = 0; index < person.OtherNames.Count; index++)
+            {
+                <span lang="@(person.OtherNames[index].Language ?? material)"><bdi>@person.OtherNames[index].Name</bdi></span>@(index < person.OtherNames.Count - 1 ? " · " : "")
+            }
+        </p>
+    }
+    @if (person.BornText is not null || person.DiedText is not null)
+    {
+        <dl class="row">
+            @if (person.BornText is not null)
+            {
+                <dt class="col-sm-2">@T["Born"]</dt>
+                <dd class="col-sm-10" lang="@material">@person.BornText</dd>
+            }
+            @if (person.DiedText is not null)
+            {
+                <dt class="col-sm-2">@T["Died"]</dt>
+                <dd class="col-sm-10" lang="@material">@person.DiedText</dd>
+            }
+        </dl>
+    }
+    @if (person.Biography is not null)
+    {
+        <p class="text-preserve-lines col-lg-8" lang="@material">@person.Biography</p>
+    }
+
+    <h2 class="h4">@T["Items"]</h2>
+    <p class="text-muted">@T.Plural("{0, plural, one {# item} other {# items}}", person.Items.TotalCount)</p>
+    <partial name="_ItemCards" model="person.Items.Items" />
+    <partial name="_Pager" model="person.Items" />
+</article>

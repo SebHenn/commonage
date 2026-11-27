@@ -61,7 +61,7 @@ public class TagTests(CommonageAppFactory app)
     }
 
     [Fact]
-    public async Task Visitors_find_every_place_and_person_of_published_items()
+    public async Task Visitors_find_every_place_of_published_items_and_people_tags_are_not_on_the_page_of_people()
     {
         await using var archive = await ArchiveAsync(app);
         using var visitor = archive.CreateClient();
@@ -71,8 +71,8 @@ public class TagTests(CommonageAppFactory app)
 
         Assert.Contains("href=\"/search?tag=Mill%20Street\">Mill Street</a>", places);
         Assert.Contains("aria-label=\"2 items\">(2)</span>", places);
-        Assert.Contains("href=\"/search?tag=Karl%20Becker\">Karl Becker</a>", people);
-        // Names only drafts or items in the bin have stay unseen.
+        // /people lists the people curators recorded (M30), not tags: until the tags become people (part 3) a person tag is on its items only.
+        Assert.DoesNotContain("Karl Becker", people);
         Assert.DoesNotContain("Anna Krause", people);
         Assert.DoesNotContain("Öhringen", places);
         Assert.DoesNotContain("harbour", places);
@@ -92,7 +92,8 @@ public class TagTests(CommonageAppFactory app)
         var item = await visitor.GetStringAsync($"/items/{floodId}");
 
         Assert.Contains("href=\"/places\">All places</a>", home);
-        Assert.Contains("href=\"/people\">All people</a>", home);
+        // Nobody is public here, so there is no page of people to point to: the link follows VisiblePeople, not the person tags.
+        Assert.DoesNotContain("All people", home);
         Assert.Contains(">Places</a>", item);
         Assert.Contains(">Topics</span>", item);
     }
