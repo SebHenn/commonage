@@ -26,9 +26,6 @@ public class EditModel(CommonageDbContext db, AuditLog audit, IStringLocalizer<S
     public IReadOnlyList<PersonName> Names { get; private set; } = [];
     public IReadOnlyList<LinkedItem> Items { get; private set; } = [];
 
-    /// <summary>True when a tag of the kind Person with this person's name still shows on visitors' pages.</summary>
-    public bool PublicTagStillExists { get; private set; }
-
     /// <summary>The choice that waits for a confirmation: a public one is never made by one click.</summary>
     public PersonDisclosure? ConfirmChoice { get; private set; }
 
@@ -190,7 +187,7 @@ public class EditModel(CommonageDbContext db, AuditLog audit, IStringLocalizer<S
             return Page();
         }
 
-        if (person.Disclosure != choice)
+        if (person.Disclosure != choice || person.NeedsReview)
         {
             person.SetDisclosure(choice, clock.GetUtcNow().UtcDateTime);
             audit.Record(AuditAction.PersonDisclosureChanged, null, person: person);
@@ -296,6 +293,5 @@ public class EditModel(CommonageDbContext db, AuditLog audit, IStringLocalizer<S
             : r.Status != ItemStatus.Published ? ItemState.Draft
             : r.PublicFrom is { } from && from > today ? ItemState.PublicFrom
             : ItemState.Shown, r.PublicFrom)).ToList();
-        PublicTagStillExists = (await db.PublicPersonTagNamesAsync(cancellationToken)).Contains(person.FoldedName);
     }
 }

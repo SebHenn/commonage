@@ -50,10 +50,6 @@
             <input type="hidden" asp-for="Name" />
             <p>@T["Add “{0}” as a new person?", Model.Name!]</p>
             <p class="text-muted">@T["Only curators see the new person until you choose otherwise."]</p>
-            @if (Model.PublicTagStillExists)
-            {
-                <p class="alert alert-warning" role="status">@T["A public tag with this name still exists"]</p>
-            }
             <button type="submit" class="btn btn-primary">@T["Yes, add the person"]</button>
             <a asp-page="/Admin/Items/Edit" asp-route-id="@Model.ItemId" class="btn btn-link">@T["Cancel"]</a>
         </form>

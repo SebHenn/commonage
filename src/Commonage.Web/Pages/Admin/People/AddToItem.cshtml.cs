@@ -36,9 +36,6 @@ public class AddToItemModel(CommonageDbContext db, AuditLog audit, IStringLocali
     [Display(Name = "Name")]
     public string? Name { get; set; }
 
-    /// <summary>True when a tag of the kind Person with this name still shows on visitors' pages.</summary>
-    public bool PublicTagStillExists { get; private set; }
-
     public async Task<IActionResult> OnGetAsync(int itemId, CancellationToken cancellationToken)
     {
         if (!await LoadItemAsync(itemId, cancellationToken))
@@ -75,7 +72,6 @@ public class AddToItemModel(CommonageDbContext db, AuditLog audit, IStringLocali
         }
 
         Current = Step.MakeNew;
-        PublicTagStillExists = (await db.PublicPersonTagNamesAsync(cancellationToken)).Contains(await db.FoldAsync(name, cancellationToken));
         return Page();
     }
 

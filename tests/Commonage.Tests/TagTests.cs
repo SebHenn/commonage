@@ -71,7 +71,7 @@ public class TagTests(CommonageAppFactory app)
 
         Assert.Contains("href=\"/search?tag=Mill%20Street\">Mill Street</a>", places);
         Assert.Contains("aria-label=\"2 items\">(2)</span>", places);
-        // /people lists the people curators recorded (M30), not tags: until the tags become people (part 3) a person tag is on its items only.
+        // /people lists the people curators recorded (M30), never tags: a person tag made by hand is on its items only.
         Assert.DoesNotContain("Karl Becker", people);
         Assert.DoesNotContain("Anna Krause", people);
         Assert.DoesNotContain("Öhringen", places);

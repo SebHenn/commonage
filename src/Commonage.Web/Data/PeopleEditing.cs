@@ -49,28 +49,9 @@ public static class PeopleEditing
     public static Person AddHiddenPerson(this CommonageDbContext db, string name, DateTime now)
     {
         var person = new Person { Name = name, CreatedAt = now, UpdatedAt = now };
+        person.StartHidden(now);
         db.People.Add(person);
         return person;
-    }
-
-    /// <summary>True when a tag of the kind Person has this name, ignoring accents and case: the public tag still shows on visitors' pages.</summary>
-    public static async Task<bool> PublicPersonTagNamedAsync(this CommonageDbContext db, string name, CancellationToken cancellationToken = default)
-    {
-        var folded = await db.FoldAsync(name, cancellationToken);
-        var kind = (int)TagKind.Person;
-        return await db.Database
-            .SqlQuery<bool>($"SELECT EXISTS (SELECT 1 FROM \"Tags\" WHERE \"Kind\" = {kind} AND lower(commonage_fold(\"Name\")) = {folded}) AS \"Value\"")
-            .SingleAsync(cancellationToken);
-    }
-
-    /// <summary>The folded names of every tag of the kind Person, to compare with the names of people without asking once for each.</summary>
-    public static async Task<HashSet<string>> PublicPersonTagNamesAsync(this CommonageDbContext db, CancellationToken cancellationToken = default)
-    {
-        var kind = (int)TagKind.Person;
-        var names = await db.Database
-            .SqlQuery<string>($"SELECT lower(commonage_fold(\"Name\")) AS \"Value\" FROM \"Tags\" WHERE \"Kind\" = {kind}")
-            .ToListAsync(cancellationToken);
-        return names.ToHashSet(StringComparer.Ordinal);
     }
 
     public enum LinkOutcome

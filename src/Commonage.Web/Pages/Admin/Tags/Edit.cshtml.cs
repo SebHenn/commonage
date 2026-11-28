@@ -57,6 +57,9 @@ public class EditModel(CommonageDbContext db, AuditLog audit, IStringLocalizer<S
         if (!await LoadAsync(id, cancellationToken))
             return NotFound();
 
+        if (!TagKinds.Choosable.Contains(Input.Kind))
+            return BadRequest();
+
         // Items take their tags as a list separated by commas, so a name with one would fall apart the next time an item is saved.
         var names = Tag.ParseList(Input.Name);
         if (ModelState.IsValid && names.Count != 1)

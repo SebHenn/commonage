@@ -153,26 +153,6 @@ public partial class PersonTests(CommonageAppFactory app)
     }
 
     [Fact]
-    public async Task A_public_tag_with_the_same_name_is_pointed_out_but_never_turned_into_a_person()
-    {
-        var item = await app.CreateContributionAsync(ItemStatus.Published);
-        var name = TestData.Unique("Taggy Person");
-        await app.WithDbAsync(async db =>
-        {
-            var tagged = await db.ArchiveItems.Include(i => i.Tags).SingleAsync(i => i.Id == item.Id);
-            tagged.SetTags([new Tag { Name = name, NormalizedName = Tag.Normalize(name), Kind = TagKind.Person }]);
-            return await db.SaveChangesAsync();
-        });
-        using var curator = await CuratorAsync();
-        var addPage = $"/Admin/People/AddToItem/{item.Id}";
-
-        var ask = await Browser.PostFormAsync(curator, addPage, new() { ["Name"] = name }, addPage);
-
-        Assert.Contains("A public tag with this name still exists", await ask.Content.ReadAsStringAsync());
-        Assert.False(await app.WithDbAsync(db => db.People.AnyAsync(p => p.Name == name)));
-    }
-
-    [Fact]
     public async Task Helpers_get_nothing_of_people()
     {
         // An item of the archive's own: helpers do not see contributions at all.

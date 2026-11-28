@@ -102,14 +102,27 @@ public class Person
     /// <summary>Marks the person as having died, which is what lets visitors see their dates. For the demo and tests; pages use <see cref="SetDisclosure"/>.</summary>
     public void MarkAsDied(DateTime now) => SetDisclosure(PersonDisclosure.Deceased, now);
 
+    /// <summary>
+    /// Makes the choice. A person carried over from a tag has none yet (<see cref="DisclosureChangedAt"/> is empty), so choosing, even
+    /// the same as it is, is the review that the list of such people waits for.
+    /// </summary>
     public void SetDisclosure(PersonDisclosure value, DateTime now)
     {
-        if (Disclosure == value)
+        if (Disclosure == value && DisclosureChangedAt is not null)
             return;
         Disclosure = value;
         DisclosureChangedAt = now;
         UpdatedAt = now;
     }
+
+    /// <summary>
+    /// A person a curator, an import or the demo makes is hidden because that is where everyone starts: this is a choice, so the
+    /// review list of people carried over from tags (whose choice is empty) does not hold them.
+    /// </summary>
+    public void StartHidden(DateTime now) => DisclosureChangedAt = now;
+
+    /// <summary>True when nobody has chosen who may see this person: they came from a tag, and the review list shows them.</summary>
+    public bool NeedsReview => DisclosureChangedAt is null;
 
     public bool TrySetBorn(string? text)
     {
