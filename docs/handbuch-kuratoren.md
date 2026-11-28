@@ -20,19 +20,14 @@ Helfer können die Liste lesen, aber nichts wiederherstellen. Für Änderungen v
 
 ## Schlagwörter aufräumen
 
-**Personen** führt die Personen des Archivs. Eine Person sehen zunächst nur Kuratoren, bis Sie etwas anderes wählen. „Ist gestorben“
-zeigt Namen, angehakte andere Namen, Daten und Lebensbeschreibung auf einer eigenen Seite, unter „Personen“ und an den Einträgen,
-in denen die Person vorkommt. „Könnte noch leben und darf gezeigt werden“ zeigt Namen, angehakte andere Namen und Lebensbeschreibung,
-aber nie ein Datum, hält die Seite aus Suchmaschinen heraus, und der Name erscheint auf Eintragsseiten und in Suchergebnissen: wählen
-Sie das nur für jemanden, der einverstanden ist. Eine Person ist nur öffentlich, solange mindestens einer ihrer Einträge es ist. Ihre
-Notiz bleibt bei den Kuratoren.
+**Personen** haben unten einen eigenen Abschnitt, [Personen](#personen). Ein Schlagwort, das eine Person nannte, wurde beim Aktualisieren zu einer Person.
 
 **Schlagwörter** listet jedes Schlagwort auf, mit der Zahl der Einträge, die es haben. Öffnen Sie eines, um:
 
 - **festzulegen, was es nennt:** einen Ort, eine Person oder ein Thema. Besucher finden alle Orte auf einer eigenen Seite,
   „Orte“, von A bis Z, und ein Eintrag zeigt seine Orte zuerst. Es zählen nur veröffentlichte Einträge, ein Name, den nur
   Entwürfe haben, bleibt also unsichtbar. Personen verwalten Sie unter **Personen**, nicht als Schlagwörter (siehe oben); ein
-  Schlagwort, das eine Person nennt, erscheint am Eintrag, bis die Schlagwörter zu Personen werden.
+  Schlagwort, das eine Person nannte, wurde beim Aktualisieren zu einer Person.
 - **es umzubenennen:** der neue Name gilt sofort bei jedem Eintrag, auch in der Suche. Einen Namen, den schon ein anderes
   Schlagwort hat, lehnt das Archiv ab; das wäre ein Zusammenführen.
 - **es mit einem anderen zusammenzuführen,** bei einem Tippfehler oder zwei Wörtern für dasselbe: Jeder Eintrag bekommt
@@ -40,6 +35,47 @@ Notiz bleibt bei den Kuratoren.
   Aktivitätsprotokoll hält es fest.
 - **es zu löschen,** sobald kein Eintrag es mehr hat, auch keiner im Papierkorb. „Die unbenutzten Schlagwörter löschen“ in der
   Liste erledigt das für alle.
+
+## Personen
+
+**Personen** (im Verwaltungsbereich unter „Personen“) führt die Menschen, die im Archiv vorkommen: einen Namen, andere Namen, Daten,
+eine Lebensbeschreibung und eine Notiz für Kuratoren. Auf der Seite eines Eintrags verknüpfen Sie ihn mit seinen Personen. Eine
+Person sehen zunächst nur Kuratoren, bis Sie etwas anderes wählen, und die Wahl liegt immer bei Ihnen: Nichts wird Besuchern aufgrund
+einer Vermutung gezeigt.
+
+**Wer eine Person sehen darf.** Es gibt drei Möglichkeiten:
+
+- **Nur Kuratoren** (hier beginnt jede Person). Besucher sehen nichts: keine Seite, keinen Namen an einem Eintrag, keinen Treffer.
+- **Ist gestorben.** Der Name, die angehakten anderen Namen, die Daten und die Lebensbeschreibung stehen auf einer eigenen Seite,
+  unter „Personen“ und an den Einträgen, in denen die Person vorkommt.
+- **Könnte noch leben und darf gezeigt werden.** Der Name, die angehakten anderen Namen und die Lebensbeschreibung werden gezeigt,
+  nie ein Datum. Die Seite bleibt aus Suchmaschinen heraus. **Der Name erscheint auf Eintragsseiten und in Suchergebnissen**, und
+  Eintragsseiten werden indexiert, eine Suchmaschine kann den Namen dort also finden. Wählen Sie das nur für jemanden, der
+  einverstanden ist.
+
+Eine Person ist nur öffentlich, solange mindestens einer ihrer Einträge es ist. Ihre Notiz und jeder Name, den Sie nicht angehakt
+haben, bleiben bei den Kuratoren. „Ist gestorben“ und „Könnte noch leben“ fragen vorher nach und sagen, was Besucher sehen werden.
+
+**Die Prüfliste.** Schlagwörter, die eine Person nannten, wurden beim Aktualisieren zu Personen und beginnen als „Nur Kuratoren“.
+Die Karte „Personen aus früheren Schlagwörtern“ auf der Startseite des Verwaltungsbereichs öffnet die Liste aller, für die noch niemand gewählt hat. Haken Sie Personen an und wählen Sie für alle zugleich: „Nur
+Kuratoren“ gilt sofort, die beiden anderen fragen vorher nach und ändern nur Personen, für die noch niemand gewählt hat.
+
+**„Das ist dieselbe Person wie ...“** führt zwei Personen zusammen. Die andere Person behält ihre Daten und bekommt die Einträge und
+die Namen, als andere Namen, die Besucher nicht sehen, bis Sie sie anhaken. War eine der beiden nur für Kuratoren sichtbar, ist es
+auch das Ergebnis, und die Seite sagt das, bevor etwas geschieht. Die zusammengeführte Person kommt in den Papierkorb.
+
+**Einträge verschieben.** Wurden zwei Personen versehentlich zusammengeführt, oder stand ein Schlagwort für zwei Personen: Haken Sie
+auf der Seite der Person die Einträge an, die woandershin gehören, und wählen Sie „Die angehakten Einträge zu einer anderen Person
+verschieben“. Sagen Sie, zu wem sie gehen (Nummer oder Name), oder legen Sie eine neue Person an, die als „Nur Kuratoren“
+beginnt. Lesen Sie, was geschehen wird, haken Sie andere Namen an, die mitgehen sollen (Besucher sehen sie nicht), und bestätigen
+Sie. Ein Eintrag, den die andere Person schon hat, wird nicht doppelt verknüpft. Die Seite warnt, wenn Besucher danach an diesen
+Einträgen mehr von der Person sehen als vorher, oder weniger. Die Einträge selbst werden nicht geändert.
+
+**Der Papierkorb.** „In den Papierkorb“ auf der Seite der Person nimmt sie sofort Besuchern, der Suche und Exporten weg und
+hebt sie 30 Tage auf, mit ihren Namen und Verknüpfungen. Unter „Papierkorb“ → „Personen“ stellen Sie sie wieder her oder löschen
+sie sofort endgültig: Ihre anderen Namen und ihre Verknüpfungen mit Einträgen verschwinden, die Einträge bleiben. Nach 30 Tagen
+löscht das Archiv sie selbst. Das Aktivitätsprotokoll hält fest, was getan wurde, nie den Namen. Unter **Einsendende** finden
+Kuratoren auch eine Person, die im Papierkorb liegt.
 
 ## Sammlungen ordnen
 
@@ -309,7 +345,14 @@ darauf zu sehen ist.
      Eintrag wiederhergestellt werden, und die Daten sind noch da.
 3. Bei jemandem, der nur auf einem Foto zu sehen ist, gibt es keinen Beitrag zu finden: Suchen Sie den Eintrag und nehmen Sie
    ihn aus der Veröffentlichung oder löschen Sie ihn.
-4. Sagen Sie der Person, was Sie getan haben. Erwähnen Sie, dass Sicherungen ältere Kopien enthalten, bis sie ersetzt werden.
+4. Steht die Person auch unter **Personen**, kümmern Sie sich auch um diesen Eintrag: Öffnen Sie ihn, legen Sie ihn in den
+   Papierkorb und wählen Sie dann unter „Papierkorb“ → „Personen“ **Endgültig löschen**. Ihre anderen Namen und Verknüpfungen
+   gehen mit. Das wartet nicht die 30 Tage ab.
+5. Prüfen Sie, was bleibt. Ein Name kann auch im **Titel** eines Eintrags stehen (suchen Sie in der Eintragsliste und im
+   Aktivitätsprotokoll, das Titel zeigt), in der Beschreibung oder in **früheren Texten** (die Liste unter dem Formular jedes
+   Eintrags hält fest, was ein Titel oder eine Beschreibung vorher sagte). Ändern Sie den Eintrag; lässt sich ein früherer Text
+   nicht anders entfernen, löschen Sie den Eintrag oder fragen Sie die Person, die den Server betreut.
+6. Sagen Sie der Person, was Sie getan haben. Erwähnen Sie, dass Sicherungen ältere Kopien enthalten, bis sie ersetzt werden.
 
 Alles, was Sie hier tun, steht im Aktivitätsprotokoll, ohne den Namen der Person.
 

@@ -153,7 +153,9 @@ and it continues after a restart. On a small server with many photos this can ta
 Deleting an item or a photo moves it to the bin ("Manage archive" → "Bin"), so a mistake can be undone. It disappears
 from the archive at once, public pages and exports included, but curators can restore it for 30 days. After that the
 archive deletes it for good, with its original files; the activity log records this as "Automatic". An item comes
-back as it was, so a published item is public again.
+back as it was, so a published item is public again. People and stories go to the bin the same way: a person in the bin is gone
+from the pages, the search and exports at once, and is restored with their names and links. The log records the automatic deletion
+of a person as "Automatic", without a name.
 
 "Delete for good" in the bin does not wait for the 30 days. Use it for spam that takes up space, and when someone asks
 for their material to be removed.

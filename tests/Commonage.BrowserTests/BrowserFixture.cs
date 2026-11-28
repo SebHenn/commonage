@@ -31,7 +31,10 @@ public sealed class BrowserFixture : WebApplicationFactory<Program>, IAsyncLifet
     public string PersonPath { get; private set; } = "";
 
     /// <summary>The address a page in the lists stands for: "CONTRIBUTE" and "PERSON" are only known once the demo archive exists.</summary>
-    public string Resolve(string path) => path switch { "CONTRIBUTE" => ContributionPath, "PERSON" => PersonPath, _ => path };
+    public string Resolve(string path) => path switch { "CONTRIBUTE" => ContributionPath, "PERSON" => PersonPath, "MOVE" => MovePath, "MOVE-CONFIRM" => MovePath + "&newName=Someone+new", _ => path };
+
+    /// <summary>The page for moving the items of the first person who has died, with its first item ticked.</summary>
+    public string MovePath { get; private set; } = "";
 
     /// <summary>How many contributions with this title have arrived, and how many photos they have together.</summary>
     public async Task<(long Contributions, long Photos)> CountContributionsAsync(string title)
@@ -70,6 +73,36 @@ public sealed class BrowserFixture : WebApplicationFactory<Program>, IAsyncLifet
         return ids;
     }
 
+    /// <summary>A person curators chose to hide, linked to demo items 1 and 2.</summary>
+    public async Task<int> AddLinkedPersonAsync(string name)
+    {
+        await using var connection = new NpgsqlConnection(_db.GetConnectionString());
+        await connection.OpenAsync();
+        await using var insert = new NpgsqlCommand("""
+            with p as (
+                insert into "People" ("PublicId", "Name", "Disclosure", "DisclosureChangedAt", "CreatedAt", "UpdatedAt")
+                values (substr(replace(gen_random_uuid()::text, '-', ''), 1, 12), @name, 'Hidden', now(), now(), now()) returning "Id"),
+            l as (
+                insert into "ItemPeople" ("ArchiveItemId", "PersonId", "CreatedAt") select i, p."Id", now() from p, unnest(array[1, 2]) as i)
+            select "Id" from p
+            """, connection);
+        insert.Parameters.AddWithValue("name", name);
+        return (int)(await insert.ExecuteScalarAsync())!;
+    }
+
+    /// <summary>The items a person is linked to, in the bin or not, and whether the person is in the bin; null when there is no such person.</summary>
+    public async Task<(int Items, bool InBin)?> PersonStateAsync(string name)
+    {
+        await using var connection = new NpgsqlConnection(_db.GetConnectionString());
+        await connection.OpenAsync();
+        await using var query = new NpgsqlCommand("""
+            select (select count(*) from "ItemPeople" l where l."PersonId" = p."Id"), p."DeletedAt" is not null from "People" p where p."Name" = @name
+            """, connection);
+        query.Parameters.AddWithValue("name", name);
+        await using var reader = await query.ExecuteReaderAsync();
+        return await reader.ReadAsync() ? ((int)reader.GetInt64(0), reader.GetBoolean(1)) : null;
+    }
+
     /// <summary>Who may see a person, as stored, and whether somebody has chosen it.</summary>
     public async Task<(string Disclosure, bool Chosen)> DisclosureOfAsync(int id)
     {
@@ -95,6 +128,19 @@ public sealed class BrowserFixture : WebApplicationFactory<Program>, IAsyncLifet
             ContributionPath = $"/contribute/{await query.ExecuteScalarAsync()}";
             await using var person = new NpgsqlCommand("""select "PublicId" from "People" where "Disclosure" = 'Deceased' and "DeletedAt" is null limit 1""", connection);
             PersonPath = $"/people/{await person.ExecuteScalarAsync()}";
+            await using var moving = new NpgsqlCommand("""select p."Id", l."ArchiveItemId" from "ItemPeople" l join "People" p on p."Id" = l."PersonId" where p."Disclosure" = 'Deceased' and p."DeletedAt" is null order by p."Id" limit 1""", connection);
+            await using (var reader = await moving.ExecuteReaderAsync())
+            {
+                await reader.ReadAsync();
+                MovePath = $"/Admin/People/Move/{reader.GetInt32(0)}?items={reader.GetInt32(1)}";
+            }
+
+            // A person in the bin, so that the bin shows its section for people.
+            await using var binned = new NpgsqlCommand("""
+                insert into "People" ("PublicId", "Name", "Disclosure", "DisclosureChangedAt", "CreatedAt", "UpdatedAt", "DeletedAt")
+                values (substr(replace(gen_random_uuid()::text, '-', ''), 1, 12), 'Binned person', 'Hidden', now(), now(), now(), now())
+                """, connection);
+            await binned.ExecuteNonQueryAsync();
 
             await using var unreviewed = new NpgsqlCommand("""
                 insert into "People" ("PublicId", "Name", "Disclosure", "DisclosureChangedAt", "CreatedAt", "UpdatedAt")

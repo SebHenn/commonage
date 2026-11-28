@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Commonage.Web.Data;
 
 /// <summary>
-/// Deleted items, photos and stories wait in the bin before they are gone for good, so a mistake can be undone. Nothing else in
+/// Deleted items, photos, stories and people wait in the bin before they are gone for good, so a mistake can be undone. Nothing else in
 /// the app sees them, because the query filters in <see cref="CommonageDbContext"/> leave them out.
 /// </summary>
 public class ArchiveBin(CommonageDbContext db, MediaUploadService uploads, AuditLog audit, TimeProvider clock)
@@ -43,6 +43,18 @@ public class ArchiveBin(CommonageDbContext db, MediaUploadService uploads, Audit
         await db.SaveChangesAsync(cancellationToken);
     }
 
+    /// <summary>
+    /// Deletes a person in the bin with their other names and their links to items (the database removes them with the person; the
+    /// items stay). The entry has no name and no link to the person, so nothing of the person is kept in the log: the log's lines
+    /// about them lose their link in the same step and read "a person since deleted".
+    /// </summary>
+    public async Task DeletePersonAsync(Person person, AuditAction action, CancellationToken cancellationToken = default)
+    {
+        audit.Record(action, null);
+        db.People.Remove(person);
+        await db.SaveChangesAsync(cancellationToken);
+    }
+
     /// <summary>Deletes what has been in the bin for longer than <see cref="RetentionDays"/>.</summary>
     public async Task PurgeExpiredAsync(CancellationToken cancellationToken = default)
     {
@@ -67,6 +79,12 @@ public class ArchiveBin(CommonageDbContext db, MediaUploadService uploads, Audit
             .ToListAsync(cancellationToken);
         foreach (var story in stories)
             await DeleteStoryAsync(story, AuditAction.StoryPurged, cancellationToken);
+
+        var people = await db.BinnedPeople
+            .Where(p => p.DeletedAt <= cutoff)
+            .ToListAsync(cancellationToken);
+        foreach (var person in people)
+            await DeletePersonAsync(person, AuditAction.PersonPurged, cancellationToken);
     }
 }
 

@@ -120,4 +120,112 @@ public class PeopleBrowserTests(BrowserFixture app)
         Assert.DoesNotContain("Plain one", await page.TextContentAsync("main"));
         Assert.Contains("Plain two", await page.TextContentAsync("main"));
     }
+
+    [Fact]
+    public async Task Ticked_items_move_to_a_new_person_after_a_page_that_says_what_will_happen()
+    {
+        var source = $"Mover {Guid.NewGuid():N}"[..14];
+        var target = $"Moved {Guid.NewGuid():N}"[..14];
+        var id = await app.AddLinkedPersonAsync(source);
+        var page = await app.LogInAsync();
+        await page.GotoAsync($"/Admin/People/Edit/{id}");
+
+        await page.Locator("input[name=items]").First.CheckAsync();
+        await page.GetByRole(AriaRole.Button, new() { Name = "Move the ticked items to another person" }).ClickAsync();
+        await page.FillAsync("#newName", target);
+        await page.GetByRole(AriaRole.Button, new() { Name = "Continue" }).ClickAsync();
+
+        var warning = page.Locator("section[role=alert]");
+        await warning.WaitForAsync();
+        Assert.Contains("1 item is moved.", await warning.TextContentAsync());
+        Assert.Equal((2, false), await app.PersonStateAsync(source));
+        Assert.Null(await app.PersonStateAsync(target));
+
+        await page.GetByRole(AriaRole.Button, new() { Name = "Yes, move them" }).ClickAsync();
+        await page.WaitForURLAsync(url => url.Contains("/Admin/People/Edit/") && !url.Contains($"/{id}"));
+
+        Assert.Equal((1, false), await app.PersonStateAsync(source));
+        Assert.Equal((1, false), await app.PersonStateAsync(target));
+        Assert.Equal(target, await page.InputValueAsync("[name='Input.Name']"));
+    }
+
+    [Fact]
+    public async Task Moving_items_works_without_javascript_and_nothing_ticked_moves_nothing()
+    {
+        var source = $"Plainmover {Guid.NewGuid():N}"[..20];
+        var target = $"Plainnew {Guid.NewGuid():N}"[..18];
+        var id = await app.AddLinkedPersonAsync(source);
+        var page = await app.NewPageAsync(390, 844, javaScript: false);
+        await page.GotoAsync("/Account/Login");
+        await page.FillAsync("[name='Input.Email']", BrowserFixture.AdminEmail);
+        await page.FillAsync("[name='Input.Password']", BrowserFixture.AdminPassword);
+        await page.ClickAsync("main form button[type=submit]");
+        await page.GotoAsync($"/Admin/People/Edit/{id}");
+
+        await page.GetByRole(AriaRole.Button, new() { Name = "Move the ticked items to another person" }).ClickAsync();
+        Assert.Contains("Tick the items to move first.", await page.TextContentAsync("main"));
+
+        await page.Locator("input[name=items]").Nth(0).CheckAsync();
+        await page.Locator("input[name=items]").Nth(1).CheckAsync();
+        await page.GetByRole(AriaRole.Button, new() { Name = "Move the ticked items to another person" }).ClickAsync();
+        await page.FillAsync("#newName", target);
+        await page.GetByRole(AriaRole.Button, new() { Name = "Continue" }).ClickAsync();
+        await page.GetByRole(AriaRole.Button, new() { Name = "Yes, move them" }).ClickAsync();
+
+        Assert.Equal((0, false), await app.PersonStateAsync(source));
+        Assert.Equal((2, false), await app.PersonStateAsync(target));
+    }
+
+    [Fact]
+    public async Task A_person_goes_to_the_bin_comes_back_and_is_deleted_for_good_after_a_question_each_time_it_is_asked()
+    {
+        var name = $"Binme {Guid.NewGuid():N}"[..16];
+        var id = await app.AddLinkedPersonAsync(name);
+        var page = await app.LogInAsync();
+        var dialogs = new List<string>();
+        page.Dialog += async (_, dialog) =>
+        {
+            dialogs.Add(dialog.Message);
+            await dialog.AcceptAsync();
+        };
+        await page.GotoAsync($"/Admin/People/Edit/{id}");
+
+        await page.GetByRole(AriaRole.Button, new() { Name = "Move to bin" }).ClickAsync();
+        await page.WaitForURLAsync(url => url.EndsWith("/Admin/People"));
+        Assert.Equal((2, true), await app.PersonStateAsync(name));
+
+        await page.GotoAsync("/Admin/Bin");
+        await page.Locator("li, .card").Filter(new() { HasText = name }).Last.GetByRole(AriaRole.Button, new() { Name = "Restore" }).ClickAsync();
+        await page.WaitForURLAsync(url => url.Contains($"/Admin/People/Edit/{id}"));
+        Assert.Equal((2, false), await app.PersonStateAsync(name));
+
+        await page.GetByRole(AriaRole.Button, new() { Name = "Move to bin" }).ClickAsync();
+        await page.WaitForURLAsync(url => url.EndsWith("/Admin/People"));
+        await page.GotoAsync("/Admin/Bin");
+        await page.Locator("li, .card").Filter(new() { HasText = name }).Last.GetByRole(AriaRole.Button, new() { Name = "Delete for good" }).ClickAsync();
+        await page.WaitForURLAsync(url => url.EndsWith("/Admin/Bin"));
+
+        Assert.Null(await app.PersonStateAsync(name));
+        Assert.Equal(3, dialogs.Count);
+    }
+
+    [Fact]
+    public async Task Without_javascript_a_person_in_the_bin_is_restored_with_one_click()
+    {
+        var name = $"Plainbin {Guid.NewGuid():N}"[..18];
+        var id = await app.AddLinkedPersonAsync(name);
+        var page = await app.NewPageAsync(390, 844, javaScript: false);
+        await page.GotoAsync("/Account/Login");
+        await page.FillAsync("[name='Input.Email']", BrowserFixture.AdminEmail);
+        await page.FillAsync("[name='Input.Password']", BrowserFixture.AdminPassword);
+        await page.ClickAsync("main form button[type=submit]");
+        await page.GotoAsync($"/Admin/People/Edit/{id}");
+
+        await page.GetByRole(AriaRole.Button, new() { Name = "Move to bin" }).ClickAsync();
+        Assert.Equal((2, true), await app.PersonStateAsync(name));
+        await page.GotoAsync("/Admin/Bin");
+        await page.Locator("li, .card").Filter(new() { HasText = name }).Last.GetByRole(AriaRole.Button, new() { Name = "Restore" }).ClickAsync();
+
+        Assert.Equal((2, false), await app.PersonStateAsync(name));
+    }
 }

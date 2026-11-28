@@ -278,6 +278,24 @@ public class EditModel(CommonageDbContext db, AuditLog audit, IStringLocalizer<S
         return Redirect($"{Url.Page("/Admin/People/Edit", new { id })}#items");
     }
 
+    /// <summary>
+    /// The person goes to the bin for 30 days with their links and other names, which the query filters hide with them: visitors lose
+    /// the person at once, the search forgets the names, and nothing is deleted. A restore from the bin puts everything back.
+    /// </summary>
+    public async Task<IActionResult> OnPostMoveToBinAsync(int id, CancellationToken cancellationToken)
+    {
+        var person = await db.People.FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
+        if (person is null)
+            return NotFound();
+
+        person.MoveToBin(clock.GetUtcNow().UtcDateTime);
+        audit.Record(AuditAction.PersonMovedToBin, null, person: person);
+        await db.SaveChangesAsync(cancellationToken);
+
+        TempData["Message"] = localizer["The person is in the bin. Visitors no longer see them. You can restore them there for 30 days."].Value;
+        return RedirectToPage("Index");
+    }
+
     private async Task LoadAsync(Person person, CancellationToken cancellationToken)
     {
         Person = person;
