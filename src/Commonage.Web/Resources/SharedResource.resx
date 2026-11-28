@@ -1065,7 +1065,7 @@
   <data name="This link is no longer valid. Please ask an admin for a new one." xml:space="preserve"><value>This link is no longer valid. Please ask an admin for a new one.</value></data>
   <data name="This page does not exist, or it is not public (any more)." xml:space="preserve"><value>This page does not exist, or it is not public (any more).</value></data>
   <data name="This person" xml:space="preserve"><value>This person</value></data>
-  <data name="This person goes to the bin, without items. Nothing is deleted at once." xml:space="preserve"><value>This person goes to the bin, without items. Nothing is deleted at once.</value></data>
+  <data name="This person goes to the bin and keeps its items there. Nothing is deleted at once." xml:space="preserve"><value>This person goes to the bin and keeps its items there. Nothing is deleted at once.</value></data>
   <data name="This person is not linked to any item. Link people on the edit page of an item." xml:space="preserve"><value>This person is not linked to any item. Link people on the edit page of an item.</value></data>
   <data name="This person logs in with a code from an authenticator app as well as their password." xml:space="preserve"><value>This person logs in with a code from an authenticator app as well as their password.</value></data>
   <data name="This person logs in with their password only." xml:space="preserve"><value>This person logs in with their password only.</value></data>

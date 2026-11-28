@@ -1273,7 +1273,7 @@
   <data name="These people were tags before. Nobody has chosen yet who may see them. Tick people and choose, or open a person to decide on their own." xml:space="preserve"><value>Diese Personen waren früher Schlagwörter. Noch hat niemand gewählt, wer sie sehen darf. Haken Sie Personen an und wählen Sie, oder öffnen Sie eine Person und entscheiden Sie einzeln.</value></data>
   <data name="This is the same person as ..." xml:space="preserve"><value>Das ist dieselbe Person wie ...</value></data>
   <data name="This person" xml:space="preserve"><value>Diese Person</value></data>
-  <data name="This person goes to the bin, without items. Nothing is deleted at once." xml:space="preserve"><value>Diese Person kommt ohne Objekte in den Papierkorb. Nichts wird sofort gelöscht.</value></data>
+  <data name="This person goes to the bin and keeps its items there. Nothing is deleted at once." xml:space="preserve"><value>Diese Person kommt in den Papierkorb und behält ihre Objekte dort. Nichts wird sofort gelöscht.</value></data>
   <data name="Tick the people first." xml:space="preserve"><value>Haken Sie zuerst die Personen an.</value></data>
   <data name="Tick {0}" xml:space="preserve"><value>{0} anhaken</value></data>
   <data name="Visitors will no longer see the other person: this person is only seen by curators, and the stricter choice is kept." xml:space="preserve"><value>Besucher sehen die andere Person nicht mehr: Diese Person sehen nur Kuratoren, und die strengere Wahl bleibt.</value></data>

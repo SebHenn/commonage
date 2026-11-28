@@ -65,7 +65,7 @@ else
             <li>@T.Plural("{0, plural, =0 {No item moves.} one {# item is linked to the other person.} other {# items are linked to the other person.}}", Model.NewItems)</li>
             <li>@T.Plural("{0, plural, =0 {No name is added.} one {# name is added as another name of the other person.} other {# names are added as other names of the other person.}}", Model.SourceNamesCarried)</li>
             <li>@T["The added names are not shown to visitors until you choose so."]</li>
-            <li>@T["This person goes to the bin, without items. Nothing is deleted at once."]</li>
+            <li>@T["This person goes to the bin and keeps its items there. Nothing is deleted at once."]</li>
             @if (Model.ResultStricterThanTarget)
             {
                 <li class="fw-semibold">

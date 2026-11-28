@@ -12,7 +12,7 @@ namespace Commonage.Web.Pages.Admin.People;
 /// "This is the same person as ...": the person of the address goes into another one. The other (the target) keeps its data and gets
 /// the items and the names. Three steps, all plain pages: find the target by number or name, read what will happen, confirm. The
 /// stricter of the two choices of who may see a person wins, so a merge never shows more than either person showed, and the page
-/// says so before anything happens. The merged person goes to the bin without links (the bin for people has its own screens later).
+/// says so before anything happens. The merged person goes to the bin and keeps its links, which the bin's filter hides from every page.
 /// </summary>
 public class MergeModel(CommonageDbContext db, AuditLog audit, IStringLocalizer<SharedResource> localizer, TimeProvider clock) : PageModel
 {
@@ -100,7 +100,6 @@ public class MergeModel(CommonageDbContext db, AuditLog audit, IStringLocalizer<
         var already = (await db.ItemPeople.IgnoreQueryFilters().Where(l => l.PersonId == target).Select(l => l.ArchiveItemId).ToListAsync(cancellationToken)).ToHashSet();
         foreach (var link in sourceLinks)
         {
-            db.ItemPeople.Remove(link);
             if (already.Add(link.ArchiveItemId))
                 db.ItemPeople.Add(new ItemPerson { ArchiveItemId = link.ArchiveItemId, PersonId = target, CreatedAt = now });
         }
@@ -122,7 +121,7 @@ public class MergeModel(CommonageDbContext db, AuditLog audit, IStringLocalizer<
             targetPerson.SetDisclosure(result, now);
         targetPerson.Touch(now);
 
-        // This person: hidden, without links, in the bin. Nothing of it is deleted.
+        // This person: hidden and in the bin. Its links stay on it (the bin's filter hides them), so a restore brings the items back.
         Source.SetDisclosure(PersonDisclosure.Hidden, now);
         Source.MoveToBin(now);
         Source.Touch(now);

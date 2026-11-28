@@ -84,9 +84,40 @@ public class PersonMergeTests(CommonageAppFactory app)
         var gone = await ReadAsync(source);
         Assert.NotNull(gone.DeletedAt);
         Assert.Equal(PersonDisclosure.Hidden, gone.Disclosure);
-        Assert.Empty(await app.WithDbAsync(db => db.ItemPeople.IgnoreQueryFilters().Where(l => l.PersonId == source).ToListAsync()));
+        // The links stay on the binned person, hidden by the bin's filter, and come back with a restore.
+        Assert.Equal(3, await app.WithDbAsync(db => db.ItemPeople.IgnoreQueryFilters().CountAsync(l => l.PersonId == source)));
+        Assert.Empty(await app.WithDbAsync(db => db.ItemPeople.Where(l => l.PersonId == source).ToListAsync()));
+        await app.WithDbAsync(async db =>
+        {
+            (await db.People.IgnoreQueryFilters().SingleAsync(p => p.Id == source)).RestoreFromBin(DateTime.UtcNow);
+            return await db.SaveChangesAsync();
+        });
+        // The item in the bin keeps hiding its own link.
+        Assert.Equal(2, await app.WithDbAsync(db => db.ItemPeople.CountAsync(l => l.PersonId == source)));
         var entries = await app.WithDbAsync(db => db.AuditEntries.Where(e => e.Action == AuditAction.PeopleMerged && e.PersonId == target).ToListAsync());
         Assert.Single(entries);
+    }
+
+    [Fact]
+    public async Task After_a_merge_the_visible_item_names_the_target_once_and_the_binned_person_nowhere()
+    {
+        var item = await app.CreateContributionAsync(ItemStatus.Published);
+        var sourceName = TestData.UniqueWord("Mergedaway");
+        var targetName = TestData.UniqueWord("Mergedinto");
+        var source = await NewPersonAsync(sourceName, PersonDisclosure.Deceased);
+        var target = await NewPersonAsync(targetName, PersonDisclosure.Deceased);
+        await LinkAsync(source, item.Id);
+        using var curator = await CuratorAsync();
+        var page = $"/Admin/People/Merge/{source}?target={target}";
+        await Browser.PostFormAsync(curator, page, new(), page);
+
+        var visitor = app.CreateClient();
+        var html = await visitor.GetStringAsync($"/items/{item.Id}");
+        Assert.Contains(targetName, html);
+        Assert.DoesNotContain(sourceName, html);
+        Assert.DoesNotContain(sourceName, await visitor.GetStringAsync("/people"));
+        Assert.DoesNotContain($"/items/{item.Id}\"", await visitor.GetStringAsync($"/search?q={sourceName}"));
+        Assert.Equal(1, await app.WithDbAsync(db => db.VisiblePeople.CountAsync(p => p.Id == source || p.Id == target)));
     }
 
     [Fact]

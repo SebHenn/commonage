@@ -18,7 +18,7 @@ namespace Commonage.Web.Data.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             // One row per person tag, with the address of its person made here: 12 characters of Crockford's base32 from 60 random
-            // bits (the bytes of two random UUIDs without their version and variant bits; 256 is a multiple of 32, so no bias).
+            // bits (twelve bytes of a random UUID, not the ones with its version and variant bits; 256 is a multiple of 32, so no bias).
             migrationBuilder.Sql("""
                 CREATE TEMPORARY TABLE person_tag_map ON COMMIT DROP AS
                 SELECT t."Id" AS tag_id,
@@ -34,7 +34,8 @@ namespace Commonage.Web.Data.Migrations
                                   AND (i."PublicFrom" IS NULL OR i."PublicFrom" < CURRENT_DATE)) AS shown,
                        NULL::integer AS person_id
                   FROM "Tags" t
-                 CROSS JOIN LATERAL (SELECT decode(replace(gen_random_uuid()::text, '-', ''), 'hex') AS bytes) r
+                 -- The WHERE names the tag, so that the subquery depends on the row and is run again for each tag, not once.
+                 CROSS JOIN LATERAL (SELECT decode(replace(gen_random_uuid()::text, '-', ''), 'hex') AS bytes WHERE t."Id" IS NOT NULL) r
                  WHERE t."Kind" = 2;
                 """);
 

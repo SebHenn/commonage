@@ -42,7 +42,13 @@ public class IndexModel(CommonageDbContext db, AuditLog audit, IStringLocalizer<
 
     /// <summary>The list of people carried over from tags that nobody has chosen a disclosure for (<c>?review=1</c>).</summary>
     [BindProperty(SupportsGet = true, Name = "review")]
-    public bool Review { get; set; }
+    public int ReviewFlag { get; set; }
+
+    public bool Review
+    {
+        get => ReviewFlag == 1;
+        set => ReviewFlag = value ? 1 : 0;
+    }
 
     /// <summary>A public choice for several people waits for a confirmation, as it does for one person.</summary>
     public PersonDisclosure? ConfirmChoice { get; private set; }
