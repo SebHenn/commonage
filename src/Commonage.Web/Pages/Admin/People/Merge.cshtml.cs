@@ -39,7 +39,8 @@ public class MergeModel(CommonageDbContext db, AuditLog audit, IStringLocalizer<
     /// <summary>The stricter of two choices: only curators, then may be living, then has died.</summary>
     public static PersonDisclosure Stricter(PersonDisclosure a, PersonDisclosure b) => Rank(a) <= Rank(b) ? a : b;
 
-    private static int Rank(PersonDisclosure value) => value switch
+    /// <summary>How much visitors see of a person: nothing, name and text, then dates too.</summary>
+    public static int Rank(PersonDisclosure value) => value switch
     {
         PersonDisclosure.Hidden => 0,
         PersonDisclosure.MayBeShown => 1,

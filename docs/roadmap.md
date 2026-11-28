@@ -185,6 +185,7 @@ real pace over M7 and M8 before promising dates. Each milestone is a minor relea
 | **M27 Visibility levels** ✅ | 5 | An item can be public as a record without its media, or embargoed until a date. Every public query goes through `VisibleItems`. |
 | **M28 Toward 1.0** ✅ | 3 | Commonage reads its own export, so archives can be merged. Dublin Core and a JSON alternate exist. A 1.0 checklist is written ([release-1.0.md](release-1.0.md)); not all of it is met yet. |
 | **M29 Stories** ✅ | 4 | A curator puts text and items in order as a story. Visitors read it at `/stories/{id}`, and an item they may not see leaves no trace in it. Stories go to the bin like items. |
+| **M30 People** ✅ | 4 | People are entities, not tags: other names, a choice of who may see each person (only curators, has died, may be living), pages at `/people`, merge, split, bin and a handbook. Tags that named a person became people. |
 
 M22 to M28 were planned in November 2026, after M21, from the "Later" list. There are still no reports from groups or
 testers, so the order is a judgement again: documents are the largest gap between what groups hold and what the app takes,
@@ -565,6 +566,17 @@ shows the years of its published items. M19 is complete.
 - A story is public when it is published, not in the bin and has a block visitors may see. An item that is hidden leaves no
   trace in a story, also in the published-only export. Stories are not in the feed, in search or in JSON, and the import does not read them.
 
+**M30 People**
+
+- The plan is in [plan-m30-people.md](plan-m30-people.md). Built in four parts, released together.
+- *Part 1:* the model (`Person`, `PersonName`, `ItemPerson`), `Visibility.Person`, `VisiblePeople` and the curator screens under
+  `/Admin/People`. *Part 2:* `/people`, `/people/{key}`, names in item pages and search, the sitemap, JSON and Dublin Core.
+  *Part 3:* the migration `PersonTagsToPeople`, the review list and merge. *Part 4:* the person bin and its purge after 30 days,
+  "Move items" (the split), and the handbook in English and German.
+- A person is public only when their choice is not "Only curators", they are not in the bin and one of their items is public.
+  Everyone starts as "Only curators". A person in the bin is not in search, in an export or in the log by name.
+- Decided: other names are hidden from visitors unless ticked; visitors never see a birth date of someone who may be living; a person without a visible item answers 404; there is no person facet in search and no link between a person and a contributor. The reasons are in the plan.
+
 ### Rules for every milestone
 
 - A change to the data model updates the export, its format version and `operations.md`.
@@ -580,14 +592,13 @@ shows the years of its published items. M19 is complete.
 PDF documents, oral histories, visibility levels, the helper role, description history, display names, Dublin Core and
 reading Commonage's own export moved into M23 to M28 above, and stories into M29. What is left, in this order:
 
-1. **People as entities.** Name variants and person pages, hidden by default for people who may be living.
-2. **IIIF** manifests with static tiles and a vendored viewer, once alt text and rights exist.
-3. **OAI-PMH**, off by default, limited by consent and rights.
-4. **Optional email** with the group's own mailbox: digest, password reset, receipt. The app must work without it.
-5. **Places with coordinates and a self-hosted map** (vendored MapLibre and one regional PMTiles file).
-6. **Short video** without re-encoding. **S3-compatible storage**, always through the permission-checking endpoint.
+1. **IIIF** manifests with static tiles and a vendored viewer, once alt text and rights exist.
+2. **OAI-PMH**, off by default, limited by consent and rights.
+3. **Optional email** with the group's own mailbox: digest, password reset, receipt. The app must work without it.
+4. **Places with coordinates and a self-hosted map** (vendored MapLibre and one regional PMTiles file).
+5. **Short video** without re-encoding. **S3-compatible storage**, always through the permission-checking endpoint.
    **OCR for typed documents** as an opt-in container. **Near-duplicates** through a perceptual hash.
-7. **"Move to a new item"**, for a contribution that turns out to be two things, **photo descriptions from contributors**, and
+6. **"Move to a new item"**, for a contribution that turns out to be two things, **photo descriptions from contributors**, and
    **captions in the search**, which only looks at an item's own fields so far.
 
 ### Not planned

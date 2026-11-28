@@ -1,0 +1,164 @@
+@page "{id:int}"
+@model Commonage.Web.Pages.Admin.People.MoveModel
+@using Commonage.Web.Domain
+@inject Commonage.Web.Operations.ArchiveProfile Profile
+@{
+    ViewData["Title"] = T["Move items to another person"];
+    var material = (await Profile.GetAsync()).MaterialLanguage;
+    var source = Model.Source;
+    var confirming = Model.Target is not null || Model.NewName is not null;
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="/Admin/People/Index">@T["People"]</a></li>
+        <li class="breadcrumb-item"><a asp-page="/Admin/People/Edit" asp-route-id="@source.Id" lang="@material">@source.Name</a></li>
+    </ol>
+</nav>
+
+<h1>@ViewData["Title"]</h1>
+
+@if (!confirming)
+{
+    <p class="col-lg-8">@T.Plural("{0, plural, one {# item will move.} other {# items will move.}}", Model.Items.Count)</p>
+    <ul class="col-lg-8">
+        @foreach (var item in Model.Items)
+        {
+            <li class="text-break" lang="@material">@ArchiveItem.ShownTitle(T, item.Title)</li>
+        }
+    </ul>
+
+    <h2 class="h4">@T["To another person"]</h2>
+    <p class="col-lg-8">@T["Say who the items go to: the name of the other person, or their number."]</p>
+    <form method="get" asp-page="/Admin/People/Move" asp-route-id="@source.Id" class="row g-2 align-items-end col-lg-8 mb-4">
+        @foreach (var itemId in Model.ItemIds)
+        {
+            <input type="hidden" name="items" value="@itemId" />
+        }
+        <div class="col-sm-8">
+            <label for="with" class="form-label">@T["Name or number of the other person"]</label>
+            <input id="with" name="with" value="@Model.With" class="form-control" maxlength="@Person.NameMaxLength" required lang="@material" />
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">@T["Find"]</button>
+        </div>
+    </form>
+    @if (Model.NothingFound)
+    {
+        <p class="text-muted" role="status">@T["No other person matches."]</p>
+    }
+    else if (Model.Matches.Count > 0)
+    {
+        <p>@T["Several people match. Which one is meant?"]</p>
+        <ul class="list-group col-lg-8 mb-4">
+            @foreach (var match in Model.Matches)
+            {
+                <li class="list-group-item d-flex flex-wrap gap-2 align-items-baseline">
+                    <a asp-page="/Admin/People/Move" asp-route-id="@source.Id" asp-route-items="@Model.ItemIds" asp-route-target="@match.Id" class="me-auto text-break" lang="@material">@match.Name</a>
+                    <small class="text-muted">@T["Number {0}", match.Id]</small>
+                    @if (match.BornText is not null || match.DiedText is not null)
+                    {
+                        <small class="text-muted" lang="@material">@(match.BornText ?? "?") – @(match.DiedText ?? "?")</small>
+                    }
+                    <small class="text-muted">@T.Plural("{0, plural, one {# item} other {# items}}", match.Items)</small>
+                </li>
+            }
+        </ul>
+    }
+
+    <h2 class="h4">@T["To a new person"]</h2>
+    <p class="col-lg-8">@T["The new person is seen by curators only until you choose otherwise."]</p>
+    <form method="get" asp-page="/Admin/People/Move" asp-route-id="@source.Id" class="row g-2 align-items-end col-lg-8 mb-4">
+        @foreach (var itemId in Model.ItemIds)
+        {
+            <input type="hidden" name="items" value="@itemId" />
+        }
+        <div class="col-sm-8">
+            <label for="newName" class="form-label">@T["Name of the new person"]</label>
+            <input id="newName" name="newName" class="form-control" maxlength="@Person.NameMaxLength" required lang="@material" />
+            <span class="text-danger">@Html.ValidationMessage("newName")</span>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-outline-primary">@T["Continue"]</button>
+            <a asp-page="/Admin/People/Edit" asp-route-id="@source.Id" class="btn btn-link">@T["Cancel"]</a>
+        </div>
+    </form>
+}
+else
+{
+    <p class="col-lg-8">
+        @if (Model.Target is { } target)
+        {
+            @T["Move the items to “{0}”?", target.Name]
+        }
+        else
+        {
+            @T["Move the items to a new person called “{0}”?", Model.NewName!]
+        }
+    </p>
+
+    <section class="alert alert-warning col-lg-8" role="alert" data-focus-on-load tabindex="-1" aria-labelledby="move-warning">
+        <h2 id="move-warning" class="h5">@T["What will happen"]</h2>
+        <ul class="mb-0">
+            <li>@T.Plural("{0, plural, =0 {No item moves.} one {# item is moved.} other {# items are moved.}}", Model.NewLinks)</li>
+            @if (Model.NewLinks < Model.Items.Count)
+            {
+                <li>@T.Plural("{0, plural, one {# item is linked to the other person already; it is only taken off this person.} other {# items are linked to the other person already; they are only taken off this person.}}", Model.Items.Count - Model.NewLinks)</li>
+            }
+            @if (Model.Target is null)
+            {
+                <li>@T["The new person is seen by curators only. Choose who may see them on their page."]</li>
+            }
+            <li>@T["The items themselves are not changed."]</li>
+            @if (Model.ShowsMore)
+            {
+                <li class="fw-semibold">@T["Visitors will see more of the person on these items than they see of this person now: check that the other person may be shown."]</li>
+            }
+            @if (Model.ShowsLess)
+            {
+                <li class="fw-semibold">@T["Visitors will see less of the person on these items, or no person at all: the other person is shown less than this person."]</li>
+            }
+        </ul>
+    </section>
+
+    <h2 class="h5">@T["Items"]</h2>
+    <ul class="mb-4">
+        @foreach (var item in Model.Items)
+        {
+            <li class="text-break" lang="@material">@ArchiveItem.ShownTitle(T, item.Title)</li>
+        }
+    </ul>
+
+    <form method="post" asp-page="/Admin/People/Move" asp-route-id="@source.Id" class="col-lg-8" data-send-once>
+        @foreach (var itemId in Model.ItemIds)
+        {
+            <input type="hidden" name="items" value="@itemId" />
+        }
+        @if (Model.Target is { } chosen)
+        {
+            <input type="hidden" name="target" value="@chosen.Id" />
+        }
+        else
+        {
+            <input type="hidden" name="newName" value="@Model.NewName" />
+        }
+        @if (Model.SourceNames.Count > 0)
+        {
+            <fieldset class="mb-4">
+                <legend class="h5">@T["Other names to take along"]</legend>
+                <p class="form-text">@T["A name taken along is not shown to visitors until you choose so on the other person's page."]</p>
+                @foreach (var name in Model.SourceNames)
+                {
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="names" value="@name.Id" id="name-@name.Id" />
+                        <label class="form-check-label" for="name-@name.Id" lang="@(name.Language ?? material)">@name.Name</label>
+                    </div>
+                }
+            </fieldset>
+        }
+        <div class="d-flex flex-wrap gap-2">
+            <button type="submit" class="btn btn-warning">@T["Yes, move them"]</button>
+            <a asp-page="/Admin/People/Edit" asp-route-id="@source.Id" class="btn btn-outline-secondary">@T["Cancel"]</a>
+        </div>
+    </form>
+}

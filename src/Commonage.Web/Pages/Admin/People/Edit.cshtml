@@ -1,5 +1,6 @@
 @page "{id:int}"
 @model Commonage.Web.Pages.Admin.People.EditModel
+@using Commonage.Web.Data
 @using Commonage.Web.Domain
 @using Commonage.Web.Pages.Admin.People
 @inject Commonage.Web.Operations.ArchiveProfile Profile
@@ -259,8 +260,12 @@
         <ul class="list-group">
             @foreach (var item in Model.Items)
             {
-                <li class="list-group-item d-flex flex-wrap gap-2 align-items-center">
-                    <span class="me-auto">
+                <li class="list-group-item d-flex gap-2 align-items-start">
+                    <span class="form-check mb-0 flex-shrink-0">
+                        <input class="form-check-input" type="checkbox" form="move-form" name="items" value="@item.Id" id="move-@item.Id"
+                               aria-label="@T["Move: {0}", ArchiveItem.ShownTitle(T, item.Title)]" />
+                    </span>
+                    <span class="flex-grow-1">
                         <a asp-page="/Admin/Items/Edit" asp-route-id="@item.Id" class="text-break" lang="@material">@ArchiveItem.ShownTitle(T, item.Title)</a>
                         @if (item.DateText is not null)
                         {
@@ -288,5 +293,18 @@
                 </li>
             }
         </ul>
+        <form id="move-form" method="get" asp-page="/Admin/People/Move" asp-route-id="@person.Id" class="mt-3">
+            <p class="form-text">@T["Tick the items that belong to another person, for example when two people were joined by mistake."]</p>
+            <button type="submit" class="btn btn-outline-secondary">@T["Move the ticked items to another person ..."]</button>
+        </form>
     }
+</section>
+
+<section class="col-lg-8 mb-5" aria-labelledby="bin-heading">
+    <h2 id="bin-heading" class="h4">@T["Move to bin"]</h2>
+    <p>@T.Plural("The person stays in the bin for {0, plural, one {# day} other {# days}}, hidden from everyone but curators, with their names and their links to items. Restore them there until then.", ArchiveBin.RetentionDays)</p>
+    <form method="post" asp-page-handler="MoveToBin" asp-route-id="@person.Id"
+          data-confirm="@(Model.Person.IsHidden ? T["Move this person to the bin?"] : T["Move this person to the bin? Visitors will no longer see them, and the search stops finding their names."])">
+        <button type="submit" class="btn btn-outline-danger">@T["Move to bin"]</button>
+    </form>
 </section>

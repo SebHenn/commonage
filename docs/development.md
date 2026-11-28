@@ -308,10 +308,6 @@ warning on each update and updates are merged by hand until a new token is store
 
 Release tags cannot be moved or deleted once pushed; a mistake is fixed with the next patch version.
 
-**People (M30).** Until part 4 is merged (the person bin, merge and split, the `PersonTagsToPeople` migration), no release can
-be made: `ReleaseGuardTests` fails a pull request whose top `CHANGELOG.md` entry has a version and a date. Parts 1 to 3 would
-leave public person tags next to hidden people of the same name. Part 4 removes the test and this paragraph.
-
 ## Database changes
 
 After changing an entity or `CommonageDbContext`, create a migration and commit it:

@@ -20,22 +20,55 @@ but not restore. Nothing is listed for changes made before this version.
 
 ## Tidying up tags
 
-**People** keeps the people of the archive. A person is seen by curators only until you choose otherwise. "Has died" shows their
-name, other names you ticked, dates and biography on a page of their own, in "People" and on the items they are on. "May be living,
-and may be shown" shows the name, the ticked other names and the biography but never a date, keeps the page out of search engines,
-and a name appears on item pages and in search results: choose it only for someone who agreed. A person is public only while
-at least one of their items is. Their note stays with curators.
+**People** have their own section, [People](#people), below. A tag that named a person was turned into a person when the archive was updated.
 
 **Tags** lists every tag with how many items have it. Open one to:
 
 - **Say what it names:** a place, a person or a topic. Visitors find every place on a page of its own, "Places", from A to Z,
   and an item shows its places first. Only published items count, so a name that only drafts have stays unseen. People are
-  kept under **People** and not as tags (see below); a tag that names a person still shows on the item until the tags become people.
+  kept under **People** and not as tags (see below); a tag that names a person was turned into a person when the archive was updated.
 - **Rename it:** the new name reaches every item at once, also in the search. A name another tag already has is refused;
   that is a merge.
 - **Merge it into another tag,** for a misspelling or two words for the same thing: every item gets the other tag instead,
   and this one is gone. This cannot be undone, and the activity log notes it.
 - **Delete it,** once no item has it, not even one in the bin. "Delete the unused tags" on the list does that for all of them.
+
+## People
+
+**People** (under "People" in the admin area) keeps the people who appear in the archive: a name, other names, dates, a
+biography and a note for curators. An item is linked to its people on its own page. A person is seen by curators only until you
+choose otherwise, and the choice is always yours: nothing is shown to visitors because of a guess.
+
+**Who may see a person.** There are three choices:
+
+- **Only curators** (where everyone starts). Visitors see nothing: no page, no name on an item, not in search.
+- **Has died.** The name, the other names you ticked, the dates and the biography are on a page of their own, in "People" and
+  on the items the person is on.
+- **May be living, and may be shown.** The name, the ticked other names and the biography are shown, never a date. The page is
+  kept out of search engines. **The name appears on item pages and in search results**, and item pages are indexed, so a
+  search engine may find that name there. Choose this only for someone who agreed.
+
+A person is public only while at least one of their items is. Their note and any name you did not tick stay with curators.
+Choosing "Has died" or "May be living" asks first, and says what visitors will see.
+
+**The review list.** Tags that named a person became people when the archive was updated, and they start as "Only curators".
+The card "People from former tags" on the start page of the admin area opens the list of everyone nobody has chosen for yet. Tick people and choose for all of them at once: "Only curators"
+is immediate, the other two ask first and change only people nobody has chosen for.
+
+**"This is the same person as ..."** merges two people. The other person keeps their data and gets the items and the names, as
+other names that visitors do not see until you tick them. If one of the two was seen by curators only, the result is too, and
+the page says so before anything happens. The merged person goes to the bin.
+
+**Move items.** When two people were joined by mistake, or one tag held two people: on the person's page, tick the items that
+belong elsewhere and choose "Move the ticked items to another person". Say who they go to (the number or the name) or make a new
+person, who starts as "Only curators". Read what will happen, tick other names to take along (they are not shown to visitors),
+and confirm. An item the other person has already is not linked twice. The page warns when visitors will see more of the person
+on these items than before, or less. The items themselves are not changed.
+
+**The bin.** "Move to bin" on the person's page takes them away from visitors, from search and from exports at once, and keeps
+them for 30 days with their names and links. Under "Bin" → "People" you can restore them, or delete them for good at once: their
+other names and their links to items go, the items stay. After 30 days the archive deletes them itself. The activity log keeps what
+was done, never the name. In **Contributors**, curators still find a person who is in the bin.
 
 ## Arranging collections
 
@@ -288,7 +321,13 @@ only in the picture.
    - **Move to bin**, then **Delete for good** in the bin: nothing remains in the archive. Until the second step, it can
      still be restored, and the data is still there.
 3. For someone who is only in a photo, there is no contribution to find: search for the item, and unpublish or delete it.
-4. Tell the person what you did. Mention that backups keep older copies until they are replaced.
+4. If the person is also in **People**, deal with that entry too: open it, move it to the bin, then use **Delete for good** under
+   "Bin" → "People". Their other names and links go with it. This does not wait for the 30 days.
+5. Check what is left. A name can also be in the **title** of an item (search for it in the item list and in the activity log, which
+   shows titles), in the description, or in **earlier texts** (the list under each item's form keeps what a title or description
+   said before). Change the item, and for earlier texts delete the item or ask the person who runs the server if one cannot
+   be removed any other way.
+6. Tell the person what you did. Mention that backups keep older copies until they are replaced.
 
 Everything you do here is written to the activity log, without the person's name.
 

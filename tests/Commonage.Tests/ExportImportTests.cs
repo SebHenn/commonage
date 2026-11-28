@@ -937,7 +937,7 @@ public partial class ExportImportTests(CommonageAppFactory app)
         Assert.Contains("2 people would be created, who only curators see.", html);
         await ImportAsync(curator, html);
 
-        var created = await app.WithDbAsync(db => db.People.Where(p => p.Name.StartsWith(word) && p.Id != existing).OrderBy(p => p.Name).ToListAsync());
+        var created = await app.WithDbAsync(db => db.People.Where(p => p.Name.StartsWith(word + " Tagged") && p.Id != existing).OrderBy(p => p.Name).ToListAsync());
         Assert.Equal([$"{word} Tagged Berta", sameName], created.Select(p => p.Name));
         Assert.All(created, p => Assert.Equal(PersonDisclosure.Hidden, p.Disclosure));
         // Hidden and chosen: they do not wait on the review list, since nothing was carried over unreviewed.
