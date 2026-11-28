@@ -260,12 +260,12 @@
         <ul class="list-group">
             @foreach (var item in Model.Items)
             {
-                <li class="list-group-item d-flex flex-wrap gap-2 align-items-center">
-                    <span class="form-check mb-0">
+                <li class="list-group-item d-flex gap-2 align-items-start">
+                    <span class="form-check mb-0 flex-shrink-0">
                         <input class="form-check-input" type="checkbox" form="move-form" name="items" value="@item.Id" id="move-@item.Id"
                                aria-label="@T["Move: {0}", ArchiveItem.ShownTitle(T, item.Title)]" />
                     </span>
-                    <span class="me-auto">
+                    <span class="flex-grow-1">
                         <a asp-page="/Admin/Items/Edit" asp-route-id="@item.Id" class="text-break" lang="@material">@ArchiveItem.ShownTitle(T, item.Title)</a>
                         @if (item.DateText is not null)
                         {
