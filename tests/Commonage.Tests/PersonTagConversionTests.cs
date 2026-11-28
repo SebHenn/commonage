@@ -45,7 +45,7 @@ public class PersonTagConversionTests(CommonageAppFactory app)
                     INSERT INTO "ArchiveItems" ("Title", "Status", "CollectionId", "CreatedAt", "UpdatedAt", "NeedsTranscription", "PublicFrom", "DeletedAt")
                     SELECT {0}, {1}, (SELECT min("Id") FROM "Collections"), now(), now(), false, {2}::date, CASE WHEN {3} THEN now() END
                      WHERE NOT EXISTS (SELECT 1 FROM "ArchiveItems" WHERE "Title" = {0});
-                    """, item.Title, item.Status, (object?)item.PublicFrom, item.Binned);
+                    """, item.Title, item.Status, (object)item.PublicFrom!, item.Binned);
                 await db.Database.ExecuteSqlRawAsync("""
                     INSERT INTO "ArchiveItemTag" ("ItemsId", "TagsId")
                     SELECT i."Id", t."Id" FROM "ArchiveItems" i, "Tags" t WHERE i."Title" = {0} AND t."Name" = {1};
