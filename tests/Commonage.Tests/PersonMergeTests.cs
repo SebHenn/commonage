@@ -98,6 +98,47 @@ public class PersonMergeTests(CommonageAppFactory app)
         Assert.Single(entries);
     }
 
+    /// <summary>
+    /// Merging never takes an item past the limit of people: the target takes the place of the source, whose links the bin's filter then hides,
+    /// and an item that has both keeps one link. So the check that adding a person makes needs no second copy in the merge.
+    /// </summary>
+    [Fact]
+    public async Task Merging_leaves_an_item_with_a_full_list_of_people_at_the_limit_and_never_over_it()
+    {
+        var full = await app.CreateContributionAsync(ItemStatus.Published);
+        var both = await app.CreateContributionAsync(ItemStatus.Published);
+        var source = await NewPersonAsync();
+        var target = await NewPersonAsync();
+        var others = await app.WithDbAsync(async db =>
+        {
+            var made = Enumerable.Range(0, Person.MaxPerItem - 1).Select(_ => db.AddHiddenPerson(TestData.Unique("Crowd"), DateTime.UtcNow)).ToList();
+            await db.SaveChangesAsync();
+            return made.Select(p => p.Id).ToList();
+        });
+        await LinkAsync(source, full.Id, both.Id);
+        await LinkAsync(target, both.Id);
+        foreach (var person in others)
+            await LinkAsync(person, full.Id);
+        await app.WithDbAsync(async db =>
+        {
+            // The other item has the source, the target and 198 more.
+            foreach (var person in others.Take(Person.MaxPerItem - 2))
+                db.ItemPeople.Add(new ItemPerson { ArchiveItemId = both.Id, PersonId = person, CreatedAt = DateTime.UtcNow });
+            return await db.SaveChangesAsync();
+        });
+        Assert.Equal(Person.MaxPerItem, await app.WithDbAsync(db => db.ItemPeople.CountAsync(l => l.ArchiveItemId == full.Id)));
+        Assert.Equal(Person.MaxPerItem, await app.WithDbAsync(db => db.ItemPeople.CountAsync(l => l.ArchiveItemId == both.Id)));
+        using var curator = await CuratorAsync();
+
+        var page = $"/Admin/People/Merge/{source}?target={target}";
+        await Browser.PostFormAsync(curator, page, new(), page);
+
+        Assert.Equal(Person.MaxPerItem, await app.WithDbAsync(db => db.ItemPeople.CountAsync(l => l.ArchiveItemId == full.Id)));
+        Assert.Equal(Person.MaxPerItem - 1, await app.WithDbAsync(db => db.ItemPeople.CountAsync(l => l.ArchiveItemId == both.Id)));
+        Assert.Equal([full.Id, both.Id], await app.WithDbAsync(db => db.ItemPeople.Where(l => l.PersonId == target).Select(l => l.ArchiveItemId).OrderBy(i => i).ToListAsync()));
+        Assert.Empty(await app.WithDbAsync(db => db.ItemPeople.Where(l => l.PersonId == source).ToListAsync()));
+    }
+
     [Fact]
     public async Task After_a_merge_the_visible_item_names_the_target_once_and_the_binned_person_nowhere()
     {
