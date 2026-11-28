@@ -1,0 +1,108 @@
+@page "{id:int}"
+@model Commonage.Web.Pages.Admin.People.MergeModel
+@using Commonage.Web.Domain
+@inject Commonage.Web.Operations.ArchiveProfile Profile
+@{
+    ViewData["Title"] = T["This is the same person as ..."];
+    var material = (await Profile.GetAsync()).MaterialLanguage;
+    var source = Model.Source;
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="/Admin/People/Index">@T["People"]</a></li>
+        <li class="breadcrumb-item"><a asp-page="/Admin/People/Edit" asp-route-id="@source.Id" lang="@material">@source.Name</a></li>
+    </ol>
+</nav>
+
+<h1>@ViewData["Title"]</h1>
+
+@if (Model.Target is not { } target)
+{
+    <p class="col-lg-8">@T["Say who this person is also known as: the name of the other person, or their number. The other person keeps their data and gets this person's items and names."]</p>
+    <form method="get" asp-page="/Admin/People/Merge" asp-route-id="@source.Id" class="row g-2 align-items-end col-lg-8 mb-4">
+        <div class="col-sm-8">
+            <label for="with" class="form-label">@T["Name or number of the other person"]</label>
+            <input id="with" name="with" value="@Model.With" class="form-control" maxlength="@Person.NameMaxLength" required lang="@material" />
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">@T["Find"]</button>
+            <a asp-page="/Admin/People/Edit" asp-route-id="@source.Id" class="btn btn-link">@T["Cancel"]</a>
+        </div>
+    </form>
+    @if (Model.NothingFound)
+    {
+        <p class="text-muted" role="status">@T["No other person matches."]</p>
+    }
+    else if (Model.Matches.Count > 0)
+    {
+        <p>@T["Several people match. Which one is meant?"]</p>
+        <ul class="list-group col-lg-8">
+            @foreach (var match in Model.Matches)
+            {
+                <li class="list-group-item d-flex flex-wrap gap-2 align-items-baseline">
+                    <a asp-page="/Admin/People/Merge" asp-route-id="@source.Id" asp-route-target="@match.Id" class="me-auto text-break" lang="@material">@match.Name</a>
+                    <small class="text-muted">@T["Number {0}", match.Id]</small>
+                    @if (match.BornText is not null || match.DiedText is not null)
+                    {
+                        <small class="text-muted" lang="@material">@(match.BornText ?? "?") – @(match.DiedText ?? "?")</small>
+                    }
+                    <small class="text-muted">@T.Plural("{0, plural, one {# item} other {# items}}", match.Items)</small>
+                </li>
+            }
+        </ul>
+    }
+}
+else
+{
+    <p class="col-lg-8">
+        @T["Merge “{0}” into “{1}”?", source.Name, target.Name]
+    </p>
+
+    <section class="alert alert-warning col-lg-8" role="alert" data-focus-on-load tabindex="-1" aria-labelledby="merge-warning">
+        <h2 id="merge-warning" class="h5">@T["What will happen"]</h2>
+        <ul class="mb-0">
+            <li>@T.Plural("{0, plural, =0 {No item moves.} one {# item is linked to the other person.} other {# items are linked to the other person.}}", Model.NewItems)</li>
+            <li>@T.Plural("{0, plural, =0 {No name is added.} one {# name is added as another name of the other person.} other {# names are added as other names of the other person.}}", Model.SourceNamesCarried)</li>
+            <li>@T["The added names are not shown to visitors until you choose so."]</li>
+            <li>@T["This person goes to the bin and keeps its items there. Nothing is deleted at once."]</li>
+            @if (Model.ResultStricterThanTarget)
+            {
+                <li class="fw-semibold">
+                    @(Model.Result == PersonDisclosure.Hidden
+                        ? T["Visitors will no longer see the other person: this person is only seen by curators, and the stricter choice is kept."]
+                        : T["The choice of who may see the other person becomes stricter: visitors will see less than before."])
+                </li>
+            }
+            @if (Model.TargetHidden)
+            {
+                <li class="fw-semibold">@T["The other person is only seen by curators. The items of this person are no longer shown with a person to visitors."]</li>
+            }
+            @if (Model.TargetInBin)
+            {
+                <li class="fw-semibold">@T["The other person is in the bin. The result stays in the bin, with all the items."]</li>
+            }
+        </ul>
+    </section>
+
+    <div class="row g-3 mb-4">
+        @foreach (var (heading, person) in new[] { (T["This person"].Value, source), (T["The other person"].Value, target) })
+        {
+            <section class="col-md-6" aria-label="@heading">
+                <h2 class="h5">@heading</h2>
+                <p class="mb-1 text-break" lang="@material"><strong>@person.Name</strong> <small class="text-muted">@T["Number {0}", person.Id]</small></p>
+                <partial name="_DisclosureBadge" model="person.Disclosure" />
+                <h3 class="h6 mt-3">@T["Biography"]</h3>
+                <p class="text-preserve-lines text-break" lang="@material">@(string.IsNullOrWhiteSpace(person.Biography) ? T["No biography"] : person.Biography)</p>
+                <h3 class="h6">@T["Note for curators"]</h3>
+                <p class="text-preserve-lines text-break" lang="@material">@(string.IsNullOrWhiteSpace(person.CuratorNote) ? "–" : person.CuratorNote)</p>
+            </section>
+        }
+    </div>
+    <p class="text-muted col-lg-8">@T["The other person keeps their own biography and note. Copy what you want to keep by hand after the merge."]</p>
+
+    <form method="post" asp-page="/Admin/People/Merge" asp-route-id="@source.Id" asp-route-target="@target.Id" class="d-flex flex-wrap gap-2" data-send-once>
+        <button type="submit" class="btn btn-warning">@T["Yes, merge them"]</button>
+        <a asp-page="/Admin/People/Edit" asp-route-id="@source.Id" class="btn btn-outline-secondary">@T["Cancel"]</a>
+    </form>
+}

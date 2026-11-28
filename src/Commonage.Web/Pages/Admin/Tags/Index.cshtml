@@ -5,14 +5,14 @@
 }
 
 <h1>@ViewData["Title"]</h1>
-<p class="col-lg-8">@T["Each tag can say whether it names a place, a person or a topic. Visitors find all places and all people on pages of their own. Renaming or merging a tag changes it on every item at once."]</p>
+<p class="col-lg-8">@T["Each tag can say whether it names a place or a topic. Visitors find all places on a page of their own. People are kept under People, not as tags. Renaming or merging a tag changes it on every item at once."]</p>
 
 <form method="get" role="search" aria-label="@T["Filter the tags"]" class="row g-2 align-items-end mb-3">
     <div class="col-sm-6 col-lg-3">
         <label for="tags-kind" class="form-label">@T["Kind"]</label>
         <select id="tags-kind" name="kind" class="form-select">
             <option value="">@T["All kinds"]</option>
-            @foreach (var kind in Enum.GetValues<TagKind>())
+            @foreach (var kind in TagKinds.Choosable)
             {
                 <option value="@kind" selected="@(Model.Kind == kind)">@TagKinds.Plural(T, kind)</option>
             }

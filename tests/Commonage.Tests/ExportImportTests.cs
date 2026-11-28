@@ -914,6 +914,42 @@ public partial class ExportImportTests(CommonageAppFactory app)
     }
 
     [Fact]
+    public async Task Person_tags_of_an_older_export_arrive_as_new_hidden_people_that_wait_for_review_even_when_a_person_of_that_name_is_here()
+    {
+        using var curator = await CuratorAsync(app);
+        var word = Word()[..12]; // a tag name is at most 50 characters
+        var sameName = $"{word} Tagged Karl";
+        var existing = await app.WithDbAsync(async db =>
+        {
+            var here = db.AddHiddenPerson(sameName, DateTime.UtcNow);
+            await db.SaveChangesAsync();
+            return here.Id;
+        });
+        var item = new
+        {
+            id = 1, collectionId = 1, title = $"{word} Team", description = (string?)null, status = "Published", date = (object?)null,
+            tags = new[] { sameName, $"{word} Tagged Berta", $"{word} Mill Street" }, people = Array.Empty<int>(), mediaLevel = (string?)null, publicFrom = (string?)null, contribution = (object?)null, files = Array.Empty<object>(),
+        };
+        var tags = new object[] { new { name = sameName, kind = "Person" }, new { name = $"{word} Tagged Berta", kind = "Person" }, new { name = $"{word} Mill Street", kind = "Place" } };
+        var json = JsonSerializer.SerializeToUtf8Bytes(new { format = "commonage-export", version = 9, collections = new[] { Collection(1, $"{word} Club") }, tags, items = new[] { item }, people = Array.Empty<object>() }, Json);
+
+        var html = await DryRunAsync(curator, Zip(("archive.json", json)));
+        Assert.Contains("2 people would be created, who only curators see.", html);
+        await ImportAsync(curator, html);
+
+        var created = await app.WithDbAsync(db => db.People.Where(p => p.Name.StartsWith(word) && p.Id != existing).OrderBy(p => p.Name).ToListAsync());
+        Assert.Equal([$"{word} Tagged Berta", sameName], created.Select(p => p.Name));
+        Assert.All(created, p => Assert.Equal(PersonDisclosure.Hidden, p.Disclosure));
+        // Hidden and chosen: they do not wait on the review list, since nothing was carried over unreviewed.
+        Assert.All(created, p => Assert.NotNull(p.DisclosureChangedAt));
+        var importedItem = Assert.Single(await ItemsAsync(word + " Team"));
+        Assert.Equal(created.Select(p => p.Id).Order(), (await app.WithDbAsync(db => db.ItemPeople.Where(l => l.ArchiveItemId == importedItem.Id).Select(l => l.PersonId).ToListAsync())).Order());
+        // The place stays a tag, the person tags are not tags here.
+        var tagNames = await app.WithDbAsync(db => db.ArchiveItems.Where(i => i.Id == importedItem.Id).SelectMany(i => i.Tags).Select(t => t.Name).ToListAsync());
+        Assert.Equal([$"{word} Mill Street"], tagNames);
+    }
+
+    [Fact]
     public async Task Imported_people_are_one_line_in_the_activity_log_with_their_number()
     {
         using var curator = await CuratorAsync(app);

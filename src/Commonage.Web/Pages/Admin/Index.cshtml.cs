@@ -88,6 +88,10 @@ public class IndexModel(CommonageDbContext db, ArchiveHealth health, ArchiveProf
 
     public bool HasFilters => Text is not null || Status is not null || CollectionId is not null || Tag is not null || Needs is not null;
 
+    /// <summary>People carried over from tags whom nobody has chosen a disclosure for: those that visitors may see, and those kept hidden.</summary>
+    public int ReviewShown { get; private set; }
+    public int ReviewHidden { get; private set; }
+
     public async Task OnGetAsync(CancellationToken cancellationToken)
     {
         var collections = await db.Collections.OrderBy(c => c.Title).ToListAsync(cancellationToken);
@@ -99,6 +103,12 @@ public class IndexModel(CommonageDbContext db, ArchiveHealth health, ArchiveProf
         GettingStarted = await LoadGettingStartedAsync(cancellationToken);
         OpenNotes = mayManage ? await db.VisitorNotes.CountAsync(n => n.HandledAt == null, cancellationToken) : 0;
         OpenRemovalRequests = mayManage ? await db.VisitorNotes.CountAsync(n => n.HandledAt == null && n.Kind == VisitorNoteKind.Removal, cancellationToken) : 0;
+        if (mayManage)
+        {
+            ReviewShown = await db.People.CountAsync(p => p.DisclosureChangedAt == null && p.Disclosure != PersonDisclosure.Hidden, cancellationToken);
+            ReviewHidden = await db.People.CountAsync(p => p.DisclosureChangedAt == null && p.Disclosure == PersonDisclosure.Hidden, cancellationToken);
+        }
+
         var visible = mayManage ? db.ArchiveItems : db.ArchiveItems.Where(i => i.Status == ItemStatus.Draft);
         NeedTranscription = await visible.CountAsync(i => i.NeedsTranscription, cancellationToken);
         HelpWanted = await visible.CountAsync(i => i.HelpWanted, cancellationToken);

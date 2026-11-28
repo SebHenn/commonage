@@ -120,6 +120,12 @@ public class PlannedExportItem(IssueBudget? budget = null)
     public DateOnly? DateTo { get; set; }
     public List<PlannedTag> Tags { get; } = [];
 
+    /// <summary>
+    /// Names that an older export wrote as tags of the kind Person. People are not tags any more, so each becomes a new person that
+    /// only curators see, linked to this item.
+    /// </summary>
+    public List<string> PersonTagNames { get; } = [];
+
     /// <summary>The keys, in the export, of the people this item names that the export describes.</summary>
     public List<int> PersonKeys { get; } = [];
     public string? RightsUri { get; set; }
@@ -409,13 +415,33 @@ public partial class ExportImport(
             }
         }
 
+        // A person tag of an older export becomes a new hidden person, once for each name in this import and never matched with a person
+        // that is here already (plan decision 16). Their keys are negative, which no exported person can have.
+        var tagPeople = new Dictionary<string, PlannedPerson>(StringComparer.Ordinal);
+        foreach (var planned in items.Where(i => i.IsReady))
+        {
+            foreach (var name in planned.PersonTagNames)
+            {
+                var normalized = Tag.Normalize(name);
+                if (!tagPeople.TryGetValue(normalized, out var made))
+                {
+                    made = new PlannedPerson(-(tagPeople.Count + 1), new ImportedPersonData(name, null, null, null, null, []));
+                    tagPeople[normalized] = made;
+                }
+
+                if (planned.PersonKeys.Count < Person.MaxPerItem && !planned.PersonKeys.Contains(made.Key))
+                    planned.PersonKeys.Add(made.Key);
+            }
+        }
+
         // A person arrives with the items that name them, so that importing the same copy twice does not make everyone twice.
         var used = items.Where(i => i.IsReady).SelectMany(i => i.PersonKeys).ToHashSet();
-        var newPeople = exportedPeople.Values.Where(p => used.Contains(p.Key)).OrderBy(p => p.Key).ToList();
+        var newExported = exportedPeople.Values.Where(p => used.Contains(p.Key)).OrderBy(p => p.Key).ToList();
+        var newPeople = newExported.Concat(tagPeople.Values.OrderByDescending(p => p.Key)).ToList();
         return new ExportPlan
         {
             Version = ArchiveExporter.Version, Items = items, NewCollections = newCollections.Values.ToList(), IssuesNotListed = budget.Omitted,
-            StoriesNotImported = archive.Stories?.Count ?? 0, NewPeople = newPeople, PeopleNotImported = (archive.People?.Count ?? 0) - newPeople.Count,
+            StoriesNotImported = archive.Stories?.Count ?? 0, NewPeople = newPeople, PeopleNotImported = (archive.People?.Count ?? 0) - newExported.Count,
         };
     }
 
@@ -521,6 +547,13 @@ public partial class ExportImport(
             if (tagKinds.TryGetValue(normalized, out var written) && written is not null && !TryEnum(written, out kind))
             {
                 Issue(planned, ExportIssueKind.ValueUnknown, "tags", Shorten(name));
+                continue;
+            }
+
+            if (kind == TagKind.Person)
+            {
+                if (Person.Clean(name) is { } personName && personName.Length <= Person.NameMaxLength)
+                    planned.PersonTagNames.Add(personName);
                 continue;
             }
 

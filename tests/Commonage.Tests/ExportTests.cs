@@ -121,7 +121,7 @@ public class ExportTests(CommonageAppFactory app)
     [InlineData(typeof(StoryBlock), "block", "kind text itemId caption",
         "Id, StoryId, Story: the block is listed under its story. ArchiveItemId: as itemId. Position: follows from the order they are listed in. ArchiveItem: as itemId, and only when that item is in the export.")]
     [InlineData(typeof(Person), "person", "id publicId name sortName disclosure born died biography curatorNote createdAt names",
-        "FoldedName: follows from the name. DisclosureChangedAt, UpdatedAt, Version: only for open forms and the order of the work. BornText, BornFrom, BornTo: as born. DiedText, DiedFrom, DiedTo: as died. DeletedAt: the bin is not exported. "
+        "FoldedName: follows from the name. DisclosureChangedAt, UpdatedAt, Version: only for open forms and the order of the work. NeedsReview: follows from DisclosureChangedAt, which stays out because it only tells the review list of this archive who still waits. BornText, BornFrom, BornTo: as born. DiedText, DiedFrom, DiedTo: as died. DeletedAt: the bin is not exported. "
         + "Links: each item lists its people. HasDied, IsHidden, MayBeShown: follow from disclosure.")]
     [InlineData(typeof(PersonName), "personName", "name kind language shownToVisitors", "Id, PersonId, Person: the name is listed under its person. FoldedName: follows from the name.")]
     public async Task Every_field_is_exported_or_left_out_on_purpose(Type type, string part, string exported, string leftOut)

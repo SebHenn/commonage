@@ -20,12 +20,8 @@
     <h1 class="me-auto mb-0">@ViewData["Title"]</h1>
     <partial name="_DisclosureBadge" model="person.Disclosure" />
     <a asp-page="/Admin/People/Preview" asp-route-id="@person.Id" class="btn btn-outline-primary">@T["Preview"]</a>
+    <a asp-page="/Admin/People/Merge" asp-route-id="@person.Id" class="btn btn-outline-secondary">@T["This is the same person as ..."]</a>
 </div>
-
-@if (Model.PublicTagStillExists)
-{
-    <p class="alert alert-warning col-lg-8" role="status">@T["A public tag with this name still exists"]</p>
-}
 
 @if (Model.SavedByOthers is { } saved)
 {

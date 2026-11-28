@@ -5,6 +5,12 @@ namespace Commonage.Web.Domain;
 /// <summary>What each kind of tag is called, and where visitors find all tags of a kind.</summary>
 public static class TagKinds
 {
+    /// <summary>
+    /// The kinds a curator can give a tag. People are not tags any more (M30): the value stays in <see cref="TagKind"/> because it
+    /// is stored and older exports name it, but nothing makes a tag of that kind.
+    /// </summary>
+    public static IReadOnlyList<TagKind> Choosable { get; } = [TagKind.Topic, TagKind.Place];
+
     public static string Name(IStringLocalizer localizer, TagKind kind) => kind switch
     {
         TagKind.Place => localizer["Place"],

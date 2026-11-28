@@ -32,7 +32,7 @@
     </div>
 }
 
-@if (!Model.HasFilters && (Model.OpenNotes > 0 || Model.NeedTranscription > 0 || Model.HelpWanted > 0))
+@if (!Model.HasFilters && (Model.OpenNotes > 0 || Model.NeedTranscription > 0 || Model.HelpWanted > 0 || Model.ReviewShown + Model.ReviewHidden > 0))
 {
     <section class="row g-3 mb-3" aria-label="@T["What needs attention"]">
         @if (Model.OpenNotes > 0)
@@ -45,6 +45,18 @@
                         {
                             <span class="d-block small fw-semibold mt-1">@T.Plural("{0, plural, one {# asks for removal} other {# ask for removal}}", Model.OpenRemovalRequests)</span>
                         }
+                    </span>
+                </a>
+            </div>
+        }
+        @if (Model.ReviewShown + Model.ReviewHidden > 0)
+        {
+            <div class="col-12 col-sm-6 col-lg-4">
+                <a asp-page="/Admin/People/Index" asp-route-review="1" class="card h-100 text-decoration-none">
+                    <span class="card-body">
+                        <span class="d-block h5 mb-1">@T["People from former tags"]</span>
+                        <span class="d-block small">@T.Plural("{0, plural, one {# shown without review} other {# shown without review}}", Model.ReviewShown)</span>
+                        <span class="d-block small">@T.Plural("{0, plural, one {# kept hidden} other {# kept hidden}}", Model.ReviewHidden)</span>
                     </span>
                 </a>
             </div>
