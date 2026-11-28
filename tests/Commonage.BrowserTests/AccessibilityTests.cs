@@ -59,6 +59,27 @@ public class AccessibilityTests(BrowserFixture app)
     }
 
     [Theory]
+    [InlineData("/Admin/People")]
+    [InlineData("/Admin/People/Edit/1")]
+    [InlineData("MOVE")]
+    [InlineData("MOVE-CONFIRM")]
+    public async Task A_people_screen_of_a_curator_works_from_right_to_left(string path)
+    {
+        var page = await app.LogInAsync(390);
+        await page.Context.AddCookiesAsync([new Cookie { Name = ".AspNetCore.Culture", Value = "c=ar|uic=ar", Url = app.BaseUrl }]);
+
+        await CheckAsync(page, app.Resolve(path));
+
+        Assert.Equal("rtl", await page.GetAttributeAsync("html", "dir"));
+        var brand = await page.Locator(".navbar-brand").BoundingBoxAsync();
+        Assert.True(brand!.X + brand.Width > 390 / 2);
+        // The text of the screen reads from the right as well, and nothing of it hangs out past the left edge.
+        Assert.Equal("rtl", await page.EvaluateAsync<string>("getComputedStyle(document.querySelector('main h1')).direction"));
+        var outside = await page.EvaluateAsync<int>("[...document.querySelectorAll('main *')].filter(e => e.getBoundingClientRect().width > 0 && e.getBoundingClientRect().left < -1).length");
+        Assert.Equal(0, outside);
+    }
+
+    [Theory]
     [MemberData(nameof(MainPages))]
     public async Task A_page_holds_up_with_much_longer_text(string path)
     {
