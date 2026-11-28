@@ -217,6 +217,10 @@ A full disk also stops the database, so the archive stops taking in files before
 These go in the `environment` of the `web` service if you need other values. What is in the bin counts towards the disk
 until it is deleted.
 
+## Person tags become people (version after 0.7)
+
+The update that adds people converts every tag of the kind Person into a person in its migration (`PersonTagsToPeople`), once. It cannot be undone by going back one migration: restore the backup that `update.sh` made. A tag with at least one item that visitors can see (published, not in the bin, an embargo that has ended before today, if there was one) becomes a person who may be living; every other tag becomes a person only curators see. Items keep their links, bin included, and lose the tag; the search words of those items are rebuilt. Afterwards the dashboard card "People from former tags" and `/Admin/People?review=1` list the people nobody has chosen for yet. The number of converted people is not logged; the activity log has one line "tags converted".
+
 ## Personal data
 
 Contributors may ask what the archive holds about them, or ask for it to be changed or removed. "Manage archive" →
@@ -239,7 +243,7 @@ file is kept in `import-staging` on the media volume until the import is done, o
 the spreadsheet import and runs inside one web request, so the reverse proxy needs the same long timeout. Limits: a ZIP of at most
 4 GB; `archive.json` at most 256 MB when unpacked, counted as it is read; at most 20,000 items, 5,000 collections, 50,000 tags and
 500 files per item and 100,000 files in all; at most 8 GB of files in all; at most 50 new collections per run; the dry run keeps
-at most 10,000 lines and counts the rest. The format versions 4 to 10 are read. Stories in an export are counted in the dry run and not imported. People arrive with the items that name them, each as a new person that only curators see (at most 50,000 people, 20 other names per person and 200 people per item are read); the dry run counts them, and nothing is matched with a person that is here. Every
+at most 10,000 lines and counts the rest. The format versions 4 to 10 are read. Stories in an export are counted in the dry run and not imported. People arrive with the items that name them (an older export's tags of the kind Person arrive as people too), each as a new person that only curators see (at most 50,000 people, 20 other names per person and 200 people per item are read); the dry run counts them, and nothing is matched with a person that is here. Every
 item is a draft, and the activity log records the run ("Imported items from a Commonage export", with counts only) and each
 new collection, never a title of the other archive's contributors or their details. The database is only added to: nothing is
 changed or removed, so a run that breaks off can be run again. A file that cannot be stored (a full disk, a broken ZIP entry) is

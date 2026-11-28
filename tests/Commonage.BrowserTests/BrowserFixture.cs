@@ -51,6 +51,37 @@ public sealed class BrowserFixture : WebApplicationFactory<Program>, IAsyncLifet
         return (reader.GetInt64(0), reader.GetInt64(1));
     }
 
+    /// <summary>People as the migration of the person tags leaves them: nobody has chosen who may see them yet. Returns their ids.</summary>
+    public async Task<List<int>> AddUnreviewedPeopleAsync(params string[] names)
+    {
+        var ids = new List<int>();
+        await using var connection = new NpgsqlConnection(_db.GetConnectionString());
+        await connection.OpenAsync();
+        foreach (var name in names)
+        {
+            await using var insert = new NpgsqlCommand("""
+                insert into "People" ("PublicId", "Name", "Disclosure", "DisclosureChangedAt", "CreatedAt", "UpdatedAt")
+                values (substr(replace(gen_random_uuid()::text, '-', ''), 1, 12), @name, 'Hidden', null, now(), now()) returning "Id"
+                """, connection);
+            insert.Parameters.AddWithValue("name", name);
+            ids.Add((int)(await insert.ExecuteScalarAsync())!);
+        }
+
+        return ids;
+    }
+
+    /// <summary>Who may see a person, as stored, and whether somebody has chosen it.</summary>
+    public async Task<(string Disclosure, bool Chosen)> DisclosureOfAsync(int id)
+    {
+        await using var connection = new NpgsqlConnection(_db.GetConnectionString());
+        await connection.OpenAsync();
+        await using var query = new NpgsqlCommand("""select "Disclosure", "DisclosureChangedAt" is not null from "People" where "Id" = @id""", connection);
+        query.Parameters.AddWithValue("id", id);
+        await using var reader = await query.ExecuteReaderAsync();
+        await reader.ReadAsync();
+        return (reader.GetString(0), reader.GetBoolean(1));
+    }
+
     public async Task InitializeAsync()
     {
         await _db.StartAsync();
@@ -64,6 +95,12 @@ public sealed class BrowserFixture : WebApplicationFactory<Program>, IAsyncLifet
             ContributionPath = $"/contribute/{await query.ExecuteScalarAsync()}";
             await using var person = new NpgsqlCommand("""select "PublicId" from "People" where "Disclosure" = 'Deceased' and "DeletedAt" is null limit 1""", connection);
             PersonPath = $"/people/{await person.ExecuteScalarAsync()}";
+
+            await using var unreviewed = new NpgsqlCommand("""
+                insert into "People" ("PublicId", "Name", "Disclosure", "DisclosureChangedAt", "CreatedAt", "UpdatedAt")
+                select substr(replace(gen_random_uuid()::text, '-', ''), 1, 12), n, 'Hidden', null, now(), now() from unnest(array['Former tag Anna', 'Former tag Berta']) as n
+                """, connection);
+            await unreviewed.ExecuteNonQueryAsync();
 
             // "Do you know more about this?" is off by default; its pages are tested here.
             await using var notes = new NpgsqlCommand("""update "ArchiveSettings" set "AcceptVisitorNotes" = true""", connection);

@@ -63,4 +63,61 @@ public class PeopleBrowserTests(BrowserFixture app)
         Assert.Contains("/items/", page.Url);
         Assert.Contains(name!, await page.TextContentAsync("main"));
     }
+
+    [Fact]
+    public async Task The_review_list_decides_for_ticked_people_with_a_box_that_ticks_all()
+    {
+        var ids = await app.AddUnreviewedPeopleAsync("Review one", "Review two", "Review three");
+        var page = await app.LogInAsync();
+        await page.GotoAsync("/Admin/People?review=1");
+
+        // With JavaScript there is a box for the whole list.
+        var all = page.Locator("#tick-all");
+        await all.CheckAsync();
+        foreach (var id in ids)
+            Assert.True(await page.Locator($"#person-{id}").IsCheckedAsync());
+        await page.Locator($"#person-{ids[2]}").UncheckAsync();
+        Assert.False(await all.IsCheckedAsync());
+
+        // "Only curators" is one click.
+        await page.ClickAsync("button[name=choice][value=Hidden]");
+        await page.WaitForURLAsync(url => url.Contains("review=1") && !url.Contains("handler"));
+        Assert.Equal(("Hidden", true), await app.DisclosureOfAsync(ids[0]));
+        Assert.Equal(("Hidden", true), await app.DisclosureOfAsync(ids[1]));
+        Assert.Equal(("Hidden", false), await app.DisclosureOfAsync(ids[2]));
+        Assert.DoesNotContain("Review one", await page.TextContentAsync("main"));
+        Assert.Contains("Review three", await page.TextContentAsync("main"));
+
+        // "Has died" shows people to visitors, so it asks first, and nothing changes until it is answered.
+        await page.Locator($"#person-{ids[2]}").CheckAsync();
+        await page.ClickAsync("button[name=choice][value=Deceased]");
+        await page.GetByRole(AriaRole.Button, new() { Name = "Yes, show them" }).WaitForAsync();
+        Assert.Equal(("Hidden", false), await app.DisclosureOfAsync(ids[2]));
+        await page.GetByRole(AriaRole.Button, new() { Name = "Yes, show them" }).ClickAsync();
+        await page.WaitForURLAsync(url => url.Contains("review=1") && !url.Contains("handler"));
+        Assert.Equal(("Deceased", true), await app.DisclosureOfAsync(ids[2]));
+    }
+
+    [Fact]
+    public async Task The_review_list_works_without_javascript_one_person_at_a_time()
+    {
+        var ids = await app.AddUnreviewedPeopleAsync("Plain one", "Plain two");
+        var page = await app.NewPageAsync(390, 844, javaScript: false);
+        await page.GotoAsync("/Account/Login");
+        await page.FillAsync("[name='Input.Email']", BrowserFixture.AdminEmail);
+        await page.FillAsync("[name='Input.Password']", BrowserFixture.AdminPassword);
+        await page.ClickAsync("main form button[type=submit]");
+        await page.GotoAsync("/Admin/People?review=1");
+
+        // The box for all people needs JavaScript and is not there without it.
+        Assert.False(await page.Locator("#tick-all").IsVisibleAsync());
+        await page.Locator($"#person-{ids[0]}").CheckAsync();
+        await page.ClickAsync("button[name=choice][value=Deceased]");
+        await page.GetByRole(AriaRole.Button, new() { Name = "Yes, show them" }).ClickAsync();
+
+        Assert.Equal(("Deceased", true), await app.DisclosureOfAsync(ids[0]));
+        Assert.Equal(("Hidden", false), await app.DisclosureOfAsync(ids[1]));
+        Assert.DoesNotContain("Plain one", await page.TextContentAsync("main"));
+        Assert.Contains("Plain two", await page.TextContentAsync("main"));
+    }
 }

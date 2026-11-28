@@ -14,7 +14,7 @@ public class AccessibilityTests(BrowserFixture app)
 
     public static TheoryData<string, int> CuratorPages() => Widths(
         "/Admin", "/Admin?status=Submitted", "/Admin/Items/Edit/11", "/Admin/Items/Edit", "/Admin/Items/AddMany", "/Admin/Items/Import", "/Admin/Items/Edit/1", "/Admin/Items/Preview/1", "/Admin/Collections", "/Admin/Collections/Edit/1", "/Admin/Collections/Edit", "/Admin/Tags", "/Admin/Tags/Edit/1", "/Admin/Notes", "/Admin/Notes?show=All", "/Admin/Contributions", "/Admin/Contributions/Poster/1",
-        "/Admin/Contributors?q=a", "/Admin/Bin", "/Admin/Settings", "/Admin/Users", "/Admin/Activity", "/Admin/Activity?what=Items", "/Admin/Stories", "/Admin/Stories/Edit/1", "/Admin/Stories/Preview/1", "/Admin/People", "/Admin/People/Edit/1", "/Admin/People/Preview/1", "/Admin/Export", "/Admin/ImportArchive", "/Admin/System", "/Account/Password", "/Account/TwoFactor");
+        "/Admin/Contributors?q=a", "/Admin/Bin", "/Admin/Settings", "/Admin/Users", "/Admin/Activity", "/Admin/Activity?what=Items", "/Admin/Stories", "/Admin/Stories/Edit/1", "/Admin/Stories/Preview/1", "/Admin/People", "/Admin/People?review=1", "/Admin/People/Edit/1", "/Admin/People/Preview/1", "/Admin/People/Merge/1", "/Admin/People/Merge/1?with=Karl", "/Admin/Export", "/Admin/ImportArchive", "/Admin/System", "/Account/Password", "/Account/TwoFactor");
 
     private static TheoryData<string, int> Widths(params string[] paths)
     {

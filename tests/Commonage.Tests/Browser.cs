@@ -85,7 +85,7 @@ public static partial class Browser
     /// <summary>The antiforgery token of a page already fetched.</summary>
     public static string Token(string page) => AntiforgeryToken().Match(page).Groups[1].Value;
 
-    private static async Task<string> GetAntiforgeryTokenAsync(HttpClient client, string url)
+    public static async Task<string> GetAntiforgeryTokenAsync(HttpClient client, string url)
     {
         var page = await client.GetStringAsync(url);
         return AntiforgeryToken().Match(page).Groups[1].Value;

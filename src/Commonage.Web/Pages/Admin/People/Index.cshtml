@@ -10,6 +10,12 @@
 <h1>@ViewData["Title"]</h1>
 <p class="text-muted col-lg-8">@T["People who appear in the archive. A new person is seen by curators only. You choose for each person whether visitors may see their name."]</p>
 
+@if (Model.Review)
+{
+    <p class="text-muted col-lg-8">@T["These people were tags before. Nobody has chosen yet who may see them. Tick people and choose, or open a person to decide on their own."]</p>
+    <p><a asp-page="/Admin/People/Index">@T["Show all people"]</a></p>
+}
+
 <form method="post" asp-page-handler="Create" class="row g-2 align-items-end col-lg-8 mb-4" data-send-once>
     <partial name="_ErrorSummary" />
     <div class="col-sm-8">
@@ -22,6 +28,10 @@
 </form>
 
 <form method="get" class="row g-2 align-items-end mb-3" role="search">
+    @if (Model.Review)
+    {
+        <input type="hidden" name="review" value="1" />
+    }
     <div class="col-sm-5 col-lg-4">
         <label asp-for="Text" class="form-label">@T["Search by name"]</label>
         <input asp-for="Text" name="q" class="form-control" lang="@material" />
@@ -46,10 +56,66 @@
 
 @if (Model.People.TotalCount == 0)
 {
-    <p class="text-muted">@(Model.IsFiltered ? T["No person matches."] : T["There are no people yet."])</p>
+    <p class="text-muted">@(Model.Review ? T["Nobody is waiting for a review."] : Model.IsFiltered ? T["No person matches."] : T["There are no people yet."])</p>
 }
 else
 {
+    @if (Model.Review)
+    {
+        if (Model.ConfirmChoice is not null)
+        {
+            <div class="alert alert-warning" role="alert" data-focus-on-load tabindex="-1">
+                <h2 class="h5">@T.Plural("{0, plural, one {Show this person to visitors as someone who has died?} other {Show these # people to visitors as people who have died?}}", Model.ConfirmPeople.Count)</h2>
+                <p>@T["Visitors will see their names, dates and biographies on the pages of the items that visitors may see."]</p>
+                <ul>
+                    @foreach (var confirmPerson in Model.ConfirmPeople)
+                    {
+                        <li class="text-break" lang="@material">@confirmPerson.Name</li>
+                    }
+                </ul>
+                <form method="post" asp-page-handler="BulkReview" class="d-flex flex-wrap gap-2" data-send-once>
+                    @foreach (var confirmPerson in Model.ConfirmPeople)
+                    {
+                        <input type="hidden" name="selected" value="@confirmPerson.Id" />
+                    }
+                    <input type="hidden" name="choice" value="@PersonDisclosure.Deceased" />
+                    <input type="hidden" name="confirmed" value="true" />
+                    <button type="submit" class="btn btn-warning">@T["Yes, show them"]</button>
+                    <a asp-page="/Admin/People/Index" asp-route-review="1" class="btn btn-outline-secondary">@T["Cancel"]</a>
+                </form>
+            </div>
+        }
+
+        <form method="post" asp-page-handler="BulkReview" data-send-once>
+            <div class="form-check mb-2">
+                <input type="checkbox" class="form-check-input" id="tick-all" data-tick-all="selected" hidden />
+                <label class="form-check-label" for="tick-all">@T["Tick all on this page"]</label>
+            </div>
+            <ul class="list-group mb-3">
+                @foreach (var person in Model.People.Items)
+                {
+                    <li class="list-group-item d-flex flex-wrap gap-2 align-items-baseline">
+                        <input type="checkbox" class="form-check-input" name="selected" value="@person.Id" id="person-@person.Id" />
+                        <label for="person-@person.Id" class="visually-hidden">@T["Tick {0}", person.Name]</label>
+                        <a asp-page="/Admin/People/Edit" asp-route-id="@person.Id" class="text-break me-auto" lang="@material">@person.Name</a>
+                        <partial name="_DisclosureBadge" model="person.Disclosure" />
+                        <small class="text-muted">@T.Plural("{0, plural, one {# item} other {# items}}", person.Items)</small>
+                        <small class="text-muted">@T.Plural("{0, plural, one {# item visitors may see} other {# items visitors may see}}", person.VisibleItems)</small>
+                        @if (person.ItemTitles.Count > 0)
+                        {
+                            <small class="w-100 text-muted text-break" lang="@material">@string.Join(" · ", person.ItemTitles.Select(t => string.IsNullOrWhiteSpace(t) ? "…" : t))</small>
+                        }
+                    </li>
+                }
+            </ul>
+            <div class="d-flex flex-wrap gap-2 mb-3">
+                <button type="submit" name="choice" value="@PersonDisclosure.Hidden" class="btn btn-outline-primary">@T["Only curators"]</button>
+                <button type="submit" name="choice" value="@PersonDisclosure.Deceased" class="btn btn-outline-primary">@T["Has died: visitors may see them"]</button>
+            </div>
+        </form>
+    }
+    else
+    {
     <ul class="list-group">
         @foreach (var person in Model.People.Items)
         {
@@ -58,12 +124,9 @@ else
                 <partial name="_DisclosureBadge" model="person.Disclosure" />
                 <small class="text-muted">@T.Plural("{0, plural, one {# item} other {# items}}", person.Items)</small>
                 <small class="text-muted">@T.Plural("{0, plural, one {# item visitors may see} other {# items visitors may see}}", person.VisibleItems)</small>
-                @if (Model.PublicTagNames.Contains(person.FoldedName))
-                {
-                    <small class="w-100 text-warning-emphasis">@T["A public tag with this name still exists"]</small>
-                }
             </li>
         }
     </ul>
+    }
     <partial name="_Pager" model="Model.People" />
 }

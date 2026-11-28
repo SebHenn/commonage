@@ -88,7 +88,7 @@
   <data name="Disk" xml:space="preserve"><value>Speicher</value></data>
   <data name="Disk space" xml:space="preserve"><value>Speicherplatz</value></data>
   <data name="Do you know more about this?" xml:space="preserve"><value>Wissen Sie mehr darüber?</value></data>
-  <data name="Each tag can say whether it names a place, a person or a topic. Visitors find all places and all people on pages of their own. Renaming or merging a tag changes it on every item at once." xml:space="preserve"><value>Jedes Schlagwort kann sagen, ob es einen Ort, eine Person oder ein Thema nennt. Besucher finden alle Orte und alle Personen auf eigenen Seiten. Umbenennen oder Zusammenführen ändert ein Schlagwort bei allen Einträgen auf einmal.</value></data>
+  <data name="Each tag can say whether it names a place or a topic. Visitors find all places on a page of their own. People are kept under People, not as tags. Renaming or merging a tag changes it on every item at once." xml:space="preserve"><value>Jedes Schlagwort kann sagen, ob es einen Ort oder ein Thema nennt. Besucher finden alle Orte auf einer eigenen Seite. Personen werden unter Personen verwaltet, nicht als Schlagwörter. Umbenennen oder Zusammenführen ändert ein Schlagwort bei allen Einträgen auf einmal.</value></data>
   <data name="Encrypted with COMMONAGE_LOGIN_KEY" xml:space="preserve"><value>Mit COMMONAGE_LOGIN_KEY verschlüsselt</value></data>
   <data name="Every place named in the archive, with how many items show it." xml:space="preserve"><value>Jeder Ort, den das Archiv nennt, und wie viele Einträge ihn zeigen.</value></data>
   <data name="Everyone" xml:space="preserve"><value>Alle</value></data>
@@ -265,7 +265,7 @@
   <data name="Version" xml:space="preserve"><value>Version</value></data>
   <data name="Visitor" xml:space="preserve"><value>Besuchende Person</value></data>
   <data name="Visitors can then send the curators more about an item, a correction, or a request to take it down. Only curators read it, under “Notes from visitors”. Name and email address are optional, and the privacy page should say that the archive keeps them." xml:space="preserve"><value>Besucher können den Kuratoren dann mehr zu einem Eintrag schicken, eine Korrektur oder die Bitte, ihn zu entfernen. Nur Kuratoren lesen das, unter „Hinweise von Besuchern“. Name und E-Mail-Adresse sind freiwillig, und die Datenschutzseite sollte sagen, dass das Archiv sie speichert.</value></data>
-  <data name="Visitors find all places and all people on pages of their own, once an item with the tag is published. That page lists every person's name, so name living people only when they agree." xml:space="preserve"><value>Besucher finden alle Orte und alle Personen auf eigenen Seiten, sobald ein Eintrag mit dem Schlagwort veröffentlicht ist. Diese Seite listet den Namen jeder Person auf, nennen Sie lebende Menschen also nur, wenn sie einverstanden sind.</value></data>
+  <data name="Visitors find all places on a page of their own, once an item with the tag is published." xml:space="preserve"><value>Besucher finden alle Orte auf einer eigenen Seite, sobald ein Eintrag mit dem Schlagwort veröffentlicht ist.</value></data>
   <data name="Visitors find the collections in this order." xml:space="preserve"><value>In dieser Reihenfolge finden Besucher die Sammlungen.</value></data>
   <data name="What changed" xml:space="preserve"><value>Was sich geändert hat</value></data>
   <data name="What visitors sent through “Do you know more about this?” on an item. It is not shown publicly: write what is worth keeping into the item, then mark the note as dealt with." xml:space="preserve"><value>Was Besucher bei einem Eintrag über „Wissen Sie mehr darüber?“ geschickt haben. Es wird nicht öffentlich gezeigt: Schreiben Sie, was es wert ist, in den Eintrag und markieren Sie den Hinweis dann als erledigt.</value></data>
@@ -1161,7 +1161,6 @@
   <data name="A person can have at most {0, plural, one {# other name} other {# other names}}." xml:space="preserve"><value>Eine Person kann höchstens {0, plural, one {# weiteren Namen} other {# weitere Namen}} haben.</value></data>
   <data name="A person is only public while at least one item they are linked to is public, too." xml:space="preserve"><value>Eine Person ist nur öffentlich, solange mindestens ein Objekt, mit dem sie verknüpft ist, ebenfalls öffentlich ist.</value></data>
   <data name="A person since deleted" xml:space="preserve"><value>Eine inzwischen gelöschte Person</value></data>
-  <data name="A public tag with this name still exists" xml:space="preserve"><value>Ein öffentliches Schlagwort mit diesem Namen gibt es noch</value></data>
   <data name="Add" xml:space="preserve"><value>Hinzufügen</value></data>
   <data name="Add a person" xml:space="preserve"><value>Person hinzufügen</value></data>
   <data name="Add name" xml:space="preserve"><value>Namen hinzufügen</value></data>
@@ -1254,4 +1253,39 @@
   <data name="{0, plural, one {# item visitors may see} other {# items visitors may see}}" xml:space="preserve"><value>{0, plural, one {# Objekt, das Besucher sehen dürfen} other {# Objekte, die Besucher sehen dürfen}}</value></data>
   <data name="{0, plural, one {# person was created, who only curators see.} other {# people were created, who only curators see.}}" xml:space="preserve"><value>{0, plural, one {# Person wurde angelegt, die nur Kuratoren sehen.} other {# Personen wurden angelegt, die nur Kuratoren sehen.}}</value></data>
   <data name="{0, plural, one {# person would be created, who only curators see.} other {# people would be created, who only curators see.}}" xml:space="preserve"><value>{0, plural, one {# Person würde angelegt, die nur Kuratoren sieht.} other {# Personen würden angelegt, die nur Kuratoren sehen.}}</value></data>
+  <data name="Find" xml:space="preserve"><value>Suchen</value></data>
+  <data name="Merge “{0}” into “{1}”?" xml:space="preserve"><value>„{0}“ mit „{1}“ zusammenführen?</value></data>
+  <data name="Name or number of the other person" xml:space="preserve"><value>Name oder Nummer der anderen Person</value></data>
+  <data name="No other person matches." xml:space="preserve"><value>Keine andere Person passt.</value></data>
+  <data name="Nobody is waiting for a review." xml:space="preserve"><value>Niemand wartet auf eine Prüfung.</value></data>
+  <data name="Number {0}" xml:space="preserve"><value>Nummer {0}</value></data>
+  <data name="People from former tags" xml:space="preserve"><value>Personen aus früheren Schlagwörtern</value></data>
+  <data name="Say who this person is also known as: the name of the other person, or their number. The other person keeps their data and gets this person&#x27;s items and names." xml:space="preserve"><value>Sagen Sie, wer diese Person auch ist: der Name der anderen Person oder ihre Nummer. Die andere Person behält ihre Angaben und bekommt die Objekte und Namen dieser Person.</value></data>
+  <data name="Several people match. Which one is meant?" xml:space="preserve"><value>Mehrere Personen passen. Welche ist gemeint?</value></data>
+  <data name="Show all people" xml:space="preserve"><value>Alle Personen zeigen</value></data>
+  <data name="The added names are not shown to visitors until you choose so." xml:space="preserve"><value>Die hinzugefügten Namen werden Besuchern erst gezeigt, wenn Sie das wählen.</value></data>
+  <data name="The choice of who may see the other person becomes stricter: visitors will see less than before." xml:space="preserve"><value>Die Wahl, wer die andere Person sehen darf, wird strenger: Besucher sehen weniger als vorher.</value></data>
+  <data name="The other person" xml:space="preserve"><value>Die andere Person</value></data>
+  <data name="The other person is in the bin. The result stays in the bin, with all the items." xml:space="preserve"><value>Die andere Person liegt im Papierkorb. Das Ergebnis bleibt im Papierkorb, mit allen Objekten.</value></data>
+  <data name="The other person is only seen by curators. The items of this person are no longer shown with a person to visitors." xml:space="preserve"><value>Die andere Person sehen nur Kuratoren. Die Objekte dieser Person werden Besuchern nicht mehr mit einer Person gezeigt.</value></data>
+  <data name="The other person keeps their own biography and note. Copy what you want to keep by hand after the merge." xml:space="preserve"><value>Die andere Person behält ihre eigene Biografie und Notiz. Kopieren Sie nach dem Zusammenführen von Hand, was Sie behalten möchten.</value></data>
+  <data name="The two people are merged." xml:space="preserve"><value>Die beiden Personen sind zusammengeführt.</value></data>
+  <data name="These people were tags before. Nobody has chosen yet who may see them. Tick people and choose, or open a person to decide on their own." xml:space="preserve"><value>Diese Personen waren früher Schlagwörter. Noch hat niemand gewählt, wer sie sehen darf. Haken Sie Personen an und wählen Sie, oder öffnen Sie eine Person und entscheiden Sie einzeln.</value></data>
+  <data name="This is the same person as ..." xml:space="preserve"><value>Das ist dieselbe Person wie ...</value></data>
+  <data name="This person" xml:space="preserve"><value>Diese Person</value></data>
+  <data name="This person goes to the bin, without items. Nothing is deleted at once." xml:space="preserve"><value>Diese Person kommt ohne Objekte in den Papierkorb. Nichts wird sofort gelöscht.</value></data>
+  <data name="Tick the people first." xml:space="preserve"><value>Haken Sie zuerst die Personen an.</value></data>
+  <data name="Tick {0}" xml:space="preserve"><value>{0} anhaken</value></data>
+  <data name="Visitors will no longer see the other person: this person is only seen by curators, and the stricter choice is kept." xml:space="preserve"><value>Besucher sehen die andere Person nicht mehr: Diese Person sehen nur Kuratoren, und die strengere Wahl bleibt.</value></data>
+  <data name="Visitors will see their names, dates and biographies on the pages of the items that visitors may see." xml:space="preserve"><value>Besucher sehen ihre Namen, Daten und Biografien auf den Seiten der Objekte, die Besucher sehen dürfen.</value></data>
+  <data name="What will happen" xml:space="preserve"><value>Was geschehen wird</value></data>
+  <data name="Yes, merge them" xml:space="preserve"><value>Ja, zusammenführen</value></data>
+  <data name="Yes, show them" xml:space="preserve"><value>Ja, zeigen</value></data>
+  <data name="{0, plural, =0 {No item moves.} one {# item is linked to the other person.} other {# items are linked to the other person.}}" xml:space="preserve"><value>{0, plural, =0 {Kein Objekt wechselt.} one {# Objekt wird mit der anderen Person verknüpft.} other {# Objekte werden mit der anderen Person verknüpft.}}</value></data>
+  <data name="{0, plural, =0 {No name is added.} one {# name is added as another name of the other person.} other {# names are added as other names of the other person.}}" xml:space="preserve"><value>{0, plural, =0 {Kein Name wird hinzugefügt.} one {# Name wird als weiterer Name der anderen Person hinzugefügt.} other {# Namen werden als weitere Namen der anderen Person hinzugefügt.}}</value></data>
+  <data name="{0, plural, one {# kept hidden} other {# kept hidden}}" xml:space="preserve"><value>{0, plural, one {# nur für Kuratoren belassen} other {# nur für Kuratoren belassen}}</value></data>
+  <data name="{0, plural, one {# person is reviewed.} other {# people are reviewed.}}" xml:space="preserve"><value>{0, plural, one {# Person ist geprüft.} other {# Personen sind geprüft.}}</value></data>
+  <data name="{0, plural, one {# shown without review} other {# shown without review}}" xml:space="preserve"><value>{0, plural, one {# ohne Prüfung gezeigt} other {# ohne Prüfung gezeigt}}</value></data>
+  <data name="{0, plural, one {Show this person to visitors as someone who has died?} other {Show these # people to visitors as people who have died?}}" xml:space="preserve"><value>{0, plural, one {Diese Person Besuchern als verstorben zeigen?} other {Diese # Personen Besuchern als verstorben zeigen?}}</value></data>
+  <data name="Someone else changed this person meanwhile. Nothing was merged; look at it again." xml:space="preserve"><value>Jemand hat diese Person inzwischen geändert. Es wurde nichts zusammengeführt; sehen Sie sich die Person noch einmal an.</value></data>
 </root>
