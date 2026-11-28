@@ -79,7 +79,7 @@ jobs:
       fail-fast: false
       matrix:
         # Each earlier 0.x minor. v0.1.0 never had a published image, so 0.1 means v0.1.1. Add a line for each new minor.
-        minor: ["0.1", "0.2", "0.3", "0.4", "0.5", "0.6"]
+        minor: ["0.1", "0.2", "0.3", "0.4", "0.5", "0.6", "0.7"]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

@@ -3,7 +3,9 @@
 All notable changes to Commonage. Versions follow [Semantic Versioning](https://semver.org/); before 1.0, a minor
 version may change things that need attention when updating, and these notes say so.
 
-## Unreleased
+## 0.8.0 (2026-11-28)
+
+**Updating:** this version adds two migrations (people, and the conversion of person tags into people); they run when the app starts, and `update.sh` makes a backup first as always. **The conversion cannot be undone by a migration**: every tag of the kind Person becomes a person, and those that sat on an item visitors may see are carried over as "may be living" (their name appears on those items). Open the dashboard card "People from former tags" after updating and decide. Pictures need no regeneration. The export format is now 10; an export of format 4 to 9 still imports (person tags in older exports become new people seen by curators only).
 
 ### For visitors
 
